@@ -1,40 +1,51 @@
 package com.backend.portalroshkabackend.admin.controller;
 
+import com.backend.portalroshkabackend.admin.service.IHumanResourceService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/admin")
 public class HumanResourceController {
+    private final IHumanResourceService humanResourceService;
+
+    public HumanResourceController(IHumanResourceService humanResourceService){
+        this.humanResourceService = humanResourceService;
+    }
 
     // Users
     @GetMapping("/th/users")
-    public String getAllEmployees(){
-        return "retornando todos los usuarios";
+    public ResponseEntity<String> getAllEmployees(){
+
+
+        return ResponseEntity.ok("retornando todos los usuarios");
     }
 
     @PostMapping("/th/users/{id}")
-    public String updateEmployee(int id){
-        return "actualizando usuario";
+    public ResponseEntity<String> updateEmployee(int id){
+        return ResponseEntity.ok("actualizando usuario") ;
     }
 
     @DeleteMapping("/th/users/{id}")
-    public String deleteEmployee(int id){
-        return "elíminando usuario";
+    public ResponseEntity<String> deleteEmployee(int id){
+        return ResponseEntity.ok("elíminando usuario") ;
     }
 
     // Request
     @GetMapping("/th/users/request")
-    public String getAllRequests(){
-        return "retornando todos las solicitudes";
+    public ResponseEntity<String> getAllRequests(){
+        return ResponseEntity.ok("retornando todos las solicitudes") ;
     }
 
     @PostMapping("/th/users/request/{id}")
-    public String manageRequest(){
-        return "aceptar/rechazar solicitud";
+    public ResponseEntity<String> manageRequest(){
+        return ResponseEntity.ok("aceptar/rechazar solicitud") ;
     }
 
     @PostMapping("/th/users/request")
-    public String addNewRequestType(){
-        return "agregar nuevo tipo de request";
+    public ResponseEntity<String> addNewRequestType(){
+
+
+        return ResponseEntity.ok("agregar nuevo tipo de request") ;
     }
 }
