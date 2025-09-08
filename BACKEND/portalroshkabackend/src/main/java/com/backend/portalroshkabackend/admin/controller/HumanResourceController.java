@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.admin.th.controller;
+package com.backend.portalroshkabackend.admin.controller;
 
 import org.springframework.web.bind.annotation.*;
 
