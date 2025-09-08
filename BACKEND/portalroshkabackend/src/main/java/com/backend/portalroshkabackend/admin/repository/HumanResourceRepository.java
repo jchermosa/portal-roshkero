@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface HumanResourceRepository extends JpaRepository<Usuario, Integer> {
+
 }

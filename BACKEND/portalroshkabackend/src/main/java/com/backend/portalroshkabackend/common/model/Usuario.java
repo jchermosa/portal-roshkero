@@ -1,24 +1,62 @@
 package com.backend.portalroshkabackend.common.model;
 
 
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "usuarios")
 public class Usuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
     private int id_usuario;
+
+    @Column(name = "nombre")
     private String nombre;
+
+    @Column(name = "apellido")
     private String apellido;
+
+    @Column(name = "nro_cedula")
     private int nro_cedula;
+
+    @Column(name = "correo")
     private String correo;
+
+    @Column(name = "id_rol")
     private int id_rol;
+
+    @Column(name = "fecha_ingreso")
     private java.sql.Date fecha_ingreso;
+
+    @Column(name = "antiguedad")
     private String antiguedad;
+
+    @Column(name = "dias_vacaciones")
     private int dias_vacaciones;
+
+    @Column(name = "estado")
     private boolean estado;
+
+    @Column(name = "contrasena")
     private String contrasena;
+
+    @Column(name = "telefono")
     private String telefono;
+
+    @Column(name = "id_equipo")
     private int id_equipo;
+
+    @Column(name = "id_cargo")
     private int id_cargo;
+
+    @Column(name = "fecha_nacimiento")
     private java.sql.Date fecha_nacimiento;
+
+    @Column(name = "dias_vacaciones_restante")
     private int dias_vacaciones_restante;
+
+    @Column(name = "requiere_cambio_contrasena")
     private boolean requiere_cambio_contrasena;
 
     public int getId_usuario() {
