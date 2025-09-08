@@ -1,56 +1,60 @@
 package com.backend.portalroshkabackend.admin.controller;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.backend.portalroshkabackend.common.model.Cargos;
+import com.backend.portalroshkabackend.common.model.Equipos;
+import com.backend.portalroshkabackend.common.model.Request;
+import com.backend.portalroshkabackend.common.model.Roles;
+import com.backend.portalroshkabackend.admin.service.IOperationService;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin")
 public class OperationsController {
 
+    private final IOperationService operationService;
+
+    public OperationsController(IOperationService operationService) {
+        this.operationService = operationService;
+    }
+
+    // ----------------- READ -----------------
     @GetMapping("/operations/request")
-    // view all request (read-only)
-    public String getAllRequests() {
-        return "1";
+    public List<Request> getAllRequests() {
+        return operationService.getAllRequests();
     }
 
     @GetMapping("/operations/rols")
-    // show all rols
-    public String getAllRols() {
-        return "1";
+    public List<Roles> getAllRols() {
+        return operationService.getAllRols();
     }
 
     @GetMapping("/operations/positions")
-    // show all positions
-    public String getAllPositions() {
-        return "1";
+    public List<Cargos> getAllPositions() {
+        return operationService.getAllCargos();
     }
 
     @GetMapping("/operations/teams")
-    // show all teams
-    public String getAllTeams() {
-        return "1";
+    public List<Equipos> getAllTeams() {
+        return operationService.getAllTeams();
     }
 
+    // ----------------- CREATE -----------------
     @PostMapping("/operations/teams")
-    // create a new team
-    public String postNewTeams() {
-        return "1";
+    public Equipos postNewTeam(@RequestBody Equipos equipo) {
+        return operationService.postNewTeam(equipo);
     }
 
+    // ----------------- DELETE -----------------
     @DeleteMapping("/operations/teams/{id}")
-    // delete a team
-    public String deleateTeam() {
-        return "1";
+    public void deleteTeam(@PathVariable int id) {
+        operationService.deleteTeam(id);
     }
 
+    // ----------------- UPDATE -----------------
     @PutMapping("/operations/teams/{id}")
-    // update a team
-    public String updateTeam() {
-        return "1";
+    public Equipos updateTeam(@PathVariable int id, @RequestBody Equipos equipo) {
+        return operationService.updateTeam(id, equipo);
     }
 }

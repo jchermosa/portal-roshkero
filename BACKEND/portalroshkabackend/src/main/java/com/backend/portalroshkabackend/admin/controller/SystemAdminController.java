@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.admin.controller;
+// package com.backend.portalroshkabackend.admin.controller;
 
-public class SystemAdminController {
-}
+// public class SystemAdminController {
+// }

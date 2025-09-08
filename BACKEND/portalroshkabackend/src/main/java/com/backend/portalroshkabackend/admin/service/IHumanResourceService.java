@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.admin.service;
+// package com.backend.portalroshkabackend.admin.service;
 
-public interface IHumanResourceService {
-}
+// public interface IHumanResourceService {
+// }

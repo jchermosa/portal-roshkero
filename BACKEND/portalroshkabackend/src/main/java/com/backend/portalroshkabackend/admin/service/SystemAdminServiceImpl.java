@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.admin.service;
+// package com.backend.portalroshkabackend.admin.service;
 
-public class SystemAdminServiceImpl implements ISystemAdminService{
-}
+// public class SystemAdminServiceImpl implements ISystemAdminService{
+// }
