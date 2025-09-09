@@ -1,24 +1,12 @@
-import { createContext, useContext, useState, useEffect} from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 
-type Rol = {
-  id: number;
-  nombre: string;
-};
-
-type Cargo = {
-  id: number;
-  nombre: string;
-};
-
-type Equipo = {
-  id: number;
-  nombre: string;
-};
+type Rol = { id?: number; nombre: string };
+type Cargo = { id?: number; nombre: string };
+type Equipo = { id?: number; nombre: string };
 
 export type User = {
-  id: number;
+  id?: number;
   nombre: string;
   apellido: string;
   correo: string;
@@ -31,7 +19,9 @@ export type User = {
 
 type AuthContextType = {
   user: User | null;
-  login: (userData: User) => void;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (token: string) => void;
   logout: () => void;
 };
 
@@ -39,36 +29,62 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // 🔹 Recuperar usuario guardado en localStorage (si existe)
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const storedToken = localStorage.getItem("auth_token");
+    if (storedToken) {
+      setToken(storedToken);
+      decodeAndSetUser(storedToken);
     }
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-    navigate("/"); // Redirige al dashboard después de login
+  const decodeAndSetUser = (jwtToken: string) => {
+    try {
+      const payload = JSON.parse(atob(jwtToken.split(".")[1]));
+      const usuario: User = {
+        nombre: payload.nombre ?? "",
+        apellido: payload.apellido ?? "",
+        correo: payload.sub,
+        rol: { nombre: payload.rol },
+        cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
+        equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
+        dias_vacaciones: payload.diasVacaciones,
+        dias_vacaciones_restante: payload.diasVacacionesRestante,
+      };
+      setUser(usuario);
+    } catch (e) {
+      console.error("Error al decodificar el token:", e);
+    }
+  };
+
+  const login = (jwtToken: string) => {
+    localStorage.setItem("auth_token", jwtToken);
+    setToken(jwtToken);
+    decodeAndSetUser(jwtToken);
   };
 
   const logout = () => {
+    localStorage.removeItem("auth_token");
     setUser(null);
-    localStorage.removeItem("user");
-    navigate("/login");
+    setToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: !!token,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook para acceder fácilmente al contexto
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
