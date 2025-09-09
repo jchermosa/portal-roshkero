@@ -1,12 +1,13 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 // Pages
 import LoginPage from "../pages/LoginPage";
-import DashboardPage from "../pages/DashboardPage";
-import UsuariosPage from "../pages/UsuariosPage";
+// import RegisterPage from "../pages/RegisterPage";
+ import HomePage from "../pages/HomePage";
+// import UsuariosPage from "../pages/UsuariosPage";
 // import PerfilPage from "../pages/PerfilPage";
 // import VacacionesPage from "../pages/VacacionesPage";
 // import ReportesPage from "../pages/ReportesPage";
@@ -23,18 +24,17 @@ export default function AppRoutes() {
       {/* Rutas privadas dentro del DashboardLayout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
-          <Route index element={<DashboardPage />} />
-            <Route path="usuarios" element={<UsuariosPage />} />
-            {/* <Route path="usuarios/nuevo" element={<UsuariosNuevoPage />} /> */}
-          {/* <Route path="usuarios/:id" element={<PerfilPage />} /> */}
-          {/* <Route path="vacaciones" element={<VacacionesPage />} /> */}
-          {/* <Route path="reportes" element={<ReportesPage />} /> */}
-          {/* <Route path="configuracion" element={<ConfiguracionPage />} /> */}
+              <Route index element={<HomePage />} /> 
+          {/*<Route path="/usuarios" element={<UsuariosPage />} />
+          <Route path="/usuarios/:id" element={<PerfilPage />} />
+          <Route path="/vacaciones" element={<VacacionesPage />} />
+          <Route path="/reportes" element={<ReportesPage />} />
+          <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
         </Route>
       </Route>
 
       {/* Fallback */}
-      <Route path="*" element={user ? <DashboardPage /> : <LoginPage />} />
+      <Route path="*" element={user ? <Navigate to="/" /> : <LoginPage />} /> 
     </Routes>
   );
 }
