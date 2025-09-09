@@ -10,7 +10,7 @@ import LoginPage from "../pages/LoginPage";
 // import UsuariosPage from "../pages/UsuariosPage";
 // import PerfilPage from "../pages/PerfilPage";
 // // si vas creando estas páginas
-// import VacacionesPage from "../pages/VacacionesPage";
+import VacacionesPage from "../pages/VacacionesPage";
 // import ReportesPage from "../pages/ReportesPage";
 // import ConfiguracionPage from "../pages/ConfiguracionPage";
 
@@ -27,9 +27,9 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
               <Route index element={<HomePage />} /> 
+           <Route path="/vacaciones" element={<VacacionesPage />} /> 
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
           <Route path="/usuarios/:id" element={<PerfilPage />} />
-          <Route path="/vacaciones" element={<VacacionesPage />} />
           <Route path="/reportes" element={<ReportesPage />} />
           <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
         </Route>
