@@ -41,13 +41,21 @@ public class OperationServiceImpl implements IOperationService {
     public List<RequestResponseDto> getAllRequests() {
         return requestRepository.findAll()
                 .stream()
-                .map(roles -> {
-                    RequestResponseDto Dto = new RequestResponseDto();
-                    Dto.setId_request(roles.getId_request());
-                    Dto.setNombre(roles.getNombre());
-                    return Dto;
+                .map(request -> {
+                    RequestResponseDto dto = new RequestResponseDto();
+                    dto.setId_request(request.getId_request());
+                    dto.setFecha_inicio(request.getFecha_inicio());
+                    dto.setFecha_fin(request.getFecha_fin());
+                    dto.setEstado(request.getEstado());
+                    dto.setId_usuario(request.getId_usuario());
+                    dto.setCantidad_dias(request.getCantidad_dias());
+                    dto.setNumero_aprobaciones(request.getNumero_aprobaciones());
+                    dto.setComentario(request.getComentario());
+                    dto.setRechazado(request.getRechazado());
+                    return dto;
                 })
                 .collect(Collectors.toList());
+
     }
 
     @Override
