@@ -1,8 +1,6 @@
 package com.backend.portalroshkabackend.admin.controller;
 
-import com.backend.portalroshkabackend.admin.dto.UserDto;
-import com.backend.portalroshkabackend.admin.dto.UserInsertDto;
-import com.backend.portalroshkabackend.admin.dto.UserUpdateDto;
+import com.backend.portalroshkabackend.admin.dto.*;
 import com.backend.portalroshkabackend.admin.service.IHumanResourceService;
 import jakarta.servlet.Servlet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +32,13 @@ public class HumanResourceController {
     @GetMapping("/th/users/active")
     public ResponseEntity<List<UserDto>> getAllActiveEmployess(){
         List<UserDto> users = humanResourceService.getAllActiveEmployees();
+
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/th/users/inactive")
+    public ResponseEntity<List<UserDto>> getAllInactiveEmployees(){
+        List<UserDto> users = humanResourceService.getAllInactiveEmployees();
 
         return ResponseEntity.ok(users);
     }
@@ -80,13 +85,33 @@ public class HumanResourceController {
 
     // ----------------- Request -----------------
     @GetMapping("/th/users/request")
-    public ResponseEntity<String> getAllRequests(){
-        return ResponseEntity.ok("retornando todos las solicitudes") ;
+    public ResponseEntity<List<RequestDto>> getAllRequests(){
+        List<RequestDto> requests = humanResourceService.getAllRequests();
+
+        return ResponseEntity.ok(requests);
     }
 
-    @PostMapping("/th/users/request/{id}")
-    public ResponseEntity<String> manageRequest(){
-        return ResponseEntity.ok("aceptar/rechazar solicitud") ;
+    @PostMapping("/th/users/request/{id}/accept")
+    public ResponseEntity<String> acceptRequest(@PathVariable int idRequest){
+
+        boolean isAccepted = humanResourceService.acceptRequest(idRequest);
+
+        if (!isAccepted){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/th/users/request/{id}/reject")
+    public ResponseEntity<String> rejectRequest(@PathVariable int idRequest, @RequestBody RequestRejectedDto rejectedDto){
+
+        boolean isRejected = humanResourceService.rejectRequest(idRequest, rejectedDto);
+
+        if (!isRejected){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().build(); //TODO: Tiene que devolver la solicitud
     }
 
     @PostMapping("/th/users/request")

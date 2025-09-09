@@ -1,9 +1,9 @@
 package com.backend.portalroshkabackend.admin.service;
 
-import com.backend.portalroshkabackend.admin.dto.UserDto;
-import com.backend.portalroshkabackend.admin.dto.UserInsertDto;
-import com.backend.portalroshkabackend.admin.dto.UserUpdateDto;
-import com.backend.portalroshkabackend.admin.repository.HumanResourceRepository;
+import com.backend.portalroshkabackend.admin.dto.*;
+import com.backend.portalroshkabackend.admin.repository.UserRepository;
+import com.backend.portalroshkabackend.admin.repository.RequestRepository;
+import com.backend.portalroshkabackend.common.model.Solicitudes;
 import com.backend.portalroshkabackend.common.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,16 +13,19 @@ import java.util.Optional;
 
 @Service
 public class HumanResourceServiceImpl implements IHumanResourceService{
-    private final HumanResourceRepository humanResourceRepository;
+    private final UserRepository userRepository;
+    private final RequestRepository requestRepository;
 
     @Autowired
-    public HumanResourceServiceImpl(HumanResourceRepository humanResourceRepository){
-        this.humanResourceRepository = humanResourceRepository;
+    public HumanResourceServiceImpl(UserRepository userRepository,
+                                    RequestRepository requestRepository){
+        this.userRepository = userRepository;
+        this.requestRepository = requestRepository;
     }
 
     @Override
     public List<UserDto> getAllEmployees() {
-        var users = humanResourceRepository.findAll(); // Guarda todos los usuarios en users
+        var users = userRepository.findAll(); // Guarda todos los usuarios en users
 
         return users.stream().map(user -> {
             UserDto userDto = new UserDto();
@@ -51,7 +54,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
     @Override
     public List<UserDto> getAllActiveEmployees() {
-        var users = humanResourceRepository.findAllActiveEmployees();
+        var users = userRepository.findAllActiveEmployees();
 
         return users.stream().map(user -> {
             UserDto userDto = new UserDto();
@@ -79,8 +82,37 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     }
 
     @Override
+    public List<UserDto> getAllInactiveEmployees() {
+        var users = userRepository.findAllInactiveEmployees();
+
+        return users.stream().map(user -> {
+            UserDto userDto = new UserDto();
+
+            userDto.setIdUsuario(user.getIdUsuario());
+            userDto.setNombre(user.getNombre());
+            userDto.setApellido(user.getApellido());
+            userDto.setNroCedula(user.getNroCedula());
+            userDto.setCorreo(user.getCorreo());
+            userDto.setIdRol(user.getIdRol());
+            userDto.setFechaIngreso(user.getFechaIngreso());
+            userDto.setAntiguedad(user.getAntiguedad());
+            userDto.setDiasVacaciones(user.getDiasVacaciones());
+            userDto.setEstado(user.isEstado());
+            userDto.setContrasena(user.getContrasena());
+            userDto.setTelefono(user.getTelefono());
+            userDto.setIdEquipo(user.getIdEquipo());
+            userDto.setIdCargo(user.getIdCargo());
+            userDto.setFechaNacimiento(user.getFechaNacimiento());
+            userDto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
+            userDto.setRequiereCambioContrasena(user.isRequiereCambioContrasena());
+
+            return userDto;
+        }).toList();
+    }
+
+    @Override
     public UserDto getEmployeeById(int id) {
-        var user = humanResourceRepository.findById(id);
+        var user = userRepository.findById(id);
 
         UserDto userDto = new UserDto();
 
@@ -123,19 +155,18 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
         user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
 
-        Usuario savedUser = humanResourceRepository.save(user);
+        Usuario savedUser = userRepository.save(user);
 
-        savedUser = humanResourceRepository.save(savedUser);
+        savedUser = userRepository.save(savedUser);
 
         int id = savedUser.getIdUsuario();
-        System.out.println("Id del usuario recien creado: " + id);
 
         return getEmployeeById(id);
     }
 
     @Override
     public UserDto updateEmployee(UserUpdateDto updateDto, int id) {
-        Optional<Usuario> userExists = humanResourceRepository.findById(id);
+        Optional<Usuario> userExists = userRepository.findById(id);
 
 
         if (userExists.isEmpty()) return null;
@@ -155,7 +186,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setIdCargo(updateDto.getIdCargo());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
 
-        Usuario updatedUser = humanResourceRepository.save(user);
+        Usuario updatedUser = userRepository.save(user);
 
         UserDto userDto = new UserDto();
 
@@ -181,7 +212,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
     @Override
     public UserDto deleteEmployee(int id) {
-        Optional<Usuario> userExists = humanResourceRepository.findById(id);
+        Optional<Usuario> userExists = userRepository.findById(id);
 
         if (userExists.isEmpty()){
             return null;
@@ -191,7 +222,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
         user.setEstado(false); // Da de baja el empleado de la base de datos
 
-        humanResourceRepository.save(user);
+        userRepository.save(user);
 
         UserDto userDto = new UserDto();
 
@@ -213,6 +244,61 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         userDto.setRequiereCambioContrasena(user.isRequiereCambioContrasena());
 
         return userDto;
+    }
+
+    @Override
+    public List<RequestDto> getAllRequests() {
+        List<Solicitudes> requests = requestRepository.findAll();
+        return requests.stream().map(request -> {
+            RequestDto requestDto = new RequestDto();
+
+            requestDto.setIdSolicitud(request.getIdSolicitud());
+            requestDto.setFechaInicio(request.getFechaInicio());
+            requestDto.setFechaFin(request.getFechaFin());
+            requestDto.setEstado(request.isEstado());
+            requestDto.setIdUsuario(request.getIdUsuario());
+            requestDto.setCantidadDias(request.getCantidadDias());
+            requestDto.setNumeroAprobaciones(request.getNumeroAprobaciones());
+            requestDto.setComentario(request.getComentario());
+            requestDto.setRechazado(request.isRechazado());
+
+            return requestDto;
+        }).toList(); // Retorna todas las solicitudes (DTOs)
+    }
+
+    @Override
+    public boolean acceptRequest(int idRequest) {
+        var request = requestRepository.findById(idRequest);
+
+        if (request.isEmpty()){
+            return false;
+        }
+        // Si se acepta la solicitud, rechazado y estado de la solicitu se setea a false
+        request.get().setRechazado(false);
+        request.get().setEstado(false);
+
+        return true;
+    }
+
+    @Override
+    public boolean rejectRequest(int idRequest, RequestRejectedDto rejectedDto) {
+        var request = requestRepository.findById(idRequest);
+
+        if (request.isEmpty()){
+            return false;
+        }
+
+        request.get().setRechazado(true); // Setea la solicitud como rechazada
+        request.get().setComentario(rejectedDto.getComentario());
+
+        requestRepository.save(request.get());
+
+        return true;
+    }
+
+    @Override
+    public RequestDto addNewRequestType() {
+        return null;
     }
 
 }
