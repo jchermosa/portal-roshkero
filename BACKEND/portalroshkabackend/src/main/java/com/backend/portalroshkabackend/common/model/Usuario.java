@@ -2,6 +2,9 @@ package com.backend.portalroshkabackend.common.model;
 
 
 import jakarta.persistence.*;
+import org.postgresql.util.PGInterval;
+
+import java.sql.Date;
 
 @Entity
 @Table(name = "usuarios")
@@ -9,7 +12,7 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
-    private int id_usuario;
+    private int idUsuario;
 
     @Column(name = "nombre")
     private String nombre;
@@ -18,22 +21,22 @@ public class Usuario {
     private String apellido;
 
     @Column(name = "nro_cedula")
-    private int nro_cedula;
+    private int nroCedula;
 
     @Column(name = "correo")
     private String correo;
 
     @Column(name = "id_rol")
-    private int id_rol;
+    private int idRol;
 
     @Column(name = "fecha_ingreso")
-    private java.sql.Date fecha_ingreso;
+    private java.sql.Date fechaIngreso;
 
-    @Column(name = "antiguedad")
+    @Column(name = "antiguedad", insertable = false, updatable = false)
     private String antiguedad;
 
-    @Column(name = "dias_vacaciones")
-    private int dias_vacaciones;
+    @Column(name = "dias_vacaciones", insertable = false, updatable = false)
+    private int diasVacaciones;
 
     @Column(name = "estado")
     private boolean estado;
@@ -45,26 +48,26 @@ public class Usuario {
     private String telefono;
 
     @Column(name = "id_equipo")
-    private int id_equipo;
+    private int idEquipo;
 
     @Column(name = "id_cargo")
-    private int id_cargo;
+    private int idCargo;
 
     @Column(name = "fecha_nacimiento")
-    private java.sql.Date fecha_nacimiento;
+    private java.sql.Date fechaNacimiento;
 
     @Column(name = "dias_vacaciones_restante")
-    private int dias_vacaciones_restante;
+    private int diasVacacionesRestante;
 
     @Column(name = "requiere_cambio_contrasena")
-    private boolean requiere_cambio_contrasena;
+    private boolean requiereCambioContrasena;
 
-    public int getId_usuario() {
-        return id_usuario;
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setId_usuario(int id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getNombre() {
@@ -83,12 +86,12 @@ public class Usuario {
         this.apellido = apellido;
     }
 
-    public int getNro_cedula() {
-        return nro_cedula;
+    public int getNroCedula() {
+        return nroCedula;
     }
 
-    public void setNro_cedula(int nro_cedula) {
-        this.nro_cedula = nro_cedula;
+    public void setNroCedula(int nroCedula) {
+        this.nroCedula = nroCedula;
     }
 
     public String getCorreo() {
@@ -99,20 +102,20 @@ public class Usuario {
         this.correo = correo;
     }
 
-    public int getId_rol() {
-        return id_rol;
+    public int getIdRol() {
+        return idRol;
     }
 
-    public void setId_rol(int id_rol) {
-        this.id_rol = id_rol;
+    public void setIdRol(int idRol) {
+        this.idRol = idRol;
     }
 
-    public java.sql.Date getFecha_ingreso() {
-        return fecha_ingreso;
+    public Date getFechaIngreso() {
+        return fechaIngreso;
     }
 
-    public void setFecha_ingreso(java.sql.Date fecha_ingreso) {
-        this.fecha_ingreso = fecha_ingreso;
+    public void setFechaIngreso(Date fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
     }
 
     public String getAntiguedad() {
@@ -123,12 +126,12 @@ public class Usuario {
         this.antiguedad = antiguedad;
     }
 
-    public int getDias_vacaciones() {
-        return dias_vacaciones;
+    public int getDiasVacaciones() {
+        return diasVacaciones;
     }
 
-    public void setDias_vacaciones(int dias_vacaciones) {
-        this.dias_vacaciones = dias_vacaciones;
+    public void setDiasVacaciones(int diasVacaciones) {
+        this.diasVacaciones = diasVacaciones;
     }
 
     public boolean isEstado() {
@@ -155,45 +158,44 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public int getId_equipo() {
-        return id_equipo;
+    public int getIdEquipo() {
+        return idEquipo;
     }
 
-    public void setId_equipo(int id_equipo) {
-        this.id_equipo = id_equipo;
+    public void setIdEquipo(int idEquipo) {
+        this.idEquipo = idEquipo;
     }
 
-    public int getId_cargo() {
-        return id_cargo;
+    public int getIdCargo() {
+        return idCargo;
     }
 
-    public void setId_cargo(int id_cargo) {
-        this.id_cargo = id_cargo;
+    public void setIdCargo(int idCargo) {
+        this.idCargo = idCargo;
     }
 
-    public java.sql.Date getFecha_nacimiento() {
-        return fecha_nacimiento;
+    public Date getFechaNacimiento() {
+        return fechaNacimiento;
     }
 
-    public void setFecha_nacimiento(java.sql.Date fecha_nacimiento) {
-        this.fecha_nacimiento = fecha_nacimiento;
+    public void setFechaNacimiento(Date fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
     }
 
-    public int getDias_vacaciones_restante() {
-        return dias_vacaciones_restante;
+    public int getDiasVacacionesRestante() {
+        return diasVacacionesRestante;
     }
 
-    public void setDias_vacaciones_restante(int dias_vacaciones_restante) {
-        this.dias_vacaciones_restante = dias_vacaciones_restante;
+    public void setDiasVacacionesRestante(int diasVacacionesRestante) {
+        this.diasVacacionesRestante = diasVacacionesRestante;
     }
 
-    public boolean isRequiere_cambio_contrasena() {
-        return requiere_cambio_contrasena;
+    public boolean isRequiereCambioContrasena() {
+        return requiereCambioContrasena;
     }
 
-    public void setRequiere_cambio_contrasena(boolean requiere_cambio_contrasena) {
-        this.requiere_cambio_contrasena = requiere_cambio_contrasena;
+    public void setRequiereCambioContrasena(boolean requiereCambioContrasena) {
+        this.requiereCambioContrasena = requiereCambioContrasena;
     }
-
 
 }

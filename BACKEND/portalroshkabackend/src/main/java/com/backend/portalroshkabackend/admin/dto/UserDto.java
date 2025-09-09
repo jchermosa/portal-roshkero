@@ -1,14 +1,17 @@
 package com.backend.portalroshkabackend.admin.dto;
 
+import org.postgresql.util.PGInterval;
+
 import java.sql.Date;
 
 public class UserDto {
+    private int idUsuario;
     private String nombre;
     private String apellido;
-    private int nro_cedula;
+    private int nroCedula;
     private String correo;
     private int idRol;
-    private Date fecha_ingreso;
+    private Date fechaIngreso;
     private String antiguedad;
     private int diasVacaciones;
     private boolean estado;
@@ -19,6 +22,14 @@ public class UserDto {
     private Date fechaNacimiento;
     private int diasVacacionesRestante;
     private boolean requiereCambioContrasena;
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
     public String getNombre() {
         return nombre;
@@ -36,12 +47,12 @@ public class UserDto {
         this.apellido = apellido;
     }
 
-    public int getNro_cedula() {
-        return nro_cedula;
+    public int getNroCedula() {
+        return nroCedula;
     }
 
-    public void setNro_cedula(int nro_cedula) {
-        this.nro_cedula = nro_cedula;
+    public void setNroCedula(int nroCedula) {
+        this.nroCedula = nroCedula;
     }
 
     public String getCorreo() {
@@ -60,12 +71,12 @@ public class UserDto {
         this.idRol = idRol;
     }
 
-    public Date getFecha_ingreso() {
-        return fecha_ingreso;
+    public Date getFechaIngreso() {
+        return fechaIngreso;
     }
 
-    public void setFecha_ingreso(Date fecha_ingreso) {
-        this.fecha_ingreso = fecha_ingreso;
+    public void setFechaIngreso(Date fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
     }
 
     public String getAntiguedad() {
