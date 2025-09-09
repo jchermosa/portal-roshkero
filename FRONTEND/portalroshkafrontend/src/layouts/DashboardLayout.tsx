@@ -18,7 +18,7 @@ export default function DashboardLayout() {
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/perfil", label: "Mi Perfil", icon: "👤", available: true },
     { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: isThOrGth },
-    { id: "/usuarios", label: "Gestión de Solicitudes", icon:  "📤", available: isThOrGth },
+    { id: "/gestionsolicitud", label: "Gestión de Solicitudes", icon:  "📤", available: isThOrGth },
     { id: "/reportes", label: "Reportes", icon: "📊", available: isThOrGth },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/solicitudes", label: "Solicitudes", icon: "📩", available: true},
@@ -72,8 +72,6 @@ export default function DashboardLayout() {
           <button
             onClick={() => {
               logout();
-              // Si tu logout NO navega, descomenta la siguiente línea:
-              // navigate("/login", { replace: true });
             }}
             className="w-full flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
           >
