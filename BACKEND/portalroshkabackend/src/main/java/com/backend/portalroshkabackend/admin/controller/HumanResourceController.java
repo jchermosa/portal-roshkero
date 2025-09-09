@@ -37,7 +37,7 @@ public class HumanResourceController {
 
     @GetMapping("/th/users/active")
     public ResponseEntity<Page<UserDto>> getAllActiveEmployess(
-            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+            @PageableDefault(size = 10, sort = "id_usuario", direction = Sort.Direction.ASC)Pageable pageable // Dejar en 'id_usuario' ya que es una consulta creada manualmente en UserRepository, de forma nativa
     ){
         Page<UserDto> users = humanResourceService.getAllActiveEmployees(pageable);
 
@@ -46,7 +46,7 @@ public class HumanResourceController {
 
     @GetMapping("/th/users/inactive")
     public ResponseEntity<Page<UserDto>> getAllInactiveEmployees(
-            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+            @PageableDefault(size = 10, sort = "id_usuario", direction = Sort.Direction.ASC)Pageable pageable // Lo mismo con este, dejar en 'id_usuario' independientemente de como este en el modelo Usuario
     ){
         Page<UserDto> users = humanResourceService.getAllInactiveEmployees(pageable);
 
@@ -96,7 +96,7 @@ public class HumanResourceController {
     // ----------------- Request -----------------
     @GetMapping("/th/users/request")
     public ResponseEntity<Page<RequestDto>> getAllRequests(
-            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+            @PageableDefault(size = 10, sort = "idSolicitud", direction = Sort.Direction.ASC)Pageable pageable
     ){
         Page<RequestDto> requests = humanResourceService.getAllRequests(pageable);
 
