@@ -1,13 +1,13 @@
 package com.backend.portalroshkabackend.Controllers;
 
 
-import com.backend.portalroshkabackend.Models.usuarios;
-import com.backend.portalroshkabackend.Repositories.usuariosRepository;
+import com.backend.portalroshkabackend.Models.Usuarios;
+import com.backend.portalroshkabackend.Repositories.UsuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.backend.portalroshkabackend.Services.usuariosService;
+import com.backend.portalroshkabackend.Services.UsuariosService;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -16,31 +16,31 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "api/usuarios")
-public class usuariosController {
+public class UsuariosController {
 
     @Autowired
-    private usuariosService usuariosService;
+    private UsuariosService usuariosService;
 
     @Autowired
-    usuariosRepository usuariosRepo;
+    UsuariosRepository usuariosRepo;
 
 
     @GetMapping
-    public List<usuarios> getAll() {
+    public List<Usuarios> getAll() {
         return usuariosService.getUsuarios();
     }
 
     @GetMapping("/{id_usuario}")
-    public Optional<usuarios> getById(@PathVariable("id_usuario") Integer ID) {
+    public Optional<Usuarios> getById(@PathVariable("id_usuario") Integer ID) {
         return usuariosService.getUsuarios(ID);
     }
 
     @PostMapping
-    public ResponseEntity<String> saveUsuario(@RequestBody usuarios User) {
+    public ResponseEntity<String> saveUsuario(@RequestBody Usuarios User) {
 
         // 1. Verificar que el usuario con ese ID existe
         if (User.getIdUsuario() != null) {
-            Optional<usuarios> existenteID = usuariosRepo.findById(User.getIdUsuario());
+            Optional<Usuarios> existenteID = usuariosRepo.findById(User.getIdUsuario());
             if (existenteID.isPresent()) {
                 System.out.println("el usuario con esa ID YA existe");
                 return ResponseEntity
@@ -50,7 +50,7 @@ public class usuariosController {
         }
 
         // Verificar duplicado por nroCedula
-        Optional<usuarios> existente = usuariosRepo.findByNroCedula(User.getNroCedula());
+        Optional<Usuarios> existente = usuariosRepo.findByNroCedula(User.getNroCedula());
         if (existente.isPresent()) {
             System.out.println("Ya existe un usuario con el número de cédula: " + User.getNroCedula());
             return ResponseEntity
@@ -71,10 +71,10 @@ public class usuariosController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody usuarios user) {
+    public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody Usuarios user) {
 
         // 1. Verificar que el usuario con ese ID existe
-        Optional<usuarios> existente = usuariosRepo.findById(id);
+        Optional<Usuarios> existente = usuariosRepo.findById(id);
         if (existente.isEmpty()) {
             System.out.println("No se encontró un usuario con ID: " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -82,7 +82,7 @@ public class usuariosController {
         }
 
         // 2. Comprobar que el nroCedula no esté usado por otro usuario
-        Optional<usuarios> cedulaDuplicada = usuariosRepo.findByNroCedula(user.getNroCedula());
+        Optional<Usuarios> cedulaDuplicada = usuariosRepo.findByNroCedula(user.getNroCedula());
         if (cedulaDuplicada.isPresent() && !cedulaDuplicada.get().getIdUsuario().equals(id)) {
             System.out.println("Ya existe un usuario con el número de cédula: " + user.getNroCedula());
             return ResponseEntity.status(HttpStatus.CONFLICT)

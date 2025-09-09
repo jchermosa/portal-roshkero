@@ -10,7 +10,7 @@ import java.time.Period;
 @Entity
 @Data
 @Table(name = "usuarios")
-public class usuarios {
+public class Usuarios {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
@@ -70,7 +70,7 @@ public class usuarios {
     // Constructor vacío
 
 
-    public usuarios(Integer idUsuario, String nombre, String apellido, Integer nroCedula, String correo, Integer idRol,
+    public Usuarios(Integer idUsuario, String nombre, String apellido, Integer nroCedula, String correo, Integer idRol,
                     LocalDate fechaIngreso, String antiguedad, Integer diasVacaciones, Boolean estado, String contrasena,
                     String telefono, Integer idEquipo, Integer idCargo, LocalDate fechaNacimiento, Integer diasVacacionesRestante,
                     Boolean requiereCambioContrasena) {
@@ -93,7 +93,7 @@ public class usuarios {
         this.requiereCambioContrasena = requiereCambioContrasena;
     }
 
-    public usuarios() {
+    public Usuarios() {
 
     }
 
