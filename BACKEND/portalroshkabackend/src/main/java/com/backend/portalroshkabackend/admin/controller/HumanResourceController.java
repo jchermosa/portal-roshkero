@@ -111,13 +111,13 @@ public class HumanResourceController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().build(); //TODO: Tiene que devolver la solicitud
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/th/users/request")
     public ResponseEntity<String> addNewRequestType(){
 
-
+        // TODO: Implementar cuando la base de datos tenga tipo de solicitudes
         return ResponseEntity.ok("agregar nuevo tipo de request") ;
     }
 }
