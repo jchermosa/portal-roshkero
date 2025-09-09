@@ -92,7 +92,7 @@ public class HumanResourceController {
     }
 
     @PostMapping("/th/users/request/{id}/accept")
-    public ResponseEntity<String> acceptRequest(@PathVariable int idRequest){
+    public ResponseEntity<?> acceptRequest(@PathVariable int idRequest){
 
         boolean isAccepted = humanResourceService.acceptRequest(idRequest);
 
@@ -103,7 +103,7 @@ public class HumanResourceController {
     }
 
     @PostMapping("/th/users/request/{id}/reject")
-    public ResponseEntity<String> rejectRequest(@PathVariable int idRequest, @RequestBody RequestRejectedDto rejectedDto){
+    public ResponseEntity<?> rejectRequest(@PathVariable int idRequest, @RequestBody RequestRejectedDto rejectedDto){
 
         boolean isRejected = humanResourceService.rejectRequest(idRequest, rejectedDto);
 
@@ -115,7 +115,7 @@ public class HumanResourceController {
     }
 
     @PostMapping("/th/users/request")
-    public ResponseEntity<String> addNewRequestType(){
+    public ResponseEntity<?> addNewRequestType(){
 
         // TODO: Implementar cuando la base de datos tenga tipo de solicitudes
         return ResponseEntity.ok("agregar nuevo tipo de request") ;
