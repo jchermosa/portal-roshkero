@@ -1,12 +1,17 @@
-//  Create/Update
 package com.backend.portalroshkabackend.admin.dto;
 
-import jakarta.validation.constraints.NotBlank;
+public class EquiposResponseDto {
 
-public class EquipoRequestDto {
-
-    @NotBlank(message = "El nombre no puede estar vacío")
+    private int id_equipo;
     private String nombre;
+
+    public int getId_equipo() {
+        return id_equipo;
+    }
+
+    public void setId_equipo(int id_equipo) {
+        this.id_equipo = id_equipo;
+    }
 
     public String getNombre() {
         return nombre;

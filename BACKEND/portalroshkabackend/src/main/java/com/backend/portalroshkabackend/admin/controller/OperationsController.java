@@ -1,11 +1,10 @@
 package com.backend.portalroshkabackend.admin.controller;
 
-import com.backend.portalroshkabackend.admin.dto.EquipoRequestDto;
-import com.backend.portalroshkabackend.admin.dto.EquipoResponseDto;
-
-import com.backend.portalroshkabackend.common.model.Cargos;
-import com.backend.portalroshkabackend.common.model.Request;
-import com.backend.portalroshkabackend.common.model.Roles;
+import com.backend.portalroshkabackend.admin.dto.EquiposRequestDto;
+import com.backend.portalroshkabackend.admin.dto.CargosResponseDto;
+import com.backend.portalroshkabackend.admin.dto.EquiposResponseDto;
+import com.backend.portalroshkabackend.admin.dto.RequestResponseDto;
+import com.backend.portalroshkabackend.admin.dto.RolesResponseDto;
 
 import jakarta.validation.Valid;
 
@@ -26,28 +25,28 @@ public class OperationsController {
 
     // ----------------- READ -----------------
     @GetMapping("/operations/request")
-    public List<Request> getAllRequests() {
+    public List<RequestResponseDto> getAllRequests() {
         return operationService.getAllRequests();
     }
 
     @GetMapping("/operations/rols")
-    public List<Roles> getAllRols() {
+    public List<RolesResponseDto> getAllRols() {
         return operationService.getAllRols();
     }
 
     @GetMapping("/operations/positions")
-    public List<Cargos> getAllPositions() {
+    public List<CargosResponseDto> getAllPositions() {
         return operationService.getAllCargos();
     }
 
     @GetMapping("/operations/teams")
-    public List<EquipoResponseDto> getAllTeams() {
+    public List<EquiposResponseDto> getAllTeams() {
         return operationService.getAllTeams();
     }
 
     // ----------------- CREATE -----------------
     @PostMapping("/operations/teams")
-    public EquipoResponseDto postNewTeam(@Valid @RequestBody EquipoRequestDto equipoRequest) {
+    public EquiposResponseDto postNewTeam(@Valid @RequestBody EquiposRequestDto equipoRequest) {
         return operationService.postNewTeam(equipoRequest);
     }
 
@@ -59,7 +58,7 @@ public class OperationsController {
 
     // ----------------- UPDATE -----------------
     @PutMapping("/operations/teams/{id}")
-    public EquipoResponseDto updateTeam(@PathVariable int id, @Valid @RequestBody EquipoRequestDto equipoRequest) {
+    public EquiposResponseDto updateTeam(@PathVariable int id, @Valid @RequestBody EquiposRequestDto equipoRequest) {
         return operationService.updateTeam(id, equipoRequest);
     }
 }

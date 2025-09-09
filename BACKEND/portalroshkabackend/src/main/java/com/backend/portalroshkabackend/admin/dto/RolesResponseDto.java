@@ -1,16 +1,16 @@
 package com.backend.portalroshkabackend.admin.dto;
 
-public class EquipoResponseDto {
-
-    private int id_equipo;
+public class RolesResponseDto {
+    
+    private int id_role;
     private String nombre;
 
-    public int getId_equipo() {
-        return id_equipo;
+    public int getId_role() {
+        return id_role;
     }
 
-    public void setId_equipo(int id_equipo) {
-        this.id_equipo = id_equipo;
+    public void setId_role(int id_role) {
+        this.id_role = id_role;
     }
 
     public String getNombre() {

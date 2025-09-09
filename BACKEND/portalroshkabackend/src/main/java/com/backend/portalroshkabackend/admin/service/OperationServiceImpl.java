@@ -3,12 +3,15 @@ package com.backend.portalroshkabackend.admin.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.backend.portalroshkabackend.admin.dto.EquipoRequestDto;
-import com.backend.portalroshkabackend.admin.dto.EquipoResponseDto;
-import com.backend.portalroshkabackend.common.model.Cargos;
+import com.backend.portalroshkabackend.admin.dto.EquiposRequestDto;
+
+import com.backend.portalroshkabackend.admin.dto.EquiposResponseDto;
+import com.backend.portalroshkabackend.admin.dto.CargosResponseDto;
+import com.backend.portalroshkabackend.admin.dto.RolesResponseDto;
+import com.backend.portalroshkabackend.admin.dto.RequestResponseDto;
+
 import com.backend.portalroshkabackend.common.model.Equipos;
-import com.backend.portalroshkabackend.common.model.Request;
-import com.backend.portalroshkabackend.common.model.Roles;
+
 import com.backend.portalroshkabackend.admin.repository.CargosRepository;
 import com.backend.portalroshkabackend.admin.repository.EquiposRepository;
 import com.backend.portalroshkabackend.admin.repository.RequestRepository;
@@ -24,9 +27,9 @@ public class OperationServiceImpl implements IOperationService {
     private final EquiposRepository equiposRepository;
 
     public OperationServiceImpl(RequestRepository requestRepository,
-                                RolesRepository rolesRepository,
-                                CargosRepository cargosRepository,
-                                EquiposRepository equiposRepository) {
+            RolesRepository rolesRepository,
+            CargosRepository cargosRepository,
+            EquiposRepository equiposRepository) {
         this.requestRepository = requestRepository;
         this.rolesRepository = rolesRepository;
         this.cargosRepository = cargosRepository;
@@ -35,27 +38,51 @@ public class OperationServiceImpl implements IOperationService {
 
     // ----------------- READ -----------------
     @Override
-    public List<Request> getAllRequests() {
-        return requestRepository.findAll();
+    public List<RequestResponseDto> getAllRequests() {
+        return requestRepository.findAll()
+                .stream()
+                .map(roles -> {
+                    RequestResponseDto Dto = new RequestResponseDto();
+                    Dto.setId_request(roles.getId_request());
+                    Dto.setNombre(roles.getNombre());
+                    return Dto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Roles> getAllRols() {
-        return rolesRepository.findAll();
+    public List<RolesResponseDto> getAllRols() {
+        return rolesRepository.findAll()
+                .stream()
+                .map(roles -> {
+                    RolesResponseDto Dto = new RolesResponseDto();
+                    Dto.setId_role(roles.getId_role());
+                    Dto.setNombre(roles.getNombre());
+                    return Dto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Cargos> getAllCargos() {
-        return cargosRepository.findAll();
+    public List<CargosResponseDto> getAllCargos() {
+        return cargosRepository.findAll()
+                .stream()
+                .map(cargos -> {
+                    CargosResponseDto Dto = new CargosResponseDto();
+                    Dto.setId_cargo(cargos.getId_cargo());
+                    Dto.setNombre(cargos.getNombre());
+                    return Dto;
+                })
+                .collect(Collectors.toList());
     }
 
-    // ----------------- TEAMS с Dto -----------------
+    // ----------------- TEAMS -----------------
     @Override
-    public List<EquipoResponseDto> getAllTeams() {
+    public List<EquiposResponseDto> getAllTeams() {
         return equiposRepository.findAll()
                 .stream()
                 .map(equipo -> {
-                    EquipoResponseDto Dto = new EquipoResponseDto();
+                    EquiposResponseDto Dto = new EquiposResponseDto();
                     Dto.setId_equipo(equipo.getId_equipo());
                     Dto.setNombre(equipo.getNombre());
                     return Dto;
@@ -64,13 +91,13 @@ public class OperationServiceImpl implements IOperationService {
     }
 
     @Override
-    public EquipoResponseDto postNewTeam(EquipoRequestDto requestDto) {
+    public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
         Equipos equipo = new Equipos();
         equipo.setNombre(requestDto.getNombre());
 
         Equipos saved = equiposRepository.save(equipo);
 
-        EquipoResponseDto Dto = new EquipoResponseDto();
+        EquiposResponseDto Dto = new EquiposResponseDto();
         Dto.setId_equipo(saved.getId_equipo());
         Dto.setNombre(saved.getNombre());
         return Dto;
@@ -82,14 +109,14 @@ public class OperationServiceImpl implements IOperationService {
     }
 
     @Override
-    public EquipoResponseDto updateTeam(int id_equipo, EquipoRequestDto requestDto) {
+    public EquiposResponseDto updateTeam(int id_equipo, EquiposRequestDto requestDto) {
         Equipos existingEquipo = equiposRepository.findById(id_equipo)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
 
         existingEquipo.setNombre(requestDto.getNombre());
         Equipos updated = equiposRepository.save(existingEquipo);
 
-        EquipoResponseDto Dto = new EquipoResponseDto();
+        EquiposResponseDto Dto = new EquiposResponseDto();
         Dto.setId_equipo(updated.getId_equipo());
         Dto.setNombre(updated.getNombre());
         return Dto;
