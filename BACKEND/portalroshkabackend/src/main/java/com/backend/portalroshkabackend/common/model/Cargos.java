@@ -1,5 +1,6 @@
 package com.backend.portalroshkabackend.common.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ public class Cargos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id_cargo;
 
+    @Column(nullable = false)
     private String nombre;
 
     public int getId_cargo() { return id_cargo; }
