@@ -15,7 +15,7 @@ public class Request {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_request;
+    private int id_solicitud;
 
     @Column(nullable = false)
     private LocalDate fecha_inicio;
@@ -40,12 +40,12 @@ public class Request {
     @Column(nullable = false)
     private Boolean rechazado;
 
-    public int getId_request() {
-        return id_request;
+    public int getId_solicitud() {
+        return id_solicitud;
     }
 
-    public void setId_request(int id_request) {
-        this.id_request = id_request;
+    public void setId_solicitud(int id_solicitud) {
+        this.id_solicitud = id_solicitud;
     }
 
     public LocalDate getFecha_inicio() {

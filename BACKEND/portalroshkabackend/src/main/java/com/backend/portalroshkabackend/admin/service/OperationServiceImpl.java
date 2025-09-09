@@ -43,7 +43,7 @@ public class OperationServiceImpl implements IOperationService {
                 .stream()
                 .map(request -> {
                     RequestResponseDto dto = new RequestResponseDto();
-                    dto.setId_request(request.getId_request());
+                    dto.setId_solicitud(request.getId_solicitud());
                     dto.setFecha_inicio(request.getFecha_inicio());
                     dto.setFecha_fin(request.getFecha_fin());
                     dto.setEstado(request.getEstado());

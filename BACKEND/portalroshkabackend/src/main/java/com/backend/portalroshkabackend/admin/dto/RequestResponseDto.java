@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class RequestResponseDto {
 
-    private int id_request;
+    private int id_solicitud;
     private LocalDate fecha_inicio;
     private LocalDate fecha_fin;
     private Boolean estado;
@@ -14,12 +14,12 @@ public class RequestResponseDto {
     private String comentario;
     private Boolean rechazado;
 
-    public int getId_request() {
-        return id_request;
+    public int getId_solicitud() {
+        return id_solicitud;
     }
 
-    public void setId_request(int id_request) {
-        this.id_request = id_request;
+    public void setId_solicitud(int id_solicitud) {
+        this.id_solicitud = id_solicitud;
     }
 
     public LocalDate getFecha_inicio() {
