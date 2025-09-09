@@ -1,33 +1,40 @@
 import React from "react";
 
-interface UserRole {
-  nombre: string;
+interface CardProps {
+  title: string;
+  icon: string;
+  color: string;
+  description?: React.ReactNode;
+  extraInfo?: React.ReactNode;
+  onClick: () => void;
+  borderClass: string; // ej: "border-blue-600"
+  buttonClass: string; // ej: "bg-blue-600 hover:bg-blue-700"
 }
 
-interface User {
-  rol?: UserRole;
-}
-
-interface ProfileCardProps {
-  user?: User;
-  setActiveSection: (section: string) => void;
-}
-
-const ProfileCard: React.FC<ProfileCardProps> = ({ user, setActiveSection }) => {
+const ProfileCard: React.FC<CardProps> = ({
+  title,
+  icon,
+  description,
+  extraInfo,
+  onClick,
+  borderClass,
+  buttonClass,
+}) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
+    <div
+      className={`bg-white p-6 rounded-xl shadow-md border-l-4 ${borderClass} hover:shadow-lg transition-shadow`}
+    >
       <div className="flex items-center mb-3">
-        <span className="text-2xl mr-3">👤</span>
-        <h3 className="text-lg font-semibold text-gray-800">Mi Perfil</h3>
+        <span className="text-2xl mr-3">{icon}</span>
+        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
       </div>
-      <p className="text-gray-600 text-sm mb-4">
-        Rol: <span className="font-semibold">{user?.rol?.nombre}</span>
-      </p>
+      {description && <p className="text-gray-600 text-sm mb-2">{description}</p>}
+      {extraInfo && <div className="text-gray-600 text-sm mb-4">{extraInfo}</div>}
       <button
-        onClick={() => setActiveSection("perfil")}
-        className="w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors"
+        onClick={onClick}
+        className={`w-full ${buttonClass} text-white py-2 px-4 rounded-lg transition-colors`}
       >
-        Ver perfil
+        Ver {title.toLowerCase()}
       </button>
     </div>
   );
