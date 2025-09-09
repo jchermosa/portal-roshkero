@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import SelectDropdown from "../components/SelectDropdown";
 
 interface UsuarioItem {
   id: number;
@@ -95,12 +96,12 @@ export default function UsuariosPage() {
     setPage(0);
   };
 
-    if (!puedeVer) return <p>No tenés permisos para ver esta página.</p>;
+  if (!puedeVer) return <p>No tenés permisos para ver esta página.</p>;
   if (loading) return <p>Cargando usuarios...</p>;
 
   return (
-    <div className="relative flex-1 overflow-auto">
-      {/* Fondo azul sólido */}
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Fondo con imagen - Solo visible en los bordes */}
       <div
         className="absolute inset-0 bg-brand-blue"
         style={{
@@ -113,137 +114,144 @@ export default function UsuariosPage() {
         <div className="absolute inset-0 bg-brand-blue/40"></div>
       </div>
 
-      {/* Contenedor principal */}
-      <div className="relative z-10 w-full max-w-6xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 my-10">
+      {/* Contenedor principal - Ocupa toda la altura disponible */}
+      <div className="relative z-10 flex flex-col h-full p-4">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
+          
+          {/* Header fijo */}
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
+            <h2 className="text-2xl font-bold text-brand-blue mb-4">
+              Listado de usuarios
+            </h2>
 
-        <h2 className="text-2xl font-bold text-brand-blue mb-6">
-          Listado de usuarios
-        </h2>
+            {error && (
+              <p className="text-red-600 mb-4">{error}</p>
+            )}
 
-        {error && (
-          <p className="text-red-600 mb-4">{error}</p>
-        )}
-
-        {/* <div className="mb-4">
+            <div className="mb-4">
           <button
             onClick={() => navigate("/usuarios/nuevo")}
             className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
           >
             ➕ Crear Usuario
           </button>
-        </div> */}
-
-        {/* Filtros */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <select
-            value={rolId}
-            onChange={(e) => setRolId(e.target.value)}
-            className="px-3 py-2 border rounded-lg"
-          >
-            <option value="">Filtrar por Rol</option>
-            {roles.map((r) => (
-              <option key={r.id} value={r.id}>{r.nombre}</option>
-            ))}
-          </select>
-
-          <select
-            value={equipoId}
-            onChange={(e) => setEquipoId(e.target.value)}
-            className="px-3 py-2 border rounded-lg"
-          >
-            <option value="">Filtrar por Equipo</option>
-            {equipos.map((e) => (
-              <option key={e.id} value={e.id}>{e.nombre}</option>
-            ))}
-          </select>
-
-          <select
-            value={cargoId}
-            onChange={(e) => setCargoId(e.target.value)}
-            className="px-3 py-2 border rounded-lg"
-          >
-            <option value="">Filtrar por Cargo</option>
-            {cargos.map((c) => (
-              <option key={c.id} value={c.id}>{c.nombre}</option>
-            ))}
-          </select>
-
-          <button
-            onClick={limpiarFiltros}
-            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
-          >
-            Limpiar filtros
-          </button>
         </div>
 
-        {/* Tabla */}
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse rounded-lg overflow-hidden">
-            <thead className="bg-blue-100 text-blue-800">
-              <tr>
-                <th className="px-4 py-2 text-left">ID</th>
-                <th className="px-4 py-2 text-left">Nombre</th>
-                <th className="px-4 py-2 text-left">Correo</th>
-                <th className="px-4 py-2 text-left">Antigüedad</th>
-                <th className="px-4 py-2 text-left">Estado</th>
-                <th className="px-4 py-2 text-left">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuarios.map((u) => (
-                <tr key={u.id} className="border-b last:border-0">
-                  <td className="px-4 py-2">{u.id}</td>
-                  <td className="px-4 py-2">{u.nombre} {u.apellido}</td>
-                  <td className="px-4 py-2">{u.correo}</td>
-                  <td className="px-4 py-2">{u.antiguedadPretty ?? "-"}</td>
-                  <td className="px-4 py-2">
-                    {u.estado === true ? (
-                      <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                        Activo
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
-                        Inactivo
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-2">
-                    <button
-                      onClick={() => navigate(`/usuarios/${u.id}`)}
-                      className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition"
-                    >
-                      Editar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            {/* Filtros */}
+            <div className="flex flex-wrap gap-4">
+              <SelectDropdown
+                  label="Rol"
+                  name="rol"
+                  value={rolId}
+                  onChange={(e) => setRolId(e.target.value)}
+                  options={roles.map((r) => ({ value: r.id, label: r.nombre }))}
+                  placeholder="Filtrar por Rol"
+                />
 
-        {/* Paginación */}
-        <div className="mt-6 flex items-center gap-2">
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => setPage(i)}
-              disabled={i === page}
-              className={`px-3 py-1 rounded-lg text-sm ${
-                i === page
-                  ? "bg-blue-600 text-white font-semibold"
-                  : "bg-gray-200 hover:bg-gray-300"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="ml-auto px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition"
-          >
-            Cancelar
-          </button>
+              <SelectDropdown
+                  label="Cargo"
+                  name="cargo"
+                  value={cargoId}
+                  onChange={(e) => setRolId(e.target.value)}
+                  options={roles.map((r) => ({ value: r.id, label: r.nombre }))}
+                  placeholder="Filtrar por Cargo"
+                />
+
+              <SelectDropdown
+                  label="Equipo"
+                  name="equipo"
+                  value={equipoId}
+                  onChange={(e) => setRolId(e.target.value)}
+                  options={roles.map((r) => ({ value: r.id, label: r.nombre }))}
+                  placeholder="Filtrar por Equipo"
+                />
+
+              <button
+                onClick={limpiarFiltros}
+                className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition text-sm"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          </div>
+
+          {/* Tabla con scroll interno */}
+          <div className="flex-1 overflow-auto p-6 pt-0">
+            <div className="mt-6">
+              <table className="w-full border-collapse rounded-lg overflow-hidden">
+                <thead className="bg-blue-100 text-blue-800 sticky top-0 z-10">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">ID</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Nombre</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Correo</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Antigüedad</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Estado</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white">
+                  {usuarios.map((u) => (
+                    <tr key={u.id} className="border-b last:border-0 hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm">{u.id}</td>
+                      <td className="px-4 py-3 text-sm font-medium">{u.nombre} {u.apellido}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{u.correo}</td>
+                      <td className="px-4 py-3 text-sm">{u.antiguedadPretty ?? "-"}</td>
+                      <td className="px-4 py-3">
+                        {u.estado === true ? (
+                          <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+                            Activo
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+                            Inactivo
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => navigate(`/usuarios/${u.id}`)}
+                          className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
+                        >
+                          Editar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Footer fijo con paginación */}
+          <div className="p-6 border-t border-gray-200 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setPage(i)}
+                    disabled={i === page}
+                    className={`px-3 py-1 rounded-lg text-sm ${
+                      i === page
+                        ? "bg-blue-600 text-white font-semibold"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition text-sm"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
