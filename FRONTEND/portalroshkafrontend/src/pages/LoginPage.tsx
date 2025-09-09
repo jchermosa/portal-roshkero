@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.jpg";
 import heroBg from "../assets/ilustracion-herov3.svg";
-
+import LoadingButton from "../components/LoadingButton";
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const nav = useNavigate();
 
   const [correo, setCorreo] = useState("");
@@ -15,48 +15,64 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      await login({ correo, contrasena });
+  // Redirige al dashboard automáticamente si ya hay usuario
+  useEffect(() => {
+    if (user) {
       nav("/");
-    } catch (err: any) {
-      setError(err?.response?.data?.message ?? "Credenciales inválidas");
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [user]);
 
-    return (
+const onSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  setError(null);
+  setLoading(true);
+
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo, contrasena }),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText);
+    }
+
+    const { token } = await res.json(); 
+    login(token); 
+  } catch (err: any) {
+    setError(err?.message ?? "Credenciales inválidas");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+  return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Fondo azul con imagen */}
       <div
         className="absolute inset-0 bg-brand-blue"
         style={{
-            backgroundImage: `url(${heroBg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
+          backgroundImage: `url(${heroBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
-        >
+      >
         <div className="absolute inset-0 bg-brand-blue/40"></div>
-     </div>
+      </div>
 
       {/* Contenedor centrado */}
       <div className="relative z-10 w-full max-w-md bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-10">
         <div className="text-center mb-8">
-          {/* <div className="inline-block bg-brand-blue text-white px-6 py-2 rounded-full text-sm font-medium mb-6">
-            Bienvenido al Sistema
-          </div> */}
-
           <img
             src={logo}
             alt="Logo Roshka"
             className="h-32 w-auto mx-auto mb-6 object-cover rounded-full shadow-md"
-            />
-
+          />
           <h1 className="text-2xl font-semibold text-brand-blue">
             INICIAR SESIÓN
           </h1>
@@ -114,20 +130,11 @@ export default function Login() {
             </div>
           )}
 
-          <button
+          <LoadingButton
             type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 font-bold py-4 rounded-full hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed text-lg"
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-900 border-t-transparent mr-2"></div>
-                Ingresando...
-              </div>
-            ) : (
-              "INGRESAR"
-            )}
-          </button>
+            loading={loading}
+            text="INGRESAR"
+          />
         </form>
 
         <div className="mt-8 text-center">
