@@ -2,7 +2,8 @@ package com.backend.portalroshkabackend.admin.service;
 
 import java.util.List;
 
-import com.backend.portalroshkabackend.common.model.Equipos;
+import com.backend.portalroshkabackend.admin.dto.EquipoRequestDto;
+import com.backend.portalroshkabackend.admin.dto.EquipoResponseDto;
 import com.backend.portalroshkabackend.common.model.Roles;
 import com.backend.portalroshkabackend.common.model.Cargos;
 import com.backend.portalroshkabackend.common.model.Request;
@@ -14,12 +15,11 @@ public interface IOperationService {
 
     List<Cargos> getAllCargos();
 
-    List<Equipos> getAllTeams();
+    List<EquipoResponseDto> getAllTeams();
 
-    Equipos postNewTeam(Equipos Equipos);
+    EquipoResponseDto postNewTeam(EquipoRequestDto equipo);
 
     void deleteTeam(int id_equipo);
 
-    Equipos updateTeam(int id_equipo, Equipos equipoDetails);
-
+    EquipoResponseDto updateTeam(int id_equipo, EquipoRequestDto equipoDetails);
 }

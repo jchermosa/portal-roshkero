@@ -1,9 +1,14 @@
 package com.backend.portalroshkabackend.admin.controller;
 
+import com.backend.portalroshkabackend.admin.dto.EquipoRequestDto;
+import com.backend.portalroshkabackend.admin.dto.EquipoResponseDto;
+
 import com.backend.portalroshkabackend.common.model.Cargos;
-import com.backend.portalroshkabackend.common.model.Equipos;
 import com.backend.portalroshkabackend.common.model.Request;
 import com.backend.portalroshkabackend.common.model.Roles;
+
+import jakarta.validation.Valid;
+
 import com.backend.portalroshkabackend.admin.service.IOperationService;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,14 +41,14 @@ public class OperationsController {
     }
 
     @GetMapping("/operations/teams")
-    public List<Equipos> getAllTeams() {
+    public List<EquipoResponseDto> getAllTeams() {
         return operationService.getAllTeams();
     }
 
     // ----------------- CREATE -----------------
     @PostMapping("/operations/teams")
-    public Equipos postNewTeam(@RequestBody Equipos equipo) {
-        return operationService.postNewTeam(equipo);
+    public EquipoResponseDto postNewTeam(@Valid @RequestBody EquipoRequestDto equipoRequest) {
+        return operationService.postNewTeam(equipoRequest);
     }
 
     // ----------------- DELETE -----------------
@@ -54,7 +59,7 @@ public class OperationsController {
 
     // ----------------- UPDATE -----------------
     @PutMapping("/operations/teams/{id}")
-    public Equipos updateTeam(@PathVariable int id, @RequestBody Equipos equipo) {
-        return operationService.updateTeam(id, equipo);
+    public EquipoResponseDto updateTeam(@PathVariable int id, @Valid @RequestBody EquipoRequestDto equipoRequest) {
+        return operationService.updateTeam(id, equipoRequest);
     }
 }
