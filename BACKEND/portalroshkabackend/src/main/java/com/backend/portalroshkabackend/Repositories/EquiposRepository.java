@@ -9,4 +9,6 @@ import com.backend.portalroshkabackend.Models.Equipos;
 public interface EquiposRepository extends CrudRepository<Equipos, Integer> {
 
 
+    
+
 }
