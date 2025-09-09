@@ -29,11 +29,11 @@ export default function DashboardLayout() {
     `${user?.nombre?.[0] ?? ""}${user?.apellido?.[0] ?? ""}`.trim() || "👤";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-xl border-r border-gray-200 relative pb-24">
+      <aside className="w-64 bg-white shadow-xl border-r border-gray-200 flex flex-col">
         {/* Perfil compacto */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white font-bold text-lg">
               {initials}
@@ -45,8 +45,8 @@ export default function DashboardLayout() {
           </div>
         </div>
 
-        {/* Menú */}
-        <nav className="mt-6">
+        {/* Menú - Área con scroll si es necesario */}
+        <nav className="flex-1 overflow-y-auto mt-6">
           {menuOptions.map((opt) => (
             <NavLink
               key={opt.id}
@@ -67,8 +67,8 @@ export default function DashboardLayout() {
           ))}
         </nav>
 
-        {/* Logout */}
-        <div className="absolute bottom-0 w-full p-6 border-t border-gray-200 bg-white">
+        {/* Logout - Fijo en la parte inferior */}
+        <div className="p-6 border-t border-gray-200 bg-white flex-shrink-0">
           <button
             onClick={() => {
               logout();
@@ -82,10 +82,8 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Contenido principal */}
-      <main className="flex-1 overflow-auto">
-        <div className="p-8">
-          <Outlet />
-        </div>
+      <main className="flex-1 overflow-hidden relative">
+        <Outlet />
       </main>
     </div>
   );
