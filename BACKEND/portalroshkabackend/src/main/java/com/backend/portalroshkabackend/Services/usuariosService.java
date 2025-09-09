@@ -1,8 +1,8 @@
-package com.backend.portalroshkabackend.Service;
+package com.backend.portalroshkabackend.Services;
 
 
 import com.backend.portalroshkabackend.Models.usuarios;
-import com.backend.portalroshkabackend.Repository.usuariosRepository;
+import com.backend.portalroshkabackend.Repositories.usuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

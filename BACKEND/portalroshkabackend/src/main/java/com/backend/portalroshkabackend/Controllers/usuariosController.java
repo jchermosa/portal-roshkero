@@ -2,12 +2,12 @@ package com.backend.portalroshkabackend.Controllers;
 
 
 import com.backend.portalroshkabackend.Models.usuarios;
-import com.backend.portalroshkabackend.Repository.usuariosRepository;
+import com.backend.portalroshkabackend.Repositories.usuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.backend.portalroshkabackend.Service.usuariosService;
+import com.backend.portalroshkabackend.Services.usuariosService;
 
 import java.time.LocalDate;
 import java.time.Period;

@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Repository;
+package com.backend.portalroshkabackend.Repositories;
 
 
 import com.backend.portalroshkabackend.Models.usuarios;
