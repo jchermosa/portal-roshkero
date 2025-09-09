@@ -1,8 +1,10 @@
 package com.backend.portalroshkabackend.admin.service;
 
 import com.backend.portalroshkabackend.admin.dto.*;
+import com.backend.portalroshkabackend.admin.repository.PositionsRepository;
 import com.backend.portalroshkabackend.admin.repository.UserRepository;
 import com.backend.portalroshkabackend.admin.repository.RequestRepository;
+import com.backend.portalroshkabackend.common.model.Cargos;
 import com.backend.portalroshkabackend.common.model.Solicitudes;
 import com.backend.portalroshkabackend.common.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,19 +13,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class HumanResourceServiceImpl implements IHumanResourceService{
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
+    private final PositionsRepository positionsRepository;
 
     @Autowired
     public HumanResourceServiceImpl(UserRepository userRepository,
-                                    RequestRepository requestRepository){
+                                    RequestRepository requestRepository,
+                                    PositionsRepository positionsRepository){
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
+        this.positionsRepository = positionsRepository;
     }
 
     @Transactional(readOnly = true)
@@ -131,6 +135,8 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return mapToUserDto(user);
     }
 
+    // ----------------- Request -----------------
+
     @Transactional(readOnly = true)
     @Override
     public Page<RequestDto> getAllRequests(Pageable pageable) {
@@ -176,6 +182,66 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return null;
     }
 
+
+    // ----------------- Position -----------------
+
+    @Override
+    public Page<PositionDto> getAllPositions(Pageable pageable) {
+        Page<Cargos> positions = positionsRepository.findAll(pageable);
+
+        return positions.map(this::mapToPositionDto);
+    }
+
+    @Override
+    public PositionDto getPositionById(int id) {
+        var position =  positionsRepository.findById(id);
+
+        return position.map(this::mapToPositionDto).orElse(null);
+    }
+
+    @Override
+    public PositionDto addPosition(PositionInsertDto positionInsertDto) {
+        Cargos position = new Cargos();
+
+        position.setNombre(positionInsertDto.getNombre());
+
+        Cargos savedPosition = positionsRepository.save(position);
+
+        return mapToPositionDto(savedPosition);
+    }
+
+    @Override
+    public PositionDto updatePosition(PositionUpdateDto positionUpdateDto, int id) {
+        Optional<Cargos> positionExists = positionsRepository.findById(id);
+
+        if (positionExists.isEmpty()) return null;
+
+        Cargos position = positionExists.get();
+
+        position.setNombre(positionUpdateDto.getNombre());
+
+        Cargos updatedPosition = new Cargos();
+
+        return mapToPositionDto(updatedPosition);
+    }
+
+    @Override
+    public PositionDto deletePosition(int id) {
+        Optional<Cargos> positionExists = positionsRepository.findById(id);
+
+        if (positionExists.isEmpty()){ // Falta validar si el cargo ya esta eliminado, para no volver a eliminar y retornar un null
+            return null;
+        }
+
+        Cargos position  = positionExists.get();
+
+         // Aca se daria de baja el cargo, ej: position.setEstado(false);
+
+        positionsRepository.save(position);
+
+        return mapToPositionDto(position);
+    }
+
     private UserDto mapToUserDto(Usuario user) {
         UserDto dto = new UserDto();
         dto.setIdUsuario(user.getIdUsuario());
@@ -212,6 +278,15 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         requestDto.setRechazado(request.isRechazado());
 
         return requestDto;
+    }
+
+    private PositionDto mapToPositionDto(Cargos position){
+        PositionDto positionDto = new PositionDto();
+
+        positionDto.setIdCargo(position.getIdCargo());
+        positionDto.setNombre(position.getNombre());
+
+        return positionDto;
     }
 
 }

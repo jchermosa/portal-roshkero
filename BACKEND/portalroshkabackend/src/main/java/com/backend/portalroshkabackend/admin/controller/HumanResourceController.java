@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.swing.text.Position;
 import java.net.URI;
 import java.util.List;
 
@@ -131,5 +132,59 @@ public class HumanResourceController {
 
         // TODO: Implementar cuando la base de datos tenga tipo de solicitudes
         return ResponseEntity.ok("agregar nuevo tipo de request") ;
+    }
+
+    @GetMapping("th/positions")
+    public ResponseEntity<Page<PositionDto>> getAllPositions(
+            @PageableDefault(size = 10, sort = "idCargo", direction = Sort.Direction.ASC)Pageable pageable
+    ){
+        Page<PositionDto> positions = humanResourceService.getAllPositions(pageable);
+
+        return ResponseEntity.ok(positions);
+    }
+
+    @GetMapping("th/positions/{id}")
+    public ResponseEntity<PositionDto> getPositionById(@PathVariable int id){
+        PositionDto position = humanResourceService.getPositionById(id);
+
+        if (position == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(position);
+    }
+
+    @PostMapping("th/positions")
+    public ResponseEntity<PositionDto> addNewPosition(@RequestBody PositionInsertDto positionInsertDto){
+        PositionDto position = humanResourceService.addPosition(positionInsertDto);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/th/users/{id}")
+                .buildAndExpand(position.getIdCargo())
+                .toUri();
+
+        return ResponseEntity.created(location).body(position);
+    }
+
+    @PutMapping("th/positions/{id}")
+    public ResponseEntity<PositionDto> updatePosition(@RequestBody PositionUpdateDto positionUpdateDto,
+                                                      @PathVariable int id){
+        PositionDto position = humanResourceService.updatePosition(positionUpdateDto, id);
+
+        if (position == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(position);
+    }
+
+    @DeleteMapping("th/positions/{id}")
+    public ResponseEntity<PositionDto> deletePosition(@PathVariable int id){
+        PositionDto position = humanResourceService.deletePosition(id);
+
+        if (position == null) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(position);
     }
 }

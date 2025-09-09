@@ -1,16 +1,8 @@
-package com.backend.portalroshkabackend.common.model;
+package com.backend.portalroshkabackend.admin.dto;
 
-import jakarta.persistence.*;
+public class PositionDto {
 
-@Entity
-@Table(name = "cargos")
-public class Cargos {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cargo")
     private int idCargo;
-
-    @Column(name = "nombre")
     private String nombre;
 
     public int getIdCargo() {
