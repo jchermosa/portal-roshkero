@@ -4,6 +4,10 @@ import com.backend.portalroshkabackend.admin.dto.*;
 import com.backend.portalroshkabackend.admin.service.IHumanResourceService;
 import jakarta.servlet.Servlet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -23,22 +27,28 @@ public class HumanResourceController {
 
     // ----------------- Users -----------------
     @GetMapping("/th/users")
-    public ResponseEntity<List<UserDto>> getAllEmployees(){
-        List<UserDto> users = humanResourceService.getAllEmployees();
+    public ResponseEntity<Page<UserDto>> getAllEmployees(
+            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+    ){
+        Page<UserDto> users = humanResourceService.getAllEmployees(pageable);
 
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/th/users/active")
-    public ResponseEntity<List<UserDto>> getAllActiveEmployess(){
-        List<UserDto> users = humanResourceService.getAllActiveEmployees();
+    public ResponseEntity<Page<UserDto>> getAllActiveEmployess(
+            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+    ){
+        Page<UserDto> users = humanResourceService.getAllActiveEmployees(pageable);
 
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/th/users/inactive")
-    public ResponseEntity<List<UserDto>> getAllInactiveEmployees(){
-        List<UserDto> users = humanResourceService.getAllInactiveEmployees();
+    public ResponseEntity<Page<UserDto>> getAllInactiveEmployees(
+            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+    ){
+        Page<UserDto> users = humanResourceService.getAllInactiveEmployees(pageable);
 
         return ResponseEntity.ok(users);
     }
@@ -85,8 +95,10 @@ public class HumanResourceController {
 
     // ----------------- Request -----------------
     @GetMapping("/th/users/request")
-    public ResponseEntity<List<RequestDto>> getAllRequests(){
-        List<RequestDto> requests = humanResourceService.getAllRequests();
+    public ResponseEntity<Page<RequestDto>> getAllRequests(
+            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+    ){
+        Page<RequestDto> requests = humanResourceService.getAllRequests(pageable);
 
         return ResponseEntity.ok(requests);
     }

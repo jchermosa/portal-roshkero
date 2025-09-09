@@ -6,6 +6,8 @@ import com.backend.portalroshkabackend.admin.repository.RequestRepository;
 import com.backend.portalroshkabackend.common.model.Solicitudes;
 import com.backend.portalroshkabackend.common.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,26 +28,26 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
     @Transactional(readOnly = true)
     @Override
-    public List<UserDto> getAllEmployees() {
-        var users = userRepository.findAll(); // Guarda todos los usuarios en users
+    public Page<UserDto> getAllEmployees(Pageable pageable) {
+        Page<Usuario> users = userRepository.findAll(pageable); // Guarda todos los usuarios en users
 
-        return users.stream().map(this::mapToUserDto).toList(); //Retorna una lista de dtos
+        return users.map(this::mapToUserDto); //Retorna una lista de dtos
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<UserDto> getAllActiveEmployees() {
-        var users = userRepository.findAllActiveEmployees();
+    public Page<UserDto> getAllActiveEmployees(Pageable pageable) {
+        Page<Usuario> users = userRepository.findAllActiveEmployees(pageable);
 
-        return users.stream().map(this::mapToUserDto).toList(); // Retorna una lista de empleados activos (DTOs)
+        return users.map(this::mapToUserDto); // Retorna una lista de empleados activos (DTOs)
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<UserDto> getAllInactiveEmployees() {
-        var users = userRepository.findAllInactiveEmployees();
+    public Page<UserDto> getAllInactiveEmployees(Pageable pageable) {
+        Page<Usuario> users = userRepository.findAllInactiveEmployees(pageable);
 
-        return users.stream().map(this::mapToUserDto).toList(); // Retorna la lista de empleados inactivos
+        return users.map(this::mapToUserDto); // Retorna la lista de empleados inactivos
     }
 
     @Transactional(readOnly = true)
@@ -131,9 +133,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
     @Transactional(readOnly = true)
     @Override
-    public List<RequestDto> getAllRequests() {
-        List<Solicitudes> requests = requestRepository.findAll();
-        return requests.stream().map(this::mapToRequestDto).toList(); // Retorna todas las solicitudes (DTOs)
+    public Page<RequestDto> getAllRequests(Pageable pageable) {
+        Page<Solicitudes> requests = requestRepository.findAll(pageable);
+        return requests.map(this::mapToRequestDto); // Retorna todas las solicitudes (DTOs)
     }
 
     @Transactional
