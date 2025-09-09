@@ -68,7 +68,7 @@ public class HumanResourceController {
                 .fromCurrentContextPath()
                 .path("/th/users/{id}")
                 .buildAndExpand(user.getIdUsuario())
-                .toUri();
+                .toUri(); // Para retornar en el header la ubicacion en donde se puede encontrar el usuario creado, por si el frontend lo necesita
         return ResponseEntity.created(location).body(user);
     }
 
