@@ -81,7 +81,7 @@ export default function ProfilePage() {
                     <span className="truncate text-sm text-gray-500 group-hover:underline">{email}</span>
                   </a>
                 )}
-
+                {/* fixear el campo editable del telefono */}
                 {/* Teléfono editable */}
                 <EditableField
                     label="📞 Teléfono"
