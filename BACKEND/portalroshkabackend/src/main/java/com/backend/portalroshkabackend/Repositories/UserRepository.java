@@ -19,6 +19,9 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
     @Query(value = "SELECT * FROM usuarios WHERE estado = false", nativeQuery = true)
     Page<Usuario> findAllInactiveEmployees(Pageable pageable); // Busca todos los usuarios inactivos
 
+    Page<Usuario> findAllByOrderByIdRolAsc(Pageable pageable); // Retona los usuarios ordenados por rol
+    Page<Usuario> findAllByOrderByIdEquipoAsc(Pageable pageable); // Retona los usuarios ordenados por equipo
+    Page<Usuario> findAllByOrderByIdCargoAsc(Pageable pageable); // Retona los usuarios ordenados por cargo
 
      Optional<Usuarios> findByNroCedula(Integer nroCedula);
 }

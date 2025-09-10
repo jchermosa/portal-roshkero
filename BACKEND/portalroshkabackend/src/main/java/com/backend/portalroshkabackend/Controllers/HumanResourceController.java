@@ -62,6 +62,33 @@ public class HumanResourceController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("th/users/rol")
+    public ResponseEntity<Page<UserDto>> getAllEmployeesByRol(
+            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+    ){
+        Page<UserDto> users = humanResourceService.getAllEmployeesByRol(pageable);
+
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("th/users/equipo")
+    public ResponseEntity<Page<UserDto>> getAllEmployeesByTeam(
+            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+    ){
+        Page<UserDto> users = humanResourceService.getAllEmployeesByTeam(pageable);
+
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("th/users/cargo")
+    public ResponseEntity<Page<UserDto>> getAllEmployeesByPosition(
+            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC)Pageable pageable
+    ){
+        Page<UserDto> users = humanResourceService.getAllEmployeesByPosition(pageable);
+
+        return ResponseEntity.ok(users);
+    }
+
     @GetMapping("/th/users/{id}")
     public ResponseEntity<UserDto> getEmployeeById(@PathVariable int id){
         UserDto user = humanResourceService.getEmployeeById(id);

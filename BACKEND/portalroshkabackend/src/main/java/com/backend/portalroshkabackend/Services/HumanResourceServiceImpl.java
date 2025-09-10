@@ -62,6 +62,27 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return users.map(this::mapToUserDto); // Retorna la lista de empleados inactivos
     }
 
+    @Override
+    public Page<UserDto> getAllEmployeesByRol(Pageable pageable) {
+        Page<Usuario> users = userRepository.findAllByOrderByIdRolAsc(pageable);
+
+        return users.map(this::mapToUserDto);
+    }
+
+    @Override
+    public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
+        Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
+
+        return users.map(this::mapToUserDto);
+    }
+
+    @Override
+    public Page<UserDto> getAllEmployeesByPosition(Pageable pageable) {
+        Page<Usuario> users = userRepository.findAllByOrderByIdCargoAsc(pageable);
+
+        return users.map(this::mapToUserDto);
+    }
+
     @Transactional(readOnly = true)
     @Override
     public UserDto getEmployeeById(int id) {
