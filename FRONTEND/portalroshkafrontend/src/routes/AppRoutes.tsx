@@ -31,7 +31,7 @@ export default function AppRoutes() {
               <Route path="/vacaciones" element={<VacacionesPage />} /> 
               <Route path="/benefits" element={<BeneficiosPage />} />
               <Route path="/usuarios/nuevo" element={<UserFormPage/>}></Route>
-          {/*<Route path="/usuarios" element={<UsuariosPage />} />
+          {/*
           <Route path="/reportes" element={<ReportesPage />} />
           <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
         </Route>
