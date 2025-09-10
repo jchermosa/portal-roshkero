@@ -137,7 +137,7 @@ const onSubmit = async (e: FormEvent) => {
           />
         </form>
 
-        <div className="mt-8 text-center">
+        {/* <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
             ¿No tienes cuenta?{" "}
             <button
@@ -147,7 +147,7 @@ const onSubmit = async (e: FormEvent) => {
               Crear cuenta
             </button>
           </p>
-        </div>
+        </div> */}
 
         <div className="mt-8 text-center">
           <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">

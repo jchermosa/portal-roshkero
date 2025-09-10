@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 type LoadingButtonProps = {
   text: string;
   loading?: boolean;
-  icon?: ReactNode; // opcional: si querés meter un ícono
+  icon?: ReactNode; 
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default function LoadingButton({
