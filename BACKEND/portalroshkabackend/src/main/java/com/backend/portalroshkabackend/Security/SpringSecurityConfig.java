@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.backend.portalroshkabackend.Security.filter.JwtAuthenticationFilter;
+import com.backend.portalroshkabackend.Security.filter.JwtValidationFilter;
 import com.backend.portalroshkabackend.Services.UserService;
 
 @Configuration
@@ -49,11 +50,12 @@ public class SpringSecurityConfig {
 
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/user").permitAll()
+                // .requestMatchers(HttpMethod.POST, "").permitAll()
+                // .requestMatchers(HttpMethod.GET, "").permitAll()
                 .anyRequest().authenticated()
             )
-            .addFilter(jwtAuthenticationFilter) // ✅ usamos la misma instancia
+            .addFilter(jwtAuthenticationFilter) // Authentication filter for login
+            .addFilter(new JwtValidationFilter(authenticationManager())) // Validation filter for all other requests
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session ->
                 session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
