@@ -26,7 +26,10 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
 }) => {
   return (
     <div className="mb-4">
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+      <label
+        htmlFor={name}
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <select
@@ -35,7 +38,10 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
         value={value}
         onChange={onChange}
         required={required}
-        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+        className="w-full px-3 py-2 border rounded-lg 
+                   focus:ring-2 focus:ring-purple-500 focus:outline-none
+                   bg-white text-gray-900 border-gray-300
+                   dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
       >
         {placeholder && <option value="">{placeholder}</option>}
         {options.map((opt) => (

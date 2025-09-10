@@ -16,7 +16,7 @@ import UsuariosPage from "../pages/UsuariosPage";
 import VacacionesPage from "../pages/VacacionesPage";
 // import VacacionesPage from "../pages/VacacionesPage";
 // import ReportesPage from "../pages/ReportesPage";
-// import ConfiguracionPage from "../pages/ConfiguracionPage";
+import Configuration from "../pages/Configuration.tsx";
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -34,9 +34,10 @@ export default function AppRoutes() {
               <Route path="/usuarios" element={<UsuariosPage />} />
               <Route path="/vacaciones" element={<VacacionesPage />} /> 
               <Route path="/benefits" element={<BeneficiosPage />} />
+              <Route path="/configuracion" element={<Configuration />} />
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
           <Route path="/reportes" element={<ReportesPage />} />
-          <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
+          < */}
         </Route>
       </Route>
 
