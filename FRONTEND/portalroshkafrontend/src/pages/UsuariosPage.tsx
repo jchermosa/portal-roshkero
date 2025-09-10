@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import SelectDropdown from "../components/SelectDropdown";
+import DataTable from "../components/DataTable";
+import PaginationFooter from "../components/PaginationFooter";
+import IconButton from "../components/IconButton";
 
 interface UsuarioItem {
   id: number;
@@ -40,6 +43,46 @@ export default function UsuariosPage() {
   const [loading, setLoading] = useState(true);
 
   const puedeVer = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH";
+
+  const columns = [
+  { key: "id", label: "ID" },
+  {
+    key: "nombre",
+    label: "Nombre",
+    render: (u: UsuarioItem) => `${u.nombre} ${u.apellido}`,
+  },
+  { key: "correo", label: "Correo" },
+  {
+    key: "antiguedadPretty",
+    label: "Antigüedad",
+    render: (u: UsuarioItem) => u.antiguedadPretty ?? "-",
+  },
+  {
+    key: "estado",
+    label: "Estado",
+    render: (u: UsuarioItem) =>
+      u.estado === true ? (
+        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+          Activo
+        </span>
+      ) : (
+        <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+          Inactivo
+        </span>
+      ),
+  },
+];
+
+
+const renderActions = (u: UsuarioItem) => (
+  <button
+    onClick={() => navigate(`/usuarios/${u.id}`)}
+    className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
+  >
+    Editar
+  </button>
+);
+
 
   useEffect(() => {
     console.log("Token:", token)
@@ -92,7 +135,6 @@ export default function UsuariosPage() {
     setRolId("");
     setEquipoId("");
     setCargoId("");
-    setUsuarios([]);
     setPage(0);
   };
 
@@ -116,29 +158,26 @@ export default function UsuariosPage() {
 
       {/* Contenedor principal - Ocupa toda la altura disponible */}
       <div className="relative z-10 flex flex-col h-full p-4">
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
+        <div className="bg-white/45 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
           
           {/* Header fijo */}
           <div className="p-6 border-b border-gray-200 flex-shrink-0">
-            <h2 className="text-2xl font-bold text-brand-blue mb-4">
-              Listado de usuarios
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-brand-blue">
+                Listado de usuarios
+              </h2>
+              <IconButton
+                label="Crear Usuario"
+                icon={<span>➕</span>}
+                variant="primary"
+                onClick={() => navigate("/usuarios/nuevo")}
+                className="h-10 text-sm px-4 flex items-center"
+              />
+            </div>
 
-            {error && (
-              <p className="text-red-600 mb-4">{error}</p>
-            )}
 
-            <div className="mb-4">
-          <button
-            onClick={() => navigate("/usuarios/nuevo")}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
-          >
-            ➕ Crear Usuario
-          </button>
-        </div>
-
-            {/* Filtros */}
-            <div className="flex flex-wrap gap-4">
+            {/* Filtros y Boton de Limpieza */}
+            <div className="flex items-center gap-4">
               <SelectDropdown
                   label="Rol"
                   name="rol"
@@ -152,8 +191,8 @@ export default function UsuariosPage() {
                   label="Cargo"
                   name="cargo"
                   value={cargoId}
-                  onChange={(e) => setRolId(e.target.value)}
-                  options={roles.map((r) => ({ value: r.id, label: r.nombre }))}
+                  onChange={(e) => setCargoId(e.target.value)}
+                  options={cargos.map((c) => ({ value: c.id, label: c.nombre }))}
                   placeholder="Filtrar por Cargo"
                 />
 
@@ -161,95 +200,47 @@ export default function UsuariosPage() {
                   label="Equipo"
                   name="equipo"
                   value={equipoId}
-                  onChange={(e) => setRolId(e.target.value)}
-                  options={roles.map((r) => ({ value: r.id, label: r.nombre }))}
+                  onChange={(e) => setEquipoId(e.target.value)}
+                  options={equipos.map((e) => ({ value: e.id, label: e.nombre }))}
                   placeholder="Filtrar por Equipo"
                 />
 
-              <button
-                onClick={limpiarFiltros}
-                className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition text-sm"
-              >
-                Limpiar filtros
-              </button>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-transparent mb-1 select-none">
+                  &nbsp;
+                </label>
+                <IconButton
+                  label="Limpiar filtros"
+                  icon={<span>🧹</span>}
+                  variant="secondary"
+                  onClick={limpiarFiltros}
+                  className="h-10 text-sm px-4 flex items-center"
+                />
+              </div>
+
             </div>
           </div>
 
           {/* Tabla con scroll interno */}
-          <div className="flex-1 overflow-auto p-6 pt-0">
-            <div className="mt-6">
-              <table className="w-full border-collapse rounded-lg overflow-hidden">
-                <thead className="bg-blue-100 text-blue-800 sticky top-0 z-10">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">ID</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Nombre</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Correo</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Antigüedad</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Estado</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white">
-                  {usuarios.map((u) => (
-                    <tr key={u.id} className="border-b last:border-0 hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm">{u.id}</td>
-                      <td className="px-4 py-3 text-sm font-medium">{u.nombre} {u.apellido}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{u.correo}</td>
-                      <td className="px-4 py-3 text-sm">{u.antiguedadPretty ?? "-"}</td>
-                      <td className="px-4 py-3">
-                        {u.estado === true ? (
-                          <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                            Activo
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
-                            Inactivo
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => navigate(`/usuarios/${u.id}`)}
-                          className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-                        >
-                          Editar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="flex-1 overflow-auto p-6">
+            <DataTable
+                data={usuarios}
+                columns={columns}
+                rowKey={(u) => u.id}
+                actions={renderActions}
+                scrollable={false}
+              />
           </div>
 
           {/* Footer fijo con paginación */}
           <div className="p-6 border-t border-gray-200 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setPage(i)}
-                    disabled={i === page}
-                    className={`px-3 py-1 rounded-lg text-sm ${
-                      i === page
-                        ? "bg-blue-600 text-white font-semibold"
-                        : "bg-gray-200 hover:bg-gray-300"
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-              
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition text-sm"
-              >
-                Cancelar
-              </button>
-            </div>
+            <PaginationFooter
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              onCancel={() => navigate(-1)}
+            />
+
           </div>
 
         </div>
