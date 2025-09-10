@@ -5,6 +5,8 @@ import SelectDropdown from "../components/SelectDropdown";
 import DataTable from "../components/DataTable";
 import PaginationFooter from "../components/PaginationFooter";
 import IconButton from "../components/IconButton";
+import rawSolicitudes from "../data/mockSolicitudes.json";
+
 
 interface SolicitudItem {
   id_solicitud: number;
@@ -28,36 +30,52 @@ export default function SolicitudesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const modoDesarrollo = true;
+  const mockSolicitudes: SolicitudItem[] = rawSolicitudes.map((s) => ({
+    ...s,
+    estado: s.estado as "P" | "A" | "R",
+  }));
+
 
   useEffect(() => {
-    if (!token || !user?.id) return;
+  if (modoDesarrollo) {
+    const solicitudesFiltradas = mockSolicitudes.filter(
+      (s) => !tipo || s.tipo?.nombre === tipo
+    );
 
-    setLoading(true);
-    setSolicitudes([]);
+    setSolicitudes(solicitudesFiltradas);
+    setTotalPages(1);
+    setLoading(false);
+    return;
+  }
 
-    const params = new URLSearchParams();
-    params.append("usuarioId", user.id.toString());
-    if (tipo) params.append("tipo", tipo);
-    params.append("page", page.toString());
-    params.append("size", "10");
+  if (!token || !user?.id) return;
 
-    fetch(`/api/solicitudes?${params.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  setLoading(true);
+  setSolicitudes([]);
+
+  const params = new URLSearchParams();
+  params.append("usuarioId", user.id.toString());
+  if (tipo) params.append("tipo", tipo);
+  params.append("page", page.toString());
+  params.append("size", "10");
+
+  fetch(`/api/solicitudes?${params.toString()}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
     })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(await res.text());
-        return res.json();
-      })
-      .then((data) => {
-        setSolicitudes(data.content);
-        setTotalPages(data.totalPages);
-      })
-      .catch((err) => {
-        setError("Error al cargar solicitudes: " + err.message);
-      })
-      .finally(() => setLoading(false));
+    .then((data) => {
+      setSolicitudes(data.content);
+      setTotalPages(data.totalPages);
+    })
+    .catch((err) => {
+      setError("Error al cargar solicitudes: " + err.message);
+    })
+    .finally(() => setLoading(false));
   }, [token, user?.id, tipo, page]);
 
   const limpiarFiltros = () => {
@@ -66,12 +84,39 @@ export default function SolicitudesPage() {
   };
 
   const columns = [
-    { key: "id", label: "ID" },
-    { key: "tipo", label: "Tipo" },
-    { key: "descripcion", label: "Descripción" },
-    { key: "estado", label: "Estado" },
-    { key: "fechaCreacion", label: "Fecha de creación" },
-  ];
+  {
+    key: "id_solicitud",
+    label: "ID",
+  },
+  {
+    key: "tipo",
+    label: "Tipo",
+    render: (s: SolicitudItem) => s.tipo?.nombre ?? "—",
+  },
+  {
+    key: "comentario",
+    label: "Comentario",
+  },
+  {
+    key: "estado",
+    label: "Estado",
+    render: (s: SolicitudItem) => {
+      const estados = { P: "Pendiente", A: "Aprobado", R: "Rechazado" };
+      const colores = {
+        P: "bg-yellow-100 text-yellow-700",
+        A: "bg-green-100 text-green-700",
+        R: "bg-red-100 text-red-700",
+      };
+      return (
+        <span
+          className={`px-2 py-1 text-xs font-medium rounded-full ${colores[s.estado]}`}
+        >
+          {estados[s.estado]}
+        </span>
+      );
+    },
+  },
+];
 
   if (loading) return <p>Cargando solicitudes...</p>;
   if (error) return <p>{error}</p>;
