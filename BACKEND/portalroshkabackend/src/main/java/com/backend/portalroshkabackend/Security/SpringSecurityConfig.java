@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Security;
+ package com.backend.portalroshkabackend.Security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -51,7 +51,7 @@ public class SpringSecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 //.requestMatchers(HttpMethod.POST, "").permitAll()
-                // .requestMatchers(HttpMethod.GET, "").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/usuarios").permitAll()
                 .requestMatchers(HttpMethod.GET,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
                 .requestMatchers(HttpMethod.POST,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
                 .requestMatchers(HttpMethod.DELETE,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder

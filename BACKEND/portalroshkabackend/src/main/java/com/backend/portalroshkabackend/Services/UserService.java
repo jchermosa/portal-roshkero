@@ -8,13 +8,13 @@ import com.backend.portalroshkabackend.Repositories.UserRepository;
 
 @Service
 public class UserService {
-    
-    @Autowired
-    private UserRepository userRepository;
+
+   @Autowired
+   private UserRepository userRepository;
 
 
-    public Usuarios getUserByCorreo(String correo) {
-        return userRepository.findByCorreo(correo);
-    }
+   public Usuarios getUserByCorreo(String correo) {
+       return userRepository.findByCorreo(correo);
+   }
 
 }

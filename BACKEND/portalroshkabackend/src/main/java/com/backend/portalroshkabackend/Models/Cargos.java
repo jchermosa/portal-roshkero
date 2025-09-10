@@ -22,6 +22,10 @@ public class Cargos {
         this.nombre = nombre;
     }
 
+    public Cargos() {
+
+    }
+
     public String getNombre() {
         return nombre;
     }

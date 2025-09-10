@@ -22,6 +22,10 @@ public class Equipos {
         this.nombre = nombre;
     }
 
+    public Equipos() {
+
+    }
+
     public String getNombre() {
         return nombre;
     }
