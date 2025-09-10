@@ -14,6 +14,9 @@ import com.backend.portalroshkabackend.Repositories.RequestRepository;
 import com.backend.portalroshkabackend.Repositories.RolesRepository;
 import com.backend.portalroshkabackend.Models.Equipos;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +41,8 @@ public class OperationServiceImpl implements IOperationService {
 
     // ----------------- READ -----------------
     @Override
-    public List<RequestResponseDto> getAllRequests() {
-        return requestRepository.findAll()
-                .stream()
+    public Page<RequestResponseDto> getAllRequests(Pageable pageable) {
+        return requestRepository.findAll(pageable)
                 .map(request -> {
                     RequestResponseDto dto = new RequestResponseDto();
                     dto.setId_solicitud(request.getIdSolicitud());
@@ -53,49 +55,42 @@ public class OperationServiceImpl implements IOperationService {
                     dto.setComentario(request.getComentario());
                     dto.setRechazado(request.isRechazado());
                     return dto;
-                })
-                .collect(Collectors.toList());
+                });
 
     }
 
     @Override
-    public List<RolesResponseDto> getAllRols() {
-        return rolesRepository.findAll()
-                .stream()
+    public Page<RolesResponseDto> getAllRols(Pageable pageable) {
+        return rolesRepository.findAll(pageable)
                 .map(roles -> {
                     RolesResponseDto Dto = new RolesResponseDto();
                     Dto.setId_role(roles.getIdRol());
                     Dto.setNombre(roles.getNombre());
                     return Dto;
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     @Override
-    public List<CargosResponseDto> getAllCargos() {
-        return cargosRepository.findAll()
-                .stream()
+    public Page<CargosResponseDto> getAllCargos(Pageable pageable) {
+        return cargosRepository.findAll(pageable)
                 .map(cargos -> {
                     CargosResponseDto Dto = new CargosResponseDto();
                     Dto.setId_cargo(cargos.getIdCargo());
                     Dto.setNombre(cargos.getNombre());
                     return Dto;
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     // ----------------- TEAMS -----------------
     @Override
-    public List<EquiposResponseDto> getAllTeams() {
-        return equiposRepository.findAll()
-                .stream()
+    public Page<EquiposResponseDto> getAllTeams(Pageable pageable) {
+        return equiposRepository.findAll(pageable)
                 .map(equipo -> {
                     EquiposResponseDto Dto = new EquiposResponseDto();
                     Dto.setId_equipo(equipo.getIdEquipo());
                     Dto.setNombre(equipo.getNombre());
                     return Dto;
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     @Override

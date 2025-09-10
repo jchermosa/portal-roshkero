@@ -10,7 +10,6 @@ import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Services.IHumanResourceService;
 
-import jakarta.servlet.Servlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.swing.text.Position;
+
 import java.net.URI;
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/v1/admin")
