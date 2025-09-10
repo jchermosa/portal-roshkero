@@ -1,12 +1,11 @@
 package com.backend.portalroshkabackend.admin.dto;
 
-import java.time.LocalDate;
-
+import java.sql.Date;
 public class RequestResponseDto {
 
     private int id_solicitud;
-    private LocalDate fecha_inicio;
-    private LocalDate fecha_fin;
+    private Date fecha_inicio;
+    private Date fecha_fin;
     private Boolean estado;
     private int id_usuario;
     private int cantidad_dias;
@@ -22,19 +21,19 @@ public class RequestResponseDto {
         this.id_solicitud = id_solicitud;
     }
 
-    public LocalDate getFecha_inicio() {
+    public Date getFecha_inicio() {
         return fecha_inicio;
     }
 
-    public void setFecha_inicio(LocalDate fecha_inicio) {
+    public void setFecha_inicio(Date fecha_inicio) {
         this.fecha_inicio = fecha_inicio;
     }
 
-    public LocalDate getFecha_fin() {
+    public Date getFecha_fin() {
         return fecha_fin;
     }
 
-    public void setFecha_fin(LocalDate fecha_fin) {
+    public void setFecha_fin(Date fecha_fin) {
         this.fecha_fin = fecha_fin;
     }
 

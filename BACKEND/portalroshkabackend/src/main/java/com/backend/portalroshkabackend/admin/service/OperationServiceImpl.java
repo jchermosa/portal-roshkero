@@ -43,15 +43,15 @@ public class OperationServiceImpl implements IOperationService {
                 .stream()
                 .map(request -> {
                     RequestResponseDto dto = new RequestResponseDto();
-                    dto.setId_solicitud(request.getId_solicitud());
-                    dto.setFecha_inicio(request.getFecha_inicio());
-                    dto.setFecha_fin(request.getFecha_fin());
-                    dto.setEstado(request.getEstado());
-                    dto.setId_usuario(request.getId_usuario());
-                    dto.setCantidad_dias(request.getCantidad_dias());
-                    dto.setNumero_aprobaciones(request.getNumero_aprobaciones());
+                    dto.setId_solicitud(request.getIdSolicitud());
+                    dto.setFecha_inicio(request.getFechaInicio());
+                    dto.setFecha_fin(request.getFechaFin());
+                    dto.setEstado(request.isEstado());
+                    dto.setId_usuario(request.getIdUsuario());
+                    dto.setCantidad_dias(request.getCantidadDias());
+                    dto.setNumero_aprobaciones(request.getNumeroAprobaciones());
                     dto.setComentario(request.getComentario());
-                    dto.setRechazado(request.getRechazado());
+                    dto.setRechazado(request.isRechazado());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -77,7 +77,7 @@ public class OperationServiceImpl implements IOperationService {
                 .stream()
                 .map(cargos -> {
                     CargosResponseDto Dto = new CargosResponseDto();
-                    Dto.setId_cargo(cargos.getId_cargo());
+                    Dto.setId_cargo(cargos.getIdCargo());
                     Dto.setNombre(cargos.getNombre());
                     return Dto;
                 })
