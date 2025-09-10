@@ -24,6 +24,8 @@ dist-ssr
 *.sw?
 
 
-
-* .env.development
-* .env.production
+# Archivos de entorno locales
+.env
+.env.development
+.env.production
+.env.test

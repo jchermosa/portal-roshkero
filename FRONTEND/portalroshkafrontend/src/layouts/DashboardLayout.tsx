@@ -16,7 +16,7 @@ export default function DashboardLayout() {
 
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
-    { id: "/perfil", label: "Mi Perfil", icon: "👤", available: true },
+    { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
     { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: isThOrGth },
     { id: "/gestionsolicitud", label: "Gestión de Solicitudes", icon:  "📤", available: isThOrGth },
     { id: "/reportes", label: "Reportes", icon: "📊", available: isThOrGth },

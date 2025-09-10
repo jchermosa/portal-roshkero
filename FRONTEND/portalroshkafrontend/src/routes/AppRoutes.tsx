@@ -5,7 +5,10 @@ import DashboardLayout from "../layouts/DashboardLayout";
 
 // Pages
 import LoginPage from "../pages/LoginPage";
+
 import HomePage from "../pages/HomePage";
+import ProfilePage from "../pages/ProfilePage";
+
 import UsuariosPage from "../pages/UsuariosPage";
 // import PerfilPage from "../pages/PerfilPage";
 // // si vas creando estas páginas
@@ -25,6 +28,12 @@ export default function AppRoutes() {
       {/* Rutas privadas dentro del DashboardLayout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="/profile" element={<ProfilePage />} /> 
+              <Route path="/vacaciones" element={<VacacionesPage />} /> 
+          {/*<Route path="/usuarios" element={<UsuariosPage />} />
+          <Route path="/reportes" element={<ReportesPage />} />
+          <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
               <Route index element={<HomePage />} /> 
                 <Route path="/usuarios" element={<UsuariosPage />} />
                 <Route path="/vacaciones" element={<VacacionesPage />} /> 
