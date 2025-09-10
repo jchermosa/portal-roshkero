@@ -4,7 +4,6 @@ import com.backend.portalroshkabackend.admin.dto.*;
 import com.backend.portalroshkabackend.admin.repository.PositionsRepository;
 import com.backend.portalroshkabackend.admin.repository.UserRepository;
 import com.backend.portalroshkabackend.admin.repository.RequestRepository;
-import com.backend.portalroshkabackend.common.model.Cargos;
 import com.backend.portalroshkabackend.common.model.Solicitudes;
 import com.backend.portalroshkabackend.common.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
