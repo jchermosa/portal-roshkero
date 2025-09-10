@@ -8,8 +8,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.backend.portalroshkabackend.Models.Usuarios;
+import com.backend.portalroshkabackend.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -23,9 +25,13 @@ import static com.backend.portalroshkabackend.Security.TokenJwtConfig.*;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 
+    
+    private final UserService userService;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, UserService userService) {
         super.setAuthenticationManager(authenticationManager);
+        this.userService = userService;
     }
 
 
@@ -51,13 +57,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
         
-            Usuarios user = (Usuarios) authResult.getPrincipal();
-            String correo = user.getCorreo();
-            int rol = user.getIdRol();
+            User user = (User) authResult.getPrincipal();
+            String correo = user.getUsername();
+
+            // obtenemos el usuario del correo para obtener su rol
+            Usuarios usuario = userService.getUserByCorreo(correo);
 
             String token = Jwts.builder()
                 .subject(correo)
-                .claim("rol", rol)
+                .claim("rol", usuario.getIdRol())
                 .expiration(Date.from(new Date().toInstant().plusSeconds(7200))) // 2 horas de validez
                 .issuedAt(Date.from(new Date().toInstant()))
                 .signWith(SECRET_KEY)
@@ -68,7 +76,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             Map<String, String> body = new HashMap<>();
             body.put("token", token);
             body.put("correo", correo);
-            body.put("rol", String.valueOf(rol));
+            body.put("rol", String.valueOf(usuario.getIdRol()));
             body.put("Message", "Authentication successful");
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(body));

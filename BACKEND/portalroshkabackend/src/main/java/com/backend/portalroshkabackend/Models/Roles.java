@@ -17,6 +17,11 @@ public class Roles {
     Integer idRol;
     String nombre;
 
+
+    public Roles() {
+    }
+
+
     public Integer getIdRol() {
         return idRol;
     }
