@@ -11,6 +11,9 @@ import BeneficiosPage from "../pages/BenefitsPage";
 
 import UsuariosPage from "../pages/UsuariosPage";
 import VacacionesPage from "../pages/VacacionesPage";
+// import VacacionesPage from "../pages/VacacionesPage";
+import RequestPage from "../pages/RequestPage";
+// import ReportesPage from "../pages/ReportesPage";
 // import ConfiguracionPage from "../pages/ConfiguracionPage";
 import UserFormPage from "../pages/UserFormPage";
 
@@ -25,6 +28,8 @@ export default function AppRoutes() {
       {/* Rutas privadas dentro del DashboardLayout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
+
+              <Route path="/requests" element={<RequestPage />} />
               <Route index element={<HomePage />} />
               <Route path="/profile" element={<ProfilePage />} /> 
               <Route path="/usuarios" element={<UsuariosPage />} />
