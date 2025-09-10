@@ -36,7 +36,6 @@ public class SpringSecurityConfig {
     // Bean de PasswordEncoder
     @Bean
     public PasswordEncoder passwordEncoder() {
-        System.out.println("Default password encoded: " + new BCryptPasswordEncoder().encode("bbb"));
         return new BCryptPasswordEncoder(); 
     }
     
