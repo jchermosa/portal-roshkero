@@ -30,17 +30,11 @@ export default function AppRoutes() {
         <Route element={<DashboardLayout />}>
               <Route index element={<HomePage />} />
               <Route path="/profile" element={<ProfilePage />} /> 
+              <Route path="/usuarios" element={<UsuariosPage />} />
               <Route path="/vacaciones" element={<VacacionesPage />} /> 
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
           <Route path="/reportes" element={<ReportesPage />} />
           <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
-              <Route index element={<HomePage />} /> 
-                <Route path="/usuarios" element={<UsuariosPage />} />
-                <Route path="/vacaciones" element={<VacacionesPage />} /> 
-
-                {/* <Route path="/usuarios/:id" element={<PerfilPage />} />
-                <Route path="/reportes" element={<ReportesPage />} />
-                <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
         </Route>
       </Route>
 
