@@ -2,20 +2,25 @@ package com.backend.portalroshkabackend.Services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.backend.portalroshkabackend.DTO.CargosResponseDto;
 import com.backend.portalroshkabackend.DTO.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.RequestResponseDto;
 import com.backend.portalroshkabackend.DTO.RolesResponseDto;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface IOperationService {
-    List<RequestResponseDto> getAllRequests();
+    Page<RequestResponseDto> getAllRequests(Pageable pageable);
 
-    List<RolesResponseDto> getAllRols();
+    Page<RolesResponseDto> getAllRols(Pageable pageable);
 
-    List<CargosResponseDto> getAllCargos();
+    Page<CargosResponseDto> getAllCargos(Pageable pageable);
 
-    List<EquiposResponseDto> getAllTeams();
+    Page<EquiposResponseDto> getAllTeams(Pageable pageable);
 
     EquiposResponseDto postNewTeam(EquiposRequestDto equipo);
 
