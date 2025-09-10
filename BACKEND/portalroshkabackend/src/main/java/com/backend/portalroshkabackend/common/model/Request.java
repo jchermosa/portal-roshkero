@@ -15,53 +15,55 @@ public class Request {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_solicitud;
+    @Column(name="id_solicitud")
+    private int idSolicitud;
 
-    @Column(nullable = false)
-    private LocalDate fecha_inicio;
+    @Column(name="fecha_inicio", nullable = false)
+    private LocalDate fechaInicio;
 
-    @Column(nullable = false)
-    private LocalDate fecha_fin;
+    @Column(name="fecha_fin", nullable = false)
+    private LocalDate fechaFin;
 
-    @Column(nullable = false)
+    @Column(name="estado", nullable = false)
     private Boolean estado;
 
-    @Column(nullable = false)
-    private int id_usuario;
+    @Column(name="id_usuario", nullable = false)
+    private int idUsuario;
 
-    @Column(nullable = false)
-    private int cantidad_dias;
+    @Column(name="cantidad_dias", nullable = false)
+    private int cantidadDias;
 
-    @Column(nullable = false)
-    private int numero_aprobaciones;
+    @Column(name="numero_aprobaciones", nullable = false)
+    private int numeroAprobaciones;
 
+    @Column(name="comentario")
     private String comentario;
 
-    @Column(nullable = false)
+    @Column(name="rechazado", nullable = false)
     private Boolean rechazado;
 
     public int getId_solicitud() {
-        return id_solicitud;
+        return idSolicitud;
     }
 
-    public void setId_solicitud(int id_solicitud) {
-        this.id_solicitud = id_solicitud;
+    public void setId_solicitud(int idSolicitud) {
+        this.idSolicitud = idSolicitud;
     }
 
     public LocalDate getFecha_inicio() {
-        return fecha_inicio;
+        return fechaInicio;
     }
 
-    public void setFecha_inicio(LocalDate fecha_inicio) {
-        this.fecha_inicio = fecha_inicio;
+    public void setFecha_inicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
 
     public LocalDate getFecha_fin() {
-        return fecha_fin;
+        return fechaFin;
     }
 
-    public void setFecha_fin(LocalDate fecha_fin) {
-        this.fecha_fin = fecha_fin;
+    public void setFecha_fin(LocalDate fechaFin) {
+        this.fechaFin = fechaFin;
     }
 
     public Boolean getEstado() {
@@ -73,27 +75,27 @@ public class Request {
     }
 
     public int getId_usuario() {
-        return id_usuario;
+        return idUsuario;
     }
 
-    public void setId_usuario(int id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setId_usuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public int getCantidad_dias() {
-        return cantidad_dias;
+        return cantidadDias;
     }
 
-    public void setCantidad_dias(int cantidad_dias) {
-        this.cantidad_dias = cantidad_dias;
+    public void setCantidad_dias(int cantidadDias) {
+        this.cantidadDias = cantidadDias;
     }
 
     public int getNumero_aprobaciones() {
-        return numero_aprobaciones;
+        return numeroAprobaciones;
     }
 
-    public void setNumero_aprobaciones(int numero_aprobaciones) {
-        this.numero_aprobaciones = numero_aprobaciones;
+    public void setNumero_aprobaciones(int numeroAprobaciones) {
+        this.numeroAprobaciones = numeroAprobaciones;
     }
 
     public String getComentario() {

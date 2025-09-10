@@ -13,13 +13,13 @@ public class Cargos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_cargo;
+    private int idСargo;
 
     @Column(nullable = false)
     private String nombre;
 
-    public int getId_cargo() { return id_cargo; }
-    public void setId_cargo(int id_cargo) { this.id_cargo = id_cargo; }
+    public int getId_cargo() { return idСargo; }
+    public void setId_cargo(int idСargo) { this.idСargo = idСargo; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
