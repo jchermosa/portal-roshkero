@@ -18,7 +18,7 @@ public class Cargos {
     @Column(nullable = false)
     private String nombre;
 
-    public int getId_cargo() { return idСargo; }
+    public int getIdCargo() { return idСargo; }
     public void setId_cargo(int idСargo) { this.idСargo = idСargo; }
 
     public String getNombre() { return nombre; }
