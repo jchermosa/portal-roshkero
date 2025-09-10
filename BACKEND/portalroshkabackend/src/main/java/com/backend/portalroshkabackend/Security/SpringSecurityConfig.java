@@ -69,11 +69,11 @@ public class SpringSecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 //.requestMatchers(HttpMethod.POST, "").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"/api/v1/admin/operations").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.GET,"/api/v1/admin/operations/**").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
                 .requestMatchers(HttpMethod.POST,"/api/v1/admin/operations").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
                 .requestMatchers(HttpMethod.DELETE,"/api/v1/admin/operations").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
                 .requestMatchers(HttpMethod.PUT,"/api/v1/admin/operations").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
-                .requestMatchers(HttpMethod.GET,"/api/v1/admin/th").hasAuthority("ROLE_1") 
+                .requestMatchers(HttpMethod.GET,"/api/v1/admin/th/**").hasAuthority("ROLE_1") 
                 .requestMatchers(HttpMethod.POST,"/api/v1/admin/th").hasAuthority("ROLE_1") 
                 .requestMatchers(HttpMethod.DELETE,"/api/v1/admin/th").hasAuthority("ROLE_1") 
                 .requestMatchers(HttpMethod.PUT,"/api/v1/admin/th").hasAuthority("ROLE_1") 
