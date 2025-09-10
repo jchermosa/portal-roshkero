@@ -32,7 +32,7 @@ useEffect(() => {
   setSolicitudes([]);
 
   const params = new URLSearchParams();
-  params.append("usuarioId", user?.id.toString() ?? "");
+  params.append("usuarioId", user?.id?.toString() ?? "");
   params.append("page", page.toString());
   params.append("size", "10");
 
