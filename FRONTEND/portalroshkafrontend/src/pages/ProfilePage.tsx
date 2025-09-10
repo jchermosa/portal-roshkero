@@ -27,9 +27,9 @@ export default function ProfilePage() {
   const email = user?.correo;
   const phone = user?.telefono;
   const [phoneLocal, setPhoneLocal] = useState<string | undefined>(phone);
-  const joinedAt = user?.fecha_ingreso ?? user?.fechaIngreso;
-  const diasVac = user?.dias_vacaciones ?? user?.diasVacaciones;
-  const diasVacRest = user?.dias_vacaciones_restante ?? user?.diasVacacionesRestante;
+  const joinedAt = user?.fecha_ingreso ?? user?.fecha_ingreso;
+  const diasVac = user?.dias_vacaciones ?? user?.dias_vacaciones;
+  const diasVacRest = user?.dias_vacaciones_restante ?? user?.dias_vacaciones_restante;
   const roleName = user?.rol?.nombre || "";
   const teamName = user?.equipo?.nombre || "";
   const jobName = user?.cargo?.nombre || "";

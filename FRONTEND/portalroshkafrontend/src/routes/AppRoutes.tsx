@@ -5,18 +5,14 @@ import DashboardLayout from "../layouts/DashboardLayout";
 
 // Pages
 import LoginPage from "../pages/LoginPage";
-
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
 import BeneficiosPage from "../pages/BenefitsPage";
 
 import UsuariosPage from "../pages/UsuariosPage";
-// import PerfilPage from "../pages/PerfilPage";
-// // si vas creando estas páginas
 import VacacionesPage from "../pages/VacacionesPage";
-// import VacacionesPage from "../pages/VacacionesPage";
-// import ReportesPage from "../pages/ReportesPage";
 // import ConfiguracionPage from "../pages/ConfiguracionPage";
+import UserFormPage from "../pages/UserFormPage";
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -34,7 +30,8 @@ export default function AppRoutes() {
               <Route path="/usuarios" element={<UsuariosPage />} />
               <Route path="/vacaciones" element={<VacacionesPage />} /> 
               <Route path="/benefits" element={<BeneficiosPage />} />
-          {/*<Route path="/usuarios" element={<UsuariosPage />} />
+              <Route path="/usuarios/nuevo" element={<UserFormPage/>}></Route>
+          {/*
           <Route path="/reportes" element={<ReportesPage />} />
           <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
         </Route>
