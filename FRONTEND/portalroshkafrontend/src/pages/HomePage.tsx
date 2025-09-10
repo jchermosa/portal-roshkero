@@ -35,7 +35,7 @@ export default function HomePage() {
                   title="Mi Perfil"
                   icon="👤"
                   description={`Rol: ${user?.rol?.nombre}`}
-                  onClick={() => navigate("/perfil")}
+                  onClick={() => navigate("/profile")}
                   borderClass="border-blue-600"
                   buttonClass="bg-blue-600 hover:bg-blue-700" color={""}        />
 
