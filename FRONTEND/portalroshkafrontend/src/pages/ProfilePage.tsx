@@ -223,7 +223,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-gray-200 flex-shrink-0">
+          <div className="p-6 border-t border-gray-200 flex-shrink-0 flex justify-end">
             <p className="text-sm text-gray-600">
               Última actualización del perfil visible aquí.
             </p>
