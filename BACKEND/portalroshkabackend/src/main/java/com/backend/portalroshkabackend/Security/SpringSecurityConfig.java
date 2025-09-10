@@ -33,7 +33,7 @@ public class SpringSecurityConfig {
     // Bean de PasswordEncoder
     @Bean
     public PasswordEncoder passwordEncoder() {
-        System.out.println("Default password encoded: " + new BCryptPasswordEncoder().encode("default_password"));
+        System.out.println("Default password encoded: " + new BCryptPasswordEncoder().encode("bbb"));
         return new BCryptPasswordEncoder(); 
     }
 
@@ -50,8 +50,17 @@ public class SpringSecurityConfig {
 
         http
             .authorizeHttpRequests(auth -> auth
-                // .requestMatchers(HttpMethod.POST, "").permitAll()
+                //.requestMatchers(HttpMethod.POST, "").permitAll()
                 // .requestMatchers(HttpMethod.GET, "").permitAll()
+                .requestMatchers(HttpMethod.GET,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.POST,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.DELETE,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.PUT,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.GET,"api/v1/admin/th").hasRole("1") 
+                .requestMatchers(HttpMethod.POST,"api/v1/admin/th").hasRole("1") 
+                .requestMatchers(HttpMethod.DELETE,"api/v1/admin/th").hasRole("1") 
+                .requestMatchers(HttpMethod.PUT,"api/v1/admin/th").hasRole("1") 
+                // .requestMatchers(HttpMethod.GET,"api/v1/usuarios").permitAll() 
                 .anyRequest().authenticated()
             )
             .addFilter(jwtAuthenticationFilter) // Authentication filter for login

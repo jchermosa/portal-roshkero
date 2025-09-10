@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.Models.Usuarios;
 import com.backend.portalroshkabackend.Services.UserService;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -23,6 +25,19 @@ public class UserController {
 
         return user;
     }
+
+
+    @GetMapping("/v1/admin/operaciones")
+    public String getOperations() {
+        return "Operaciones administrativas realizadas con éxito."; 
+    }
+
+    @GetMapping("/v1/admin/th")
+    public String getTh() {
+        return " Consulta de recursos humanos realizadas con éxito."; 
+    }
+    
+    
 }
 
 
