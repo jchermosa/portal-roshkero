@@ -1,14 +1,9 @@
 package com.backend.portalroshkabackend.Repositories;
 
-import org.springframework.data.repository.CrudRepository;
+import com.backend.portalroshkabackend.Models.Equipos;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.backend.portalroshkabackend.Models.Equipos;
-
 @Repository
-public interface EquiposRepository extends CrudRepository<Equipos, Integer> {
-
-
-    
-
+public interface EquiposRepository extends JpaRepository<Equipos, Integer> {
 }

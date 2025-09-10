@@ -11,7 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.backend.portalroshkabackend.Models.Usuarios;
-import com.backend.portalroshkabackend.Services.UserService;
+import com.backend.portalroshkabackend.Services.UsuariosService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -26,10 +26,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 
     
-    private final UserService userService;
+    private final UsuariosService userService;
 
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, UserService userService) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, UsuariosService userService) {
         super.setAuthenticationManager(authenticationManager);
         this.userService = userService;
     }

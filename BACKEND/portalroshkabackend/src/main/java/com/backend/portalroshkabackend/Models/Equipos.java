@@ -34,6 +34,12 @@ public class Equipos {
         this.nombre = nombre;
     }
 
-    
+    public Integer getIdEquipo() {
+        return idEquipo;
+    }
+
+    public void setIdEquipo(Integer idEquipo) {
+        this.idEquipo = idEquipo;
+    }
 
 }

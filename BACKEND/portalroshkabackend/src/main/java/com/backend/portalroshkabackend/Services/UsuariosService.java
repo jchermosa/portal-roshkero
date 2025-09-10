@@ -12,7 +12,6 @@ import java.util.Optional;
 @Service
 public class UsuariosService {
     @Autowired
-
     UsuariosRepository usuariosRepository;
 
     public List<Usuarios> getUsuarios(){
@@ -29,5 +28,10 @@ public class UsuariosService {
 
     public void delete(Integer id){
         usuariosRepository.deleteById(id);
+    }
+    
+    public Usuarios getUserByCorreo(String correo) {
+        Optional<Usuarios> usuario = usuariosRepository.findByCorreo(correo);
+        return usuario.orElse(null);
     }
 }

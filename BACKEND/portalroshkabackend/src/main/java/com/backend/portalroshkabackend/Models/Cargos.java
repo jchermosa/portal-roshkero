@@ -34,6 +34,12 @@ public class Cargos {
         this.nombre = nombre;
     }
 
-    
+    public Integer getIdCargo() {
+        return idCargo;
+    }
+
+    public void setIdCargo(Integer idCargo) {
+        this.idCargo = idCargo;
+    }
 
 }

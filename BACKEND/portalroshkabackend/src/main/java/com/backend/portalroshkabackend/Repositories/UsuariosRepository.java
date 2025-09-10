@@ -12,5 +12,6 @@ import java.util.Optional;
 @Repository
 public interface UsuariosRepository extends CrudRepository<Usuarios, Integer> {
     Optional<Usuarios> findByNroCedula(Integer nroCedula);
+    Optional<Usuarios> findByCorreo(String correo);
 }
 

@@ -1,7 +1,8 @@
 package com.backend.portalroshkabackend.Services;
 import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.portalroshkabackend.Models.Usuarios;
 import com.backend.portalroshkabackend.Models.Roles;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.UsuariosRepository;
 
 @Service
 public class JpaUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UsuariosRepository userRepository;
 
     @Autowired
     private RolesService rolesService;
@@ -27,27 +28,41 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
-        Usuarios user = userRepository.findByCorreo(correo);
+        // Buscar usuario por correo
+        Optional<Usuarios> optionalUser = userRepository.findByCorreo(correo);
 
-        if (user == null) {
+        // Verificar si existe el usuario
+        if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("Usuario no encontrado con el correo: " + correo);
         }
 
-        // Si quieres listar todos los roles de la BD (opcional)
-        Iterable<Roles> todosRoles = rolesService.getAllRoles();
+        // Obtener el usuario del Optional
+        Usuarios user = optionalUser.get();
+        
+        // Obtener el ID del rol del usuario
+        Integer userRolId = user.getIdRol();
+        
+        // Buscar el rol del usuario directamente
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        
+        // Recorrer todos los roles (optimizado para encontrar solo el rol del usuario)
+        for (Roles rol : rolesService.getAllRoles()) {
+            if (rol.getIdRol().equals(userRolId)) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + rol.getNombre()));
+                break; // Salir del bucle una vez que encontramos el rol del usuario
+            }
+        }
+        
+        // Si no se encontró ningún rol, asignar una lista vacía
+        if (authorities.isEmpty()) {
+            authorities = Collections.emptyList();
+        }
 
-        // Mapeamos los roles del usuario a GrantedAuthority
-        Collection<? extends GrantedAuthority> authorities = 
-            StreamSupport.stream(todosRoles.spliterator(), false)  // false → stream secuencial
-                .filter(r -> r.getIdRol().equals(user.getIdRol())) // si el usuario tiene ese rol
-                .map(r -> new SimpleGrantedAuthority("ROLE_" + r.getNombre()))
-                .collect(Collectors.toList());
-
-        // Devolvemos un objeto que Spring Security pueda manejar
+        // Devolver el objeto User de Spring Security
         return new org.springframework.security.core.userdetails.User(
-                user.getCorreo(),       // username → será el correo
-                user.getContrasena(),   // contraseña encriptada en la BD
-                authorities             // lista de roles/permisos
+                user.getCorreo(),      // username
+                user.getContrasena(),  // contraseña
+                authorities            // roles/autoridades
         );
     }
 }

@@ -10,10 +10,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.backend.portalroshkabackend.Security.filter.JwtAuthenticationFilter;
 import com.backend.portalroshkabackend.Security.filter.JwtValidationFilter;
-import com.backend.portalroshkabackend.Services.UserService;
+import com.backend.portalroshkabackend.Services.UsuariosService;
 
 @Configuration
 public class SpringSecurityConfig {
@@ -22,7 +25,7 @@ public class SpringSecurityConfig {
     private AuthenticationConfiguration authenticationConfiguration;
 
     @Autowired
-    private UserService userService; // ✅ inyectamos UserService
+    private UsuariosService userService; // ✅ inyectamos UserService
 
     // Bean de AuthenticationManager
     @Bean
@@ -35,6 +38,21 @@ public class SpringSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         System.out.println("Default password encoded: " + new BCryptPasswordEncoder().encode("bbb"));
         return new BCryptPasswordEncoder(); 
+    }
+    
+    // Configuración de CORS
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+        config.setAllowedOrigins(java.util.List.of("http://localhost:5173")); // Origen del frontend
+        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowCredentials(true);
+        config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type"));
+        
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = 
+            new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     // Configuración de SecurityFilterChain
@@ -51,21 +69,22 @@ public class SpringSecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 //.requestMatchers(HttpMethod.POST, "").permitAll()
-                .requestMatchers(HttpMethod.GET, "api/v1/usuarios/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
-                .requestMatchers(HttpMethod.POST,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
-                .requestMatchers(HttpMethod.DELETE,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
-                .requestMatchers(HttpMethod.PUT,"api/v1/admin/operaciones").hasRole("4") // Solo usuarios con rol 4 pueden acceder
-                .requestMatchers(HttpMethod.GET,"api/v1/admin/th").hasRole("1") 
-                .requestMatchers(HttpMethod.POST,"api/v1/admin/th").hasRole("1") 
-                .requestMatchers(HttpMethod.DELETE,"api/v1/admin/th").hasRole("1") 
-                .requestMatchers(HttpMethod.PUT,"api/v1/admin/th").hasRole("1") 
-                // .requestMatchers(HttpMethod.GET,"api/v1/usuarios").permitAll() 
+                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/v1/admin/operaciones").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.POST,"/api/v1/admin/operaciones").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.DELETE,"/api/v1/admin/operaciones").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.PUT,"/api/v1/admin/operaciones").hasAuthority("ROLE_4") // Solo usuarios con rol 4 pueden acceder
+                .requestMatchers(HttpMethod.GET,"/api/v1/admin/th").hasAuthority("ROLE_1") 
+                .requestMatchers(HttpMethod.POST,"/api/v1/admin/th").hasAuthority("ROLE_1") 
+                .requestMatchers(HttpMethod.DELETE,"/api/v1/admin/th").hasAuthority("ROLE_1") 
+                .requestMatchers(HttpMethod.PUT,"/api/v1/admin/th").hasAuthority("ROLE_1") 
+                // .requestMatchers(HttpMethod.GET,"/api/v1/usuarios").permitAll() 
                 .anyRequest().authenticated()
             )
             .addFilter(jwtAuthenticationFilter) // Authentication filter for login
             .addFilter(new JwtValidationFilter(authenticationManager())) // Validation filter for all other requests
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configure(http)) // Habilitar CORS
             .sessionManagement(session ->
                 session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
             );

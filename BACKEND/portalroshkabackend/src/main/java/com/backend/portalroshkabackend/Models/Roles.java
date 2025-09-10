@@ -24,6 +24,10 @@ public class Roles {
     public Integer getIdRol() {
         return idRol;
     }
+    
+    public void setIdRol(Integer idRol) {
+        this.idRol = idRol;
+    }
 
     public Roles(String nombre) {
         this.nombre = nombre;
