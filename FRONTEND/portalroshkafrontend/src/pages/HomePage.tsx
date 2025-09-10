@@ -1,4 +1,3 @@
-// src/pages/HomePage.tsx
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ProfileCard from "../components/ProfileCard";
@@ -9,12 +8,11 @@ export default function HomePage() {
 
   if (!user) return <p>Cargando...</p>;
 
-  const isThOrGth = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH";
+  const isThOrGth = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH" || user?.rol?.nombre === "OPERACIONES";
   const isFuncionario = [
     "FUNCIONARIO_FABRICA",
     "FUNCIONARIO_TERCERIZADO",
     "LIDER",
-    "OPERACIONES",
     "DIRECTORIO",
   ].includes(user?.rol?.nombre || "");
 
@@ -71,28 +69,7 @@ export default function HomePage() {
                 color={""}
               />
 
-              {isFuncionario && (
-                <ProfileCard
-                  title="Mis Vacaciones"
-                  icon="🏖️"
-                  description="Consulta tus vacaciones"
-                  extraInfo={
-                    <>
-                      Disponibles:{" "}
-                      <span className="font-semibold text-yellow-600">
-                        {user?.dias_vacaciones_restante ?? 0} días
-                      </span>
-                      <br />
-                      Total asignados: {user?.dias_vacaciones ?? 0} días
-                    </>
-                  }
-                  onClick={() => navigate("/vacaciones")}
-                  borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700"
-                  color={""}
-                />
-              )}
-
+            
               {isThOrGth && (
                 <ProfileCard
                   title="Gestión de Usuarios"

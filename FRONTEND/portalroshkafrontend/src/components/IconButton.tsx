@@ -1,10 +1,11 @@
 interface IconButtonProps {
   label: string;
   icon?: React.ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
   type?: "button" | "submit" | "reset";
-  variant?: "primary" | "secondary" | "danger";
+  variant?: "primary" | "secondary" | "danger" | "ghost";
+  disabled?: boolean;
 }
 
 export default function IconButton({
@@ -20,6 +21,7 @@ export default function IconButton({
     primary: "bg-green-600 text-white hover:bg-green-700",
     secondary: "bg-gray-200 text-black hover:bg-gray-300",
     danger: "bg-red-600 text-white hover:bg-red-700",
+    ghost: "bg-transparent text-gray-700 hover:bg-gray-100",
   };
 
   return (
