@@ -185,6 +185,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
     // ----------------- Position -----------------
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PositionDto> getAllPositions(Pageable pageable) {
         Page<Cargos> positions = positionsRepository.findAll(pageable);
@@ -192,6 +193,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return positions.map(this::mapToPositionDto);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public PositionDto getPositionById(int id) {
         var position =  positionsRepository.findById(id);
@@ -199,6 +201,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return position.map(this::mapToPositionDto).orElse(null);
     }
 
+    @Transactional
     @Override
     public PositionDto addPosition(PositionInsertDto positionInsertDto) {
         Cargos position = new Cargos();
@@ -210,6 +213,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return mapToPositionDto(savedPosition);
     }
 
+    @Transactional
     @Override
     public PositionDto updatePosition(PositionUpdateDto positionUpdateDto, int id) {
         Optional<Cargos> positionExists = positionsRepository.findById(id);
@@ -225,6 +229,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return mapToPositionDto(updatedPosition);
     }
 
+    @Transactional
     @Override
     public PositionDto deletePosition(int id) {
         Optional<Cargos> positionExists = positionsRepository.findById(id);
