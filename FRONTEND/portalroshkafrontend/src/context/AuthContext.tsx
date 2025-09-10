@@ -86,9 +86,9 @@ equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
 
 telefono: payload.telefono ?? undefined,
 fecha_ingreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
+
 dias_vacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
-dias_vacaciones_restante:
-payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante,
+dias_vacaciones_restante:payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante
 };
 
 

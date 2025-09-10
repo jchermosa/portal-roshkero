@@ -19,77 +19,114 @@ export default function HomePage() {
   ].includes(user?.rol?.nombre || "");
 
   return (
-    <div className="space-y-6">
-      {/* Header de bienvenida */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 rounded-2xl">
-        <h2 className="text-3xl font-bold mb-2">¡Bienvenido de nuevo! 👋</h2>
-        <p className="text-blue-100 text-lg">
-          {user?.nombre} {user?.apellido}
-        </p>
-        <p className="text-blue-200 text-sm mt-1">{user?.correo}</p>
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Fondo con imagen */}
+      <div
+        className="absolute inset-0 bg-brand-blue"
+        style={{
+          backgroundImage: "url('/src/assets/ilustracion-herov3.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="absolute inset-0 bg-brand-blue/40"></div>
       </div>
 
-      {/* Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <ProfileCard
-                  title="Mi Perfil"
-                  icon="👤"
-                  description={`Rol: ${user?.rol?.nombre}`}
-                  onClick={() => navigate("/profile")}
-                  borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700" color={""}        />
+      {/* Contenedor principal */}
+      <div className="relative z-10 flex flex-col h-full p-4">
+        <div className="bg-white/45 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
+          
+          {/* Header fijo */}
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
+            <h2 className="text-2xl font-bold text-brand-blue mb-1">
+              ¡Bienvenido de nuevo! 👋
+            </h2>
+            <p className="text-gray-700 text-lg">
+              {user?.nombre} {user?.apellido}
+            </p>
+            <p className="text-gray-500 text-sm mt-1">{user?.correo}</p>
+          </div>
 
-        <ProfileCard
-                  title="Vacaciones"
+          {/* Cards con scroll interno si se excede */}
+          <div className="flex-1 overflow-auto p-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <ProfileCard
+                title="Mi Perfil"
+                icon="👤"
+                description={`Rol: ${user?.rol?.nombre}`}
+                onClick={() => navigate("/profile")}
+                borderClass="border-blue-600"
+                buttonClass="bg-blue-600 hover:bg-blue-700"
+                color={""}
+              />
+
+              <ProfileCard
+                title="Vacaciones"
+                icon="🏖️"
+                description="Consulta tus vacaciones"
+                onClick={() => navigate("/vacaciones")}
+                borderClass="border-blue-600"
+                buttonClass="bg-blue-600 hover:bg-blue-700"
+                color={""}
+              />
+
+              {isFuncionario && (
+                <ProfileCard
+                  title="Mis Vacaciones"
                   icon="🏖️"
                   description="Consulta tus vacaciones"
+                  extraInfo={
+                    <>
+                      Disponibles:{" "}
+                      <span className="font-semibold text-yellow-600">
+                        {user?.dias_vacaciones_restante ?? 0} días
+                      </span>
+                      <br />
+                      Total asignados: {user?.dias_vacaciones ?? 0} días
+                    </>
+                  }
                   onClick={() => navigate("/vacaciones")}
                   borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700" color={""}        />
+                  buttonClass="bg-blue-600 hover:bg-blue-700"
+                  color={""}
+                />
+              )}
 
-        {isFuncionario && (
-          <ProfileCard
-                      title="Mis Vacaciones"
-                      icon="🏖️"
-                      description="Consulta tus vacaciones"
-                      extraInfo={<>
-                          Disponibles:{" "}
-                          <span className="font-semibold text-yellow-600">
-                              {user?.dias_vacaciones_restante ?? 0} días
-                          </span>
-                          <br />
-                          Total asignados: {user?.dias_vacaciones ?? 0} días
-                      </>}
-                      onClick={() => navigate("/vacaciones")}
-                      borderClass="border-blue-600"
-                      buttonClass="bg-blue-600 hover:bg-blue-700" color={""}         />
-        )}
-
-        {isThOrGth && (
-          <ProfileCard
-                      title="Gestión de Usuarios"
-                      icon="👥"
-                      description="Administra perfiles y usuarios del sistema"
-                      onClick={() => navigate("/usuarios")}
-                      borderClass="border-blue-600"
-                      buttonClass="bg-blue-600 hover:bg-blue-700" color={""}          />
-        )}
-
-        <ProfileCard
-                  title="Solicitudes"
-                  icon="📝"
-                  description="Crea y revisa tus solicitudes"
-                  onClick={() => navigate("/solicitudes")}
-                  borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700" color={""}        />
-        <ProfileCard
-                  title="Gestion de Solcitudes"
-                  icon="📤"
-                  description="Administra las solicitudes de los usuarios"
+              {isThOrGth && (
+                <ProfileCard
+                  title="Gestión de Usuarios"
+                  icon="👥"
+                  description="Administra perfiles y usuarios del sistema"
                   onClick={() => navigate("/usuarios")}
                   borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700" color={""}        />
-                  
+                  buttonClass="bg-blue-600 hover:bg-blue-700"
+                  color={""}
+                />
+              )}
+
+              <ProfileCard
+                title="Solicitudes"
+                icon="📝"
+                description="Crea y revisa tus solicitudes"
+                onClick={() => navigate("/solicitudes")}
+                borderClass="border-blue-600"
+                buttonClass="bg-blue-600 hover:bg-blue-700"
+                color={""}
+              />
+
+              <ProfileCard
+                title="Gestión de Solicitudes"
+                icon="📤"
+                description="Administra las solicitudes de los usuarios"
+                onClick={() => navigate("/usuarios")}
+                borderClass="border-blue-600"
+                buttonClass="bg-blue-600 hover:bg-blue-700"
+                color={""}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
