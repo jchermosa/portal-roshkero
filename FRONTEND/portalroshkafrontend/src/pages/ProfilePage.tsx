@@ -117,8 +117,9 @@ export default function ProfilePage() {
                         </span>
                       </a>
                     )}
-
+                  
                     <EditableField
+                      
                       label="📞 Teléfono"
                       value={phoneLocal}
                       placeholder="No definido"
@@ -150,8 +151,7 @@ export default function ProfilePage() {
                           console.error("Fallo al guardar teléfono:", err);
                         }
                       }}
-                      className="rounded-xl border border-white/60 bg-white/60 backdrop-blur-sm p-0"
-                      inputClassName="bg-transparent"
+                      
                     />
 
                     {joinedAt && (
