@@ -18,9 +18,10 @@ export default function DashboardLayout() {
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
     { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: isThOrGth },
     { id: "/gestionsolicitud", label: "Gestión de Solicitudes", icon:  "📤", available: isThOrGth },
-    { id: "/reportes", label: "Reportes", icon: "📊", available: isThOrGth },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true},
+    { id: "/solicitudes", label: "Solicitudes", icon: "📩", available: true},
+    { id: "/benefits", label: "Beneficios", icon: "🏆", available: true },
     { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
   ].filter(o => o.available);
 
