@@ -8,6 +8,7 @@ import LoginPage from "../pages/LoginPage";
 
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
+import BeneficiosPage from "../pages/BenefitsPage";
 
 import UsuariosPage from "../pages/UsuariosPage";
 // import PerfilPage from "../pages/PerfilPage";
@@ -32,6 +33,7 @@ export default function AppRoutes() {
               <Route path="/profile" element={<ProfilePage />} /> 
               <Route path="/usuarios" element={<UsuariosPage />} />
               <Route path="/vacaciones" element={<VacacionesPage />} /> 
+              <Route path="/benefits" element={<BeneficiosPage />} />
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
           <Route path="/reportes" element={<ReportesPage />} />
           <Route path="/configuracion" element={<ConfiguracionPage />} /> */}
