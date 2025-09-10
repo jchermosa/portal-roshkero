@@ -5,12 +5,11 @@ export default function DashboardLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const isThOrGth = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH";
+  const isThOrGth = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH" || user?.rol?.nombre === "OPERACIONES";
   const isFuncionario = [
     "FUNCIONARIO_FABRICA",
     "FUNCIONARIO_TERCERIZADO",
     "LIDER",
-    "OPERACIONES",
     "DIRECTORIO",
   ].includes(user?.rol?.nombre || "");
 
