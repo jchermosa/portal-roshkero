@@ -9,6 +9,8 @@ import com.backend.portalroshkabackend.admin.dto.RolesResponseDto;
 import jakarta.validation.Valid;
 
 import com.backend.portalroshkabackend.admin.service.IOperationService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class OperationsController {
 
     private final IOperationService operationService;
 
+    @Autowired
     public OperationsController(IOperationService operationService) {
         this.operationService = operationService;
     }

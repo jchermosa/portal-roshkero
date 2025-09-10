@@ -16,6 +16,8 @@ import com.backend.portalroshkabackend.admin.repository.CargosRepository;
 import com.backend.portalroshkabackend.admin.repository.EquiposRepository;
 import com.backend.portalroshkabackend.admin.repository.RequestRepository;
 import com.backend.portalroshkabackend.admin.repository.RolesRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +28,7 @@ public class OperationServiceImpl implements IOperationService {
     private final CargosRepository cargosRepository;
     private final EquiposRepository equiposRepository;
 
+    @Autowired
     public OperationServiceImpl(RequestRepository requestRepository,
             RolesRepository rolesRepository,
             CargosRepository cargosRepository,
