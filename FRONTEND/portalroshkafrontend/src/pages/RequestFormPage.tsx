@@ -198,7 +198,7 @@ export default function SolicitudFormPage() {
         <div className="max-w-2xl w-full mx-auto flex flex-col h-full">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col w-full max-h-[96vh] overflow-hidden">
             <DynamicForm
-                title="Crear solicitud"
+                title="Crear solicitud "
                 subtitle="Completá los campos para enviar tu solicitud"
                 headerIcon="📝"
                 sections={getSections()}
