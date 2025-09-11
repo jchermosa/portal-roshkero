@@ -170,7 +170,7 @@ const renderActions = (u: UsuarioItem) => (
                 label="Crear Usuario"
                 icon={<span>➕</span>}
                 variant="primary"
-                onClick={() => navigate("/usuarios/nuevo")}
+                onClick={() => navigate("/usuarios/buscar")}
                 className="h-10 text-sm px-4 flex items-center"
               />
             </div>
