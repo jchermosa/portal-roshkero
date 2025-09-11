@@ -1,7 +1,6 @@
 package com.backend.portalroshkabackend.Repositories;
 
 
-import com.backend.portalroshkabackend.Models.Usuarios;
 import com.backend.portalroshkabackend.Models.Usuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,5 +22,7 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
     Page<Usuario> findAllByOrderByIdEquipoAsc(Pageable pageable); // Retona los usuarios ordenados por equipo
     Page<Usuario> findAllByOrderByIdCargoAsc(Pageable pageable); // Retona los usuarios ordenados por cargo
 
-     Optional<Usuarios> findByNroCedula(Integer nroCedula);
+     Optional<Usuario> findByNroCedula(Integer nroCedula);
+
+    Optional<Usuario> findByCorreo(String correo);
 }

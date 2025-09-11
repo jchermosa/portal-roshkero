@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.backend.portalroshkabackend.Models.Usuario;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.backend.portalroshkabackend.Models.Usuarios;
 import com.backend.portalroshkabackend.Services.UsuariosService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
@@ -40,7 +41,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throws AuthenticationException {
 
         try {
-            Usuarios user = new ObjectMapper().readValue(request.getInputStream(), Usuarios.class);
+            Usuario user = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
 
             UsernamePasswordAuthenticationToken authRequest =
                 new UsernamePasswordAuthenticationToken(user.getCorreo(), user.getContrasena());
@@ -61,7 +62,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             String correo = user.getUsername();
 
             // obtenemos el usuario del correo para obtener su rol
-            Usuarios usuario = userService.getUserByCorreo(correo);
+            Usuario usuario = userService.getUserByCorreo(correo);
 
             String token = Jwts.builder()
                 .subject(correo)

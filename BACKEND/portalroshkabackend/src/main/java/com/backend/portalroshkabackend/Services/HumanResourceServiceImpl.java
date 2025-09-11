@@ -286,6 +286,8 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         dto.setIdRol(user.getIdRol());
         dto.setFechaIngreso(user.getFechaIngreso());
         dto.setAntiguedad(user.getAntiguedad());
+
+
         dto.setDiasVacaciones(user.getDiasVacaciones());
         dto.setEstado(user.isEstado());
         dto.setContrasena(user.getContrasena());

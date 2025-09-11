@@ -2,9 +2,13 @@ package com.backend.portalroshkabackend.Models;
 
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.postgresql.util.PGInterval;
 
 import java.sql.Date;
+import java.time.Duration;
+import java.time.Period;
 
 @Entity
 @Table(name = "usuarios")

@@ -3,6 +3,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.ArrayList;
+
+import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,15 +15,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.backend.portalroshkabackend.Models.Usuarios;
 import com.backend.portalroshkabackend.Models.Roles;
-import com.backend.portalroshkabackend.Repositories.UsuariosRepository;
 
 @Service
 public class JpaUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UsuariosRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private RolesService rolesService;
@@ -29,7 +30,7 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
         // Buscar usuario por correo
-        Optional<Usuarios> optionalUser = userRepository.findByCorreo(correo);
+        Optional<Usuario> optionalUser = userRepository.findByCorreo(correo);
 
         // Verificar si existe el usuario
         if (optionalUser.isEmpty()) {
@@ -37,7 +38,7 @@ public class JpaUserDetailsService implements UserDetailsService {
         }
 
         // Obtener el usuario del Optional
-        Usuarios user = optionalUser.get();
+        Usuario user = optionalUser.get();
         
         // Obtener el ID del rol del usuario
         Integer userRolId = user.getIdRol();
