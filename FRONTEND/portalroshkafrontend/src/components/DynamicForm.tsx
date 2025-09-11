@@ -3,14 +3,18 @@ import React, { useEffect, useState } from "react";
 export interface FormField {
   name: string;
   label: string;
-  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox";
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
   helperText?: string;
   disabled?: boolean;
   validation?: (value: any) => string | null;
+  //Para campo de request
+  value?: any;
+  onChange?: (e: React.ChangeEvent<any>) => void;
 }
+
 
 export interface FormSection {
   title: string;
@@ -27,6 +31,7 @@ export interface DynamicFormProps {
   initialData?: Record<string, any>;
   onSubmit: (data: Record<string, any>) => Promise<void>;
   onCancel?: () => void;
+  onChange?: (data: Record<string, any>) => void;
   submitLabel?: string;
   cancelLabel?: string;
   loading?: boolean;
@@ -46,6 +51,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   initialData = {},
   onSubmit,
   onCancel,
+  onChange, // <-- incluido
   submitLabel = "Guardar cambios",
   cancelLabel = "Cancelar",
   loading = false,
@@ -67,7 +73,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     if (type === "checkbox") processedValue = (e.target as HTMLInputElement).checked;
     else if (type === "number") processedValue = value === "" ? "" : Number(value);
 
-    setFormData((prev) => ({ ...prev, [name]: processedValue }));
+    setFormData((prev) => {
+      const next = { ...prev, [name]: processedValue };
+      if (onChange) onChange(next); // <-- notifico al padre con el nuevo estado
+      return next;
+    });
 
     if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
     if (message) setMessage(null);
@@ -117,10 +127,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     const error = errors[field.name];
     const isFieldDisabled = field.disabled || loading;
 
+    //Cambios para que funione cantidad_dias en RequestFormPage
     const baseProps = {
       name: field.name,
-      value: field.type === "checkbox" ? undefined : value,
-      onChange: handleChange,
+      value: field.value !== undefined ? field.value : field.type === "checkbox" ? undefined : value,
+      onChange: field.onChange ?? handleChange,
       required: field.required,
       placeholder: field.placeholder,
       disabled: isFieldDisabled,
