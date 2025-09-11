@@ -85,7 +85,7 @@ export default function HomePage() {
                 title="Solicitudes"
                 icon="📝"
                 description="Crea y revisa tus solicitudes"
-                onClick={() => navigate("/solicitudes")}
+                onClick={() => navigate("/requests")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
                 color=""
