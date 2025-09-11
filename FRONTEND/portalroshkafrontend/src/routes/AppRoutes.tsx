@@ -31,6 +31,7 @@ export default function AppRoutes() {
               <Route index element={<HomePage />} />
               <Route path="/profile" element={<ProfilePage />} /> 
               <Route path="/usuarios" element={<UsuariosPage />} />
+              <Route path="/usuarios/nuevo" element={<UserFormPage />} />
               <Route path="/vacaciones" element={<VacacionesPage />} /> 
               <Route path="/benefits" element={<BeneficiosPage />} />
               <Route path="/configuracion" element={<Configuration />} />
