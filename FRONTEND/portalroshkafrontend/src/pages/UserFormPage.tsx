@@ -162,7 +162,7 @@ export default function UserFormPage() {
     <div className="relative z-10 flex flex-col h-full p-4">
       <div className="max-w-3xl w-full mx-auto flex flex-col h-full">
         {/* Tarjeta translúcida con scroll interno */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col w-full max-h-[96vh] overflow-hidden">
+        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col w-full max-h-[96vh] overflow-hidden">
           <DynamicForm
             title={isEditing ? "Editar usuario" : "Crear usuario"}
             subtitle={
