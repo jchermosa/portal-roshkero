@@ -80,20 +80,19 @@ export default function Login() {
         <div className="absolute inset-0 bg-brand-blue/40"></div>
       </div>
 
+      {/* Toggle dark mode con íconos */}
+        <button
+          onClick={() => setDarkMode((prev) => !prev)}
+          type="button"
+          className="absolute top-4 right-4 z-20 text-2xl transition-transform transform hover:scale-110"
+        >
+          {darkMode ? "🌙" : "🌞"}
+        </button>
+
+
       {/* Contenedor */}
       <div className="relative z-10 w-full max-w-md bg-white/95 dark:bg-gray-900/90 backdrop-blur-sm shadow-2xl rounded-2xl p-10">
-        {/* Toggle dark mode */}
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => setDarkMode((prev) => !prev)}
-            type="button"
-            className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${
-              darkMode ? "bg-blue-600 justify-end" : "bg-gray-400 justify-start"
-            }`}
-          >
-            <span className="w-4 h-4 bg-white rounded-full shadow-md"></span>
-          </button>
-        </div>
+       
 
         {/* Logo + título */}
         <div className="text-center mb-8">
