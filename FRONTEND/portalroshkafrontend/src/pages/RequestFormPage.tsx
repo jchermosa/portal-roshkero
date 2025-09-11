@@ -20,6 +20,11 @@ export default function SolicitudFormPage() {
   const [cantidadDias, setCantidadDias] = useState<number | null>(null);
   const [cantidadEditable, setCantidadEditable] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
+  const initialData: Record<string, any> = {
+    id_solicitud_tipo: tipoSeleccionado ?? "",
+    cantidad_dias: cantidadEditable ? undefined : cantidadDias ?? null,
+  };
+
   const modoDesarrollo = true;
 
   useEffect(() => {
@@ -61,18 +66,30 @@ export default function SolicitudFormPage() {
       return;
     }
 
-    const nombre = tipo.nombre.toLowerCase();
+    const nombre = tipo.nombre;
 
-    if (nombre.includes("inventario")) {
+    if (nombre.includes("Inventario")) {
       setCantidadDias(null);
       setCantidadEditable(false);
-    } else if (nombre.includes("maternidad")) {
+    } else if (nombre.includes("Paternidad")) {
+      setCantidadDias(14);
+      setCantidadEditable(false);
+    } else if (nombre.includes("Maternidad")) {
       setCantidadDias(150);
       setCantidadEditable(false);
-    } else if (nombre.includes("maternidad")) {
-      setCantidadDias(150);
+    } else if (nombre.includes("Cumpleanos")) {
+      setCantidadDias(1);
       setCantidadEditable(false);  
-    } else if (["Vacaciones", "Capacitacion", "Examenes", "Reposo", "Otros"].some((k) => nombre.includes(k))) {
+    } else if (nombre.includes("Matrimonio")) {
+      setCantidadDias(5);
+      setCantidadEditable(false);    
+    } else if (nombre.includes("Luto(1er grado)")) {
+      setCantidadDias(5);
+      setCantidadEditable(false);
+    } else if (nombre.includes("Luto(2do grado)")) {
+      setCantidadDias(3);
+      setCantidadEditable(false);      
+    } else if (["Capacitacion", "Examenes", "Reposo", "Otros"].some((k) => nombre.includes(k))) {
       setCantidadEditable(true);
       setCantidadDias(null);
     } else {
@@ -87,7 +104,7 @@ export default function SolicitudFormPage() {
   const payload = {
     id_usuario: user?.id,
     id_solicitud_tipo: formData.id_solicitud_tipo,
-    cantidad_dias: cantidadEditable ? formData.cantidad_dias : cantidadDias,
+    cantidad_dias: formData.cantidad_dias ?? cantidadDias,
     fecha_inicio: formData.fecha_inicio,
     fecha_fin: formData.fecha_fin,
     comentario: formData.comentario,
@@ -101,23 +118,23 @@ export default function SolicitudFormPage() {
      return;
     }
 
-  const res = await fetch("/api/solicitudes", {
+    const res = await fetch("/api/solicitudes", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
-  });
+    });
 
-  if (!res.ok) {
-    throw new Error(await res.text());
-  }
+    if (!res.ok) {
+        throw new Error(await res.text());
+    }
 
   navigate("/requests");
 };
 
-  const sections: FormSection[] = [
+  const getSections = (): FormSection[] => [
     {
       title: "Nueva Solicitud",
       icon: "📅",
@@ -127,18 +144,20 @@ export default function SolicitudFormPage() {
           label: "Tipo de solicitud",
           type: "select",
           required: true,
-          options: tipos.map((t) => ({ value: t.id, label: t.nombre })),
-          onChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
-            setTipoSeleccionado(Number(e.target.value)),
+          options: tipos
+            .filter((t) => t.nombre.toLowerCase() !== "vacaciones")
+            .map((t) => ({ value: t.id, label: t.nombre })),
+          placeholder: "Seleccionar...",
         },
+
         {
           name: "cantidad_dias",
           label: "Cantidad de días",
           type: "number",
           required: false,
           disabled: !cantidadEditable,
-          value: cantidadEditable ? undefined : cantidadDias ?? undefined,
         },
+
         {
           name: "fecha_inicio",
           label: "Fecha de inicio",
@@ -179,16 +198,20 @@ export default function SolicitudFormPage() {
         <div className="max-w-2xl w-full mx-auto flex flex-col h-full">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col w-full max-h-[96vh] overflow-hidden">
             <DynamicForm
-              title="Crear solicitud"
-              subtitle="Completá los campos para enviar tu solicitud"
-              headerIcon="📝"
-              sections={sections}
-              initialData={{}}
-              onSubmit={handleSubmit}
-              onCancel={() => navigate("/requests")}
-              loading={loading}
-              submitLabel="Enviar solicitud"
-              className="flex-1 overflow-hidden"
+                title="Crear solicitud"
+                subtitle="Completá los campos para enviar tu solicitud"
+                headerIcon="📝"
+                sections={getSections()}
+                initialData={initialData}
+                onChange={(data) => {
+                    const id = data.id_solicitud_tipo;
+                    setTipoSeleccionado(id ? Number(id) : null);
+                }}
+                onSubmit={handleSubmit}
+                onCancel={() => navigate("/requests")}
+                loading={loading}
+                submitLabel="Enviar solicitud"
+                className="flex-1 overflow-hidden"
             />
           </div>
         </div>
