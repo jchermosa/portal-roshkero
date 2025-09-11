@@ -28,19 +28,6 @@ export default function SolicitudFormPage() {
   const modoDesarrollo = true;
 
   useEffect(() => {
-    if (!token) return;
-
-    setLoading(true);
-    fetch("/api/tipo-solicitud", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setTipos(data))
-      .catch((err) => console.error("Error al cargar tipos:", err))
-      .finally(() => setLoading(false));
-  }, [token]);
-
-  useEffect(() => {
     if (modoDesarrollo) {
       setTipos(mockTipos);
       return;
