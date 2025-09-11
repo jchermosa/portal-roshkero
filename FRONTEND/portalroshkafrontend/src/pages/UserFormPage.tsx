@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DynamicForm from "../components/DynamicForm";
 import type { FormSection } from "../components/DynamicForm";
+import { useLocation } from "react-router-dom";
 
 interface CatalogItem {
   id: number;
@@ -13,6 +14,9 @@ export default function UserFormPage() {
   const { token } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const param = new URLSearchParams(location.search);
+  const cedulaParam = param.get("cedula")
 
   const [roles, setRoles] = useState<CatalogItem[]>([]);
   const [cargos, setCargos] = useState<CatalogItem[]>([]);
@@ -22,10 +26,15 @@ export default function UserFormPage() {
 
   const isEditing = !!id;
 
-  useEffect(() => {
-    if (!token) return;
+    useEffect(() => {
+      if (!isEditing) {
+        setInitialData({ nroCedula: cedulaParam || "" });
+      }
+    }, [isEditing, cedulaParam]);
 
-    
+    useEffect(() => {
+      if (!token) return;
+
     setLoading(true);
     Promise.all([
       fetch("/api/catalogos/roles").then((r) => r.json()),

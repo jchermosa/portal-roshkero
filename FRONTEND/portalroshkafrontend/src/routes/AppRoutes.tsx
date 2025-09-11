@@ -13,6 +13,7 @@ import VacacionesPage from "../pages/VacacionesPage";
 import RequestPage from "../pages/RequestPage";
 import Configuration from "../pages/Configuration.tsx";
 import UserFormPage from "../pages/UserFormPage";
+import UserSearchPage from "../pages/UserSearchPage.tsx";
 import RequestFormPage from "../pages/RequestFormPage"
 
 
@@ -32,7 +33,9 @@ export default function AppRoutes() {
               <Route index element={<HomePage />} />
               <Route path="/profile" element={<ProfilePage />} /> 
               <Route path="/usuarios" element={<UsuariosPage />} />
+              <Route path="/usuarios/buscar" element={<UserSearchPage />} />
               <Route path="/usuarios/nuevo" element={<UserFormPage />} />
+              <Route path="/usuarios/:id" element={<UserFormPage />} />
               <Route path="/vacaciones" element={<VacacionesPage />} /> 
               <Route path="/benefits" element={<BeneficiosPage />} />
               <Route path="/configuracion" element={<Configuration />} />
