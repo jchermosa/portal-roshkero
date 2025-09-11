@@ -16,12 +16,18 @@ export default function IconButton({
   type = "button",
   variant = "primary",
 }: IconButtonProps) {
-  const baseStyles = "px-4 py-2 rounded-lg font-medium transition flex items-center gap-2";
-  const variants: Record<typeof variant, string> = {
-    primary: "bg-green-600 text-white hover:bg-green-700",
-    secondary: "bg-gray-200 text-black hover:bg-gray-300",
-    danger: "bg-red-600 text-white hover:bg-red-700",
-    ghost: "bg-transparent text-gray-700 hover:bg-gray-100",
+
+  const baseStyles =
+    "px-4 py-2 rounded-lg font-medium transition flex items-center gap-2";
+
+  const variants: Record<NonNullable<IconButtonProps["variant"]>, string> = {
+    primary:
+      "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600",
+    secondary:
+      "bg-gray-200 text-black hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600",
+    danger:
+      "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
+
   };
 
   return (
@@ -35,36 +41,3 @@ export default function IconButton({
     </button>
   );
 }
-
-
-// 🎯 ICONOS DISPONIBLES (pueden usarse como <span>icon</span>)
-
-// ➕   Crear, agregar nuevo
-// 🖊️   Editar
-// 🗑️   Eliminar
-// 🧹   Limpiar filtros o campos
-// 🔍   Buscar
-// 📤   Enviar o exportar
-// 📥   Importar o recibir
-// ✅   Confirmar
-// ❌   Cancelar o cerrar
-// 🔄   Recargar o refrescar
-// ⏳   Cargando, procesando
-// 👁️   Ver detalles
-// 🧾   Ver comprobante, factura
-// 🧑‍🤝‍🧑   Usuarios
-// 📄   Documentos
-// 📅   Fecha / calendario
-// 💾   Guardar
-// ⚙️   Configurar o ajustar
-// 🔒   Bloquear
-// 🔓   Desbloquear
-// 📋   Copiar
-// 📊   Reportes o estadísticas
-// utilizacion del boton en Pages
-{/* <IconButton
-  label="Limpiar filtros"
-  icon={<span>🧹</span>}
-  variant="secondary"
-  onClick={limpiarFiltros}
-/> */}

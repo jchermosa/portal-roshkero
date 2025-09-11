@@ -18,7 +18,7 @@ export default function HomePage() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      {/* Fondo con imagen */}
+      {/* Fondo */}
       <div
         className="absolute inset-0 bg-brand-blue"
         style={{
@@ -31,22 +31,23 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-brand-blue/40"></div>
       </div>
 
-      {/* Contenedor principal */}
+      {/* Contenedor */}
       <div className="relative z-10 flex flex-col h-full p-4">
-        <div className="bg-white/45 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
-          
-          {/* Header fijo */}
-          <div className="p-6 border-b border-gray-200 flex-shrink-0">
-            <h2 className="text-2xl font-bold text-brand-blue mb-1">
+        <div className="bg-white/60 dark:bg-gray-900/70 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
+          {/* Header */}
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <h2 className="text-2xl font-bold text-brand-blue dark:text-white mb-1">
               ¡Bienvenido de nuevo! 👋
             </h2>
-            <p className="text-gray-700 text-lg">
+            <p className="text-gray-700 dark:text-gray-200 text-lg">
               {user?.nombre} {user?.apellido}
             </p>
-            <p className="text-gray-500 text-sm mt-1">{user?.correo}</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              {user?.correo}
+            </p>
           </div>
 
-          {/* Cards con scroll interno si se excede */}
+          {/* Cards */}
           <div className="flex-1 overflow-auto p-6">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <ProfileCard
@@ -56,7 +57,7 @@ export default function HomePage() {
                 onClick={() => navigate("/profile")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
-                color={""}
+                color=""
               />
 
               <ProfileCard
@@ -66,10 +67,8 @@ export default function HomePage() {
                 onClick={() => navigate("/vacaciones")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
-                color={""}
+                color=""
               />
-
-            
               {isThOrGth && (
                 <ProfileCard
                   title="Gestión de Usuarios"
@@ -78,7 +77,7 @@ export default function HomePage() {
                   onClick={() => navigate("/usuarios")}
                   borderClass="border-blue-600"
                   buttonClass="bg-blue-600 hover:bg-blue-700"
-                  color={""}
+                  color=""
                 />
               )}
 
@@ -89,7 +88,7 @@ export default function HomePage() {
                 onClick={() => navigate("/solicitudes")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
-                color={""}
+                color=""
               />
 
               <ProfileCard
@@ -99,7 +98,7 @@ export default function HomePage() {
                 onClick={() => navigate("/usuarios")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
-                color={""}
+                color=""
               />
             </div>
           </div>
