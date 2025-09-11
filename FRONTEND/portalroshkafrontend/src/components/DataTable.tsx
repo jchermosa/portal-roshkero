@@ -57,7 +57,7 @@ function DataTable<T>({
         </div>
       )}
 
-      <table className="w-full border-collapse rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+      <table className="w-full border-collapse rounded-lg overflow-hidden bg-white dark:bg-gray-700">
         <thead className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 sticky top-0 z-10">
           <tr>
             {columns.map((col) => (
