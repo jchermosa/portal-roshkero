@@ -14,7 +14,6 @@ function formatDate(d?: string | Date) {
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [phoneLocal, setPhoneLocal] = useState<string | undefined>(user?.telefono);
 
   if (!user) {
     return (
