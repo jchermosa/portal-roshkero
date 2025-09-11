@@ -19,7 +19,7 @@ interface SolicitudItem {
 }
 
 
-export default function SolicitudesPage() {
+export default function RequestPage() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
 
@@ -160,7 +160,7 @@ export default function SolicitudesPage() {
                 label="Nueva Solicitud"
                 icon={<span>➕</span>}
                 variant="primary"
-                onClick={() => navigate("/solicitudes/nueva")}
+                onClick={() => navigate("/requests/nuevo")}
                 className="h-10 text-sm px-4 flex items-center"
               />
             </div>
