@@ -3,14 +3,13 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PaginationFooter from "../components/PaginationFooter";
 
-// Carga masiva de imágenes desde src/assets/beneficios/*.png
+// Carga masiva de imágenes desde src/assets/*.png
 const images = import.meta.glob("/src/assets/*.png", {
   eager: true,
   import: "default",
 }) as Record<string, string>;
 
-const getImage = (fileName: string) =>
-  images[`/src/assets/${fileName}`] ?? "";
+const getImage = (fileName: string) => images[`/src/assets/${fileName}`] ?? "";
 
 type Benefit = {
   id: number;
@@ -34,10 +33,9 @@ const DATA: Benefit[] = [
   { id: 12, nombre: "Gym", descripcion: "Convenio con el gym FITTEST", imagen: "image12.png" },
   { id: 13, nombre: "Graduacion", descripcion: "Regalos para los nuevos egresados", imagen: "image13.png" },
   { id: 14, nombre: "Frutas y snacks", descripcion: "Snacks para merienda y desayuno saludable", imagen: "image14.png" },
-  
 ];
 
-const PAGE_SIZE = 11;
+const PAGE_SIZE = 14;
 
 export default function BeneficiosPage() {
   const navigate = useNavigate();
@@ -67,21 +65,25 @@ export default function BeneficiosPage() {
         </div>
 
         <div className="relative z-10 flex flex-col h-full p-4">
-          <div className="bg-white/45 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
-            <div className="p-6 border-b border-gray-200 flex-shrink-0">
-              <h2 className="text-2xl font-bold text-brand-blue">{seleccionado.nombre}</h2>
-              <p className="mt-2 text-gray-700">{seleccionado.descripcion}</p>
+          <div className="bg-white/45 dark:bg-gray-900/70 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+              <h2 className="text-2xl font-bold text-brand-blue dark:text-white">
+                {seleccionado.nombre}
+              </h2>
+              <p className="mt-2 text-gray-700 dark:text-gray-200">
+                {seleccionado.descripcion}
+              </p>
             </div>
 
             <div className="flex-1 overflow-auto p-6 flex items-center justify-center">
               <img
                 src={getImage(seleccionado.imagen)}
                 alt={seleccionado.nombre}
-                className="w-full max-w-xl max-h-[800px] object-contain rounded-xl border shadow-sm"
+                className="w-full max-w-xl max-h-[800px] object-contain rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm"
               />
             </div>
 
-            <div className="p-6 border-t border-gray-200 flex-shrink-0 flex justify-end">
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 flex justify-end">
               <button
                 onClick={() => setSeleccionado(null)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -111,37 +113,45 @@ export default function BeneficiosPage() {
       </div>
 
       <div className="relative z-10 flex flex-col h-full p-4">
-        <div className="bg-white/45 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
-          <div className="p-6 border-b border-gray-200 flex-shrink-0">
-            <h2 className="text-2xl font-bold text-brand-blue">Beneficios</h2>
+        <div className="bg-white/45 dark:bg-gray-900/70 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <h2 className="text-2xl font-bold text-brand-blue dark:text-white">
+              Beneficios
+            </h2>
           </div>
 
           <div className="flex-1 overflow-auto p-6">
-            <div className="rounded-2xl overflow-hidden shadow bg-white">
+            <div className="rounded-2xl overflow-hidden shadow bg-white dark:bg-gray-800">
               <table className="min-w-full border-collapse">
-                <thead className="bg-blue-100">
+                <thead className="bg-blue-100 dark:bg-blue-900">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-blue-700">
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-blue-700 dark:text-blue-100">
                       Beneficio
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-blue-700">
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-blue-700 dark:text-blue-100">
                       Descripción
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="text-gray-800 dark:text-gray-200">
                   {slice.length === 0 ? (
                     <tr>
-                      <td colSpan={2} className="px-4 py-6 text-center text-gray-400">
+                      <td
+                        colSpan={2}
+                        className="px-4 py-6 text-center text-gray-400 dark:text-gray-500"
+                      >
                         No hay resultados.
                       </td>
                     </tr>
                   ) : (
                     slice.map((b) => (
-                      <tr key={b.id} className="hover:bg-gray-50 border-t">
+                      <tr
+                        key={b.id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-t border-gray-200 dark:border-gray-700"
+                      >
                         <td className="px-4 py-2">
                           <button
-                            className="text-blue-600 hover:underline"
+                            className="text-blue-600 dark:text-blue-400 hover:underline"
                             onClick={() => setSeleccionado(b)}
                           >
                             {b.nombre}
@@ -156,7 +166,7 @@ export default function BeneficiosPage() {
             </div>
           </div>
 
-          <div className="p-6 border-t border-gray-200 flex-shrink-0">
+          <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
             <PaginationFooter
               currentPage={page}
               totalPages={totalPages}
