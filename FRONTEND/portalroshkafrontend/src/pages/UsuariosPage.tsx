@@ -42,7 +42,7 @@ export default function UsuariosPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const puedeVer = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH";
+  const puedeVer = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH" || user?.rol?.nombre === "OPERACIONES"
 
   const columns = [
   { key: "id", label: "ID" },

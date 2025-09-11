@@ -5,18 +5,15 @@ import DashboardLayout from "../layouts/DashboardLayout";
 
 // Pages
 import LoginPage from "../pages/LoginPage";
-
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
 import BeneficiosPage from "../pages/BenefitsPage";
-
 import UsuariosPage from "../pages/UsuariosPage";
-// import PerfilPage from "../pages/PerfilPage";
-// // si vas creando estas páginas
 import VacacionesPage from "../pages/VacacionesPage";
-// import VacacionesPage from "../pages/VacacionesPage";
-// import ReportesPage from "../pages/ReportesPage";
+import RequestPage from "../pages/RequestPage";
 import Configuration from "../pages/Configuration.tsx";
+import UserFormPage from "../pages/UserFormPage";
+
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -29,6 +26,8 @@ export default function AppRoutes() {
       {/* Rutas privadas dentro del DashboardLayout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
+
+              <Route path="/requests" element={<RequestPage />} />
               <Route index element={<HomePage />} />
               <Route path="/profile" element={<ProfilePage />} /> 
               <Route path="/usuarios" element={<UsuariosPage />} />
@@ -36,7 +35,7 @@ export default function AppRoutes() {
               <Route path="/benefits" element={<BeneficiosPage />} />
               <Route path="/configuracion" element={<Configuration />} />
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
-          <Route path="/reportes" element={<ReportesPage />} />
+
           < */}
         </Route>
       </Route>
