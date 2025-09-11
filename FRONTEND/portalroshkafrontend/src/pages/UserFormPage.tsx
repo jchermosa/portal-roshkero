@@ -81,25 +81,33 @@ export default function UserFormPage() {
       .finally(() => setLoading(false));
   }, [id, token, isEditing]);
 
-  const handleSubmit = async (formData: Record<string, any>) => {
-    const method = isEditing ? "PUT" : "POST";
-    const url = isEditing ? `/api/usuarios/${id}` : "/api/usuarios";
+ const handleSubmit = async (formData: Record<string, any>) => {
+  const method = isEditing ? "PUT" : "POST";
+  const url = isEditing ? `/api/usuarios/${id}` : "/api/usuarios";
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!res.ok) {
-      throw new Error(await res.text());
-    }
-
-    navigate("/usuarios");
+  // 🔑 Normalizar nroCedula a número
+  const processedData = {
+    ...formData,
+    nroCedula: formData.nroCedula ? parseInt(formData.nroCedula, 10) : null,
+    contrasena: isEditing ? undefined : "usuario123",
   };
+
+  const res = await fetch(url, {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(processedData),
+  });
+
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+
+  navigate("/usuarios");
+};
+
 
   const sections: FormSection[] = [
     {
@@ -108,9 +116,10 @@ export default function UserFormPage() {
       fields: [
         { name: "nombre", label: "Nombre", type: "text", required: true },
         { name: "apellido", label: "Apellido", type: "text", required: true },
-        { name: "nroCedula", label: "Número de cédula", type: "text", required: true },
+        { name: "nroCedula", label: "Número de cédula", type: "number", required: true },
         { name: "correo", label: "Correo electrónico", type: "email", required: true },
         { name: "telefono", label: "Teléfono", type: "text" },
+        // { name: "contraseña", label: "Contraseña", type: "password" },
         { name: "fechaIngreso", label: "Fecha de ingreso", type: "date" },
         { name: "fechaNacimiento", label: "Fecha de nacimiento", type: "date" },
       ],
