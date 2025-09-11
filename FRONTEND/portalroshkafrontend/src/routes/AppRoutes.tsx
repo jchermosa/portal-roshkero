@@ -13,6 +13,7 @@ import VacacionesPage from "../pages/VacacionesPage";
 import RequestPage from "../pages/RequestPage";
 import Configuration from "../pages/Configuration.tsx";
 import UserFormPage from "../pages/UserFormPage";
+import RequestFormPage from "../pages/RequestFormPage"
 
 
 export default function AppRoutes() {
@@ -35,6 +36,7 @@ export default function AppRoutes() {
               <Route path="/vacaciones" element={<VacacionesPage />} /> 
               <Route path="/benefits" element={<BeneficiosPage />} />
               <Route path="/configuracion" element={<Configuration />} />
+              <Route path="/requests/nuevo" element={<RequestFormPage />} />
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
 
           < */}

@@ -3,14 +3,18 @@ import React, { useEffect, useState } from "react";
 export interface FormField {
   name: string;
   label: string;
-  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox";
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
   helperText?: string;
   disabled?: boolean;
   validation?: (value: any) => string | null;
+  //Para campo de request
+  value?: any;
+  onChange?: (e: React.ChangeEvent<any>) => void;
 }
+
 
 export interface FormSection {
   title: string;
