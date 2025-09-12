@@ -12,6 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface IHumanResourceService {
+    // ------ Me ------
+    boolean updateEmail(int id, String newEmail);
+    boolean updatePhone(int id, String newPhone);
     // ------ Employees ------
     Page<UserDto> getAllEmployees(Pageable pageable);
     Page<UserDto> getAllActiveEmployees(Pageable pageable);

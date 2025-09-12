@@ -15,12 +15,17 @@ import com.backend.portalroshkabackend.Repositories.RequestRepository;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
 import com.backend.portalroshkabackend.Models.Cargos;
 
+import com.backend.portalroshkabackend.tools.errors.errorslist.CargoNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.RequestNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.UserAlreadyInactiveException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
@@ -36,6 +41,30 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
         this.cargosRepository = cargosRepository;
+    }
+
+    @Transactional
+    @Override
+    public boolean updateEmail(int id, String newEmail) {
+        var userExists = userRepository.findById(id);
+
+        if (userExists.isEmpty()){
+            return false;
+        }
+
+        Usuario user = userExists.get();
+
+        user.setCorreo(newEmail);
+
+        userRepository.save(user);
+
+
+        return true;
+    }
+
+    @Override
+    public boolean updatePhone(int id, String newPhone) {
+        return false;
     }
 
     @Transactional(readOnly = true)
@@ -86,9 +115,10 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional(readOnly = true)
     @Override
     public UserDto getEmployeeById(int id) {
-        var user = userRepository.findById(id);
+        var user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id)); //Lanza una excepcion personalizada
 
-        return user.map(this::mapToUserDto).orElse(null); //Si no existe usuario con esa id retorna null, sino retorna un Dto
+        return mapToUserDto(user); //Si no existe usuario con esa id retorna null, sino retorna un Dto
 
     }
 
@@ -121,12 +151,8 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional
     @Override
     public UserDto updateEmployee(UserUpdateDto updateDto, int id) {
-        Optional<Usuario> userExists = userRepository.findById(id);
-
-
-        if (userExists.isEmpty()) return null;
-
-        Usuario user = userExists.get();
+        Usuario user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         user.setNombre(updateDto.getNombre());
         user.setApellido(updateDto.getApellido());
@@ -149,13 +175,12 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional
     @Override
     public UserDto deleteEmployee(int id) {
-        Optional<Usuario> userExists = userRepository.findById(id);
+        Usuario user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (userExists.isEmpty() || userExists.get().isEstado() == false){
-            return null;
+        if (!user.isEstado()){
+            throw new UserAlreadyInactiveException(id);
         }
-
-        Usuario user = userExists.get();
 
         user.setEstado(false); // Da de baja el empleado de la base de datos
 
@@ -176,14 +201,12 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional
     @Override
     public boolean acceptRequest(int idRequest) {
-        var request = requestRepository.findById(idRequest);
+        Solicitudes request = requestRepository.findById(idRequest)
+                .orElseThrow(() -> new RequestNotFoundException(idRequest));
 
-        if (request.isEmpty()){
-            return false;
-        }
         // Si se acepta la solicitud, rechazado y estado de la solicitu se setea a false
-        request.get().setRechazado(false);
-        request.get().setEstado(false);
+        request.setRechazado(false);
+        request.setEstado(false);
 
         return true;
     }
@@ -191,16 +214,13 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional
     @Override
     public boolean rejectRequest(int idRequest, RequestRejectedDto rejectedDto) {
-        var request = requestRepository.findById(idRequest);
+        Solicitudes request = requestRepository.findById(idRequest)
+                .orElseThrow(() -> new RequestNotFoundException(idRequest));
 
-        if (request.isEmpty()){
-            return false;
-        }
+        request.setRechazado(true); // Setea la solicitud como rechazada
+        request.setComentario(rejectedDto.getComentario());
 
-        request.get().setRechazado(true); // Setea la solicitud como rechazada
-        request.get().setComentario(rejectedDto.getComentario());
-
-        requestRepository.save(request.get());
+        requestRepository.save(request);
 
         return true;
     }
@@ -225,9 +245,10 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional(readOnly = true)
     @Override
     public PositionDto getPositionById(int id) {
-        var position =  cargosRepository.findById(id);
+        var position =  cargosRepository.findById(id)
+                .orElseThrow(() -> new CargoNotFoundException(id));
 
-        return position.map(this::mapToPositionDto).orElse(null);
+        return mapToPositionDto(position);
     }
 
     @Transactional
@@ -245,11 +266,8 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional
     @Override
     public PositionDto updatePosition(PositionUpdateDto positionUpdateDto, int id) {
-        Optional<Cargos> positionExists = cargosRepository.findById(id);
-
-        if (positionExists.isEmpty()) return null;
-
-        Cargos position = positionExists.get();
+        Cargos position = cargosRepository.findById(id)
+                .orElseThrow(() -> new CargoNotFoundException(id));
 
         position.setNombre(positionUpdateDto.getNombre());
 
@@ -261,15 +279,12 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional
     @Override
     public PositionDto deletePosition(int id) {
-        Optional<Cargos> positionExists = cargosRepository.findById(id);
+        Cargos position = cargosRepository.findById(id)
+                .orElseThrow(() -> new CargoNotFoundException(id));
 
-        if (positionExists.isEmpty()){ // Falta validar si el cargo ya esta eliminado, para no volver a eliminar y retornar un null
-            return null;
-        }
+        //TODO: Aca se va a lanzar exepcion CargoAlreadyInactive si ya se encuentra inactivo el cargo, falta la nueva base de datos solamente
 
-        Cargos position  = positionExists.get();
-
-        // Aca se daria de baja el cargo, ej: position.setEstado(false);
+        //TODO: Aca se daria de baja el cargo, ej: position.setEstado(false);
 
         cargosRepository.save(position);
 

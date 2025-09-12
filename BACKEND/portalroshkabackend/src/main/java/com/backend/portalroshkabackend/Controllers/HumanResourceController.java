@@ -33,6 +33,25 @@ public class HumanResourceController {
         this.humanResourceService = humanResourceService;
     }
 
+    // ----------------- Me -----------------
+    @PutMapping("/th/me/{id}")
+    public ResponseEntity<?> updateMe(
+            @RequestParam(value = "newEmail", required = false) String newEmail,
+            @RequestParam(value = "newPhone", required = false) String newPhone,
+            @PathVariable int id
+            )
+    {
+        boolean isUpdated = false;
+
+        if (newEmail != null){
+            isUpdated = humanResourceService.updateEmail(id, newEmail);
+        } else if (newPhone != null) {
+            isUpdated = humanResourceService.updatePhone(id, newPhone);
+        }
+
+        return isUpdated ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    }
+
     // ----------------- Users -----------------
     @GetMapping("/th/users")
     public ResponseEntity<Page<UserDto>> getAllEmployees(
