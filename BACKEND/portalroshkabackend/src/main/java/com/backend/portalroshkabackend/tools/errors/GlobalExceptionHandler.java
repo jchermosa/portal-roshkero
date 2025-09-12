@@ -46,6 +46,12 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    // --- DATA BASE ---
+    @ExceptionHandler(DatabaseOperationException.class)
+    public ResponseEntity<ErrorResponseDto> handleDatabaseOperation(DatabaseOperationException ex){
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
     // --- GENERAL EXCEPTION HANDLER
 
     @ExceptionHandler
