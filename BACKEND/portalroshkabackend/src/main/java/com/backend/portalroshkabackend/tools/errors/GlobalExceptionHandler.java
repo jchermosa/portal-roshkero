@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.tools.errors;
 
 import com.backend.portalroshkabackend.DTO.ErrorResponseDto;
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
+import com.sun.net.httpserver.HttpsServer;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -18,67 +19,48 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleUserNotFound(UserNotFoundException ex){
-        ErrorResponseDto errorDto = new ErrorResponseDto();
-
-        errorDto.setStatus(HttpStatus.NOT_FOUND.value());
-        errorDto.setMessage(ex.getMessage());
-
-        return new ResponseEntity<>(errorDto, HttpStatus.NOT_FOUND);
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(UserAlreadyInactiveException.class)
     public ResponseEntity<ErrorResponseDto> handleUserAlreadyInactive(UserAlreadyInactiveException ex){
-        ErrorResponseDto errorDto = new ErrorResponseDto();
-
-        errorDto.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorDto.setMessage(ex.getMessage());
-
-        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     // --- SOLICITUDES EXCEPTIONS HANDLER ---
 
     @ExceptionHandler(RequestNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleRequestNotFound(RequestNotFoundException ex){
-        ErrorResponseDto errorDto = new ErrorResponseDto();
-
-        errorDto.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorDto.setMessage(ex.getMessage());
-
-        return new ResponseEntity<>(errorDto, HttpStatus.NOT_FOUND);
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     // --- CARGOS EXCEPTIONS HANDLER ---
 
     @ExceptionHandler(CargoNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handlePositionNotFound(CargoNotFoundException ex){
-        ErrorResponseDto errorDto = new ErrorResponseDto();
-
-        errorDto.setStatus(HttpStatus.NOT_FOUND.value());
-        errorDto.setMessage(ex.getMessage());
-
-        return new ResponseEntity<>(errorDto, HttpStatus.NOT_FOUND);
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(CargoAlreadyInactiveException.class)
     public ResponseEntity<ErrorResponseDto> handlePositionAlreadyInactive(CargoAlreadyInactiveException ex){
-        ErrorResponseDto errorDto = new ErrorResponseDto();
-
-        errorDto.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorDto.setMessage(ex.getMessage());
-
-        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     // --- GENERAL EXCEPTION HANDLER
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> handleGeneralError(Exception ex){
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrio un error inesperado" + ex.getMessage());
+    }
+
+    // -------
+
+    private ResponseEntity<ErrorResponseDto> buildError(HttpStatus status, String message){
         ErrorResponseDto errorDto = new ErrorResponseDto();
 
-        errorDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        errorDto.setMessage("Ocurrio un error inesperado: " + ex.getMessage());
+        errorDto.setStatus(status.value());
+        errorDto.setMessage(message);
 
-        return new ResponseEntity<>(errorDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorDto, status);
     }
 }

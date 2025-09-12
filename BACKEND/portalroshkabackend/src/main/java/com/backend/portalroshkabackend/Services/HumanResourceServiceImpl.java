@@ -22,6 +22,7 @@ import com.backend.portalroshkabackend.tools.errors.errorslist.UserNotFoundExcep
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -141,11 +142,15 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
         user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
 
-        Usuario savedUser = userRepository.save(user);
+        try{
+            Usuario savedUser = userRepository.save(user);
 
-        int id = savedUser.getIdUsuario();
+            return mapToUserDto(savedUser);
+        } catch (JpaSystemException ex){
+            return null;
+        }
 
-        return getEmployeeById(id);
+
     }
 
     @Transactional
@@ -271,7 +276,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
         position.setNombre(positionUpdateDto.getNombre());
 
-        Cargos updatedPosition = new Cargos();
+        Cargos updatedPosition = cargosRepository.save(position);
 
         return mapToPositionDto(updatedPosition);
     }
