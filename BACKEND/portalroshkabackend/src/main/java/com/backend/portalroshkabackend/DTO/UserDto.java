@@ -1,10 +1,6 @@
 package com.backend.portalroshkabackend.DTO;
 
-import jakarta.validation.constraints.NotNull;
-import org.postgresql.util.PGInterval;
-
 import java.sql.Date;
-import java.time.Period;
 
 public class UserDto {
     private int idUsuario;

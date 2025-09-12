@@ -3,23 +3,17 @@ package com.backend.portalroshkabackend.Security.filter;
 import static com.backend.portalroshkabackend.Security.TokenJwtConfig.HEADER_AUTHORIZATION;
 import static com.backend.portalroshkabackend.Security.TokenJwtConfig.PREFIX_TOKEN;
 import static com.backend.portalroshkabackend.Security.TokenJwtConfig.SECRET_KEY;
-
 import java.io.IOException;
-import java.security.Security;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

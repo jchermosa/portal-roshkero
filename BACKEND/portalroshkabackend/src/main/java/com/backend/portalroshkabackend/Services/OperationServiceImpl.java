@@ -1,8 +1,5 @@
 package com.backend.portalroshkabackend.Services;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.backend.portalroshkabackend.DTO.CargosResponseDto;
 import com.backend.portalroshkabackend.DTO.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.EquiposResponseDto;
@@ -13,11 +10,8 @@ import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.RequestRepository;
 import com.backend.portalroshkabackend.Repositories.RolesRepository;
 import com.backend.portalroshkabackend.Models.Equipos;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +22,6 @@ public class OperationServiceImpl implements IOperationService {
     private final CargosRepository cargosRepository;
     private final EquiposRepository equiposRepository;
 
-    @Autowired
     public OperationServiceImpl(RequestRepository requestRepository,
             RolesRepository rolesRepository,
             CargosRepository cargosRepository,

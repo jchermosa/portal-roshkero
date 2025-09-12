@@ -1,16 +1,12 @@
 package com.backend.portalroshkabackend.Services;
 
-import java.util.List;
 
 import org.springframework.data.domain.Page;
-
 import com.backend.portalroshkabackend.DTO.CargosResponseDto;
 import com.backend.portalroshkabackend.DTO.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.RequestResponseDto;
 import com.backend.portalroshkabackend.DTO.RolesResponseDto;
-
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface IOperationService {

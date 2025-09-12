@@ -9,8 +9,6 @@ import com.backend.portalroshkabackend.DTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Services.IHumanResourceService;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,7 +26,6 @@ import java.net.URI;
 public class HumanResourceController {
     private final IHumanResourceService humanResourceService;
 
-    @Autowired
     public HumanResourceController(IHumanResourceService humanResourceService){
         this.humanResourceService = humanResourceService;
     }

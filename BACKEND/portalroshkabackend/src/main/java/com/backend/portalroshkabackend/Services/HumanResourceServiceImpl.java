@@ -14,8 +14,6 @@ import com.backend.portalroshkabackend.Repositories.CargosRepository;
 import com.backend.portalroshkabackend.Repositories.RequestRepository;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
 import com.backend.portalroshkabackend.Models.Cargos;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,6 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     private final RequestRepository requestRepository;
     private final CargosRepository cargosRepository;
 
-    @Autowired
     public HumanResourceServiceImpl(UserRepository userRepository,
                                     RequestRepository requestRepository,
                                     CargosRepository cargosRepository){
