@@ -46,6 +46,18 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    // --- ROLES EXCEPTIONS HANDLER ---
+    @ExceptionHandler(RolesNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleRolesNotFound(RolesNotFoundException ex){
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    // --- EQUIPOS EXCEPTIONS HANDLER ---
+    @ExceptionHandler(EquipoNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleEquipoNotFound(EquipoNotFoundException ex){
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     // --- DATA BASE ---
     @ExceptionHandler(DatabaseOperationException.class)
     public ResponseEntity<ErrorResponseDto> handleDatabaseOperation(DatabaseOperationException ex){

@@ -10,9 +10,7 @@ import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Models.Solicitudes;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.CargosRepository;
-import com.backend.portalroshkabackend.Repositories.RequestRepository;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.Models.Cargos;
 
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
@@ -31,14 +29,20 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
     private final CargosRepository cargosRepository;
+    private final RolesRepository rolesRepository;
+    private final EquiposRepository equiposRepository;
 
     @Autowired
     public HumanResourceServiceImpl(UserRepository userRepository,
                                     RequestRepository requestRepository,
-                                    CargosRepository cargosRepository){
+                                    CargosRepository cargosRepository,
+                                    RolesRepository rolesRepository,
+                                    EquiposRepository equiposRepository){
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
         this.cargosRepository = cargosRepository;
+        this.rolesRepository = rolesRepository;
+        this.equiposRepository = equiposRepository;
     }
 
     @Transactional
@@ -136,6 +140,18 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
             throw new DuplicateCedulaException(insertDto.getNroCedula());
         }
 
+        if (!rolesRepository.existsById(insertDto.getIdRol())){ // Si no existe el cargo, lanza excepcion
+            throw new RolesNotFoundException(insertDto.getIdRol());
+        }
+
+        if (!equiposRepository.existsById(insertDto.getIdEquipo())){
+            throw new EquipoNotFoundException(insertDto.getIdEquipo());
+        }
+
+        if (!cargosRepository.existsById(insertDto.getIdCargo())){
+            throw new CargoNotFoundException(insertDto.getIdCargo());
+        }
+
         Usuario user = new Usuario();
         user.setNombre(insertDto.getNombre());
         user.setApellido(insertDto.getApellido());
@@ -174,6 +190,18 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
         if (userRepository.existsByNroCedula(updateDto.getNroCedula())){
             throw new DuplicateCedulaException(updateDto.getNroCedula());
+        }
+
+        if (!rolesRepository.existsById(updateDto.getIdRol())){ // Si no existe el cargo, lanza excepcion
+            throw new RolesNotFoundException(updateDto.getIdRol());
+        }
+
+        if (!equiposRepository.existsById(updateDto.getIdEquipo())){
+            throw new EquipoNotFoundException(updateDto.getIdEquipo());
+        }
+
+        if (!cargosRepository.existsById(updateDto.getIdCargo())){
+            throw new CargoNotFoundException(updateDto.getIdCargo());
         }
 
         user.setNombre(updateDto.getNombre());
