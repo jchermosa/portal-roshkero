@@ -52,14 +52,26 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
-    // --- GENERAL EXCEPTION HANDLER
+    // --- DUPLICATIONS EXCEPTION HANDLER ---
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ErrorResponseDto> handleDuplicateEmail(DuplicateEmailException ex){
+        return buildError(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateCedulaException.class)
+    public ResponseEntity<ErrorResponseDto> handleDuplicateCedula(DuplicateCedulaException ex){
+        return buildError(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    // --- GENERAL EXCEPTION HANDLER ---
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> handleGeneralError(Exception ex){
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrio un error inesperado" + ex.getMessage());
     }
 
-    // -------
+
 
     private ResponseEntity<ErrorResponseDto> buildError(HttpStatus status, String message){
         ErrorResponseDto errorDto = new ErrorResponseDto();

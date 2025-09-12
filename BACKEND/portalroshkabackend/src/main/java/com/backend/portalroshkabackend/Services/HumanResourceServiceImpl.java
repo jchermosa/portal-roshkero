@@ -44,13 +44,12 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Transactional
     @Override
     public boolean updateEmail(int id, String newEmail) {
-        var userExists = userRepository.findById(id);
+        Usuario user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (userExists.isEmpty()){
-            return false;
+        if (userRepository.existsByCorreo(newEmail)){
+            throw new DuplicateEmailException(newEmail); // Si el ya esta asginado a otro usuario, lanza excepcion
         }
-
-        Usuario user = userExists.get();
 
         user.setCorreo(newEmail);
 
@@ -129,6 +128,14 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Override
     public UserDto addEmployee(UserInsertDto insertDto) {
 
+        if (userRepository.existsByCorreo(insertDto.getCorreo())){
+            throw new DuplicateEmailException(insertDto.getCorreo()); // Excepcion si el email ya esta asociado a un usuario existente
+        }
+
+        if (userRepository.existsByNroCedula(insertDto.getNroCedula())){
+            throw new DuplicateCedulaException(insertDto.getNroCedula());
+        }
+
         Usuario user = new Usuario();
         user.setNombre(insertDto.getNombre());
         user.setApellido(insertDto.getApellido());
@@ -160,6 +167,14 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     public UserDto updateEmployee(UserUpdateDto updateDto, int id) {
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (userRepository.existsByCorreo(updateDto.getCorreo())){
+            throw new DuplicateEmailException(updateDto.getCorreo());
+        }
+
+        if (userRepository.existsByNroCedula(updateDto.getNroCedula())){
+            throw new DuplicateCedulaException(updateDto.getNroCedula());
+        }
 
         user.setNombre(updateDto.getNombre());
         user.setApellido(updateDto.getApellido());

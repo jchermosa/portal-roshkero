@@ -22,7 +22,10 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
     Page<Usuario> findAllByOrderByIdEquipoAsc(Pageable pageable); // Retona los usuarios ordenados por equipo
     Page<Usuario> findAllByOrderByIdCargoAsc(Pageable pageable); // Retona los usuarios ordenados por cargo
 
-     Optional<Usuario> findByNroCedula(Integer nroCedula);
+    boolean existsByCorreo(String correo);
+    boolean existsByNroCedula(int nroCedula);
+
+    Optional<Usuario> findByNroCedula(Integer nroCedula);
 
     Optional<Usuario> findByCorreo(String correo);
 }
