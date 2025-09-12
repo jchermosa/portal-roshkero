@@ -1,72 +1,84 @@
 package com.backend.portalroshkabackend.DTO;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
+
+import com.backend.portalroshkabackend.Models.EstadoSolicitud;
+
 public class RequestResponseDto {
-
-    private int id_solicitud;
-    private Date fecha_inicio;
-    private Date fecha_fin;
-    private Boolean estado;
-    private int id_usuario;
-    private int cantidad_dias;
-    private int numero_aprobaciones;
+    private int idSolicitud;
+    private Date fechaInicio;
+    private Date fechaFin;
+    private int idUsuario;
+    private int cantidadDias;
+    private int numeroAprobaciones;
     private String comentario;
-    private Boolean rechazado;
+    private int idSolicitudTipo;
+    private EstadoSolicitud estado;
+    private LocalDateTime fechaCreacion;
 
-    public int getId_solicitud() {
-        return id_solicitud;
+    public int getIdSolicitud() {
+        return idSolicitud;
     }
 
-    public void setId_solicitud(int id_solicitud) {
-        this.id_solicitud = id_solicitud;
+    public void setIdSolicitud(int idSolicitud) {
+        this.idSolicitud = idSolicitud;
     }
 
-    public Date getFecha_inicio() {
-        return fecha_inicio;
+    public Date getFechaInicio() {
+        return fechaInicio;
     }
 
-    public void setFecha_inicio(Date fecha_inicio) {
-        this.fecha_inicio = fecha_inicio;
+    public void setFechaInicio(Date fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
 
-    public Date getFecha_fin() {
-        return fecha_fin;
+    public Date getFechaFin() {
+        return fechaFin;
     }
 
-    public void setFecha_fin(Date fecha_fin) {
-        this.fecha_fin = fecha_fin;
+    public void setFechaFin(Date fechaFin) {
+        this.fechaFin = fechaFin;
     }
 
-    public Boolean getEstado() {
+    public EstadoSolicitud getEstado() {
         return estado;
     }
 
-    public void setEstado(Boolean estado) {
+    public void setEstado(EstadoSolicitud estado) {
         this.estado = estado;
     }
 
-    public int getId_usuario() {
-        return id_usuario;
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setId_usuario(int id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    public int getCantidad_dias() {
-        return cantidad_dias;
+    public int getCantidadDias() {
+        return cantidadDias;
     }
 
-    public void setCantidad_dias(int cantidad_dias) {
-        this.cantidad_dias = cantidad_dias;
+    public void setCantidadDias(int cantidadDias) {
+        this.cantidadDias = cantidadDias;
     }
 
-    public int getNumero_aprobaciones() {
-        return numero_aprobaciones;
+    public int getNumeroAprobaciones() {
+        return numeroAprobaciones;
     }
 
-    public void setNumero_aprobaciones(int numero_aprobaciones) {
-        this.numero_aprobaciones = numero_aprobaciones;
+    public void setNumeroAprobaciones(int numeroAprobaciones) {
+        this.numeroAprobaciones = numeroAprobaciones;
+    }
+
+    public int getidSolicitudTipo() {
+        return idSolicitudTipo;
+    }
+
+    public void setidSolicitudTipo(int idSolicitudTipo) {
+        this.idSolicitudTipo = idSolicitudTipo;
     }
 
     public String getComentario() {
@@ -77,11 +89,11 @@ public class RequestResponseDto {
         this.comentario = comentario;
     }
 
-    public Boolean getRechazado() {
-        return rechazado;
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
     }
 
-    public void setRechazado(Boolean rechazado) {
-        this.rechazado = rechazado;
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 }

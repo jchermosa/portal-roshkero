@@ -51,7 +51,7 @@ public class Usuario {
     @Column(name = "telefono")
     private String telefono;
 
-    @Column(name = "id_equipo")
+    @Column(name = "id_equipos")
     private int idEquipo;
 
     @Column(name = "id_cargo")

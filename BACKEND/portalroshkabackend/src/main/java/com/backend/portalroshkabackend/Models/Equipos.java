@@ -1,11 +1,9 @@
 package com.backend.portalroshkabackend.Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.sql.Date;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "equipos")
@@ -13,17 +11,40 @@ public class Equipos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_equipo")
-    Integer idEquipo;
+    @Column(name = "id_equipos")
+    private Integer idEquipo;
 
-    String nombre;
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "fecha_inicio")
+    private Date fechaInicio;
+
+    @Column(name = "fecha_limite")
+    private Date fechaLimite;
+
+    @Column(name = "id_cliente")
+    private int idCliente;
+
+    @Column(name = "fecha_creacion")
+    private LocalDateTime fechaCreacion;
+
+    @Column(name = "estado")
+    private boolean estado;
+
+    public Equipos() {
+    }
 
     public Equipos(String nombre) {
         this.nombre = nombre;
     }
 
-    public Equipos() {
+    public Integer getIdEquipo() {
+        return idEquipo;
+    }
 
+    public void setIdEquipo(Integer idEquipo) {
+        this.idEquipo = idEquipo;
     }
 
     public String getNombre() {
@@ -34,12 +55,44 @@ public class Equipos {
         this.nombre = nombre;
     }
 
-    public Integer getIdEquipo() {
-        return idEquipo;
+    public Date getFechaInicio() {
+        return fechaInicio;
     }
 
-    public void setIdEquipo(Integer idEquipo) {
-        this.idEquipo = idEquipo;
+    public void setFechaInicio(Date fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public Date getFechaLimite() {
+        return fechaLimite;
+    }
+
+    public void setFechaLimite(Date fechaLimite) {
+        this.fechaLimite = fechaLimite;
+    }
+
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
     }
 
 }

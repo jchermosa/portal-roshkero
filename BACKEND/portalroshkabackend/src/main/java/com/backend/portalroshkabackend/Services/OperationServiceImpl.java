@@ -1,5 +1,6 @@
 package com.backend.portalroshkabackend.Services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,15 +46,17 @@ public class OperationServiceImpl implements IOperationService {
         return requestRepository.findAll(pageable)
                 .map(request -> {
                     RequestResponseDto dto = new RequestResponseDto();
-                    dto.setId_solicitud(request.getIdSolicitud());
-                    dto.setFecha_inicio(request.getFechaInicio());
-                    dto.setFecha_fin(request.getFechaFin());
-                    dto.setEstado(request.isEstado());
-                    dto.setId_usuario(request.getIdUsuario());
-                    dto.setCantidad_dias(request.getCantidadDias());
-                    dto.setNumero_aprobaciones(request.getNumeroAprobaciones());
+                    dto.setIdSolicitud(request.getIdSolicitud());
+                    dto.setFechaInicio(request.getFechaInicio());
+                    dto.setFechaFin(request.getFechaFin());
+                    dto.setIdUsuario(request.getIdUsuario());
+                    dto.setCantidadDias(request.getCantidadDias());
+                    dto.setNumeroAprobaciones(request.getNumeroAprobaciones());
                     dto.setComentario(request.getComentario());
-                    dto.setRechazado(request.isRechazado());
+                    dto.setidSolicitudTipo(request.getidSolicitudTipo());
+                    dto.setEstado(request.getEstado());
+                    dto.setFechaCreacion(request.getFechaCreacion());
+
                     return dto;
                 });
 
@@ -87,8 +90,13 @@ public class OperationServiceImpl implements IOperationService {
         return equiposRepository.findAll(pageable)
                 .map(equipo -> {
                     EquiposResponseDto Dto = new EquiposResponseDto();
-                    Dto.setId_equipo(equipo.getIdEquipo());
+                    Dto.setIdEquipo(equipo.getIdEquipo());
                     Dto.setNombre(equipo.getNombre());
+                    Dto.setFechaInicio(equipo.getFechaInicio());
+                    Dto.setFechaLimite(equipo.getFechaLimite());
+                    Dto.setIdCliente(equipo.getIdCliente());
+                    Dto.setFechaCreacion(equipo.getFechaCreacion());
+                    Dto.setEstado(equipo.isEstado());
                     return Dto;
                 });
     }
@@ -97,31 +105,58 @@ public class OperationServiceImpl implements IOperationService {
     public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
         Equipos equipo = new Equipos();
         equipo.setNombre(requestDto.getNombre());
+        equipo.setFechaInicio(requestDto.getFechaInicio());
+        equipo.setFechaLimite(requestDto.getFechaLimite());
+        equipo.setIdCliente(requestDto.getIdCliente());
+        equipo.setEstado(requestDto.isEstado());
+        equipo.setFechaCreacion(LocalDateTime.now().withNano(0)); // new date
 
         Equipos saved = equiposRepository.save(equipo);
 
-        EquiposResponseDto Dto = new EquiposResponseDto();
-        Dto.setId_equipo(saved.getIdEquipo());
-        Dto.setNombre(saved.getNombre());
-        return Dto;
+        EquiposResponseDto dto = new EquiposResponseDto();
+        dto.setIdEquipo(saved.getIdEquipo());
+        dto.setNombre(saved.getNombre());
+        dto.setFechaInicio(saved.getFechaInicio());
+        dto.setFechaLimite(saved.getFechaLimite());
+        dto.setIdCliente(saved.getIdCliente());
+        dto.setFechaCreacion(saved.getFechaCreacion());
+        dto.setEstado(saved.isEstado());
+
+        return dto;
     }
 
     @Override
     public void deleteTeam(int id_equipo) {
-        equiposRepository.deleteById(id_equipo);
+        Equipos equipo = equiposRepository.findById(id_equipo)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        equipo.setEstado(false); //
+        equiposRepository.save(equipo);
     }
 
     @Override
     public EquiposResponseDto updateTeam(int id_equipo, EquiposRequestDto requestDto) {
+
         Equipos existingEquipo = equiposRepository.findById(id_equipo)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
 
         existingEquipo.setNombre(requestDto.getNombre());
+        existingEquipo.setFechaInicio(requestDto.getFechaInicio());
+        existingEquipo.setFechaLimite(requestDto.getFechaLimite());
+        existingEquipo.setIdCliente(requestDto.getIdCliente());
+        existingEquipo.setEstado(requestDto.isEstado());
+
         Equipos updated = equiposRepository.save(existingEquipo);
 
-        EquiposResponseDto Dto = new EquiposResponseDto();
-        Dto.setId_equipo(updated.getIdEquipo());
-        Dto.setNombre(updated.getNombre());
-        return Dto;
+        EquiposResponseDto dto = new EquiposResponseDto();
+        dto.setIdEquipo(updated.getIdEquipo());
+        dto.setNombre(updated.getNombre());
+        dto.setFechaInicio(updated.getFechaInicio());
+        dto.setFechaLimite(updated.getFechaLimite());
+        dto.setIdCliente(updated.getIdCliente());
+        dto.setFechaCreacion(updated.getFechaCreacion()); // not new. take from form
+        dto.setEstado(updated.isEstado());
+
+        return dto;
     }
 }

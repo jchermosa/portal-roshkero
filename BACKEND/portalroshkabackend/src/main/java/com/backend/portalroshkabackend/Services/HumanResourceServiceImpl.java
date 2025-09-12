@@ -182,8 +182,8 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
             return false;
         }
         // Si se acepta la solicitud, rechazado y estado de la solicitu se setea a false
-        request.get().setRechazado(false);
-        request.get().setEstado(false);
+        // request.get().setRechazado(false);
+        // request.get().setEstado(false);
 
         return true;
     }
@@ -197,7 +197,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
             return false;
         }
 
-        request.get().setRechazado(true); // Setea la solicitud como rechazada
+        // request.get().setRechazado(true); // Setea la solicitud como rechazada
         request.get().setComentario(rejectedDto.getComentario());
 
         requestRepository.save(request.get());
@@ -306,12 +306,12 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         requestDto.setIdSolicitud(request.getIdSolicitud());
         requestDto.setFechaInicio(request.getFechaInicio());
         requestDto.setFechaFin(request.getFechaFin());
-        requestDto.setEstado(request.isEstado());
+        requestDto.setEstado(request.getEstado());
         requestDto.setIdUsuario(request.getIdUsuario());
         requestDto.setCantidadDias(request.getCantidadDias());
         requestDto.setNumeroAprobaciones(request.getNumeroAprobaciones());
         requestDto.setComentario(request.getComentario());
-        requestDto.setRechazado(request.isRechazado());
+        // requestDto.setRechazado(request.isRechazado());
 
         return requestDto;
     }

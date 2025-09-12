@@ -2,16 +2,19 @@ package com.backend.portalroshkabackend.DTO;
 
 import java.sql.Date;
 
+import com.backend.portalroshkabackend.Models.EstadoSolicitud;
+
 public class RequestDto {
     private int idSolicitud;
     private Date fechaInicio;
     private Date fechaFin;
-    private boolean estado;
     private int idUsuario;
     private int cantidadDias;
     private int numeroAprobaciones;
     private String comentario;
-    private boolean rechazado;
+    private int idSolicitudTipo;
+    private EstadoSolicitud estado;
+    private Date fechaCreacion;
 
     public int getIdSolicitud() {
         return idSolicitud;
@@ -37,11 +40,11 @@ public class RequestDto {
         this.fechaFin = fechaFin;
     }
 
-    public boolean isEstado() {
+    public EstadoSolicitud getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(EstadoSolicitud estado) {
         this.estado = estado;
     }
 
@@ -68,6 +71,14 @@ public class RequestDto {
     public void setNumeroAprobaciones(int numeroAprobaciones) {
         this.numeroAprobaciones = numeroAprobaciones;
     }
+    
+    public int getidSolicitudTipo() {
+        return idSolicitudTipo;
+    }
+
+    public void setidSolicitudTipo(int idSolicitudTipo) {
+        this.idSolicitudTipo = idSolicitudTipo;
+    }
 
     public String getComentario() {
         return comentario;
@@ -77,11 +88,11 @@ public class RequestDto {
         this.comentario = comentario;
     }
 
-    public boolean isRechazado() {
-        return rechazado;
+    public Date getFechaCreacion() {
+        return fechaCreacion;
     }
 
-    public void setRechazado(boolean rechazado) {
-        this.rechazado = rechazado;
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 }

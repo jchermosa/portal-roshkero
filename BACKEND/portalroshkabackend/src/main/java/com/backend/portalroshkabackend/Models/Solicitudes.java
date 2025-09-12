@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.Models;
 import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "solicitudes")
@@ -19,9 +20,6 @@ public class Solicitudes {
     @Column(name = "fecha_fin")
     private Date fechaFin;
 
-    @Column(name = "estado")
-    private boolean estado;
-
     @Column(name = "id_usuario")
     private int idUsuario;
 
@@ -34,8 +32,15 @@ public class Solicitudes {
     @Column(name = "comentario")
     private String comentario;
 
-    @Column(name = "rechazado")
-    private boolean rechazado;
+    @Column(name = "id_solicitud_tipo")
+    private int idSolicitudTipo;
+
+    @Enumerated(EnumType.STRING) // string enum
+    @Column(name = "estado")
+    private EstadoSolicitud estado;
+
+    @Column(name = "fecha_creacion")
+    private LocalDateTime fechaCreacion;
 
     public int getIdSolicitud() {
         return idSolicitud;
@@ -61,11 +66,11 @@ public class Solicitudes {
         this.fechaFin = fechaFin;
     }
 
-    public boolean isEstado() {
+    public EstadoSolicitud getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(EstadoSolicitud estado) {
         this.estado = estado;
     }
 
@@ -101,11 +106,20 @@ public class Solicitudes {
         this.comentario = comentario;
     }
 
-    public boolean isRechazado() {
-        return rechazado;
+    public int getidSolicitudTipo() {
+        return idSolicitudTipo;
     }
 
-    public void setRechazado(boolean rechazado) {
-        this.rechazado = rechazado;
+    public void setidSolicitudTipo(int idSolicitudTipo) {
+        this.idSolicitudTipo = idSolicitudTipo;
     }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
 }

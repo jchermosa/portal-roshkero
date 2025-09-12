@@ -10,6 +10,8 @@ import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Services.IHumanResourceService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -96,7 +98,7 @@ public class HumanResourceController {
     }
 
     @PostMapping("/th/users")
-    public ResponseEntity<UserDto> addEmployee(@RequestBody UserInsertDto insertDto){
+    public ResponseEntity<UserDto> addEmployee(@Valid @RequestBody UserInsertDto insertDto){
         UserDto user = humanResourceService.addEmployee(insertDto);
 
         URI location = ServletUriComponentsBuilder
