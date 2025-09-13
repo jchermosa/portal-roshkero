@@ -15,6 +15,7 @@ import com.backend.portalroshkabackend.Models.Cargos;
 
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.SQLException;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class HumanResourceServiceImpl implements IHumanResourceService {
     private final UserRepository userRepository;
@@ -52,9 +54,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (userRepository.existsByCorreo(newEmail)) {
-            throw new DuplicateEmailException(newEmail); // Si el ya esta asginado a otro usuario, lanza excepcion
-        }
+        validateUniqueEmail(newEmail, id); // Si el correo ya esta asginado a otro usuario, lanza excepcion
 
         user.setCorreo(newEmail);
 
@@ -133,25 +133,10 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
     @Override
     public UserDto addEmployee(UserInsertDto insertDto) {
 
-        if (userRepository.existsByCorreo(insertDto.getCorreo())) {
-            throw new DuplicateEmailException(insertDto.getCorreo()); // Excepcion si el email ya esta asociado a un usuario existente
-        }
+        validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
+        validateUniqueEmail(insertDto.getCorreo(), null);
+        validateRelatedEntities(insertDto.getIdRol(), insertDto.getIdEquipo(), insertDto.getIdCargo());
 
-        if (userRepository.existsByNroCedula(insertDto.getNroCedula())) {
-            throw new DuplicateCedulaException(insertDto.getNroCedula());
-        }
-
-        if (!rolesRepository.existsById(insertDto.getIdRol())) { // Si no existe el cargo, lanza excepcion
-            throw new RolesNotFoundException(insertDto.getIdRol());
-        }
-
-        if (!equiposRepository.existsById(insertDto.getIdEquipo())) {
-            throw new EquipoNotFoundException(insertDto.getIdEquipo());
-        }
-
-        if (!cargosRepository.existsById(insertDto.getIdCargo())) {
-            throw new CargoNotFoundException(insertDto.getIdCargo());
-        }
 
         Usuario user = new Usuario();
         user.setNombre(insertDto.getNombre());
@@ -185,25 +170,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (userRepository.existsByCorreoAndIdUsuarioNot(updateDto.getCorreo(), id)) {
-            throw new DuplicateEmailException(updateDto.getCorreo());
-        }
-
-        if (userRepository.existsByNroCedulaAndIdUsuarioNot(updateDto.getNroCedula(), id)) {
-            throw new DuplicateCedulaException(updateDto.getNroCedula());
-        }
-
-        if (!rolesRepository.existsById(updateDto.getIdRol())) { // Si no existe el cargo, lanza excepcion
-            throw new RolesNotFoundException(updateDto.getIdRol());
-        }
-
-        if (!equiposRepository.existsById(updateDto.getIdEquipo())) {
-            throw new EquipoNotFoundException(updateDto.getIdEquipo());
-        }
-
-        if (!cargosRepository.existsById(updateDto.getIdCargo())) {
-            throw new CargoNotFoundException(updateDto.getIdCargo());
-        }
+        validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
+        validateUniqueEmail(updateDto.getCorreo(), id);
+        validateRelatedEntities(updateDto.getIdRol(), updateDto.getIdEquipo(), updateDto.getIdCargo());
 
         user.setNombre(updateDto.getNombre());
         user.setApellido(updateDto.getApellido());
@@ -372,6 +341,38 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
             throw new DatabaseOperationException("Error al eliminar cargo: ", ex);
         }
 
+    }
+
+
+
+    // ------------------ HELPERS ------------------
+
+    private void validateUniqueEmail(String correo, Integer excludeUserId){
+        boolean exists = (excludeUserId == null)
+                ? userRepository.existsByCorreo(correo)
+                : userRepository.existsByCorreoAndIdUsuarioNot(correo, excludeUserId);
+
+        if (exists){
+            throw new DuplicateEmailException(correo);
+        }
+    }
+
+    private void validateUniqueCedula(Integer nroCedula, Integer excludeUserId){
+        boolean exists = (excludeUserId == null)
+                ? userRepository.existsByNroCedula(nroCedula)
+                : userRepository.existsByNroCedulaAndIdUsuarioNot(nroCedula, excludeUserId);
+
+        if (exists){
+            throw new DuplicateCedulaException(nroCedula);
+        }
+    }
+
+    private void validateRelatedEntities(Integer idRol, Integer idEquipo, Integer idCargo){
+        if (!rolesRepository.existsById(idRol)) throw new RolesNotFoundException(idRol);
+
+        if (!equiposRepository.existsById(idEquipo)) throw new EquipoNotFoundException(idEquipo);
+
+        if (!cargosRepository.existsById(idCargo)) throw new CargoNotFoundException(idCargo);
     }
 
 }
