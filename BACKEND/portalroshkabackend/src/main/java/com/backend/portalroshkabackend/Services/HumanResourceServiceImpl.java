@@ -138,20 +138,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         validateRelatedEntities(insertDto.getIdRol(), insertDto.getIdEquipo(), insertDto.getIdCargo());
 
 
-        Usuario user = new Usuario();
-        user.setNombre(insertDto.getNombre());
-        user.setApellido(insertDto.getApellido());
-        user.setNroCedula(insertDto.getNroCedula());
-        user.setCorreo(insertDto.getCorreo());
-        user.setIdRol(insertDto.getIdRol());
-        user.setFechaIngreso(insertDto.getFechaIngreso());
-        user.setEstado(insertDto.isEstado());
-        user.setContrasena(insertDto.getContrasena());
-        user.setTelefono(insertDto.getTelefono());
-        user.setIdEquipo(insertDto.getIdEquipo());
-        user.setIdCargo(insertDto.getIdCargo());
-        user.setFechaNacimiento(insertDto.getFechaNacimiento());
-        user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
+        Usuario user = AutoMap.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
         try {
             Usuario savedUser = userRepository.save(user);
@@ -179,7 +166,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         user.setNroCedula(updateDto.getNroCedula());
         user.setCorreo(updateDto.getCorreo());
         user.setIdRol(updateDto.getIdRol());
-        user.setFechaIngreso(updateDto.getFechaIngreso());
+        user.setFechaIngreso(updateDto.getFechaIngreso()); // TODO: Preguntar si usar PUT o PATCH
         user.setEstado(updateDto.isEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());

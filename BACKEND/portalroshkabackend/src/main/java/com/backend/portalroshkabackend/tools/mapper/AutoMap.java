@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.tools.mapper;
 import com.backend.portalroshkabackend.DTO.PositionDto;
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.UserDto;
+import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Solicitudes;
 import com.backend.portalroshkabackend.Models.Usuario;
@@ -55,5 +56,24 @@ public class AutoMap {
         positionDto.setNombre(position.getNombre());
 
         return positionDto;
+    }
+
+    public static Usuario toUsuarioFromInsertDto(UserInsertDto insertDto){
+        Usuario user = new Usuario();
+        user.setNombre(insertDto.getNombre());
+        user.setApellido(insertDto.getApellido());
+        user.setNroCedula(insertDto.getNroCedula());
+        user.setCorreo(insertDto.getCorreo());
+        user.setIdRol(insertDto.getIdRol());
+        user.setFechaIngreso(insertDto.getFechaIngreso());
+        user.setEstado(insertDto.isEstado());
+        user.setContrasena(insertDto.getContrasena());
+        user.setTelefono(insertDto.getTelefono());
+        user.setIdEquipo(insertDto.getIdEquipo());
+        user.setIdCargo(insertDto.getIdCargo());
+        user.setFechaNacimiento(insertDto.getFechaNacimiento());
+        user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
+
+        return user;
     }
 }
