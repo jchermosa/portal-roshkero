@@ -184,11 +184,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (userRepository.existsByCorreo(updateDto.getCorreo())){
+        if (userRepository.existsByCorreoAndIdUsuarioNot(updateDto.getCorreo(), id)){
             throw new DuplicateEmailException(updateDto.getCorreo());
         }
 
-        if (userRepository.existsByNroCedula(updateDto.getNroCedula())){
+        if (userRepository.existsByNroCedulaAndIdUsuarioNot(updateDto.getNroCedula(), id)){
             throw new DuplicateCedulaException(updateDto.getNroCedula());
         }
 
