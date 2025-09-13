@@ -14,6 +14,7 @@ import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.Models.Cargos;
 
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
+import com.backend.portalroshkabackend.tools.mapper.AutoMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
-public class HumanResourceServiceImpl implements IHumanResourceService{
+public class HumanResourceServiceImpl implements IHumanResourceService {
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
     private final CargosRepository cargosRepository;
@@ -37,7 +38,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
                                     RequestRepository requestRepository,
                                     CargosRepository cargosRepository,
                                     RolesRepository rolesRepository,
-                                    EquiposRepository equiposRepository){
+                                    EquiposRepository equiposRepository) {
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
         this.cargosRepository = cargosRepository;
@@ -51,7 +52,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (userRepository.existsByCorreo(newEmail)){
+        if (userRepository.existsByCorreo(newEmail)) {
             throw new DuplicateEmailException(newEmail); // Si el ya esta asginado a otro usuario, lanza excepcion
         }
 
@@ -59,11 +60,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
         // Este try catch lanza una excepcion si ocurre algun error al usar el metodo save() de Jpa
 
-        try{
+        try {
             userRepository.save(user);
 
             return true;
-        } catch (JpaSystemException ex){
+        } catch (JpaSystemException ex) {
             throw new DatabaseOperationException("Error al actualizar email: ", ex);
         }
     }
@@ -78,7 +79,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     public Page<UserDto> getAllEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAll(pageable); // Guarda todos los usuarios en users
 
-        return users.map(this::mapToUserDto); //Retorna una lista de dtos
+        return users.map(AutoMap::toUserDto); //Retorna una lista de dtos
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +87,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     public Page<UserDto> getAllActiveEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllActiveEmployees(pageable);
 
-        return users.map(this::mapToUserDto); // Retorna una lista de empleados activos (DTOs)
+        return users.map(AutoMap::toUserDto); // Retorna una lista de empleados activos (DTOs)
     }
 
     @Transactional(readOnly = true)
@@ -94,28 +95,28 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     public Page<UserDto> getAllInactiveEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllInactiveEmployees(pageable);
 
-        return users.map(this::mapToUserDto); // Retorna la lista de empleados inactivos
+        return users.map(AutoMap::toUserDto); // Retorna la lista de empleados inactivos
     }
 
     @Override
     public Page<UserDto> getAllEmployeesByRol(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByIdRolAsc(pageable);
 
-        return users.map(this::mapToUserDto);
+        return users.map(AutoMap::toUserDto);
     }
 
     @Override
     public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
 
-        return users.map(this::mapToUserDto);
+        return users.map(AutoMap::toUserDto);
     }
 
     @Override
     public Page<UserDto> getAllEmployeesByPosition(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByIdCargoAsc(pageable);
 
-        return users.map(this::mapToUserDto);
+        return users.map(AutoMap::toUserDto);
     }
 
     @Transactional(readOnly = true)
@@ -124,7 +125,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id)); //Lanza una excepcion personalizada
 
-        return mapToUserDto(user); //Si no existe usuario con esa id retorna null, sino retorna un Dto
+        return AutoMap.toUserDto(user); //Si no existe usuario con esa id retorna null, sino retorna un Dto
 
     }
 
@@ -132,23 +133,23 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Override
     public UserDto addEmployee(UserInsertDto insertDto) {
 
-        if (userRepository.existsByCorreo(insertDto.getCorreo())){
+        if (userRepository.existsByCorreo(insertDto.getCorreo())) {
             throw new DuplicateEmailException(insertDto.getCorreo()); // Excepcion si el email ya esta asociado a un usuario existente
         }
 
-        if (userRepository.existsByNroCedula(insertDto.getNroCedula())){
+        if (userRepository.existsByNroCedula(insertDto.getNroCedula())) {
             throw new DuplicateCedulaException(insertDto.getNroCedula());
         }
 
-        if (!rolesRepository.existsById(insertDto.getIdRol())){ // Si no existe el cargo, lanza excepcion
+        if (!rolesRepository.existsById(insertDto.getIdRol())) { // Si no existe el cargo, lanza excepcion
             throw new RolesNotFoundException(insertDto.getIdRol());
         }
 
-        if (!equiposRepository.existsById(insertDto.getIdEquipo())){
+        if (!equiposRepository.existsById(insertDto.getIdEquipo())) {
             throw new EquipoNotFoundException(insertDto.getIdEquipo());
         }
 
-        if (!cargosRepository.existsById(insertDto.getIdCargo())){
+        if (!cargosRepository.existsById(insertDto.getIdCargo())) {
             throw new CargoNotFoundException(insertDto.getIdCargo());
         }
 
@@ -167,11 +168,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
         user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
 
-        try{
+        try {
             Usuario savedUser = userRepository.save(user);
 
-            return mapToUserDto(savedUser);
-        } catch (JpaSystemException ex){
+            return AutoMap.toUserDto(savedUser);
+        } catch (JpaSystemException ex) {
             throw new DatabaseOperationException("Error al guardadr usuario: ", ex);
         }
 
@@ -184,23 +185,23 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (userRepository.existsByCorreoAndIdUsuarioNot(updateDto.getCorreo(), id)){
+        if (userRepository.existsByCorreoAndIdUsuarioNot(updateDto.getCorreo(), id)) {
             throw new DuplicateEmailException(updateDto.getCorreo());
         }
 
-        if (userRepository.existsByNroCedulaAndIdUsuarioNot(updateDto.getNroCedula(), id)){
+        if (userRepository.existsByNroCedulaAndIdUsuarioNot(updateDto.getNroCedula(), id)) {
             throw new DuplicateCedulaException(updateDto.getNroCedula());
         }
 
-        if (!rolesRepository.existsById(updateDto.getIdRol())){ // Si no existe el cargo, lanza excepcion
+        if (!rolesRepository.existsById(updateDto.getIdRol())) { // Si no existe el cargo, lanza excepcion
             throw new RolesNotFoundException(updateDto.getIdRol());
         }
 
-        if (!equiposRepository.existsById(updateDto.getIdEquipo())){
+        if (!equiposRepository.existsById(updateDto.getIdEquipo())) {
             throw new EquipoNotFoundException(updateDto.getIdEquipo());
         }
 
-        if (!cargosRepository.existsById(updateDto.getIdCargo())){
+        if (!cargosRepository.existsById(updateDto.getIdCargo())) {
             throw new CargoNotFoundException(updateDto.getIdCargo());
         }
 
@@ -217,11 +218,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setIdCargo(updateDto.getIdCargo());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
 
-        try{
+        try {
             Usuario updatedUser = userRepository.save(user);
 
-            return mapToUserDto(updatedUser);
-        } catch (JpaSystemException ex){
+            return AutoMap.toUserDto(updatedUser);
+        } catch (JpaSystemException ex) {
             throw new DatabaseOperationException("Error al actualizar usuario: ", ex);
         }
 
@@ -234,7 +235,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (!user.isEstado()){
+        if (!user.isEstado()) {
             throw new UserAlreadyInactiveException(id);
         }
 
@@ -243,8 +244,8 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         try {
             Usuario deletedUser = userRepository.save(user);
 
-            return mapToUserDto(deletedUser);
-        } catch (JpaSystemException ex){
+            return AutoMap.toUserDto(deletedUser);
+        } catch (JpaSystemException ex) {
             throw new DatabaseOperationException("Error al eliminar usuario: ", ex);
         }
 
@@ -256,7 +257,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     @Override
     public Page<RequestDto> getAllRequests(Pageable pageable) {
         Page<Solicitudes> requests = requestRepository.findAll(pageable);
-        return requests.map(this::mapToRequestDto); // Retorna todas las solicitudes (DTOs)
+        return requests.map(AutoMap::toRequestDto); // Retorna todas las solicitudes (DTOs)
     }
 
     @Transactional
@@ -286,7 +287,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
             requestRepository.save(request);
 
             return true;
-        } catch (JpaSystemException ex){
+        } catch (JpaSystemException ex) {
             throw new DatabaseOperationException("Error al rechazar la solicitud: ", ex.getCause());
         }
 
@@ -306,16 +307,16 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     public Page<PositionDto> getAllPositions(Pageable pageable) {
         Page<Cargos> positions = cargosRepository.findAll(pageable);
 
-        return positions.map(this::mapToPositionDto);
+        return positions.map(AutoMap::toPositionDto);
     }
 
     @Transactional(readOnly = true)
     @Override
     public PositionDto getPositionById(int id) {
-        var position =  cargosRepository.findById(id)
+        var position = cargosRepository.findById(id)
                 .orElseThrow(() -> new CargoNotFoundException(id));
 
-        return mapToPositionDto(position);
+        return AutoMap.toPositionDto(position);
     }
 
     @Transactional
@@ -325,11 +326,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
         position.setNombre(positionInsertDto.getNombre());
 
-        try{
+        try {
             Cargos savedPosition = cargosRepository.save(position);
 
-            return mapToPositionDto(savedPosition);
-        } catch (JpaSystemException ex){
+            return AutoMap.toPositionDto(savedPosition);
+        } catch (JpaSystemException ex) {
             throw new DatabaseOperationException("Error al añadir cargo: ", ex);
         }
 
@@ -343,11 +344,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
         position.setNombre(positionUpdateDto.getNombre());
 
-        try{
+        try {
             Cargos updatedPosition = cargosRepository.save(position);
 
-            return mapToPositionDto(updatedPosition);
-        } catch (JpaSystemException ex){
+            return AutoMap.toPositionDto(updatedPosition);
+        } catch (JpaSystemException ex) {
             throw new DatabaseOperationException("Error al actualizar cargo: ", ex);
         }
 
@@ -363,63 +364,14 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
         //TODO: Aca se daria de baja el cargo, ej: position.setEstado(false);
 
-        try{
+        try {
             Cargos deletedPosition = cargosRepository.save(position);
 
-            return mapToPositionDto(deletedPosition);
-        } catch (JpaSystemException ex){
+            return AutoMap.toPositionDto(deletedPosition);
+        } catch (JpaSystemException ex) {
             throw new DatabaseOperationException("Error al eliminar cargo: ", ex);
         }
 
-    }
-
-    private UserDto mapToUserDto(Usuario user) {
-        UserDto dto = new UserDto();
-        dto.setIdUsuario(user.getIdUsuario());
-        dto.setNombre(user.getNombre());
-        dto.setApellido(user.getApellido());
-        dto.setNroCedula(user.getNroCedula());
-        dto.setCorreo(user.getCorreo());
-        dto.setIdRol(user.getIdRol());
-        dto.setFechaIngreso(user.getFechaIngreso());
-        dto.setAntiguedad(user.getAntiguedad());
-
-
-        dto.setDiasVacaciones(user.getDiasVacaciones());
-        dto.setEstado(user.isEstado());
-        dto.setContrasena(user.getContrasena());
-        dto.setTelefono(user.getTelefono());
-        dto.setIdEquipo(user.getIdEquipo());
-        dto.setIdCargo(user.getIdCargo());
-        dto.setFechaNacimiento(user.getFechaNacimiento());
-        dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
-        dto.setRequiereCambioContrasena(user.isRequiereCambioContrasena());
-        return dto;
-    }
-
-    private RequestDto mapToRequestDto(Solicitudes request){
-        RequestDto requestDto = new RequestDto();
-
-        requestDto.setIdSolicitud(request.getIdSolicitud());
-        requestDto.setFechaInicio(request.getFechaInicio());
-        requestDto.setFechaFin(request.getFechaFin());
-        requestDto.setEstado(request.isEstado());
-        requestDto.setIdUsuario(request.getIdUsuario());
-        requestDto.setCantidadDias(request.getCantidadDias());
-        requestDto.setNumeroAprobaciones(request.getNumeroAprobaciones());
-        requestDto.setComentario(request.getComentario());
-        requestDto.setRechazado(request.isRechazado());
-
-        return requestDto;
-    }
-
-    private PositionDto mapToPositionDto(Cargos position){
-        PositionDto positionDto = new PositionDto();
-
-        positionDto.setIdCargo(position.getIdCargo());
-        positionDto.setNombre(position.getNombre());
-
-        return positionDto;
     }
 
 }
