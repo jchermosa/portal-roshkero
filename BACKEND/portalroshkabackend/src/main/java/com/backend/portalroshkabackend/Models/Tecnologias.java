@@ -1,8 +1,8 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.sql.Date;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,22 +10,20 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @NoArgsConstructor
-@Table(name = "tipo_inventario")
-public class Dispositivo {
-
-
+@Table(name = "tecnologias")
+public class Tecnologias {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idTipoInventario;
+    @Column(name = "id_tecnologia")
+    private Integer idTecnologia;
     @Column(name = "nombre")
     private String nombre;
-    @Column(name = "detalle")
-    private String detalle;   
+    @Column(name = "descripcion")
+    private String descripcion;
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion; 
-
-
+    private Date fechaCreacion;
+    
 }

@@ -13,19 +13,20 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "tipo_inventario")
-public class Dispositivo {
-
-
+@Table(name = "clientes")
+public class Clientes {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idTipoInventario;
+    private Integer idCliente;
     @Column(name = "nombre")
     private String nombre;
-    @Column(name = "detalle")
-    private String detalle;   
+    @Column(name = "nro_telefono")
+    private String nroTelefono;
+    @Column(name = "correo")
+    private String correo;
+    @Column(name = "ruc")
+    private String ruc;
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion; 
-
-
+    private Date fechaCreacion;
 }
