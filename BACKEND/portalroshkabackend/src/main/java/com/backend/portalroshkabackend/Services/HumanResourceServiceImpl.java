@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
@@ -58,15 +59,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
         user.setCorreo(newEmail);
 
-        // Este try catch lanza una excepcion si ocurre algun error al usar el metodo save() de Jpa
+        // Este metodo recibe una funcion como primer parametro, y mensaje de error como segundo parametro,
+        // dentro de saveEntity se maneja el try/catch por si ocurre error al guardar la entidad.
 
-        try {
-            userRepository.save(user);
-
-            return true;
-        } catch (JpaSystemException ex) {
-            throw new DatabaseOperationException("Error al actualizar email: ", ex);
-        }
+        Usuario savedUser = saveEntity(() -> userRepository.save(user), "Error al guarda el usuario: ");
+        return true;
     }
 
     @Override
@@ -137,17 +134,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         validateUniqueEmail(insertDto.getCorreo(), null);
         validateRelatedEntities(insertDto.getIdRol(), insertDto.getIdEquipo(), insertDto.getIdCargo());
 
-
         Usuario user = AutoMap.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
-        try {
-            Usuario savedUser = userRepository.save(user);
+        Usuario savedUser = saveEntity( () -> userRepository.save(user), "Error al guardar el usuario: ");
 
-            return AutoMap.toUserDto(savedUser);
-        } catch (JpaSystemException ex) {
-            throw new DatabaseOperationException("Error al guardadr usuario: ", ex);
-        }
-
+        return AutoMap.toUserDto(savedUser);
 
     }
 
@@ -174,14 +165,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         user.setIdCargo(updateDto.getIdCargo());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
 
-        try {
-            Usuario updatedUser = userRepository.save(user);
+        Usuario updatedUser = saveEntity( () -> userRepository.save(user), "Error al actualizar el usuario: ");
 
-            return AutoMap.toUserDto(updatedUser);
-        } catch (JpaSystemException ex) {
-            throw new DatabaseOperationException("Error al actualizar usuario: ", ex);
-        }
-
+        return AutoMap.toUserDto(updatedUser);
 
     }
 
@@ -197,13 +183,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
         user.setEstado(false); // Da de baja el empleado de la base de datos
 
-        try {
-            Usuario deletedUser = userRepository.save(user);
+        Usuario deletedUser = saveEntity( () -> userRepository.save(user), "Error al eliminar el usuario: ");
 
-            return AutoMap.toUserDto(deletedUser);
-        } catch (JpaSystemException ex) {
-            throw new DatabaseOperationException("Error al eliminar usuario: ", ex);
-        }
+        return AutoMap.toUserDto(deletedUser);
 
     }
 
@@ -238,14 +220,8 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         request.setRechazado(true); // Setea la solicitud como rechazada
         request.setComentario(rejectedDto.getComentario());
 
-
-        try {
-            requestRepository.save(request);
-
-            return true;
-        } catch (JpaSystemException ex) {
-            throw new DatabaseOperationException("Error al rechazar la solicitud: ", ex.getCause());
-        }
+        saveEntity( () -> requestRepository.save(request), "Error al rechazar la solicitud: ");
+        return true;
 
     }
 
@@ -282,13 +258,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
         position.setNombre(positionInsertDto.getNombre());
 
-        try {
-            Cargos savedPosition = cargosRepository.save(position);
+        Cargos savedPosition = saveEntity( () -> cargosRepository.save(position), "Error al añadir el cargo: ");
 
-            return AutoMap.toPositionDto(savedPosition);
-        } catch (JpaSystemException ex) {
-            throw new DatabaseOperationException("Error al añadir cargo: ", ex);
-        }
+        return AutoMap.toPositionDto(savedPosition);
 
     }
 
@@ -300,13 +272,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
         position.setNombre(positionUpdateDto.getNombre());
 
-        try {
-            Cargos updatedPosition = cargosRepository.save(position);
+        Cargos updatedPosition = saveEntity( () -> cargosRepository.save(position), "Error al actualizar el cargo: ");
 
-            return AutoMap.toPositionDto(updatedPosition);
-        } catch (JpaSystemException ex) {
-            throw new DatabaseOperationException("Error al actualizar cargo: ", ex);
-        }
+        return AutoMap.toPositionDto(updatedPosition);
 
     }
 
@@ -320,13 +288,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
         //TODO: Aca se daria de baja el cargo, ej: position.setEstado(false);
 
-        try {
-            Cargos deletedPosition = cargosRepository.save(position);
+        Cargos deletedPosition = saveEntity( () -> cargosRepository.save(position), "Error al eliminar cargo");
 
-            return AutoMap.toPositionDto(deletedPosition);
-        } catch (JpaSystemException ex) {
-            throw new DatabaseOperationException("Error al eliminar cargo: ", ex);
-        }
+        return AutoMap.toPositionDto(deletedPosition);
 
     }
 
@@ -362,4 +326,11 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         if (!cargosRepository.existsById(idCargo)) throw new CargoNotFoundException(idCargo);
     }
 
+    private <T> T saveEntity(Supplier<T> saveOperation, String errorMessage){
+        try{
+            return saveOperation.get();
+        } catch (JpaSystemException ex){
+            throw new DatabaseOperationException(errorMessage, ex);
+        }
+    }
 }
