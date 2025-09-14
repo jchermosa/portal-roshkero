@@ -15,6 +15,7 @@ import com.backend.portalroshkabackend.Models.Cargos;
 
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
+import com.backend.portalroshkabackend.tools.validator.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,17 +37,22 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
     private final RolesRepository rolesRepository;
     private final EquiposRepository equiposRepository;
 
+    private final Validator validator;
+
     @Autowired
     public HumanResourceServiceImpl(UserRepository userRepository,
                                     RequestRepository requestRepository,
                                     CargosRepository cargosRepository,
                                     RolesRepository rolesRepository,
-                                    EquiposRepository equiposRepository) {
+                                    EquiposRepository equiposRepository,
+                                    Validator validator) {
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
         this.cargosRepository = cargosRepository;
         this.rolesRepository = rolesRepository;
         this.equiposRepository = equiposRepository;
+
+        this.validator = validator;
     }
 
     @Transactional
@@ -55,7 +61,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        validateUniqueEmail(newEmail, id); // Si el correo ya esta asginado a otro usuario, lanza excepcion
+        validator.validateUniqueEmail(newEmail, id); // Si el correo ya esta asginado a otro usuario, lanza excepcion
 
         user.setCorreo(newEmail);
 
@@ -130,9 +136,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
     @Override
     public UserDto addEmployee(UserInsertDto insertDto) {
 
-        validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
-        validateUniqueEmail(insertDto.getCorreo(), null);
-        validateRelatedEntities(insertDto.getIdRol(), insertDto.getIdEquipo(), insertDto.getIdCargo());
+        validator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
+        validator.validateUniqueEmail(insertDto.getCorreo(), null);
+        validator.validateRelatedEntities(insertDto.getIdRol(), insertDto.getIdEquipo(), insertDto.getIdCargo());
 
         Usuario user = AutoMap.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
@@ -148,9 +154,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
-        validateUniqueEmail(updateDto.getCorreo(), id);
-        validateRelatedEntities(updateDto.getIdRol(), updateDto.getIdEquipo(), updateDto.getIdCargo());
+        validator.validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
+        validator.validateUniqueEmail(updateDto.getCorreo(), id);
+        validator.validateRelatedEntities(updateDto.getIdRol(), updateDto.getIdEquipo(), updateDto.getIdCargo());
 
         user.setNombre(updateDto.getNombre());
         user.setApellido(updateDto.getApellido());
@@ -189,7 +195,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
     }
 
-    // ----------------- Request -----------------
+    // ----------------- Solicitudes -----------------
 
     @Transactional(readOnly = true)
     @Override
@@ -232,7 +238,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
     }
 
 
-    // ----------------- Position -----------------
+    // ----------------- Cargos -----------------
 
     @Transactional(readOnly = true)
     @Override
@@ -298,33 +304,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
     // ------------------ HELPERS ------------------
 
-    private void validateUniqueEmail(String correo, Integer excludeUserId){
-        boolean exists = (excludeUserId == null)
-                ? userRepository.existsByCorreo(correo)
-                : userRepository.existsByCorreoAndIdUsuarioNot(correo, excludeUserId);
 
-        if (exists){
-            throw new DuplicateEmailException(correo);
-        }
-    }
-
-    private void validateUniqueCedula(Integer nroCedula, Integer excludeUserId){
-        boolean exists = (excludeUserId == null)
-                ? userRepository.existsByNroCedula(nroCedula)
-                : userRepository.existsByNroCedulaAndIdUsuarioNot(nroCedula, excludeUserId);
-
-        if (exists){
-            throw new DuplicateCedulaException(nroCedula);
-        }
-    }
-
-    private void validateRelatedEntities(Integer idRol, Integer idEquipo, Integer idCargo){
-        if (!rolesRepository.existsById(idRol)) throw new RolesNotFoundException(idRol);
-
-        if (!equiposRepository.existsById(idEquipo)) throw new EquipoNotFoundException(idEquipo);
-
-        if (!cargosRepository.existsById(idCargo)) throw new CargoNotFoundException(idCargo);
-    }
 
     private <T> T saveEntity(Supplier<T> saveOperation, String errorMessage){
         try{
