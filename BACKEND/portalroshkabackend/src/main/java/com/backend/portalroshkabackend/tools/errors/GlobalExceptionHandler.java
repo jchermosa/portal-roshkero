@@ -76,6 +76,11 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(DuplicateTelefonoException.class)
+    public ResponseEntity<ErrorResponseDto> handleDuplicateTelefono(DuplicateTelefonoException ex){
+        return buildError(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     // --- GENERAL EXCEPTION HANDLER ---
 
     @ExceptionHandler

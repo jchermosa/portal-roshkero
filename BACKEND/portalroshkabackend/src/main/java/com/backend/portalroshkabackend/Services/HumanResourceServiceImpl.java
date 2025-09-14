@@ -1,13 +1,6 @@
 package com.backend.portalroshkabackend.Services;
 
-import com.backend.portalroshkabackend.DTO.PositionDto;
-import com.backend.portalroshkabackend.DTO.PositionInsertDto;
-import com.backend.portalroshkabackend.DTO.PositionUpdateDto;
-import com.backend.portalroshkabackend.DTO.RequestDto;
-import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
-import com.backend.portalroshkabackend.DTO.UserDto;
-import com.backend.portalroshkabackend.DTO.UserInsertDto;
-import com.backend.portalroshkabackend.DTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.Models.Solicitudes;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
@@ -57,7 +50,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
     @Transactional
     @Override
-    public boolean updateEmail(int id, String newEmail) {
+    public EmailUpdatedDto updateEmail(int id, String newEmail) {
         Usuario user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -65,16 +58,23 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
         user.setCorreo(newEmail);
 
-        // Este metodo recibe una funcion como primer parametro, y mensaje de error como segundo parametro,
-        // dentro de saveEntity se maneja el try/catch por si ocurre error al guardar la entidad.
+        Usuario savedUser = saveEntity(() -> userRepository.save(user), "Error al guardar el usuario: ");// Este metodo recibe una funcion como primer parametro, y mensaje de error como segundo parametro, dentro de saveEntity se maneja el try/catch por si ocurre error al guardar la entidad.
 
-        Usuario savedUser = saveEntity(() -> userRepository.save(user), "Error al guarda el usuario: ");
-        return true;
+        return AutoMap.toEmailUpdatedDto(savedUser);
     }
 
+    @Transactional
     @Override
-    public boolean updatePhone(int id, String newPhone) {
-        return false;
+    public PhoneUpdatedDto updatePhone(int id, String newPhone) {
+        Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+
+        validator.validateUniquePhone(newPhone, id);
+
+        user.setTelefono(newPhone);
+
+        Usuario savedUser = saveEntity(() -> userRepository.save(user), "Error al guardar el usuario: ");
+
+        return AutoMap.toPhoneUpdatedDto(savedUser);
     }
 
     @Transactional(readOnly = true)
@@ -138,7 +138,8 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
         validator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
         validator.validateUniqueEmail(insertDto.getCorreo(), null);
-        validator.validateRelatedEntities(insertDto.getIdRol(), insertDto.getIdEquipo(), insertDto.getIdCargo());
+        validator.validateUniquePhone(insertDto.getTelefono(), null);
+        validator.validateRelatedEntities(insertDto.getIdRol(), insertDto.getIdEquipo(), insertDto.getIdCargo());  // LLama al metodo que verifica si el rol/equipo o cargo asignado existen
 
         Usuario user = AutoMap.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
@@ -156,6 +157,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService {
 
         validator.validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
         validator.validateUniqueEmail(updateDto.getCorreo(), id);
+        validator.validateUniquePhone(updateDto.getTelefono(), id);
         validator.validateRelatedEntities(updateDto.getIdRol(), updateDto.getIdEquipo(), updateDto.getIdCargo());
 
         user.setNombre(updateDto.getNombre());

@@ -1,13 +1,6 @@
 package com.backend.portalroshkabackend.Controllers;
 
-import com.backend.portalroshkabackend.DTO.PositionDto;
-import com.backend.portalroshkabackend.DTO.PositionInsertDto;
-import com.backend.portalroshkabackend.DTO.PositionUpdateDto;
-import com.backend.portalroshkabackend.DTO.RequestDto;
-import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
-import com.backend.portalroshkabackend.DTO.UserDto;
-import com.backend.portalroshkabackend.DTO.UserInsertDto;
-import com.backend.portalroshkabackend.DTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.Services.IHumanResourceService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,22 +27,23 @@ public class HumanResourceController {
     }
 
     // ----------------- Me -----------------
-    @PutMapping("/th/me/{id}")
+    @PutMapping("/th/me/update/{id}")
     public ResponseEntity<?> updateMe(
             @RequestParam(value = "newEmail", required = false) String newEmail,
             @RequestParam(value = "newPhone", required = false) String newPhone,
             @PathVariable int id
             )
     {
-        boolean isUpdated = false;
 
         if (newEmail != null){
-            isUpdated = humanResourceService.updateEmail(id, newEmail);
+            EmailUpdatedDto dto = humanResourceService.updateEmail(id, newEmail);
+            return ResponseEntity.ok(dto);
         } else if (newPhone != null) {
-            isUpdated = humanResourceService.updatePhone(id, newPhone);
+            PhoneUpdatedDto dto = humanResourceService.updatePhone(id, newPhone);
+            return ResponseEntity.ok(dto);
         }
 
-        return isUpdated ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().build();
     }
 
     // ----------------- Users -----------------

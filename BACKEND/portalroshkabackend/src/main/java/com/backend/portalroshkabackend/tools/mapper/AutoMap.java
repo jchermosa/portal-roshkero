@@ -1,9 +1,6 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
-import com.backend.portalroshkabackend.DTO.PositionDto;
-import com.backend.portalroshkabackend.DTO.RequestDto;
-import com.backend.portalroshkabackend.DTO.UserDto;
-import com.backend.portalroshkabackend.DTO.UserInsertDto;
+import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Solicitudes;
 import com.backend.portalroshkabackend.Models.Usuario;
@@ -56,6 +53,24 @@ public class AutoMap {
         positionDto.setNombre(position.getNombre());
 
         return positionDto;
+    }
+
+    public static EmailUpdatedDto toEmailUpdatedDto(Usuario user){
+        EmailUpdatedDto emailUpdatedDto = new EmailUpdatedDto();
+
+        emailUpdatedDto.setIdUsuario(user.getIdUsuario());
+        emailUpdatedDto.setCorreo(user.getCorreo());
+
+        return emailUpdatedDto;
+    }
+
+    public static PhoneUpdatedDto toPhoneUpdatedDto(Usuario user){
+        PhoneUpdatedDto phoneUpdatedDto = new PhoneUpdatedDto();
+
+        phoneUpdatedDto.setIdUsuario(user.getIdUsuario());
+        phoneUpdatedDto.setTelefono(user.getTelefono());
+
+        return phoneUpdatedDto;
     }
 
     public static Usuario toUsuarioFromInsertDto(UserInsertDto insertDto){

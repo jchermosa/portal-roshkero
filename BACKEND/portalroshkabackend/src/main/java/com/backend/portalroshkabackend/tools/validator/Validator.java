@@ -44,6 +44,16 @@ public class Validator {
         }
     }
 
+    public void validateUniquePhone(String phone, Integer excludeUserId){
+        boolean exists = (excludeUserId == null)
+                ? userRepository.existsByTelefono(phone)
+                : userRepository.existsByTelefonoAndIdUsuarioNot(phone, excludeUserId);
+
+        if (exists){
+            throw new DuplicateTelefonoException(phone);
+        }
+    }
+
     public void validateRelatedEntities(Integer idRol, Integer idEquipo, Integer idCargo){
         if (!rolesRepository.existsById(idRol)) throw new RolesNotFoundException(idRol);
 

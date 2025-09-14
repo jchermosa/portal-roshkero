@@ -1,20 +1,13 @@
 package com.backend.portalroshkabackend.Services;
 
-import com.backend.portalroshkabackend.DTO.PositionDto;
-import com.backend.portalroshkabackend.DTO.PositionInsertDto;
-import com.backend.portalroshkabackend.DTO.PositionUpdateDto;
-import com.backend.portalroshkabackend.DTO.RequestDto;
-import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
-import com.backend.portalroshkabackend.DTO.UserDto;
-import com.backend.portalroshkabackend.DTO.UserInsertDto;
-import com.backend.portalroshkabackend.DTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface IHumanResourceService {
     // ------ Me ------
-    boolean updateEmail(int id, String newEmail);
-    boolean updatePhone(int id, String newPhone);
+    EmailUpdatedDto updateEmail(int id, String newEmail);
+    PhoneUpdatedDto updatePhone(int id, String newPhone);
     // ------ Employees ------
     Page<UserDto> getAllEmployees(Pageable pageable);
     Page<UserDto> getAllActiveEmployees(Pageable pageable);

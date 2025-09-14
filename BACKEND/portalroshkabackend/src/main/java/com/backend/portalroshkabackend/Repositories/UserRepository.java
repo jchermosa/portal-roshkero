@@ -24,9 +24,10 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
 
     boolean existsByCorreo(String correo);
     boolean existsByNroCedula(int nroCedula);
+    boolean existsByTelefono(String telefono);
     boolean existsByCorreoAndIdUsuarioNot(String correo, Integer idUsuario); // Si el correo / cedula ya existe excluyendo al propio usuario
     boolean existsByNroCedulaAndIdUsuarioNot(Integer nroCedula, Integer idUsuario);
-
+    boolean existsByTelefonoAndIdUsuarioNot(String telefono, Integer idUsuario);
 
     Optional<Usuario> findByNroCedula(Integer nroCedula);
 
