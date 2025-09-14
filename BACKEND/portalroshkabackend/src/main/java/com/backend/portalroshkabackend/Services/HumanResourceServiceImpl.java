@@ -66,12 +66,12 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return users.map(this::mapToUserDto);
     }
 
-    @Override
-    public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
+    // @Override
+    // public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
+    //     Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
 
-        return users.map(this::mapToUserDto);
-    }
+    //     return users.map(this::mapToUserDto);
+    // }
 
     @Override
     public Page<UserDto> getAllEmployeesByPosition(Pageable pageable) {
@@ -103,7 +103,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setEstado(insertDto.isEstado());
         user.setContrasena(insertDto.getContrasena());
         user.setTelefono(insertDto.getTelefono());
-        user.setIdEquipo(insertDto.getIdEquipo());
+        // user.setIdEquipo(insertDto.getIdEquipo());
         user.setIdCargo(insertDto.getIdCargo());
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
         user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
@@ -134,7 +134,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setEstado(updateDto.isEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
-        user.setIdEquipo(updateDto.getIdEquipo());
+        // user.setIdEquipo(updateDto.getIdEquipo());
         user.setIdCargo(updateDto.getIdCargo());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
 
@@ -289,7 +289,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         dto.setEstado(user.isEstado());
         dto.setContrasena(user.getContrasena());
         dto.setTelefono(user.getTelefono());
-        dto.setIdEquipo(user.getIdEquipo());
+        // dto.setIdEquipo(user.getIdEquipo());
         dto.setIdCargo(user.getIdCargo());
         dto.setFechaNacimiento(user.getFechaNacimiento());
         dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());

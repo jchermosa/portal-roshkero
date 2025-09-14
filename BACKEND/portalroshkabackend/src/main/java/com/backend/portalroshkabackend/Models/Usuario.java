@@ -44,9 +44,6 @@ public class Usuario {
     @Column(name = "telefono")
     private String telefono;
 
-    @Column(name = "id_equipo")
-    private int idEquipo;
-
     @Column(name = "id_cargo")
     private int idCargo;
 
@@ -131,11 +128,11 @@ public class Usuario {
         this.diasVacaciones = diasVacaciones;
     }
 
-    public boolean isEstado() {
+    public Boolean isEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(Boolean estado) {
         this.estado = estado;
     }
 
@@ -153,14 +150,6 @@ public class Usuario {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    public int getIdEquipo() {
-        return idEquipo;
-    }
-
-    public void setIdEquipo(int idEquipo) {
-        this.idEquipo = idEquipo;
     }
 
     public int getIdCargo() {
