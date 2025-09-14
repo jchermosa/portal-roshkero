@@ -36,7 +36,7 @@ public class Usuario {
     private int diasVacaciones;
 
     @Column(name = "estado")
-    private boolean estado;
+    private Character estado;
 
     @Column(name = "contrasena")
     private String contrasena;
@@ -128,11 +128,11 @@ public class Usuario {
         this.diasVacaciones = diasVacaciones;
     }
 
-    public Boolean isEstado() {
+    public Character getEstado() {
         return estado;
     }
 
-    public void setEstado(Boolean estado) {
+    public void setEstado(Character estado) {
         this.estado = estado;
     }
 

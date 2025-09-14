@@ -13,7 +13,7 @@ public class UserDto {
     private Date fechaIngreso;
     private String antiguedad;
     private int diasVacaciones;
-    private boolean estado;
+    private Character estado;
     private String contrasena;
     private String telefono;
     private int idEquipo;
@@ -94,11 +94,11 @@ public class UserDto {
         this.diasVacaciones = diasVacaciones;
     }
 
-    public boolean isEstado() {
+    public Character getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(Character estado) {
         this.estado = estado;
     }
 

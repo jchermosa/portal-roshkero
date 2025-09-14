@@ -15,7 +15,7 @@ public class UserUpdateDto {
 
     private Date fechaIngreso;
 
-    private boolean estado;
+    private Character estado;
 
     private String contrasena;
 
@@ -77,11 +77,11 @@ public class UserUpdateDto {
         this.fechaIngreso = fechaIngreso;
     }
 
-    public boolean isEstado() {
+    public Character getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(Character estado) {
         this.estado = estado;
     }
 

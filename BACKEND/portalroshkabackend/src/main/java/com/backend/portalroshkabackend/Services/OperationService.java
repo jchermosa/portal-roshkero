@@ -5,6 +5,7 @@ import com.backend.portalroshkabackend.DTO.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.RequestResponseDto;
 import com.backend.portalroshkabackend.DTO.RolesResponseDto;
+import com.backend.portalroshkabackend.Interfaces.IOperationService;
 import com.backend.portalroshkabackend.Repositories.CargosRepository;
 import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.RequestRepository;
@@ -15,14 +16,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OperationServiceImpl implements IOperationService {
+public class OperationService implements IOperationService {
 
     private final RequestRepository requestRepository;
     private final RolesRepository rolesRepository;
     private final CargosRepository cargosRepository;
     private final EquiposRepository equiposRepository;
 
-    public OperationServiceImpl(RequestRepository requestRepository,
+    public OperationService(RequestRepository requestRepository,
             RolesRepository rolesRepository,
             CargosRepository cargosRepository,
             EquiposRepository equiposRepository) {
@@ -41,7 +42,7 @@ public class OperationServiceImpl implements IOperationService {
                     dto.setId_solicitud(request.getIdSolicitud());
                     dto.setFecha_inicio(request.getFechaInicio());
                     dto.setFecha_fin(request.getFechaFin());
-                    dto.setEstado(request.isEstado());
+                    dto.setEstado(request.getEstado());
                     dto.setId_usuario(request.getIdUsuario());
                     dto.setCantidad_dias(request.getCantidadDias());
                     dto.setNumero_aprobaciones(request.getNumeroAprobaciones());

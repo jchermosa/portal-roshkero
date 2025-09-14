@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services;
+package com.backend.portalroshkabackend.Interfaces;
 
 
 import org.springframework.data.domain.Page;

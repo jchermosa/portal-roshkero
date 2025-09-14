@@ -12,10 +12,10 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<Usuario, Integer> {
 
-    @Query(value =  "SELECT * FROM usuarios WHERE estado = true", nativeQuery = true)
+    @Query(value =  "SELECT * FROM usuarios WHERE estado = 'A'", nativeQuery = true)
     Page<Usuario> findAllActiveEmployees(Pageable pageable); //Busca todos los usuarios activos
 
-    @Query(value = "SELECT * FROM usuarios WHERE estado = false", nativeQuery = true)
+    @Query(value = "SELECT * FROM usuarios WHERE estado = 'I'", nativeQuery = true)
     Page<Usuario> findAllInactiveEmployees(Pageable pageable); // Busca todos los usuarios inactivos
 
     Page<Usuario> findAllByOrderByIdRolAsc(Pageable pageable); // Retona los usuarios ordenados por rol

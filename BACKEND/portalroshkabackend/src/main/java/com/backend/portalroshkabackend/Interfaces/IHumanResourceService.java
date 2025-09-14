@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services;
+package com.backend.portalroshkabackend.Interfaces;
 
 import com.backend.portalroshkabackend.DTO.PositionDto;
 import com.backend.portalroshkabackend.DTO.PositionInsertDto;

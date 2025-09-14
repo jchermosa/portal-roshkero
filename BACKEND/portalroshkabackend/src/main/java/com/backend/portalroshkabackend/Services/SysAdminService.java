@@ -24,6 +24,10 @@ public class SysAdminService {
         return sysAdminRepository.findSolicitudesAprovadas();
     }
 
+    public List<SolicitudDispositivos> findAllSolicitudes(){
+        return sysAdminRepository.findAllSolicitudes();
+    }
+
 
 
 }

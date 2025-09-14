@@ -13,7 +13,10 @@ import com.backend.portalroshkabackend.Models.Usuario;
 public interface SysAdminRepository extends JpaRepository<Usuario, Integer>{
 
 
-  @Query(value = "SELECT * FROM solicitud_dispositivos WHERE estado = 'A'", nativeQuery = true)
+    @Query(value = "SELECT * FROM solicitud_dispositivos WHERE estado = 'A'", nativeQuery = true)
     List<SolicitudDispositivos> findSolicitudesAprovadas(); 
+
+    @Query(value = "SELECT * FROM solicitud_dispositivos", nativeQuery = true)
+    List<SolicitudDispositivos> findAllSolicitudes(); 
 } 
     

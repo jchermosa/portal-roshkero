@@ -20,7 +20,7 @@ public class Solicitudes {
     private Date fechaFin;
 
     @Column(name = "estado")
-    private boolean estado;
+    private Character estado;
 
     @Column(name = "id_usuario")
     private int idUsuario;
@@ -61,11 +61,11 @@ public class Solicitudes {
         this.fechaFin = fechaFin;
     }
 
-    public boolean isEstado() {
+    public Character getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(Character estado) {
         this.estado = estado;
     }
 

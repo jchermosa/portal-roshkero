@@ -20,7 +20,7 @@ public class SolicitudDispositivos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_solicitud_dispositivo")
+    @Column(name = "id_solicitud_dispositivos")
     private Integer idSolicitudDispositivo;
 
     @Column(name = "fecha_inicio")

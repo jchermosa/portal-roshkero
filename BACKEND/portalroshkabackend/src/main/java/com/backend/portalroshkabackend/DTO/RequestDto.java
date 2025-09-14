@@ -6,7 +6,7 @@ public class RequestDto {
     private int idSolicitud;
     private Date fechaInicio;
     private Date fechaFin;
-    private boolean estado;
+    private Character estado;
     private int idUsuario;
     private int cantidadDias;
     private int numeroAprobaciones;
@@ -37,11 +37,11 @@ public class RequestDto {
         this.fechaFin = fechaFin;
     }
 
-    public boolean isEstado() {
+    public Character getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(Character estado) {
         this.estado = estado;
     }
 

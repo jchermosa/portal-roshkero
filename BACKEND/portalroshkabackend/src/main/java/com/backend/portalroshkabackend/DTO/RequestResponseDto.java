@@ -6,7 +6,7 @@ public class RequestResponseDto {
     private int id_solicitud;
     private Date fecha_inicio;
     private Date fecha_fin;
-    private Boolean estado;
+    private Character estado;
     private int id_usuario;
     private int cantidad_dias;
     private int numero_aprobaciones;
@@ -37,11 +37,11 @@ public class RequestResponseDto {
         this.fecha_fin = fecha_fin;
     }
 
-    public Boolean getEstado() {
+    public Character getEstado() {
         return estado;
     }
 
-    public void setEstado(Boolean estado) {
+    public void setEstado(Character estado) {
         this.estado = estado;
     }
 

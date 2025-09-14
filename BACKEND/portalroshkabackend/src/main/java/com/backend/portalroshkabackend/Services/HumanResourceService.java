@@ -8,6 +8,7 @@ import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
 import com.backend.portalroshkabackend.DTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
+import com.backend.portalroshkabackend.Interfaces.IHumanResourceService;
 import com.backend.portalroshkabackend.Models.Solicitudes;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.CargosRepository;
@@ -22,12 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-public class HumanResourceServiceImpl implements IHumanResourceService{
+public class HumanResourceService implements IHumanResourceService{
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
     private final CargosRepository cargosRepository;
 
-    public HumanResourceServiceImpl(UserRepository userRepository,
+    public HumanResourceService(UserRepository userRepository,
                                     RequestRepository requestRepository,
                                     CargosRepository cargosRepository){
         this.userRepository = userRepository;
@@ -100,7 +101,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setCorreo(insertDto.getCorreo());
         user.setIdRol(insertDto.getIdRol());
         user.setFechaIngreso(insertDto.getFechaIngreso());
-        user.setEstado(insertDto.isEstado());
+        user.setEstado(insertDto.getEstado());
         user.setContrasena(insertDto.getContrasena());
         user.setTelefono(insertDto.getTelefono());
         // user.setIdEquipo(insertDto.getIdEquipo());
@@ -131,7 +132,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setCorreo(updateDto.getCorreo());
         user.setIdRol(updateDto.getIdRol());
         user.setFechaIngreso(updateDto.getFechaIngreso());
-        user.setEstado(updateDto.isEstado());
+        user.setEstado(updateDto.getEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
         // user.setIdEquipo(updateDto.getIdEquipo());
@@ -148,13 +149,13 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     public UserDto deleteEmployee(int id) {
         Optional<Usuario> userExists = userRepository.findById(id);
 
-        if (userExists.isEmpty() || userExists.get().isEstado() == false){
+        if (userExists.isEmpty() || userExists.get().getEstado() == 'I'){
             return null;
         }
 
         Usuario user = userExists.get();
 
-        user.setEstado(false); // Da de baja el empleado de la base de datos
+        user.setEstado('I'); // Da de baja el empleado de la base de datos
 
         userRepository.save(user);
 
@@ -178,9 +179,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         if (request.isEmpty()){
             return false;
         }
-        // Si se acepta la solicitud, rechazado y estado de la solicitu se setea a false
+        // Si se acepta la solicitud, rechazado se setea a false y estado de la solicitud se setea según corresponda
         request.get().setRechazado(false);
-        request.get().setEstado(false);
+        request.get().setEstado('I');
 
         return true;
     }
@@ -266,7 +267,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
         Cargos position  = positionExists.get();
 
-        // Aca se daria de baja el cargo, ej: position.setEstado(false);
+        // Aca se daria de baja el cargo, ej: position.setEstado('I');
 
         cargosRepository.save(position);
 
@@ -286,7 +287,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
 
 
         dto.setDiasVacaciones(user.getDiasVacaciones());
-        dto.setEstado(user.isEstado());
+        dto.setEstado(user.getEstado());
         dto.setContrasena(user.getContrasena());
         dto.setTelefono(user.getTelefono());
         // dto.setIdEquipo(user.getIdEquipo());
@@ -303,7 +304,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         requestDto.setIdSolicitud(request.getIdSolicitud());
         requestDto.setFechaInicio(request.getFechaInicio());
         requestDto.setFechaFin(request.getFechaFin());
-        requestDto.setEstado(request.isEstado());
+        requestDto.setEstado(request.getEstado());
         requestDto.setIdUsuario(request.getIdUsuario());
         requestDto.setCantidadDias(request.getCantidadDias());
         requestDto.setNumeroAprobaciones(request.getNumeroAprobaciones());

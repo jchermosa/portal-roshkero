@@ -7,7 +7,8 @@ import com.backend.portalroshkabackend.DTO.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.RequestResponseDto;
 import com.backend.portalroshkabackend.DTO.RolesResponseDto;
-import com.backend.portalroshkabackend.Services.IOperationService;
+import com.backend.portalroshkabackend.Interfaces.IOperationService;
+
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
