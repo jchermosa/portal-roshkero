@@ -21,13 +21,10 @@ export default function IconButton({
     "px-4 py-2 rounded-lg font-medium transition flex items-center gap-2";
 
   const variants: Record<NonNullable<IconButtonProps["variant"]>, string> = {
-    primary:
-      "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600",
-    secondary:
-      "bg-gray-200 text-black hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600",
-    danger:
-      "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
-
+    primary: "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600",
+    secondary: "bg-gray-200 text-black hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600",
+    danger: "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
+    ghost: ""
   };
 
   return (
