@@ -4,6 +4,7 @@ import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,11 @@ import lombok.NoArgsConstructor;
 public class SolicitudLideres {
 
 
+    @Id
     @Column(name = "id_solicitud")
     private Integer idSolicitud;
 
+    @Id
     @Column(name = "id_lider")
     private Integer idLider;
 
