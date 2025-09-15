@@ -3,19 +3,21 @@
     "id_solicitud": 1,
     "tipo": { "id": 1, "nombre": "Vacaciones" },
     "comentario": "Solicito 5 días por viaje familiar",
-    "estado": "P"
-    
+    "estado": "P",
+    "aprobaciones": 1
   },
   {
     "id_solicitud": 2,
     "tipo": { "id": 2, "nombre": "Inventario" },
     "comentario": "Notebook nueva por falla técnica",
-    "estado": "A"
+    "estado": "A",
+    "aprobaciones": 2
   },
   {
     "id_solicitud": 3,
     "tipo": { "id": 3, "nombre": "Matrimonio" },
-    "comentario": "Me case, me voy de luna de miel a Villa Elisa ",
-    "estado": "R"
+    "comentario": "Me case, me voy de luna de miel a Villa Elisa",
+    "estado": "R",
+    "aprobaciones": 0
   }
 ]
