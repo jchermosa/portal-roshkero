@@ -1,9 +1,6 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.sql.Date;
-
-import org.hibernate.annotations.ManyToAny;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

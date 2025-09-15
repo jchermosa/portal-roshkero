@@ -1,13 +1,9 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.sql.Date;
-
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
-import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -70,6 +70,10 @@ public class Usuario {
     @Column(name = "requiere_cambio_contrasena")
     private boolean requiereCambioContrasena;
 
-    
+    @Column(name = "url")
+    private String url;
+
+    @Column(name = "disponibilidad")
+    private Integer disponibilidad;
 
 }

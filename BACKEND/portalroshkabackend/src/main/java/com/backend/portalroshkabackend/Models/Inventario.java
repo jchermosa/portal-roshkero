@@ -21,17 +21,17 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "inventario")
+@Table(name = "dispositivos")
 public class Inventario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_inventario")
-    private Integer idInventario;
+    @Column(name = "id_dispositivo")
+    private Integer idDispositivo;
 
     @ManyToOne
-    @JoinColumn(name = "id_tipo_inventario")
-    private TipoInventario idTipoInventario;
+    @JoinColumn(name = "id_tipo_dispositivo")
+    private tipoDispositivo idTipoInventario;
 
     @Column(name = "nro_serie")
     private String nroSerie;

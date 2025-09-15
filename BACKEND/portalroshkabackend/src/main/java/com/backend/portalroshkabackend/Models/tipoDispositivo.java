@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "tipo_inventario")
-public class TipoInventario {
+@Table(name = "tipo_dispositivo")
+public class tipoDispositivo {
 
 
     @Id

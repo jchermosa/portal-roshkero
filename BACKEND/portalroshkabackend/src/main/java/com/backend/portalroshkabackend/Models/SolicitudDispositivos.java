@@ -56,7 +56,7 @@ public class SolicitudDispositivos {
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_inventario")
-    private TipoInventario idTipoInventario;
+    private tipoDispositivo idTipoInventario;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")

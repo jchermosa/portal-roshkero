@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.portalroshkabackend.DTO.DispositivoDto;
-import com.backend.portalroshkabackend.Models.TipoInventario;
+import com.backend.portalroshkabackend.Models.tipoDispositivo;
 import com.backend.portalroshkabackend.Repositories.DispositivoRepository;
 
 
@@ -28,31 +28,31 @@ public class DispositivoService {
     public DispositivoDto createDevice(DispositivoDto dispositivo) {
 
         // creando un nuevo dispositivo
-        TipoInventario newDispositivo = new TipoInventario();
+        tipoDispositivo newDispositivo = new tipoDispositivo();
         newDispositivo.setNombre(dispositivo.getNombre());
         newDispositivo.setDetalle(dispositivo.getDetalle());
         newDispositivo.setFechaCreacion(new Date());
 
-        TipoInventario savedDispositivo = dispositivoRepository.save(newDispositivo);
+        tipoDispositivo savedDispositivo = dispositivoRepository.save(newDispositivo);
         
         return mapToDispositivoDto(savedDispositivo);
     }
 
     @Transactional(readOnly = true)
     public List<DispositivoDto> getAllDevices() {
-        List<TipoInventario> dispositivos = dispositivoRepository.findAll();
+        List<tipoDispositivo> dispositivos = dispositivoRepository.findAll();
         return dispositivos.stream().map(this::mapToDispositivoDto).collect(Collectors.toList());
     }
 
     @Transactional
     public DispositivoDto updateDevice(Integer id, DispositivoDto dispositivoDto) {
-        TipoInventario existingDispositivo = dispositivoRepository.findById(id)
+        tipoDispositivo existingDispositivo = dispositivoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dispositivo not found with id: " + id));
 
         existingDispositivo.setNombre(dispositivoDto.getNombre());
         existingDispositivo.setDetalle(dispositivoDto.getDetalle());
 
-        TipoInventario updatedDispositivo = dispositivoRepository.save(existingDispositivo);
+        tipoDispositivo updatedDispositivo = dispositivoRepository.save(existingDispositivo);
         
         return mapToDispositivoDto(updatedDispositivo);
     }
@@ -62,7 +62,7 @@ public class DispositivoService {
         dispositivoRepository.deleteById(id);
     }
     
-    private DispositivoDto mapToDispositivoDto(TipoInventario dispositivo) {
+    private DispositivoDto mapToDispositivoDto(tipoDispositivo dispositivo) {
         DispositivoDto dto = new DispositivoDto();
         dto.setIdTipoInventario(dispositivo.getIdInventario());
         dto.setNombre(dispositivo.getNombre());

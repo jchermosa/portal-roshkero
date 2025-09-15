@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.backend.portalroshkabackend.DTO.InventarioAsignadoDto;
-import com.backend.portalroshkabackend.Models.InventarioAsignado;
+import com.backend.portalroshkabackend.Models.DispositivoAsignado;
 import com.backend.portalroshkabackend.Repositories.InventarioAsignadoRepository;
 import com.backend.portalroshkabackend.Repositories.DispositivoRepository;
 
@@ -32,14 +32,14 @@ public class InventarioAsignadoService {
         }
         
         // Crear el objeto con todos los datos
-        InventarioAsignado inventarioAsignado = new InventarioAsignado();
+        DispositivoAsignado inventarioAsignado = new DispositivoAsignado();
         inventarioAsignado.setFechaAsignacion(inventarioAsignadoDto.getFechaAsignacion());
         inventarioAsignado.setFechaDevolucion(inventarioAsignadoDto.getFechaDevolucion());
         
-        // Buscar y asignar el dispositivo por ID
+        // Buscar y asignar el tipo de dispositivo por ID
         if (inventarioAsignadoDto.getIdInventario() != null) {
             dispositivoRepository.findById(inventarioAsignadoDto.getIdInventario())
-                .ifPresent(inventarioAsignado::setIdInventario);
+                .ifPresent(inventarioAsignado::setIdTipoDispositivo);
         }
         
         inventarioAsignado.setEstado(estadoEnum);
@@ -47,17 +47,17 @@ public class InventarioAsignadoService {
         // Por ahora, no asignar idSolicitudDispositivos hasta que se cree el repositorio correspondiente
         // TODO: Crear SolicitudDispositivosRepository e implementar el mapeo
        
-        InventarioAsignado savedInventario = inventarioAsignadoRepository.save(inventarioAsignado);
+        DispositivoAsignado savedInventario = inventarioAsignadoRepository.save(inventarioAsignado);
         
         return mapToDto(savedInventario);
     }
     
-    private InventarioAsignadoDto mapToDto(InventarioAsignado inventarioAsignado) {
+    private InventarioAsignadoDto mapToDto(DispositivoAsignado inventarioAsignado) {
         InventarioAsignadoDto dto = new InventarioAsignadoDto();
         dto.setFechaAsignacion(inventarioAsignado.getFechaAsignacion());
         dto.setFechaDevolucion(inventarioAsignado.getFechaDevolucion());
-        dto.setIdInventario(inventarioAsignado.getIdInventario() != null ? 
-            inventarioAsignado.getIdInventario().getIdInventario() : null);
+        dto.setIdInventario(inventarioAsignado.getIdTipoDispositivo() != null ? 
+            inventarioAsignado.getIdTipoDispositivo().getIdInventario() : null);
         dto.setEstado(inventarioAsignado.getEstado());
         dto.setIdSolicitudDispositivos(inventarioAsignado.getIdSolicitudDispositivos() != null ? 
             inventarioAsignado.getIdSolicitudDispositivos().getIdSolicitudDispositivo() : null);

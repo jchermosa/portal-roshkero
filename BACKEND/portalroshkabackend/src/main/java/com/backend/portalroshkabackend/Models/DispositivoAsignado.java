@@ -21,13 +21,13 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "inventario_asignado")
-public class InventarioAsignado {
+@Table(name = "dispositivo_asignado")
+public class DispositivoAsignado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_asignacion")
-    private Integer idAsignacion;
+    @Column(name = "id_dispositivo_asignado")
+    private Integer idDispositivoAsignado;
 
     @Column(name = "fecha_asignacion")
     private Date fechaAsignacion;
@@ -38,8 +38,8 @@ public class InventarioAsignado {
 
     
     @ManyToOne
-    @JoinColumn(name = "id_tipo_inventario")
-    private TipoInventario idInventario;
+    @JoinColumn(name = "id_tipo_dispositivo")
+    private tipoDispositivo idTipoDispositivo;
 
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente
     @Enumerated(EnumType.STRING)
