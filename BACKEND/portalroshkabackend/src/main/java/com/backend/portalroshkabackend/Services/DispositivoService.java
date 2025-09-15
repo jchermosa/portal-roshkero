@@ -51,4 +51,9 @@ public class DispositivoService {
         return dispositivoRepository.save(existingDispositivo);
     }
 
+    @Transactional
+    public void deleteDeviceById(Integer id) {
+        dispositivoRepository.deleteById(id);
+    }
+
 }

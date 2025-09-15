@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.backend.portalroshkabackend.Models.SolicitudDispositivos;
 import com.backend.portalroshkabackend.Repositories.SysAdminRepository;
 
@@ -15,9 +14,13 @@ public class SysAdminService {
     @Autowired
     private SysAdminRepository sysAdminRepository;
 
+    @Autowired
+    private final DispositivoService dispositivoService;
 
-    SysAdminService(SysAdminRepository sysAdminRepository) {
+
+    SysAdminService(SysAdminRepository sysAdminRepository, DispositivoService dispositivoService) {
         this.sysAdminRepository = sysAdminRepository;
+        this.dispositivoService = dispositivoService;
     }
 
 
@@ -31,6 +34,12 @@ public class SysAdminService {
         return sysAdminRepository.findAllSolicitudes();
     }
 
+
+    @Transactional
+    public void deleteDispositivo(Integer id){
+
+        dispositivoService.deleteDeviceById(id);
+    }
 
 
 }
