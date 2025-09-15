@@ -81,11 +81,18 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    // --- INVALID ARGUMENT ---
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDto> handleIllegalArgument(IllegalArgumentException ex){
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+
     // --- GENERAL EXCEPTION HANDLER ---
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> handleGeneralError(Exception ex){
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrio un error inesperado" + ex.getMessage());
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrio un error inesperado: " + ex.getMessage());
     }
 
 

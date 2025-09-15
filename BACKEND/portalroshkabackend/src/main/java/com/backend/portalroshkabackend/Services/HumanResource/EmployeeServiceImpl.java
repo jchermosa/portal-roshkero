@@ -67,7 +67,7 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
     @Transactional(readOnly = true)
     @Override
     public Page<UserDto> getAllActiveEmployees(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllActiveEmployees(pageable);
+        Page<Usuario> users = userRepository.findAllByEstadoTrue(pageable);
 
         return users.map(AutoMap::toUserDto); // Retorna una lista de empleados activos (DTOs)
     }
@@ -75,7 +75,7 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
     @Transactional(readOnly = true)
     @Override
     public Page<UserDto> getAllInactiveEmployees(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllInactiveEmployees(pageable);
+        Page<Usuario> users = userRepository.findAllByEstadoFalse(pageable);
 
         return users.map(AutoMap::toUserDto); // Retorna la lista de empleados inactivos
     }
