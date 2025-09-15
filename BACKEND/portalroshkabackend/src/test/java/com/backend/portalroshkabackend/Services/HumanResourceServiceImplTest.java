@@ -2,6 +2,8 @@ package com.backend.portalroshkabackend.Services;
 
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
+import com.backend.portalroshkabackend.Services.HumanResource.ITHService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.DatabaseOperationException;
 import com.backend.portalroshkabackend.tools.validator.Validator;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,7 @@ public class HumanResourceServiceImplTest {
     private Validator validator;
 
     @InjectMocks
-    private HumanResourceServiceImpl service;
+    private ITHService service;
 
     HumanResourceServiceImplTest(){
         MockitoAnnotations.openMocks(this);
