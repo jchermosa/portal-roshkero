@@ -7,6 +7,11 @@ import PaginationFooter from "../components/PaginationFooter";
 import IconButton from "../components/IconButton";
 import rawSolicitudes from "../data/mockSolicitudes.json";
 
+interface LiderItem {
+  id: number;
+  nombre: string;
+  aprobado: boolean;
+}
 
 interface SolicitudItem {
   id_solicitud: number;
@@ -16,12 +21,10 @@ interface SolicitudItem {
   };
   comentario: string;
   estado: "P" | "A" | "R";
-  lideres: {
-    id_lider: number;
-    nombre: string;
-    aprobado: boolean;
-  }[];
+  lideres: LiderItem[];
+  aprobaciones: number;
 }
+
 
 
 
@@ -39,6 +42,9 @@ export default function RequestPage() {
   const mockSolicitudes: SolicitudItem[] = rawSolicitudes.map((s) => ({
     ...s,
     estado: s.estado as "P" | "A" | "R",
+    lideres: [
+    { id: 1, nombre: "Ana", aprobado: true },
+    { id: 2, nombre: "Carlos", aprobado: false },],
   }));
 
 
@@ -104,6 +110,18 @@ export default function RequestPage() {
     label: "Comentario",
   },
   {
+    key: "aprobaciones",
+    label: "Aprobaciones",
+    render: (s: SolicitudItem) => {
+      const total = s.lideres.length;
+      return(
+      <span className="font-medium text-sm">
+        {s.aprobaciones}/{total}
+      </span>
+      )
+    },
+  },
+  {
     key: "estado",
     label: "Estado",
     render: (s: SolicitudItem) => {
@@ -121,6 +139,18 @@ export default function RequestPage() {
         </span>
       );
     },
+  },
+  {
+    key: "acciones",
+    label: "Acciones",
+    render: (s: SolicitudItem) => (
+      <button
+        onClick={() => navigate(`/requests/editar/${s.id_solicitud}`)}
+        className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+      >
+        Editar
+      </button>
+    ),
   },
 ];
 
