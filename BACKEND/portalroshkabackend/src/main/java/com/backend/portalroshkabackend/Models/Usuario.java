@@ -9,7 +9,7 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
-    private int idUsuario;
+    private Integer idUsuario;
 
     @Column(name = "nombre")
     private String nombre;
@@ -56,11 +56,11 @@ public class Usuario {
     @Column(name = "requiere_cambio_contrasena")
     private boolean requiereCambioContrasena;
 
-    public int getIdUsuario() {
+    public Integer getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(int idUsuario) {
+    public void setIdUsuario(Integer idUsuario) {
         this.idUsuario = idUsuario;
     }
 
