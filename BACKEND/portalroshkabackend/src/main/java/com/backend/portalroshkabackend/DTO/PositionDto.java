@@ -2,14 +2,14 @@ package com.backend.portalroshkabackend.DTO;
 
 public class PositionDto {
 
-    private int idCargo;
+    private Integer idCargo;
     private String nombre;
 
-    public int getIdCargo() {
+    public Integer getIdCargo() {
         return idCargo;
     }
 
-    public void setIdCargo(int idCargo) {
+    public void setIdCargo(Integer idCargo) {
         this.idCargo = idCargo;
     }
 

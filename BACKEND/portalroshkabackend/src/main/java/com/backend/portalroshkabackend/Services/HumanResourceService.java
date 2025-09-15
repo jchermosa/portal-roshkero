@@ -14,7 +14,10 @@ import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.CargosRepository;
 import com.backend.portalroshkabackend.Repositories.RequestRepository;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.RolesRepository;
 import com.backend.portalroshkabackend.Models.Cargos;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,13 +30,16 @@ public class HumanResourceService implements IHumanResourceService{
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
     private final CargosRepository cargosRepository;
+    private final RolesRepository rolesRepository;
 
     public HumanResourceService(UserRepository userRepository,
                                     RequestRepository requestRepository,
-                                    CargosRepository cargosRepository){
+                                    CargosRepository cargosRepository,
+                                    RolesRepository rolesRepository){
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
         this.cargosRepository = cargosRepository;
+        this.rolesRepository = rolesRepository;
     }
 
     @Transactional(readOnly = true)
@@ -99,15 +105,25 @@ public class HumanResourceService implements IHumanResourceService{
         user.setApellido(insertDto.getApellido());
         user.setNroCedula(insertDto.getNroCedula());
         user.setCorreo(insertDto.getCorreo());
-        user.setIdRol(insertDto.getIdRol());
+        
+        // Buscar y asignar el rol por ID
+        if (insertDto.getIdRol() != null) {
+            rolesRepository.findById(insertDto.getIdRol()).ifPresent(user::setIdRol);
+        }
+        
         user.setFechaIngreso(insertDto.getFechaIngreso());
         user.setEstado(insertDto.getEstado());
         user.setContrasena(insertDto.getContrasena());
         user.setTelefono(insertDto.getTelefono());
         // user.setIdEquipo(insertDto.getIdEquipo());
-        user.setIdCargo(insertDto.getIdCargo());
+        
+        // Buscar y asignar el cargo por ID
+        if (insertDto.getIdCargo() != null) {
+            cargosRepository.findById(insertDto.getIdCargo()).ifPresent(user::setIdCargo);
+        }
+        
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
-        user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
+        user.setRequiereCambioContrasena(insertDto.isRequiereCambioContrasena());
 
         Usuario savedUser = userRepository.save(user);
 
@@ -130,13 +146,23 @@ public class HumanResourceService implements IHumanResourceService{
         user.setApellido(updateDto.getApellido());
         user.setNroCedula(updateDto.getNroCedula());
         user.setCorreo(updateDto.getCorreo());
-        user.setIdRol(updateDto.getIdRol());
+        
+        // Buscar y asignar el rol por ID
+        if (updateDto.getIdRol() != null) {
+            rolesRepository.findById(updateDto.getIdRol()).ifPresent(user::setIdRol);
+        }
+        
         user.setFechaIngreso(updateDto.getFechaIngreso());
         user.setEstado(updateDto.getEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
         // user.setIdEquipo(updateDto.getIdEquipo());
-        user.setIdCargo(updateDto.getIdCargo());
+        
+        // Buscar y asignar el cargo por ID
+        if (updateDto.getIdCargo() != null) {
+            cargosRepository.findById(updateDto.getIdCargo()).ifPresent(user::setIdCargo);
+        }
+        
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
 
         Usuario updatedUser = userRepository.save(user);
@@ -149,13 +175,13 @@ public class HumanResourceService implements IHumanResourceService{
     public UserDto deleteEmployee(int id) {
         Optional<Usuario> userExists = userRepository.findById(id);
 
-        if (userExists.isEmpty() || userExists.get().getEstado() == 'I'){
+        if (userExists.isEmpty() || userExists.get().getEstado() == EstadoActivoInactivo.I){
             return null;
         }
 
         Usuario user = userExists.get();
 
-        user.setEstado('I'); // Da de baja el empleado de la base de datos
+        user.setEstado(EstadoActivoInactivo.I); // Da de baja el empleado de la base de datos
 
         userRepository.save(user);
 
@@ -179,9 +205,9 @@ public class HumanResourceService implements IHumanResourceService{
         if (request.isEmpty()){
             return false;
         }
-        // Si se acepta la solicitud, rechazado se setea a false y estado de la solicitud se setea según corresponda
+        // Si se acepta la solicitud, rechazado se setea a false y estado de la solicitud se setea a Aprobada
         request.get().setRechazado(false);
-        request.get().setEstado('I');
+        request.get().setEstado(EstadoSolicitudEnum.A);
 
         return true;
     }
@@ -281,7 +307,10 @@ public class HumanResourceService implements IHumanResourceService{
         dto.setApellido(user.getApellido());
         dto.setNroCedula(user.getNroCedula());
         dto.setCorreo(user.getCorreo());
-        dto.setIdRol(user.getIdRol());
+        
+        // Mapear el rol a su ID
+        dto.setIdRol(user.getIdRol() != null ? user.getIdRol().getIdRol() : null);
+        
         dto.setFechaIngreso(user.getFechaIngreso());
         dto.setAntiguedad(user.getAntiguedad());
 
@@ -291,7 +320,10 @@ public class HumanResourceService implements IHumanResourceService{
         dto.setContrasena(user.getContrasena());
         dto.setTelefono(user.getTelefono());
         // dto.setIdEquipo(user.getIdEquipo());
-        dto.setIdCargo(user.getIdCargo());
+        
+        // Mapear el cargo a su ID
+        dto.setIdCargo(user.getIdCargo() != null ? user.getIdCargo().getIdCargo() : null);
+        
         dto.setFechaNacimiento(user.getFechaNacimiento());
         dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
         dto.setRequiereCambioContrasena(user.isRequiereCambioContrasena());

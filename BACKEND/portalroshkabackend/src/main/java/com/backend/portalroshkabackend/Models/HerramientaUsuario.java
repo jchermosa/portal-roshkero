@@ -1,21 +1,34 @@
 package com.backend.portalroshkabackend.Models;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Table(name = "herramienta_usuario")
 @Data
 @NoArgsConstructor
 public class HerramientaUsuario {
     
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_herramienta_usuario")
+    private Integer idHerramientaUsuario;
 
-    @Column(name = "id_herramienta")
-    private Integer idHerramienta;
+    @ManyToOne
+    @JoinColumn(name = "id_herramienta")
+    private Herramientas idHerramienta;
 
-    @Column(name = "id_usuario")
-    private Integer idUsuario;
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario idUsuario;
 
     @Column(name = "fecha_asignacion")
     private java.sql.Date fechaAsignacion;

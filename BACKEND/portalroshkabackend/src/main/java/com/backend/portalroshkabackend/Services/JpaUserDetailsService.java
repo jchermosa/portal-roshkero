@@ -23,9 +23,6 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private RolesService rolesService;
-
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
@@ -40,18 +37,15 @@ public class JpaUserDetailsService implements UserDetailsService {
         // Obtener el usuario del Optional
         Usuario user = optionalUser.get();
         
-        // Obtener el ID del rol del usuario
-        Integer userRolId = user.getIdRol();
+        // Obtener el rol del usuario directamente del objeto
+        Roles userRol = user.getIdRol();
         
         // Buscar el rol del usuario directamente
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         
-        // Recorrer todos los roles (optimizado para encontrar solo el rol del usuario)
-        for (Roles rol : rolesService.getAllRoles()) {
-            if (rol.getIdRol().equals(userRolId)) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + rol.getNombre()));
-                break; // Salir del bucle una vez que encontramos el rol del usuario
-            }
+        // Si el usuario tiene un rol asignado, agregar la autoridad
+        if (userRol != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + userRol.getNombre()));
         }
         
         // Si no se encontró ningún rol, asignar una lista vacía

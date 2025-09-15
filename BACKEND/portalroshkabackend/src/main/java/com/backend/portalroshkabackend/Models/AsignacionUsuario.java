@@ -2,11 +2,15 @@ package com.backend.portalroshkabackend.Models;
 
 import java.sql.Date;
 
+import org.hibernate.annotations.ManyToAny;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,17 +32,20 @@ public class AsignacionUsuario {
     @Column(name = "fecha_fin")
     private Date fechaFin;
 
-    @Column(name ="porcenttaje_trabajo")
+    @Column(name ="porcentaje_trabajo")
     private Float porcentajeTrabajo;
 
-    @Column(name = "id_usuario")
-    private Integer idUsuario;
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario idUsuario;
 
-    @Column(name = "id_tecnologia")
-    private Integer idTecnologia;
+    @ManyToOne
+    @JoinColumn(name = "id_tecnologia")
+    private Tecnologias idTecnologia;
 
-    @Column(name = "equipos")
-    private Integer equipos;
+    @ManyToOne
+    @JoinColumn(name = "id_equipo")
+    private Equipos equipos;
 
     @Column(name = "fecha_creacion")
     private Date fechaCreacion;

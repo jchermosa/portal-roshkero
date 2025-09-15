@@ -6,6 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,8 +23,9 @@ public class DocumentosPermisos {
     @Column(name = "id_documento")
     private Integer idDocumento;
 
-    @Column(name = "id_solicitud")
-    private Integer idSolicitud;
+    @ManyToOne
+    @JoinColumn(name = "id_solicitud")
+    private SolicitudesTH idSolicitud;
 
     @Column(name = "url_documento")
     private String urlDocumento;

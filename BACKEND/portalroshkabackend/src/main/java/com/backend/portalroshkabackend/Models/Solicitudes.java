@@ -1,10 +1,19 @@
 package com.backend.portalroshkabackend.Models;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+
 @Entity
+@Data
+@NoArgsConstructor
 @Table(name = "solicitudes")
 public class Solicitudes {
 
@@ -19,8 +28,10 @@ public class Solicitudes {
     @Column(name = "fecha_fin")
     private Date fechaFin;
 
-    @Column(name = "estado")
-    private Character estado;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", columnDefinition = "estado_sol_enum")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private EstadoSolicitudEnum estado;
 
     @Column(name = "id_usuario")
     private int idUsuario;
@@ -37,75 +48,4 @@ public class Solicitudes {
     @Column(name = "rechazado")
     private boolean rechazado;
 
-    public int getIdSolicitud() {
-        return idSolicitud;
-    }
-
-    public void setIdSolicitud(int idSolicitud) {
-        this.idSolicitud = idSolicitud;
-    }
-
-    public Date getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(Date fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public Date getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(Date fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public Character getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Character estado) {
-        this.estado = estado;
-    }
-
-    public int getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
-    public int getCantidadDias() {
-        return cantidadDias;
-    }
-
-    public void setCantidadDias(int cantidadDias) {
-        this.cantidadDias = cantidadDias;
-    }
-
-    public int getNumeroAprobaciones() {
-        return numeroAprobaciones;
-    }
-
-    public void setNumeroAprobaciones(int numeroAprobaciones) {
-        this.numeroAprobaciones = numeroAprobaciones;
-    }
-
-    public String getComentario() {
-        return comentario;
-    }
-
-    public void setComentario(String comentario) {
-        this.comentario = comentario;
-    }
-
-    public boolean isRechazado() {
-        return rechazado;
-    }
-
-    public void setRechazado(boolean rechazado) {
-        this.rechazado = rechazado;
-    }
 }

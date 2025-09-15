@@ -1,12 +1,14 @@
 package com.backend.portalroshkabackend.DTO;
 
 import java.sql.Date;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+
 public class RequestResponseDto {
 
     private int id_solicitud;
     private Date fecha_inicio;
     private Date fecha_fin;
-    private Character estado;
+    private EstadoSolicitudEnum estado;
     private int id_usuario;
     private int cantidad_dias;
     private int numero_aprobaciones;
@@ -37,11 +39,11 @@ public class RequestResponseDto {
         this.fecha_fin = fecha_fin;
     }
 
-    public Character getEstado() {
+    public EstadoSolicitudEnum getEstado() {
         return estado;
     }
 
-    public void setEstado(Character estado) {
+    public void setEstado(EstadoSolicitudEnum estado) {
         this.estado = estado;
     }
 

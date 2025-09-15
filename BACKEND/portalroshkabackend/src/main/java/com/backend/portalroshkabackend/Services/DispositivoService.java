@@ -1,20 +1,20 @@
 package com.backend.portalroshkabackend.Services;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.portalroshkabackend.DTO.DispositivoDto;
-import com.backend.portalroshkabackend.Models.Dispositivo;
+import com.backend.portalroshkabackend.Models.TipoInventario;
 import com.backend.portalroshkabackend.Repositories.DispositivoRepository;
 
 
 @Service
 public class DispositivoService {
-    
-
 
     @Autowired
     DispositivoRepository dispositivoRepository;
@@ -25,35 +25,49 @@ public class DispositivoService {
 
     // insert tipo de inventario
     @Transactional
-    public Dispositivo createDevice(DispositivoDto dispositivo) {
+    public DispositivoDto createDevice(DispositivoDto dispositivo) {
 
         // creando un nuevo dispositivo
-        Dispositivo newDispositivo = new Dispositivo();
+        TipoInventario newDispositivo = new TipoInventario();
         newDispositivo.setNombre(dispositivo.getNombre());
         newDispositivo.setDetalle(dispositivo.getDetalle());
+        newDispositivo.setFechaCreacion(new Date());
 
-        return dispositivoRepository.save(newDispositivo);
+        TipoInventario savedDispositivo = dispositivoRepository.save(newDispositivo);
+        
+        return mapToDispositivoDto(savedDispositivo);
     }
 
     @Transactional(readOnly = true)
-    public List<Dispositivo> getAllDevices() {
-        return dispositivoRepository.findAll();
+    public List<DispositivoDto> getAllDevices() {
+        List<TipoInventario> dispositivos = dispositivoRepository.findAll();
+        return dispositivos.stream().map(this::mapToDispositivoDto).collect(Collectors.toList());
     }
 
     @Transactional
-    public Dispositivo updateDevice(Integer id, DispositivoDto dispositivoDto) {
-        Dispositivo existingDispositivo = dispositivoRepository.findById(id)
+    public DispositivoDto updateDevice(Integer id, DispositivoDto dispositivoDto) {
+        TipoInventario existingDispositivo = dispositivoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dispositivo not found with id: " + id));
 
         existingDispositivo.setNombre(dispositivoDto.getNombre());
         existingDispositivo.setDetalle(dispositivoDto.getDetalle());
 
-        return dispositivoRepository.save(existingDispositivo);
+        TipoInventario updatedDispositivo = dispositivoRepository.save(existingDispositivo);
+        
+        return mapToDispositivoDto(updatedDispositivo);
     }
 
     @Transactional
     public void deleteDeviceById(Integer id) {
         dispositivoRepository.deleteById(id);
     }
-
+    
+    private DispositivoDto mapToDispositivoDto(TipoInventario dispositivo) {
+        DispositivoDto dto = new DispositivoDto();
+        dto.setIdTipoInventario(dispositivo.getIdInventario());
+        dto.setNombre(dispositivo.getNombre());
+        dto.setDetalle(dispositivo.getDetalle());
+        dto.setFechaCreacion(dispositivo.getFechaCreacion());
+        return dto;
+    }
 }

@@ -1,9 +1,19 @@
 package com.backend.portalroshkabackend.Models;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.sql.Date;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+
 @Entity
+@Data
+@NoArgsConstructor
 @Table(name = "usuarios")
 public class Usuario {
     @Id
@@ -23,11 +33,12 @@ public class Usuario {
     @Column(name = "correo")
     private String correo;
 
-    @Column(name = "id_rol")
-    private int idRol;
+    @ManyToOne
+    @JoinColumn(name = "id_rol",  nullable = false)
+    private Roles idRol;
 
     @Column(name = "fecha_ingreso")
-    private java.sql.Date fechaIngreso;
+    private Date fechaIngreso;
 
     @Column(name = "antiguedad", insertable = false, updatable = false)
     private String antiguedad;
@@ -35,8 +46,10 @@ public class Usuario {
     @Column(name = "dias_vacaciones", insertable = false, updatable = false)
     private int diasVacaciones;
 
-    @Column(name = "estado")
-    private Character estado;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", columnDefinition = "estado_ac_enum")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private EstadoActivoInactivo estado;
 
     @Column(name = "contrasena")
     private String contrasena;
@@ -44,8 +57,9 @@ public class Usuario {
     @Column(name = "telefono")
     private String telefono;
 
-    @Column(name = "id_cargo")
-    private int idCargo;
+    @ManyToOne
+    @JoinColumn(name = "id_cargo",  nullable = false)
+    private Cargos idCargo;
 
     @Column(name = "fecha_nacimiento")
     private java.sql.Date fechaNacimiento;
@@ -56,132 +70,6 @@ public class Usuario {
     @Column(name = "requiere_cambio_contrasena")
     private boolean requiereCambioContrasena;
 
-    public Integer getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(Integer idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public int getNroCedula() {
-        return nroCedula;
-    }
-
-    public void setNroCedula(int nroCedula) {
-        this.nroCedula = nroCedula;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public int getIdRol() {
-        return idRol;
-    }
-
-    public void setIdRol(int idRol) {
-        this.idRol = idRol;
-    }
-
-    public Date getFechaIngreso() {
-        return fechaIngreso;
-    }
-
-    public void setFechaIngreso(Date fechaIngreso) {
-        this.fechaIngreso = fechaIngreso;
-    }
-
-    public String getAntiguedad() {
-        return antiguedad;
-    }
-
-    public void setAntiguedad(String antiguedad) {
-        this.antiguedad = antiguedad;
-    }
-
-    public int getDiasVacaciones() {
-        return diasVacaciones;
-    }
-
-    public void setDiasVacaciones(int diasVacaciones) {
-        this.diasVacaciones = diasVacaciones;
-    }
-
-    public Character getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Character estado) {
-        this.estado = estado;
-    }
-
-    public String getContrasena() {
-        return contrasena;
-    }
-
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public int getIdCargo() {
-        return idCargo;
-    }
-
-    public void setIdCargo(int idCargo) {
-        this.idCargo = idCargo;
-    }
-
-    public Date getFechaNacimiento() {
-        return fechaNacimiento;
-    }
-
-    public void setFechaNacimiento(Date fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
-    }
-
-    public int getDiasVacacionesRestante() {
-        return diasVacacionesRestante;
-    }
-
-    public void setDiasVacacionesRestante(int diasVacacionesRestante) {
-        this.diasVacacionesRestante = diasVacacionesRestante;
-    }
-
-    public boolean isRequiereCambioContrasena() {
-        return requiereCambioContrasena;
-    }
-
-    public void setRequiereCambioContrasena(boolean requiereCambioContrasena) {
-        this.requiereCambioContrasena = requiereCambioContrasena;
-    }
+    
 
 }

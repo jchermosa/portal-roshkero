@@ -4,6 +4,7 @@ import java.sql.Date;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +13,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -51,9 +54,11 @@ public class SolicitudDispositivos {
     @Column(name = "fecha_creacion")
     private Date fechaCreacion;
 
-    @Column(name = "id_tipo_inventario")
-    private Integer idTipoInventario;
+    @ManyToOne
+    @JoinColumn(name = "id_tipo_inventario")
+    private TipoInventario idTipoInventario;
 
-    @Column(name = "id_usuario")
-    private Integer idUsuario;
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario idUsuario;
 }

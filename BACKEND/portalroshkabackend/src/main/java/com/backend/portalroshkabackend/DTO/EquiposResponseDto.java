@@ -2,15 +2,15 @@ package com.backend.portalroshkabackend.DTO;
 
 public class EquiposResponseDto {
 
-    private int id_equipo;
+    private Integer idEquipo;
     private String nombre;
 
-    public int getId_equipo() {
-        return id_equipo;
+    public Integer getIdEquipo() {
+        return idEquipo;
     }
 
-    public void setId_equipo(int id_equipo) {
-        this.id_equipo = id_equipo;
+    public void setIdEquipo(Integer idEquipo) {
+        this.idEquipo = idEquipo;
     }
 
     public String getNombre() {

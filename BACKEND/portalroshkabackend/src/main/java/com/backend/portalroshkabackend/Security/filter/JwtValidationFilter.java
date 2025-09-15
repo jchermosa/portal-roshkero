@@ -50,16 +50,20 @@ public class JwtValidationFilter extends BasicAuthenticationFilter{
                     String correo = claims.getSubject();
                     Integer rol = claims.get("rol", Integer.class);
 
-                    Collection<? extends GrantedAuthority> authorities = 
-                    List.of(new SimpleGrantedAuthority("ROLE_" + rol));
+                    if (rol != null) {
+                        Collection<? extends GrantedAuthority> authorities = 
+                        List.of(new SimpleGrantedAuthority("ROLE_" + rol));
 
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(correo, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(correo, null, authorities);
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
+                    
                     chain.doFilter(request, response);
 
                 } catch (JwtException e) {
                     Map<String, String> error = new HashMap<>();
-                    error.put("error", e.getMessage());
+                    error.put("error", "Token inválido");
+                    error.put("message", e.getMessage());
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
 

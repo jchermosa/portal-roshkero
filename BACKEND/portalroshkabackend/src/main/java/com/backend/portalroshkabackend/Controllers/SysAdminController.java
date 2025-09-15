@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.DTO.DispositivoDto;
 import com.backend.portalroshkabackend.DTO.InventarioAsignadoDto;
-import com.backend.portalroshkabackend.Models.Dispositivo;
-import com.backend.portalroshkabackend.Models.InventarioAsignado;
 import com.backend.portalroshkabackend.Models.SolicitudDispositivos;
 import com.backend.portalroshkabackend.Services.DispositivoService;
 import com.backend.portalroshkabackend.Services.InventarioAsignadoService;
@@ -59,21 +57,21 @@ public class SysAdminController {
    
     // Listar tipos de dispositivos 
     @GetMapping("allDevices")
-    public List<Dispositivo> getAllDevices() {
+    public List<DispositivoDto> getAllDevices() {
         // Lógica para obtener y devolver la lista de dispositivos
         return dispositivoService.getAllDevices();
     }    
 
     //Crear dispositivos 
     @PostMapping("createDevice")
-    public Dispositivo createDevice(@Valid @RequestBody DispositivoDto dispositivoDto) {
+    public DispositivoDto createDevice(@Valid @RequestBody DispositivoDto dispositivoDto) {
 
         return dispositivoService.createDevice(dispositivoDto);
     }
 
     // Actualizar dispositivos
     @PutMapping("updateDevice/{id}")
-    public Dispositivo updateDevice(@PathVariable String id, @RequestBody DispositivoDto dispositivoDto) {
+    public DispositivoDto updateDevice(@PathVariable String id, @RequestBody DispositivoDto dispositivoDto) {
         return dispositivoService.updateDevice(Integer.valueOf(id), dispositivoDto);
     }
 
@@ -88,7 +86,7 @@ public class SysAdminController {
     // Crear una asignacion 
 
     @PostMapping("createAssignment")
-    public InventarioAsignado createAssignment(@Valid @RequestBody InventarioAsignadoDto inventarioAsignadoDto) {
+    public InventarioAsignadoDto createAssignment(@Valid @RequestBody InventarioAsignadoDto inventarioAsignadoDto) {
 
         return inventarioAsignadoService.crearInventarioAsignado(inventarioAsignadoDto);
 

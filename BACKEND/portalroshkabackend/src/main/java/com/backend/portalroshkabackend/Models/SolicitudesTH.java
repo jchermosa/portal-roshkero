@@ -13,6 +13,9 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,8 +39,9 @@ public class SolicitudesTH {
     @Column(name = "fecha_fin")
     private Date fechaFin;
 
-    @Column(name = "id_usuario")
-    private Integer idUsuario;
+    @JoinColumn(name = "id_usuario")
+    @ManyToOne
+    private Usuario idUsuario;
 
     @Column(name = "cantidad_dias")
     private Integer cantidadDias;
@@ -48,8 +52,9 @@ public class SolicitudesTH {
     @Column(name = "comentario")
     private String comentario;
 
-    @Column(name = "id_solicitud_tipo")
-    private Integer idSolicitudTipo;
+    @ManyToOne
+    @JoinColumn(name = "id_solicitud_tipo")
+    private SolicitudThTipo idSolicitudTipo;
 
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente
     @Enumerated(EnumType.STRING)
@@ -60,9 +65,11 @@ public class SolicitudesTH {
     @Column(name = "fecha_creacion")
     private Date fechaCreacion;
 
-    @Column(name = "id_permiso")
-    private Integer idPermiso;
+    @ManyToOne
+    @JoinColumn(name = "id_permiso")
+    private Permisos idPermiso;
 
-    @Column(name = "id_beneficio")
-    private Integer idBeneficio;
+    @ManyToOne
+    @JoinColumn(name = "id_beneficio")
+    private Beneficios idBeneficio;
 }

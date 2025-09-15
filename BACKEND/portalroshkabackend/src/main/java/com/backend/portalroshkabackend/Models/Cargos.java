@@ -1,45 +1,31 @@
 package com.backend.portalroshkabackend.Models;
 
+import java.sql.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@NoArgsConstructor
 @Table(name = "cargos")
 public class Cargos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cargo")
-    Integer idCargo;
+    private Integer idCargo;
 
-    String nombre;
+    private String nombre;
 
-    public Cargos(String nombre) {
-        this.nombre = nombre;
-    }
+    @Column(name = "fecha_creacion")
+    private Date fechaCreacion;
 
-    public Cargos() {
-
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public Integer getIdCargo() {
-        return idCargo;
-    }
-
-    public void setIdCargo(Integer idCargo) {
-        this.idCargo = idCargo;
-    }
 
 }

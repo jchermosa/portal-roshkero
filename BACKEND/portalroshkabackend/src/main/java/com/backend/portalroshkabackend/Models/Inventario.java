@@ -12,6 +12,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,8 +29,9 @@ public class Inventario {
     @Column(name = "id_inventario")
     private Integer idInventario;
 
-    @Column(name = "id_tipo_inventario")
-    private Integer idTipoInventario;
+    @ManyToOne
+    @JoinColumn(name = "id_tipo_inventario")
+    private TipoInventario idTipoInventario;
 
     @Column(name = "nro_serie")
     private String nroSerie;

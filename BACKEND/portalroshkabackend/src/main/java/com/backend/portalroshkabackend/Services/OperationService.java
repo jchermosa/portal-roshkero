@@ -58,7 +58,7 @@ public class OperationService implements IOperationService {
         return rolesRepository.findAll(pageable)
                 .map(roles -> {
                     RolesResponseDto Dto = new RolesResponseDto();
-                    Dto.setId_role(roles.getIdRol());
+                    Dto.setIdRol(roles.getIdRol());
                     Dto.setNombre(roles.getNombre());
                     return Dto;
                 });
@@ -69,7 +69,7 @@ public class OperationService implements IOperationService {
         return cargosRepository.findAll(pageable)
                 .map(cargos -> {
                     CargosResponseDto Dto = new CargosResponseDto();
-                    Dto.setId_cargo(cargos.getIdCargo());
+                    Dto.setIdCargo(cargos.getIdCargo());
                     Dto.setNombre(cargos.getNombre());
                     return Dto;
                 });
@@ -81,7 +81,7 @@ public class OperationService implements IOperationService {
         return equiposRepository.findAll(pageable)
                 .map(equipo -> {
                     EquiposResponseDto Dto = new EquiposResponseDto();
-                    Dto.setId_equipo(equipo.getIdEquipo());
+                    Dto.setIdEquipo(equipo.getIdEquipo());
                     Dto.setNombre(equipo.getNombre());
                     return Dto;
                 });
@@ -95,7 +95,7 @@ public class OperationService implements IOperationService {
         Equipos saved = equiposRepository.save(equipo);
 
         EquiposResponseDto Dto = new EquiposResponseDto();
-        Dto.setId_equipo(saved.getIdEquipo());
+        Dto.setIdEquipo(saved.getIdEquipo());
         Dto.setNombre(saved.getNombre());
         return Dto;
     }
@@ -114,7 +114,7 @@ public class OperationService implements IOperationService {
         Equipos updated = equiposRepository.save(existingEquipo);
 
         EquiposResponseDto Dto = new EquiposResponseDto();
-        Dto.setId_equipo(updated.getIdEquipo());
+        Dto.setIdEquipo(updated.getIdEquipo());
         Dto.setNombre(updated.getNombre());
         return Dto;
     }

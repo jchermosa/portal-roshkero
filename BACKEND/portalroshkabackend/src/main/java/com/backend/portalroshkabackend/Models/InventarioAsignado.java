@@ -14,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -26,14 +28,18 @@ public class InventarioAsignado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_asignacion")
     private Integer idAsignacion;
+
     @Column(name = "fecha_asignacion")
     private Date fechaAsignacion;
     @Column(name = "fecha_devolucion")
     private Date fechaDevolucion;
     @Column(name = "fecha_creacion")
     private Date fechaCreacion;
-    @Column(name = "id_inventario")
-    private Integer idInventario;
+
+    
+    @ManyToOne
+    @JoinColumn(name = "id_tipo_inventario")
+    private TipoInventario idInventario;
 
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente
     @Enumerated(EnumType.STRING)
@@ -41,7 +47,8 @@ public class InventarioAsignado {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private EstadoAsignacion estado;
 
-    @Column(name = "id_solicitud_dispositivos")
-    private Integer idSolicitudDispositivos;
+    @ManyToOne
+    @JoinColumn(name = "id_solicitud_dispositivos")
+    private SolicitudDispositivos idSolicitudDispositivos;
 
 }

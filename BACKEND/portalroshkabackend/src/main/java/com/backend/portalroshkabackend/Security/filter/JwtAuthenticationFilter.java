@@ -63,10 +63,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             // obtenemos el usuario del correo para obtener su rol
             Usuario usuario = userService.getUserByCorreo(correo);
+            
+            // Obtener solo el ID del rol
+            Integer rolId = usuario.getIdRol().getIdRol();
 
             String token = Jwts.builder()
                 .subject(correo)
-                .claim("rol", usuario.getIdRol())
+                .claim("rol", rolId) // Solo guardamos el ID del rol
                 .expiration(Date.from(new Date().toInstant().plusSeconds(7200))) // 2 horas de validez
                 .issuedAt(Date.from(new Date().toInstant()))
                 .signWith(SECRET_KEY)
@@ -74,10 +77,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
 
-            Map<String, String> body = new HashMap<>();
+            Map<String, Object> body = new HashMap<>();
             body.put("token", token);
             body.put("correo", correo);
-            body.put("rol", String.valueOf(usuario.getIdRol()));
+            body.put("rol", rolId); // Solo devolvemos el ID del rol
             body.put("Message", "Authentication successful");
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(body));

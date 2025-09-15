@@ -35,4 +35,7 @@ public class Beneficios {
     @Column(name = "fin_vigencia")
     private Date finVigencia;
 
+    @Column(name = "fecha_creacion")
+    private Date fechaCreacion; 
+
 }

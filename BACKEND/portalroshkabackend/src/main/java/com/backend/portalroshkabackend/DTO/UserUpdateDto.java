@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.DTO;
 
 import java.sql.Date;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 public class UserUpdateDto {
     private String nombre;
@@ -11,19 +12,19 @@ public class UserUpdateDto {
 
     private String correo;
 
-    private int idRol;
+    private Integer idRol;
 
     private Date fechaIngreso;
 
-    private Character estado;
+    private EstadoActivoInactivo estado;
 
     private String contrasena;
 
     private String telefono;
 
-    private int idEquipo;
+    private Integer idEquipo;
 
-    private int idCargo;
+    private Integer idCargo;
 
     private Date fechaNacimiento;
 
@@ -61,11 +62,11 @@ public class UserUpdateDto {
         this.correo = correo;
     }
 
-    public int getIdRol() {
+    public Integer getIdRol() {
         return idRol;
     }
 
-    public void setIdRol(int idRol) {
+    public void setIdRol(Integer idRol) {
         this.idRol = idRol;
     }
 
@@ -77,11 +78,11 @@ public class UserUpdateDto {
         this.fechaIngreso = fechaIngreso;
     }
 
-    public Character getEstado() {
+    public EstadoActivoInactivo getEstado() {
         return estado;
     }
 
-    public void setEstado(Character estado) {
+    public void setEstado(EstadoActivoInactivo estado) {
         this.estado = estado;
     }
 
@@ -101,19 +102,19 @@ public class UserUpdateDto {
         this.telefono = telefono;
     }
 
-    public int getIdEquipo() {
+    public Integer getIdEquipo() {
         return idEquipo;
     }
 
-    public void setIdEquipo(int idEquipo) {
+    public void setIdEquipo(Integer idEquipo) {
         this.idEquipo = idEquipo;
     }
 
-    public int getIdCargo() {
+    public Integer getIdCargo() {
         return idCargo;
     }
 
-    public void setIdCargo(int idCargo) {
+    public void setIdCargo(Integer idCargo) {
         this.idCargo = idCargo;
     }
 

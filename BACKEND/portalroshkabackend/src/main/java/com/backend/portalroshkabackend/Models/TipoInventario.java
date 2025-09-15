@@ -13,16 +13,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Table(name = "tipo_inventario")
-public class Dispositivo {
+public class TipoInventario {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idTipoInventario;
+    @Column(name = "id_tipo_inventario")
+    private Integer idInventario;
+
     @Column(name = "nombre")
     private String nombre;
+
     @Column(name = "detalle")
     private String detalle;   
+
     @Column(name = "fecha_creacion")
     private java.util.Date fechaCreacion; 
 

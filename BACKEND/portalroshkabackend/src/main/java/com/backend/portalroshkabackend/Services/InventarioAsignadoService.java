@@ -6,23 +6,25 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.portalroshkabackend.DTO.InventarioAsignadoDto;
 import com.backend.portalroshkabackend.Models.InventarioAsignado;
 import com.backend.portalroshkabackend.Repositories.InventarioAsignadoRepository;
+import com.backend.portalroshkabackend.Repositories.DispositivoRepository;
 
 @Service
 public class InventarioAsignadoService {
 
-
     @Autowired
     private InventarioAsignadoRepository inventarioAsignadoRepository;
+    
+    @Autowired
+    private DispositivoRepository dispositivoRepository;
 
-    InventarioAsignadoService(InventarioAsignadoRepository inventarioAsignadoRepository) {
+    public InventarioAsignadoService(InventarioAsignadoRepository inventarioAsignadoRepository,
+                                   DispositivoRepository dispositivoRepository) {
         this.inventarioAsignadoRepository = inventarioAsignadoRepository;
+        this.dispositivoRepository = dispositivoRepository;
     }
 
-    
     @Transactional
-    public InventarioAsignado crearInventarioAsignado(InventarioAsignadoDto inventarioAsignadoDto) {
-        // Si el problema persiste después de todas las soluciones, podemos usar SQL nativo con casting explícito
-        
+    public InventarioAsignadoDto crearInventarioAsignado(InventarioAsignadoDto inventarioAsignadoDto) {
         // Validar el estado
         com.backend.portalroshkabackend.Models.Enum.EstadoAsignacion estadoEnum = inventarioAsignadoDto.getEstado();
         if (estadoEnum == null) {
@@ -33,10 +35,32 @@ public class InventarioAsignadoService {
         InventarioAsignado inventarioAsignado = new InventarioAsignado();
         inventarioAsignado.setFechaAsignacion(inventarioAsignadoDto.getFechaAsignacion());
         inventarioAsignado.setFechaDevolucion(inventarioAsignadoDto.getFechaDevolucion());
-        inventarioAsignado.setIdInventario(inventarioAsignadoDto.getIdInventario());
+        
+        // Buscar y asignar el dispositivo por ID
+        if (inventarioAsignadoDto.getIdInventario() != null) {
+            dispositivoRepository.findById(inventarioAsignadoDto.getIdInventario())
+                .ifPresent(inventarioAsignado::setIdInventario);
+        }
+        
         inventarioAsignado.setEstado(estadoEnum);
-        inventarioAsignado.setIdSolicitudDispositivos(inventarioAsignadoDto.getIdSolicitudDispositivos());
+        
+        // Por ahora, no asignar idSolicitudDispositivos hasta que se cree el repositorio correspondiente
+        // TODO: Crear SolicitudDispositivosRepository e implementar el mapeo
        
-        return inventarioAsignadoRepository.save(inventarioAsignado);
+        InventarioAsignado savedInventario = inventarioAsignadoRepository.save(inventarioAsignado);
+        
+        return mapToDto(savedInventario);
+    }
+    
+    private InventarioAsignadoDto mapToDto(InventarioAsignado inventarioAsignado) {
+        InventarioAsignadoDto dto = new InventarioAsignadoDto();
+        dto.setFechaAsignacion(inventarioAsignado.getFechaAsignacion());
+        dto.setFechaDevolucion(inventarioAsignado.getFechaDevolucion());
+        dto.setIdInventario(inventarioAsignado.getIdInventario() != null ? 
+            inventarioAsignado.getIdInventario().getIdInventario() : null);
+        dto.setEstado(inventarioAsignado.getEstado());
+        dto.setIdSolicitudDispositivos(inventarioAsignado.getIdSolicitudDispositivos() != null ? 
+            inventarioAsignado.getIdSolicitudDispositivos().getIdSolicitudDispositivo() : null);
+        return dto;
     }
 }
