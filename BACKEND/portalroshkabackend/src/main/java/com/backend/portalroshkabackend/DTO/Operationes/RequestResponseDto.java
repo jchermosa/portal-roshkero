@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.Operationes;
 
 import java.sql.Date;
 import java.time.LocalDateTime;

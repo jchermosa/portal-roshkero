@@ -1,34 +1,37 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.Operationes;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.sql.Date;
+import java.time.LocalDateTime;
 
-public class EquiposRequestDto {
+public class EquiposResponseDto {
 
-    @NotBlank(message = "El nombre no puede estar vacio")
+    private Integer idEquipo;
     private String nombre;
-
-    @NotNull(message = "La fecha de inicio es obligatoria")
     private Date fechaInicio;
-
-    @NotNull(message = "La fecha límite es obligatoria")
     private Date fechaLimite;
+    private int idCliente;
+    private LocalDateTime fechaCreacion;
+    private boolean estado;
 
-    @NotNull(message = "El ID del cliente es obligatorio")
-    private Integer idCliente;
-
-    private boolean estado = true;
-
-    public EquiposRequestDto() {
+    public EquiposResponseDto() {
     }
 
-    public EquiposRequestDto(String nombre, Date fechaInicio, Date fechaLimite, Integer idCliente, boolean estado) {
+    public EquiposResponseDto(String nombre, Date fechaInicio, Date fechaLimite,
+            int idCliente, LocalDateTime fechaCreacion, boolean estado) {
         this.nombre = nombre;
         this.fechaInicio = fechaInicio;
         this.fechaLimite = fechaLimite;
         this.idCliente = idCliente;
+        this.fechaCreacion = fechaCreacion;
         this.estado = estado;
+    }
+
+    public Integer getIdEquipo() {
+        return idEquipo;
+    }
+
+    public void setIdEquipo(Integer idEquipo) {
+        this.idEquipo = idEquipo;
     }
 
     public String getNombre() {
@@ -55,12 +58,20 @@ public class EquiposRequestDto {
         this.fechaLimite = fechaLimite;
     }
 
-    public Integer getIdCliente() {
+    public int getIdCliente() {
         return idCliente;
     }
 
-    public void setIdCliente(Integer idCliente) {
+    public void setIdCliente(int idCliente) {
         this.idCliente = idCliente;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 
     public boolean isEstado() {

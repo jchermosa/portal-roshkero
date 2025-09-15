@@ -1,16 +1,16 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.Operationes;
 
 public class RolesResponseDto {
     
-    private int id_role;
+    private int idRole;
     private String nombre;
 
-    public int getId_role() {
-        return id_role;
+    public int getIdRole() {
+        return idRole;
     }
 
-    public void setId_role(int id_role) {
-        this.id_role = id_role;
+    public void setIdRole(int idRole) {
+        this.idRole = idRole;
     }
 
     public String getNombre() {

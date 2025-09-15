@@ -1,90 +1,27 @@
-package com.backend.portalroshkabackend.Services;
+package com.backend.portalroshkabackend.Services.Operations;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.backend.portalroshkabackend.DTO.CargosResponseDto;
-import com.backend.portalroshkabackend.DTO.EquiposRequestDto;
-import com.backend.portalroshkabackend.DTO.EquiposResponseDto;
-import com.backend.portalroshkabackend.DTO.RequestResponseDto;
-import com.backend.portalroshkabackend.DTO.RolesResponseDto;
-import com.backend.portalroshkabackend.Repositories.CargosRepository;
-import com.backend.portalroshkabackend.Repositories.EquiposRepository;
-import com.backend.portalroshkabackend.Repositories.RequestRepository;
-import com.backend.portalroshkabackend.Repositories.RolesRepository;
-import com.backend.portalroshkabackend.Models.Equipos;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@Service
-public class OperationServiceImpl implements IOperationService {
+import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
+import com.backend.portalroshkabackend.Models.Equipos;
 
-    private final RequestRepository requestRepository;
-    private final RolesRepository rolesRepository;
-    private final CargosRepository cargosRepository;
+import com.backend.portalroshkabackend.Repositories.EquiposRepository;
+
+@Service
+public class EquiposServiceImpl implements IEquiposService {
     private final EquiposRepository equiposRepository;
 
     @Autowired
-    public OperationServiceImpl(RequestRepository requestRepository,
-            RolesRepository rolesRepository,
-            CargosRepository cargosRepository,
-            EquiposRepository equiposRepository) {
-        this.requestRepository = requestRepository;
-        this.rolesRepository = rolesRepository;
-        this.cargosRepository = cargosRepository;
+    public EquiposServiceImpl(EquiposRepository equiposRepository) {
         this.equiposRepository = equiposRepository;
     }
 
-    // ----------------- READ -----------------
-    @Override
-    public Page<RequestResponseDto> getAllRequests(Pageable pageable) {
-        return requestRepository.findAll(pageable)
-                .map(request -> {
-                    RequestResponseDto dto = new RequestResponseDto();
-                    dto.setIdSolicitud(request.getIdSolicitud());
-                    dto.setFechaInicio(request.getFechaInicio());
-                    dto.setFechaFin(request.getFechaFin());
-                    dto.setIdUsuario(request.getIdUsuario());
-                    dto.setCantidadDias(request.getCantidadDias());
-                    dto.setNumeroAprobaciones(request.getNumeroAprobaciones());
-                    dto.setComentario(request.getComentario());
-                    dto.setidSolicitudTipo(request.getidSolicitudTipo());
-                    dto.setEstado(request.getEstado());
-                    dto.setFechaCreacion(request.getFechaCreacion());
-
-                    return dto;
-                });
-
-    }
-
-    @Override
-    public Page<RolesResponseDto> getAllRols(Pageable pageable) {
-        return rolesRepository.findAll(pageable)
-                .map(roles -> {
-                    RolesResponseDto Dto = new RolesResponseDto();
-                    Dto.setId_role(roles.getIdRol());
-                    Dto.setNombre(roles.getNombre());
-                    return Dto;
-                });
-    }
-
-    @Override
-    public Page<CargosResponseDto> getAllCargos(Pageable pageable) {
-        return cargosRepository.findAll(pageable)
-                .map(cargos -> {
-                    CargosResponseDto Dto = new CargosResponseDto();
-                    Dto.setId_cargo(cargos.getIdCargo());
-                    Dto.setNombre(cargos.getNombre());
-                    return Dto;
-                });
-    }
-
-    // ----------------- TEAMS -----------------
     @Override
     public Page<EquiposResponseDto> getAllTeams(Pageable pageable) {
         return equiposRepository.findAll(pageable)
