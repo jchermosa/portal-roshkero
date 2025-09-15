@@ -26,6 +26,10 @@ public class Equipos {
     @Column(name = "id_cliente")
     private int idCliente;
 
+    @ManyToOne (fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_cliente", insertable = false, updatable = false)
+    private Clientes cliente;
+
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
@@ -77,6 +81,14 @@ public class Equipos {
 
     public void setIdCliente(int idCliente) {
         this.idCliente = idCliente;
+    }
+
+    public Clientes getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Clientes cliente) {
+        this.cliente = cliente;
     }
 
     public LocalDateTime getFechaCreacion() {
