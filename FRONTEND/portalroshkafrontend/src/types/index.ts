@@ -9,6 +9,7 @@ export interface UsuarioItem {
   apellido: string;
   correo: string;
   nroCedula: string;
+  contrasena?: string;
   telefono?: string;
   fechaIngreso?: string; 
   fechaNacimiento?: string; 
