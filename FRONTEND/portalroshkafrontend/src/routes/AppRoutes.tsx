@@ -8,13 +8,14 @@ import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
 import BeneficiosPage from "../pages/BenefitsPage";
-import UsuariosPage from "../pages/UsuariosPage";
+import UsuariosPage from "../pages/UserPage.tsx";
 import VacacionesPage from "../pages/VacacionesPage";
 import RequestPage from "../pages/RequestPage";
 import Configuration from "../pages/Configuration.tsx";
 import UserFormPage from "../pages/UserFormPage";
 import UserSearchPage from "../pages/UserSearchPage.tsx";
 import RequestFormPage from "../pages/RequestFormPage"
+import SolicitudVacacionesPage from "../pages/SolicitudVacacionesPage";
 import BeneficioFormPage from "../pages/BenefitsFormPage.tsx";
 
 
@@ -37,7 +38,8 @@ export default function AppRoutes() {
               <Route path="/usuarios/buscar" element={<UserSearchPage />} />
               <Route path="/usuarios/nuevo" element={<UserFormPage />} />
               <Route path="/usuarios/:id" element={<UserFormPage />} />
-              <Route path="/vacaciones" element={<VacacionesPage />} /> 
+              <Route path="/vacaciones" element={<VacacionesPage />} />
+              <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
               <Route path="/benefits" element={<BeneficiosPage />} />
               <Route path="/configuracion" element={<Configuration />} />
               <Route path="/requests/nuevo" element={<RequestFormPage />} />
