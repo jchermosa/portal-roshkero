@@ -32,6 +32,7 @@ export default function UserFormPage() {
       nroCedula: cedulaParam || "",
       estado: true,
       requiereCambioContrasena: false,
+      contrasena: "usuario123" // Contraseña por defecto al crear usuario
     },
     transformResponse: (data) => ({
       ...data,
@@ -42,6 +43,10 @@ export default function UserFormPage() {
 
   // 🔄 Loading combinado (catálogos + usuario si es edición)
   const loading = loadingCatalogos || loadingUsuario;
+
+
+  //Contraseña por defecto al crear usuario
+  
 
   // ✅ Configuración de secciones
   const sections: FormSection[] = [

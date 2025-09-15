@@ -4,7 +4,6 @@ export interface FormField {
   name: string;
   label: string;
   type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom";
-  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea" | "custom";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
@@ -14,9 +13,6 @@ export interface FormField {
   //Para campo de request
   value?: any;
   onChange?: (e: React.ChangeEvent<any>) => void;
-  render?: () => React.ReactNode;
-  className?: string;
-  fullWidth?: boolean;
   render?: () => React.ReactNode;
   className?: string;
   fullWidth?: boolean;
@@ -51,10 +47,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   sections,
   initialData = {},
   onSubmit,
-  onCancel,
   onChange,
-  submitLabel = "Guardar cambios",
-  cancelLabel = "Cancelar",
   loading = false,
   className = "",
 }) => {
@@ -189,14 +182,17 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         );
 
       case "custom":
-          if (field.render) {
-            return (
-              <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
-                {field.render()}
-              </div>
-            );
-          }
-      return null;
+        if (field.render) {
+          return (
+            <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+              {field.render()}
+            </div>
+          );
+        }
+        return null;
+
+      // 🔒 Duplicado del case "custom" mantenido pero comentado para no romper el switch:
+      /*
       case "custom":
         if (field.render) {
           return (
@@ -206,36 +202,41 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
           );
         }
         return null;
+      */
 
       default:
         return (
-          <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
-
-          <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <input
-              type={field.type}
-              {...baseProps}
-              className={`w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                          bg-white text-gray-800 border
-                          border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
-                          ${error ? "border-red-500 focus:ring-red-500" : ""}
-                          ${isFieldDisabled ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" : ""}`}
-            />
-            {field.helperText && (
-              <p className="text-gray-500 dark:text-gray-400 text-xs">{field.helperText}</p>
-            )}
-            {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
-          </div>
+          <>
+            {/*
+              Línea duplicada tras el merge; la comento para evitar un <div> sin cerrar:
+              <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+            */}
+            <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                {field.label}
+                {field.required && <span className="text-red-500 ml-1">*</span>}
+              </label>
+              <input
+                type={field.type}
+                {...baseProps}
+                className={`w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                            bg-white text-gray-800 border
+                            border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
+                            ${error ? "border-red-500 focus:ring-red-500" : ""}
+                            ${isFieldDisabled ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" : ""}`}
+              />
+              {field.helperText && (
+                <p className="text-gray-500 dark:text-gray-400 text-xs">{field.helperText}</p>
+              )}
+              {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
+            </div>
+          </>
         );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`flex flex-col h-full ${className}`}>
+    <form id="dynamic-form" onSubmit={handleSubmit} className={`flex flex-col h-full ${className}`}>
       {/* Mensajes */}
       {message && (
         <div
