@@ -16,6 +16,9 @@ export default function SolicitudFormPage() {
   const navigate = useNavigate();
 
   const [tipos, setTipos] = useState<CatalogItem[]>([]);
+  const [lideres, setLideres] = useState<CatalogItem[]>([]);
+  const [liderSeleccionado, setLiderSeleccionado] = useState<string>("");
+  const [lideresAsignados, setLideresAsignados] = useState<CatalogItem[]>([]);
   const [tipoSeleccionado, setTipoSeleccionado] = useState<number | null>(null);
   const [cantidadDias, setCantidadDias] = useState<number | null>(null);
   const [cantidadEditable, setCantidadEditable] = useState<boolean>(false);
@@ -23,6 +26,7 @@ export default function SolicitudFormPage() {
   const initialData: Record<string, any> = {
     id_solicitud_tipo: tipoSeleccionado ?? "",
     cantidad_dias: cantidadEditable ? undefined : cantidadDias ?? null,
+    id_lideres: [],
   };
 
   const modoDesarrollo = true;
@@ -44,6 +48,25 @@ export default function SolicitudFormPage() {
       .catch((err) => console.error("Error al cargar tipos:", err))
       .finally(() => setLoading(false));
   }, [token]);
+
+  useEffect(() => {
+  if (modoDesarrollo) {
+    setLideres([
+      { id: 1, nombre: "Ana" },
+      { id: 2, nombre: "Carlos" },
+      { id: 3, nombre: "Lucía" },
+    ]);
+    return;
+  }
+
+  fetch("/api/lideres", {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((res) => res.json())
+    .then((data) => setLideres(data))
+    .catch((err) => console.error("Error al cargar líderes:", err));
+}, [token]);
+
 
   useEffect(() => {
     const tipo = tipos.find((t) => t.id === tipoSeleccionado);
@@ -86,8 +109,6 @@ export default function SolicitudFormPage() {
   }, [tipoSeleccionado, tipos]);
 
   const handleSubmit = async (formData: Record<string, any>) => {
-    
-
   const payload = {
     id_usuario: user?.id,
     id_solicitud_tipo: formData.id_solicitud_tipo,
@@ -98,28 +119,31 @@ export default function SolicitudFormPage() {
     estado: "P",
     numero_aprobaciones: 0,
   };
+
   if (modoDesarrollo) {
     console.log("Solicitud simulada:", payload);
-      alert("Solicitud simulada enviada correctamente.");
-     navigate("/solicitudes");
-     return;
-    }
+    alert("Solicitud simulada enviada correctamente.");
+    navigate("/solicitudes");
+    return;
+  }
 
-    const res = await fetch("/api/solicitudes", {
+  const res = await fetch("/api/solicitudes", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
-    });
+  });
 
-    if (!res.ok) {
-        throw new Error(await res.text());
-    }
+  if (!res.ok) throw new Error(await res.text());
 
-  navigate("/requests");
-};
+  const solicitudCreada = await res.json(); // 👈 capturás el ID aquí
+  const solicitudId = solicitudCreada.id;
+
+    navigate("/requests");
+  };
+
 
   const getSections = (): FormSection[] => [
     {
