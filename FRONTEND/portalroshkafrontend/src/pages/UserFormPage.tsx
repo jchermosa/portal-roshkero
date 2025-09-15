@@ -1,106 +1,54 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+// src/pages/UserFormPage.tsx
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DynamicForm from "../components/DynamicForm";
 import type { FormSection } from "../components/DynamicForm";
-import { useLocation } from "react-router-dom";
-
-interface CatalogItem {
-  id: number;
-  nombre: string;
-}
+import { useCatalogos } from "../hooks/useCatalogos";
+import { useFormResource } from "../hooks/useFormResource";
+import FormLayout from "../layouts/FormLayout";
+import type { UsuarioItem } from "../types";
 
 export default function UserFormPage() {
   const { token } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const param = new URLSearchParams(location.search);
-  const cedulaParam = param.get("cedula")
-
-  const [roles, setRoles] = useState<CatalogItem[]>([]);
-  const [cargos, setCargos] = useState<CatalogItem[]>([]);
-  const [equipos, setEquipos] = useState<CatalogItem[]>([]);
-  const [initialData, setInitialData] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(false); 
+  const cedulaParam = new URLSearchParams(location.search).get("cedula");
 
   const isEditing = !!id;
 
-    useEffect(() => {
-      if (!isEditing) {
-        setInitialData({ nroCedula: cedulaParam || "" });
-      }
-    }, [isEditing, cedulaParam]);
+  // ✅ Catálogos centralizados
+  const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogos(token);
 
-    useEffect(() => {
-      if (!token) return;
+  // ✅ Hook de recurso (creación/edición de usuario)
+  const {
+    data: initialData,
+    setData,
+    loading: loadingUsuario,
+    handleSubmit,
+    isEditing: editing,
+  } = useFormResource<UsuarioItem>("usuarios", token, id, {
+    initialData: {
+      nroCedula: cedulaParam || "",
+      estado: true,
+      requiereCambioContrasena: false,
+      contrasena: "usuario123" // Contraseña por defecto al crear usuario
+    },
+    transformResponse: (data) => ({
+      ...data,
+      estado: data.estado ?? true,
+      requiereCambioContrasena: data.requiereCambioContrasena ?? false,
+    }),
+  });
 
-    setLoading(true);
-    Promise.all([
-      fetch("/api/catalogos/roles").then((r) => r.json()),
-      fetch("/api/catalogos/cargos").then((r) => r.json()),
-      fetch("/api/catalogos/equipos").then((r) => r.json()),
-    ])
-    .then(([rolesData, cargosData, equiposData]) => {
-      setRoles(rolesData);
-      setCargos(cargosData);
-      setEquipos(equiposData);
-    })
-    .catch((error) => {
-      console.error('Error loading catalogs:', error);
-    })
-    .finally(() => {
-      if (!isEditing) {
-        setLoading(false);
-      }
-    });
-  }, [token, isEditing]);
+  // 🔄 Loading combinado (catálogos + usuario si es edición)
+  const loading = loadingCatalogos || loadingUsuario;
 
-  useEffect(() => {
-    if (!token || !isEditing) {
-      setLoading(false);
-      return;
-    }
 
-    setLoading(true);
-    fetch(`/api/usuarios/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const processedData = {
-          ...data,
-          estado: data.estado ?? true,
-          requiereCambioContrasena: data.requiereCambioContrasena ?? false,
-        };
-        setInitialData(processedData);
-      })
-      .catch((error) => {
-        console.error('Error loading user data:', error);
-      })
-      .finally(() => setLoading(false));
-  }, [id, token, isEditing]);
+  //Contraseña por defecto al crear usuario
+  
 
-  const handleSubmit = async (formData: Record<string, any>) => {
-    const method = isEditing ? "PUT" : "POST";
-    const url = isEditing ? `/api/usuarios/${id}` : "/api/usuarios";
-
-    const res = await fetch(url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!res.ok) {
-      throw new Error(await res.text());
-    }
-
-    navigate("/usuarios");
-  };
-
+  // ✅ Configuración de secciones
   const sections: FormSection[] = [
     {
       title: "Información básica",
@@ -153,44 +101,24 @@ export default function UserFormPage() {
   ];
 
   return (
-  <div className="min-h-screen flex flex-col overflow-hidden">
-    {/* Fondo ilustrativo */}
-    <div
-      className="absolute inset-0 bg-brand-blue"
-      style={{
-        backgroundImage: "url('/src/assets/ilustracion-herov3.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
+    <FormLayout
+      title={isEditing ? "Editar usuario" : "Crear usuario"}
+      subtitle={isEditing ? "Modifica los campos necesarios" : "Completá la información del nuevo usuario"}
+      icon={isEditing ? "✏️" : "🧑‍💻"}
+      onCancel={() => navigate("/usuarios")}
+      onSubmitLabel={isEditing ? "Guardar cambios" : "Crear usuario"}
     >
-      <div className="absolute inset-0 bg-brand-blue/40"></div>
-    </div>
-
-    {/* Contenedor principal */}
-    <div className="relative z-10 flex flex-col h-full p-4">
-      <div className="max-w-3xl w-full mx-auto flex flex-col h-full">
-        {/* Tarjeta translúcida con scroll interno */}
-        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col w-full max-h-[96vh] overflow-hidden">
-          <DynamicForm
-            title={isEditing ? "Editar usuario" : "Crear usuario"}
-            subtitle={
-              isEditing
-                ? "Modifica los campos necesarios"
-                : "Completá la información del nuevo usuario"
-            }
-            headerIcon={isEditing ? "✏️" : "🧑‍💻"}
-            sections={sections}
-            initialData={initialData}
-            onSubmit={handleSubmit}
-            onCancel={() => navigate("/usuarios")}
-            loading={loading}
-            submitLabel={isEditing ? "Guardar cambios" : "Crear usuario"}
-            className="flex-1 overflow-hidden"   
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-);
+      <DynamicForm
+        id="dynamic-form" // 🔑 importante para enlazar con FormLayout
+        sections={sections}
+        initialData={initialData}
+        onSubmit={async (formData) => {
+          await handleSubmit(formData);
+          navigate("/usuarios");
+        }}
+        loading={loading}
+        className="flex-1 overflow-hidden"
+      />
+    </FormLayout>
+  );
 }
