@@ -83,7 +83,7 @@ export default function HomePage() {
                   title="Gestión de Solicitudes"
                   icon="📤"
                   description="Administra las solicitudes de los usuarios"
-                  onClick={() => navigate("/gestionsolicitud")}
+                  onClick={() => navigate("/gestion-solicitudes")}
                   borderClass="border-blue-600"
                   buttonClass="bg-blue-600 hover:bg-blue-700"
                   color=""
