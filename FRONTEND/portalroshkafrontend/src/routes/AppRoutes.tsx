@@ -8,7 +8,7 @@ import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
 import BeneficiosPage from "../pages/BenefitsPage";
-import UsuariosPage from "../pages/UsuariosPage";
+import UsuariosPage from "../pages/UserPage.tsx";
 import VacacionesPage from "../pages/VacacionesPage";
 import RequestPage from "../pages/RequestPage";
 import Configuration from "../pages/Configuration.tsx";
