@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PaginationFooter from "../components/PaginationFooter";
-
+import IconButton from "../components/IconButton";
 // Carga masiva de imágenes desde src/assets/*.png
 const images = import.meta.glob("/src/assets/*.png", {
   eager: true,
@@ -97,6 +97,10 @@ export default function BeneficiosPage() {
     );
   }
 
+  function handleSolicitudClick(): void {
+    navigate("/beneficios/nuevo");
+  }
+
   // Lista
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -114,11 +118,18 @@ export default function BeneficiosPage() {
 
       <div className="relative z-10 flex flex-col h-full p-4">
         <div className="bg-white/45 dark:bg-gray-900/70 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-            <h2 className="text-2xl font-bold text-brand-blue dark:text-white">
-              Beneficios
-            </h2>
-          </div>
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-brand-blue dark:text-white">
+                    Beneficios
+                  </h2>
+                  <IconButton
+                    label="Solicitar Beneficio"
+                    icon={<span>➕</span>}
+                    variant="primary"
+                    onClick={handleSolicitudClick}
+                  />
+                </div>
+
 
           <div className="flex-1 overflow-auto p-6">
             <div className="rounded-2xl overflow-hidden shadow bg-white dark:bg-gray-800">
