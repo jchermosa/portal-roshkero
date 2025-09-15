@@ -15,6 +15,7 @@ export interface FormField {
   onChange?: (e: React.ChangeEvent<any>) => void;
   render?: () => React.ReactNode;
   className?: string;
+  fullWidth?: boolean;
 }
 
 
@@ -190,16 +191,19 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
           </label>
         );
 
+      case "custom":
+          if (field.render) {
+            return (
+              <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+                {field.render()}
+              </div>
+            );
+          }
+      return null;
       default:
-        if (field.type === "custom" && field.render) {
         return (
-          <div key={field.name} className="mb-4">
-            {field.render()}
-          </div>
-        );
-      }
-        return (
-          <div key={field.name} className="space-y-2">
+          <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+
             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
