@@ -179,13 +179,14 @@ export default function SolicitudFormPage() {
           name: "comentario",
           label: "Comentario",
           type: "textarea",
-          className: "w-full",
+          fullWidth: true,
           required: true,
         },
        {
           name: "lideres_custom",
           label: "Líderes asignados",
           type: "custom",
+          fullWidth: true,
           render: () => (
             <AsignadorEntidad
               disponibles={lideres}
