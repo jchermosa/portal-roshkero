@@ -8,10 +8,15 @@ export interface UsuarioItem {
   nombre: string;
   apellido: string;
   correo: string;
+  nroCedula: string;
+  telefono?: string;
+  fechaIngreso?: string; 
+  fechaNacimiento?: string; 
+  estado: boolean;
+  requiereCambioContrasena: boolean;
   rolId?: number;
   equipoId?: number;
   cargoId?: number;
-  estado?: boolean;
   antiguedad?: string;
   antiguedadPretty?: string;
 }
