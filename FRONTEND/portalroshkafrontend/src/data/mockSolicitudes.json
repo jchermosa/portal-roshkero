@@ -4,6 +4,7 @@
     "tipo": { "id": 1, "nombre": "Vacaciones" },
     "comentario": "Solicito 5 días por viaje familiar",
     "estado": "P"
+    
   },
   {
     "id_solicitud": 2,

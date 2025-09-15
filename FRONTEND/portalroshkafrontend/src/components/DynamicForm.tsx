@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 export interface FormField {
   name: string;
   label: string;
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom";
   type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea" | "custom";
   required?: boolean;
   placeholder?: string;
@@ -13,6 +14,9 @@ export interface FormField {
   //Para campo de request
   value?: any;
   onChange?: (e: React.ChangeEvent<any>) => void;
+  render?: () => React.ReactNode;
+  className?: string;
+  fullWidth?: boolean;
   render?: () => React.ReactNode;
   className?: string;
   fullWidth?: boolean;
@@ -185,6 +189,15 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         );
 
       case "custom":
+          if (field.render) {
+            return (
+              <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+                {field.render()}
+              </div>
+            );
+          }
+      return null;
+      case "custom":
         if (field.render) {
           return (
             <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
@@ -196,6 +209,8 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
       default:
         return (
+          <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+
           <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               {field.label}

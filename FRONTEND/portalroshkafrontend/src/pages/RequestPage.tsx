@@ -16,7 +16,13 @@ interface SolicitudItem {
   };
   comentario: string;
   estado: "P" | "A" | "R";
+  lideres: {
+    id_lider: number;
+    nombre: string;
+    aprobado: boolean;
+  }[];
 }
+
 
 
 export default function RequestPage() {
