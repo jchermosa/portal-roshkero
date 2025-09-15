@@ -23,7 +23,7 @@ export default function DashboardLayout() {
     { id: "/gestionsolicitud", label: "Gestión de Solicitudes", icon: "📤", available: isThOrGth },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
-    { id: "/benefits", label: "Beneficios", icon: "🏆", available: true },
+    { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
     { id: "/configuracion", label: "Configuration", icon: "⚙️", available: true },
   ].filter((o) => o.available);
 
