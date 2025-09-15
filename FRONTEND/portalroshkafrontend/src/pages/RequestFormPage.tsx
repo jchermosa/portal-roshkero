@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import DynamicForm from "../components/DynamicForm";
 import type { FormSection } from "../components/DynamicForm";
 import mockTipos from "../data/mockTipoSolicitudes.json";
+import { AsignadorEntidad } from "../components/Assigner";
 
 
 interface CatalogItem {
@@ -16,14 +17,18 @@ export default function SolicitudFormPage() {
   const navigate = useNavigate();
 
   const [tipos, setTipos] = useState<CatalogItem[]>([]);
+  const [lideres, setLideres] = useState<CatalogItem[]>([]);
+  const [lideresAsignados, setLideresAsignados] = useState<CatalogItem[]>([]);
   const [tipoSeleccionado, setTipoSeleccionado] = useState<number | null>(null);
   const [cantidadDias, setCantidadDias] = useState<number | null>(null);
   const [cantidadEditable, setCantidadEditable] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
-  const initialData: Record<string, any> = {
-    id_solicitud_tipo: tipoSeleccionado ?? "",
-    cantidad_dias: cantidadEditable ? undefined : cantidadDias ?? null,
-  };
+  const [initialData, setInitialData] = useState<Record<string, any>>({
+  id_solicitud_tipo: "",
+  cantidad_dias: null,
+  id_lideres: [],
+});
+
 
   const modoDesarrollo = true;
 
@@ -46,48 +51,58 @@ export default function SolicitudFormPage() {
   }, [token]);
 
   useEffect(() => {
-    const tipo = tipos.find((t) => t.id === tipoSeleccionado);
-    if (!tipo) {
-      setCantidadDias(null);
-      setCantidadEditable(false);
-      return;
-    }
+  if (modoDesarrollo) {
+    setLideres([
+      { id: 1, nombre: "Ana" },
+      { id: 2, nombre: "Carlos" },
+      { id: 3, nombre: "Lucía" },
+    ]);
+    return;
+  }
 
-    const nombre = tipo.nombre;
+  fetch("/api/lideres", {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((res) => res.json())
+    .then((data) => setLideres(data))
+    .catch((err) => console.error("Error al cargar líderes:", err));
+}, [token]);
 
-    if (nombre.includes("Inventario")) {
-      setCantidadDias(null);
-      setCantidadEditable(false);
-    } else if (nombre.includes("Paternidad")) {
-      setCantidadDias(14);
-      setCantidadEditable(false);
-    } else if (nombre.includes("Maternidad")) {
-      setCantidadDias(150);
-      setCantidadEditable(false);
-    } else if (nombre.includes("Cumpleanos")) {
-      setCantidadDias(1);
-      setCantidadEditable(false);  
-    } else if (nombre.includes("Matrimonio")) {
-      setCantidadDias(5);
-      setCantidadEditable(false);    
-    } else if (nombre.includes("Luto(1er grado)")) {
-      setCantidadDias(5);
-      setCantidadEditable(false);
-    } else if (nombre.includes("Luto(2do grado)")) {
-      setCantidadDias(3);
-      setCantidadEditable(false);      
-    } else if (["Capacitacion", "Examenes", "Reposo", "Otros"].some((k) => nombre.includes(k))) {
-      setCantidadEditable(true);
-      setCantidadDias(null);
-    } else {
-      setCantidadDias(null);
-      setCantidadEditable(false);
-    }
-  }, [tipoSeleccionado, tipos]);
+
+  useEffect(() => {
+  const tipo = tipos.find((t) => t.id === tipoSeleccionado);
+  const nombre = tipo?.nombre ?? "";
+
+  let nuevaCantidad: number | null = null;
+  let editable = false;
+
+  if (nombre.includes("Paternidad")) {
+    nuevaCantidad = 14;
+  } else if (nombre.includes("Maternidad")) {
+    nuevaCantidad = 150;
+  } else if (nombre.includes("Cumpleanos")) {
+    nuevaCantidad = 1;
+  } else if (nombre.includes("Matrimonio")) {
+    nuevaCantidad = 5;
+  } else if (nombre.includes("Luto(1er grado)")) {
+    nuevaCantidad = 5;
+  } else if (nombre.includes("Luto(2do grado)")) {
+    nuevaCantidad = 3;
+  } else if (["Capacitacion", "Examenes", "Reposo", "Otros"].some((k) => nombre.includes(k))) {
+    editable = true;
+  }
+
+  setCantidadEditable(editable);
+  setCantidadDias(nuevaCantidad);
+
+  setInitialData((prev) => ({
+    ...prev,
+    id_solicitud_tipo: tipoSeleccionado ?? "",
+    cantidad_dias: editable ? undefined : nuevaCantidad,
+  }));
+}, [tipoSeleccionado, tipos]);
 
   const handleSubmit = async (formData: Record<string, any>) => {
-    
-
   const payload = {
     id_usuario: user?.id,
     id_solicitud_tipo: formData.id_solicitud_tipo,
@@ -98,28 +113,31 @@ export default function SolicitudFormPage() {
     estado: "P",
     numero_aprobaciones: 0,
   };
+
   if (modoDesarrollo) {
     console.log("Solicitud simulada:", payload);
-      alert("Solicitud simulada enviada correctamente.");
-     navigate("/solicitudes");
-     return;
-    }
+    alert("Solicitud simulada enviada correctamente.");
+    navigate("/requests");
+    return;
+  }
 
-    const res = await fetch("/api/solicitudes", {
+  const res = await fetch("/api/solicitudes", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
-    });
+  });
 
-    if (!res.ok) {
-        throw new Error(await res.text());
-    }
+  if (!res.ok) throw new Error(await res.text());
 
-  navigate("/requests");
-};
+  const solicitudCreada = await res.json();//<-captura para la creacion de solicitud-lider
+  const solicitudId = solicitudCreada.id;
+
+    navigate("/requests");
+  };
+
 
   const getSections = (): FormSection[] => [
     {
@@ -161,8 +179,22 @@ export default function SolicitudFormPage() {
           name: "comentario",
           label: "Comentario",
           type: "textarea",
+          className: "w-full",
           required: true,
         },
+       {
+          name: "lideres_custom",
+          label: "Líderes asignados",
+          type: "custom",
+          render: () => (
+            <AsignadorEntidad
+              disponibles={lideres}
+              asignados={lideresAsignados}
+              setAsignados={setLideresAsignados}
+              label="Líderes asignados"
+            />
+          ),
+        }
       ],
     },
   ];
