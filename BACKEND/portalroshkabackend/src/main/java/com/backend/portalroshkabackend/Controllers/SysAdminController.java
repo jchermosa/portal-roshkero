@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.DTO.DispositivoDto;
+import com.backend.portalroshkabackend.DTO.InventarioAsignadoDto;
 import com.backend.portalroshkabackend.Models.Dispositivo;
+import com.backend.portalroshkabackend.Models.InventarioAsignado;
 import com.backend.portalroshkabackend.Models.SolicitudDispositivos;
 import com.backend.portalroshkabackend.Services.DispositivoService;
+import com.backend.portalroshkabackend.Services.InventarioAsignadoService;
 import com.backend.portalroshkabackend.Services.SysAdminService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,9 +33,13 @@ public class SysAdminController {
     @Autowired
     private final DispositivoService dispositivoService;
 
-    SysAdminController(SysAdminService sysAdminService, DispositivoService dispositivoService) {
+    @Autowired 
+    private final InventarioAsignadoService inventarioAsignadoService;
+
+    SysAdminController(SysAdminService sysAdminService, DispositivoService dispositivoService, InventarioAsignadoService inventarioAsignadoService) {
         this.sysAdminService = sysAdminService;
         this.dispositivoService = dispositivoService;
+        this.inventarioAsignadoService = inventarioAsignadoService;
     }
 
     // =========> DISPOSITIVOS <=========
@@ -72,6 +79,15 @@ public class SysAdminController {
     // TODO Desactivar dispositivos
         
 
+
+    // Crear una asignacion 
+
+    @PostMapping("createAssignment")
+    public InventarioAsignado createAssignment(@Valid @RequestBody InventarioAsignadoDto inventarioAsignadoDto) {
+
+        return inventarioAsignadoService.crearInventarioAsignado(inventarioAsignadoDto);
+
+    }   
     
 
 

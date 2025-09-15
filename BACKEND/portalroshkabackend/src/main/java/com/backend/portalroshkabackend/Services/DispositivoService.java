@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.portalroshkabackend.DTO.DispositivoDto;
 import com.backend.portalroshkabackend.Models.Dispositivo;
 import com.backend.portalroshkabackend.Repositories.DispositivoRepository;
+
 
 @Service
 public class DispositivoService {
@@ -21,7 +23,8 @@ public class DispositivoService {
         this.dispositivoRepository = dispositivoRepository;
     }
 
-
+    // insert tipo de inventario
+    @Transactional
     public Dispositivo createDevice(DispositivoDto dispositivo) {
 
         // creando un nuevo dispositivo
@@ -32,10 +35,12 @@ public class DispositivoService {
         return dispositivoRepository.save(newDispositivo);
     }
 
+    @Transactional(readOnly = true)
     public List<Dispositivo> getAllDevices() {
         return dispositivoRepository.findAll();
     }
 
+    @Transactional
     public Dispositivo updateDevice(Integer id, DispositivoDto dispositivoDto) {
         Dispositivo existingDispositivo = dispositivoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dispositivo not found with id: " + id));

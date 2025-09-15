@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.portalroshkabackend.Models.SolicitudDispositivos;
 import com.backend.portalroshkabackend.Repositories.SysAdminRepository;
@@ -20,10 +21,12 @@ public class SysAdminService {
     }
 
 
+    @Transactional(readOnly = true)
     public List<SolicitudDispositivos> getAllAprovedRequest(){
         return sysAdminRepository.findSolicitudesAprovadas();
     }
 
+    @Transactional(readOnly = true)
     public List<SolicitudDispositivos> findAllSolicitudes(){
         return sysAdminRepository.findAllSolicitudes();
     }
