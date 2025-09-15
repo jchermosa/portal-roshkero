@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 export interface FormField {
   name: string;
   label: string;
-  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea";
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
@@ -13,6 +13,8 @@ export interface FormField {
   //Para campo de request
   value?: any;
   onChange?: (e: React.ChangeEvent<any>) => void;
+  render?: () => React.ReactNode;
+  className?: string;
 }
 
 
@@ -189,6 +191,13 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         );
 
       default:
+        if (field.type === "custom" && field.render) {
+        return (
+          <div key={field.name} className="mb-4">
+            {field.render()}
+          </div>
+        );
+      }
         return (
           <div key={field.name} className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
