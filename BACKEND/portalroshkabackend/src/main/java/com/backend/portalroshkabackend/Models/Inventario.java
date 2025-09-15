@@ -1,7 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
+import com.backend.portalroshkabackend.Models.Enum.*;
 import java.sql.Date;
-
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -47,5 +47,8 @@ public class Inventario {
     @Column(name = "estado", columnDefinition = "estado_inventario_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private EstadoInventario estado;
+
+    @Column(name = "fecha_creacion")
+    private Date fechaCreacion;
     
 }

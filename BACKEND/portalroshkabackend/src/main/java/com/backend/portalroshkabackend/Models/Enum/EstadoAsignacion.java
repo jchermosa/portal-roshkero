@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Models;
+package com.backend.portalroshkabackend.Models.Enum;
 
 public enum EstadoAsignacion {
     U, // En uso

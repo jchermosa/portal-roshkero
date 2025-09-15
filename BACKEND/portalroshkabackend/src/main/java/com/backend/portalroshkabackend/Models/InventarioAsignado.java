@@ -5,6 +5,8 @@ import java.sql.Date;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.backend.portalroshkabackend.Models.Enum.EstadoAsignacion;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -2,7 +2,7 @@ package com.backend.portalroshkabackend.DTO;
 
 import java.sql.Date;
 
-import com.backend.portalroshkabackend.Models.EstadoAsignacion;
+import com.backend.portalroshkabackend.Models.Enum.EstadoAsignacion;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

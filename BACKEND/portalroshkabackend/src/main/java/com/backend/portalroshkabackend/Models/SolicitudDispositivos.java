@@ -2,8 +2,13 @@ package com.backend.portalroshkabackend.Models;
 
 import java.sql.Date;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,12 +43,13 @@ public class SolicitudDispositivos {
     @Column(name = "comentario")
     private String comentario;
 
-    @Column(name = "estado")
-    private Character estado;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", columnDefinition = "estado_ac_enum")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private EstadoActivoInactivo estado;
 
     @Column(name = "fecha_creacion")
     private Date fechaCreacion;
-
 
     @Column(name = "id_tipo_inventario")
     private Integer idTipoInventario;
