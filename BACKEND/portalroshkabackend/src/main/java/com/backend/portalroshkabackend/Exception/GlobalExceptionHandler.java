@@ -1,27 +1,51 @@
 package com.backend.portalroshkabackend.Exception;
 
 import org.springframework.web.bind.annotation.*;
+
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> fieldErrors = new HashMap<>();
+    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        Map<String, String> errors = new HashMap<>();
+
         ex.getBindingResult().getFieldErrors()
-                .forEach(error -> fieldErrors.put(error.getField(), error.getDefaultMessage()));
+                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", new Date());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("errors", fieldErrors);
-        response.put("message", "Validación fallida");
+        body.put("message", "Validación fallida");
+        body.put("errors", errors);
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+     @ExceptionHandler(InvalidFormatException.class)
+    public ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        Map<String, String> errors = new HashMap<>();
+
+        if (ex.getTargetType().isEnum()) {
+            errors.put("estado", "Solo se permite A o I");
+        } else {
+            errors.put("value", "Formato inválido");
+        }
+
+        body.put("message", "Validación fallida");
+        body.put("errors", errors);
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
 }

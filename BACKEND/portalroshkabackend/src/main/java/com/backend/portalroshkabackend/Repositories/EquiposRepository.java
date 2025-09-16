@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EquiposRepository extends JpaRepository<Equipos, Integer> {
-    // Получить команду с клиентом по ID
     @Query("SELECT e FROM Equipos e LEFT JOIN FETCH e.cliente WHERE e.idEquipo = :id")
     Optional<Equipos> findByIdWithCliente(@Param("id") int id);
 

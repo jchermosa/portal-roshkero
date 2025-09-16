@@ -12,7 +12,6 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
-import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 
@@ -54,7 +53,7 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setFechaLimite(requestDto.getFechaLimite());
         equipo.setIdCliente(cliente);
         equipo.setEstado(requestDto.getEstado());
-        equipo.setFechaCreacion(new Date(0));
+        equipo.setFechaCreacion(new Date(System.currentTimeMillis()));
 
         Equipos savedEquipo = equiposRepository.save(equipo);
 

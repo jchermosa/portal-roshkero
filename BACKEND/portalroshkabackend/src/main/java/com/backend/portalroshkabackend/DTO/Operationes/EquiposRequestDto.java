@@ -6,6 +6,8 @@ import java.sql.Date;
 
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+import com.backend.portalroshkabackend.tools.validator.ClienteExists;
+import com.backend.portalroshkabackend.tools.validator.ValidEstado;
 
 public class EquiposRequestDto {
 
@@ -19,8 +21,11 @@ public class EquiposRequestDto {
     private Date fechaLimite;
 
     @NotNull(message = "El ID del cliente es obligatorio")
+    @ClienteExists
     private Integer idCliente;
 
+    @NotNull(message = "El estado es obligatorio")
+    @ValidEstado
     private EstadoActivoInactivo estado;
 
     public EquiposRequestDto() {
