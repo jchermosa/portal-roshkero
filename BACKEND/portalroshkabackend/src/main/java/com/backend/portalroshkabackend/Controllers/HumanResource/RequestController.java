@@ -6,7 +6,9 @@ import com.backend.portalroshkabackend.DTO.th.BenefitsTypesResponseDto;
 import com.backend.portalroshkabackend.DTO.th.DevicesTypesResponseDto;
 import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
 import com.backend.portalroshkabackend.DTO.th.SolicitudTHTipoResponseDto;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Services.HumanResource.IRequestService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -33,6 +36,35 @@ public class RequestController {
     ){
         Page<RequestDto> requests = requestService.getAllRequests(pageable); // Solicitud Enviar -> Aprueba Lider/es -> Aparece en TH para aprobar / rechazar
 
+
+        return ResponseEntity.ok(requests);
+    }
+
+    @GetMapping("/th/users/request/sortby")
+    public ResponseEntity<Page<SolicitudTHResponseDto>> getRequestSortByEstado(
+            @RequestParam(value = "estado", required = true) String estado,
+            @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request
+    ){
+        Set<String> allowedParams = Set.of("estado");
+
+        for (String paramName : request.getParameterMap().keySet()){
+            if (!allowedParams.contains(paramName)){
+                throw new IllegalArgumentException("Parametro desconocido: " + paramName);
+            }
+        }
+
+        if (estado.isBlank()) throw new IllegalArgumentException("El argumento del parametro no debe estar vacio");
+
+
+        Page<SolicitudTHResponseDto> requests;
+
+        switch (estado) {
+            case "A" -> requests = requestService.getByEstado(EstadoSolicitudEnum.A, pageable);
+            case "R" -> requests = requestService.getByEstado(EstadoSolicitudEnum.R, pageable);
+            case "P" -> requests = requestService.getByEstado(EstadoSolicitudEnum.P, pageable);
+            default -> throw new IllegalArgumentException("Argumento del parametro invalido: " + estado);
+        }
 
         return ResponseEntity.ok(requests);
     }
@@ -98,7 +130,7 @@ public class RequestController {
     }
 
     //TODO: Tipo de solicitudes,
-    // GET:Solicitudes aprobadas por lideres{PENDIENTES, FECHA} - CREADO
+
 
 
     //TODO: dias disponibles{id}, dias totales de vacaciones, historial de solicitudes
@@ -109,11 +141,15 @@ public class RequestController {
 
     //TODO; mis solicitudes.GET
 
-    //TODO: Listar por tipo de solicitud, listar por estado de la solicitud (A,I,P)
+    //TODO: Listar por tipo de solicitud,
+
     //TODO: POST-Solicitar BENEFICIO.
 
-    //TODO: GET-Tipos de BENEFICIO, DISPOSITIVOS, PERMISOS.
+    // ---------------------
 
+    // GET-Tipos de BENEFICIO, DISPOSITIVOS, PERMISOS. - LISTO
+    // GET:Solicitudes aprobadas por lideres{PENDIENTES, FECHA} - LISTO
+    // GET: listar por estado de la solicitud (A,I,P)
 
 
 }

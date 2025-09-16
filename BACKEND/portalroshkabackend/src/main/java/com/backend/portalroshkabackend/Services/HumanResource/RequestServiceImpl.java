@@ -80,6 +80,13 @@ public class RequestServiceImpl implements IRequestService{
         return solicitudTHTipoRepository.findAll().stream().map(AutoMap::toSolicitudTHTipoResponseDto).toList();
     }
 
+    @Override
+    public Page<SolicitudTHResponseDto> getByEstado(EstadoSolicitudEnum estado, Pageable pageable) {
+        Page<SolicitudesTH> requestSorted = solicitudesTHRepository.findAllByEstado(estado, pageable);
+
+        return requestSorted.map(AutoMap::toSolicitudTHResponseDto);
+    }
+
 
     @Transactional
     @Override

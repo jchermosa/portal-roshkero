@@ -6,6 +6,7 @@ import com.backend.portalroshkabackend.DTO.th.BenefitsTypesResponseDto;
 import com.backend.portalroshkabackend.DTO.th.DevicesTypesResponseDto;
 import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
 import com.backend.portalroshkabackend.DTO.th.SolicitudTHTipoResponseDto;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,6 +19,8 @@ public interface IRequestService {
     List<BenefitsTypesResponseDto> getAllBenefitsTypes();
     List<DevicesTypesResponseDto> getAllDevicesTypes();
     List<SolicitudTHTipoResponseDto> getAllPermissionsTypes();
+
+    Page<SolicitudTHResponseDto> getByEstado(EstadoSolicitudEnum estado, Pageable pageable);
 
     boolean acceptRequest(int idRequest);
     boolean rejectRequest(int idRequest, RequestRejectedDto rejectedDto);

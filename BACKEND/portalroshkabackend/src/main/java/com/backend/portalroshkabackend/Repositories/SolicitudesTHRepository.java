@@ -23,4 +23,6 @@ public interface SolicitudesTHRepository extends JpaRepository<SolicitudesTH, In
             @Param("estadoTh") EstadoSolicitudEnum estadoTh,
             Pageable pageable);
 
+    Page<SolicitudesTH> findAllByEstado(EstadoSolicitudEnum estado, Pageable pageable);
+
 }
