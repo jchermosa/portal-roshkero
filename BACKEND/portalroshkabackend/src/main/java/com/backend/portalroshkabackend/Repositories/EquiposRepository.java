@@ -12,7 +12,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EquiposRepository extends JpaRepository<Equipos, Integer> {
+
+    boolean existsByNombre(String nombre);//для обработки повторяющизся имен.
+
     @Query("SELECT e FROM Equipos e LEFT JOIN FETCH e.cliente WHERE e.idEquipo = :id")
-    Optional<Equipos> findByIdWithCliente(@Param("id") int id);
+    Optional<Equipos> findByIdWithCliente(@Param("id") int id);// no trabajo
 
 }

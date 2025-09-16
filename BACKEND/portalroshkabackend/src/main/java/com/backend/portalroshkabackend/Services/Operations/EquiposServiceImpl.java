@@ -52,7 +52,7 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setFechaInicio(requestDto.getFechaInicio());
         equipo.setFechaLimite(requestDto.getFechaLimite());
         equipo.setIdCliente(cliente);
-        equipo.setEstado(requestDto.getEstado());
+        equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));;
         equipo.setFechaCreacion(new Date(System.currentTimeMillis()));
 
         Equipos savedEquipo = equiposRepository.save(equipo);
@@ -81,7 +81,7 @@ public class EquiposServiceImpl implements IEquiposService {
         existingEquipo.setFechaInicio(requestDto.getFechaInicio());
         existingEquipo.setFechaLimite(requestDto.getFechaLimite());
         existingEquipo.setIdCliente(cliente);
-        existingEquipo.setEstado(requestDto.getEstado());
+        existingEquipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
 
         equiposRepository.save(existingEquipo);
 

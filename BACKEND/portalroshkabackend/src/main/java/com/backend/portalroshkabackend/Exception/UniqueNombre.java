@@ -1,15 +1,16 @@
-package com.backend.portalroshkabackend.tools.validator;
+package com.backend.portalroshkabackend.Exception;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = ClienteExistsValidator.class)
+@Constraint(validatedBy = NombreUnicoValidator.class)
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ClienteExists {
-    String message() default "El cliente no existe";
+public @interface UniqueNombre {
+    String message() default "El nombre ya existe";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

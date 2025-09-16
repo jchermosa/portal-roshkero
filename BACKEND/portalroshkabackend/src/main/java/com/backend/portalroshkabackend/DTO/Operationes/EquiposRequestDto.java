@@ -4,14 +4,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Date;
 
+import com.backend.portalroshkabackend.Exception.ClienteExists;
+import com.backend.portalroshkabackend.Exception.UniqueNombre;
+import com.backend.portalroshkabackend.Exception.ValidEstado;
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
-import com.backend.portalroshkabackend.tools.validator.ClienteExists;
-import com.backend.portalroshkabackend.tools.validator.ValidEstado;
 
 public class EquiposRequestDto {
 
     @NotBlank(message = "El nombre no puede estar vacio")
+    @UniqueNombre
     private String nombre;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
@@ -26,12 +28,12 @@ public class EquiposRequestDto {
 
     @NotNull(message = "El estado es obligatorio")
     @ValidEstado
-    private EstadoActivoInactivo estado;
+    private String estado;
 
     public EquiposRequestDto() {
     }
 
-    public EquiposRequestDto(String nombre, Date fechaInicio, Date fechaLimite, Integer idCliente, EstadoActivoInactivo estado) {
+    public EquiposRequestDto(String nombre, Date fechaInicio, Date fechaLimite, Integer idCliente, String estado) {
         this.nombre = nombre;
         this.fechaInicio = fechaInicio;
         this.fechaLimite = fechaLimite;
@@ -71,11 +73,11 @@ public class EquiposRequestDto {
         this.idCliente = idCliente;
     }
 
-    public EstadoActivoInactivo getEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(EstadoActivoInactivo estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 }

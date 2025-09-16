@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.tools.validator;
+package com.backend.portalroshkabackend.Exception;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

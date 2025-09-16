@@ -1,15 +1,15 @@
-package com.backend.portalroshkabackend.tools.validator;
+package com.backend.portalroshkabackend.Exception;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = EstadoValidator.class)
+@Constraint(validatedBy = ClienteExistsValidator.class)
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidEstado {
-    String message() default "Solo se permite A o I";
+public @interface ClienteExists {
+    String message() default "El cliente no existe";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-}   
+}
