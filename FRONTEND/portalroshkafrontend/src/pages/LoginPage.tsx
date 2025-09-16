@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo.jpg";
-import heroBg from "../assets/ilustracion-herov3.svg";
+import { logo, logo_white_transparent, heroBg } from "../assets";
 import LoadingButton from "../components/LoadingButton";
 
 export default function Login() {
@@ -15,6 +14,28 @@ export default function Login() {
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Estados para animación
+  const [showSplash, setShowSplash] = useState(true);
+  const [phase, setPhase] = useState<"start" | "grow" | "move" | "done">("start");
+
+  useEffect(() => {
+    // Fase 1: giro y crecimiento
+    const growTimer = setTimeout(() => setPhase("grow"), 100); 
+    // Fase 2: mover arriba
+    const moveTimer = setTimeout(() => setPhase("move"), 1500);
+    // Fase 3: mostrar login
+    const doneTimer = setTimeout(() => {
+      setPhase("done");
+      setShowSplash(false);
+    }, 2500);
+
+    return () => {
+      clearTimeout(growTimer);
+      clearTimeout(moveTimer);
+      clearTimeout(doneTimer);
+    };
+  }, []);
 
   // Dark mode toggle
   const [darkMode, setDarkMode] = useState(
@@ -67,6 +88,22 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* --- SPLASH ANIMADO --- */}
+      {showSplash && (
+        <div className="absolute inset-0 flex items-center justify-center absolute inset-0 bg-[radial-gradient(circle_at_center,_#1D75BD_0%,_#0a3d62_100%)] z-50">
+          <img
+            src={logo_white_transparent}
+            alt="Splash Logo"
+            className={`
+              w-32 h-32 object-contain transform transition-all duration-1000 ease-out
+              ${phase === "start" ? "scale-50 rotate-0 opacity-0" : ""}
+              ${phase === "grow" ? "scale-125 rotate-180 opacity-100" : ""}
+              ${phase === "move" ? "-translate-y-36 scale-100 rotate-360 opacity-100" : ""}
+            `}
+          />
+        </div>
+      )}
+
       {/* Fondo */}
       <div
         className="absolute inset-0 bg-brand-blue"
@@ -80,20 +117,21 @@ export default function Login() {
         <div className="absolute inset-0 bg-brand-blue/40"></div>
       </div>
 
-      {/* Toggle dark mode con íconos */}
-        <button
-          onClick={() => setDarkMode((prev) => !prev)}
-          type="button"
-          className="absolute top-4 right-4 z-20 text-2xl transition-transform transform hover:scale-110"
-        >
-          {darkMode ? "🌙" : "🌞"}
-        </button>
+      {/* Toggle dark mode */}
+      <button
+        onClick={() => setDarkMode((prev) => !prev)}
+        type="button"
+        className="absolute top-4 right-4 z-20 text-2xl transition-transform transform hover:scale-110"
+      >
+        {darkMode ? "🌙" : "🌞"}
+      </button>
 
-
-      {/* Contenedor */}
-      <div className="relative z-10 w-full max-w-md bg-white/95 dark:bg-gray-900/90 backdrop-blur-sm shadow-2xl rounded-2xl p-10">
-       
-
+      {/* Contenedor del login */}
+      <div
+        className={`relative z-10 w-full max-w-md bg-white/95 dark:bg-gray-900/90 backdrop-blur-sm shadow-2xl rounded-2xl p-10 transform transition-all duration-1000
+          ${phase === "move" || phase === "done" ? "translate-y-0 opacity-100 delay-500" : "translate-y-12 opacity-0"}
+        `}
+      >
         {/* Logo + título */}
         <div className="text-center mb-8">
           <img
@@ -173,14 +211,6 @@ export default function Login() {
             className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700"
           />
         </form>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <div className="flex items-center justify-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-          </div>
-        </div>
       </div>
     </div>
   );
