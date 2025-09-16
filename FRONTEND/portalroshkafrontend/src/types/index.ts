@@ -24,9 +24,17 @@ export interface UsuarioItem {
 
 export type SolicitudEstado = "P" | "A" | "R";
 
+export interface LiderItem {
+  id: number;
+  nombre: string;
+  aprobado: boolean;
+}
+
 export interface SolicitudItem {
   id_solicitud: number;
   tipo: CatalogItem;
   comentario: string;
   estado: SolicitudEstado;
 }
+
+
