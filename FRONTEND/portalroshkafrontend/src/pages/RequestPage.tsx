@@ -6,21 +6,22 @@ import DataTable from "../components/DataTable";
 import PaginationFooter from "../components/PaginationFooter";
 import IconButton from "../components/IconButton";
 import rawSolicitudes from "../data/mockSolicitudes.json";
+import type { LiderItem } from "../types";
+import { useFormResource } from "../hooks/useFormResource";
 
 
 interface SolicitudItem {
-  id_solicitud: number;
-  tipo: {
-    id: number;
-    nombre: string;
-  };
+  id: number;
+  id_usuario: number;
+  id_solicitud_tipo: number;
+  tipo: { id: number; nombre: string };
+  cantidad_dias: number | null;
+  fecha_inicio: string;
+  fecha_fin: string;
   comentario: string;
   estado: "P" | "A" | "R";
-  lideres: {
-    id_lider: number;
-    nombre: string;
-    aprobado: boolean;
-  }[];
+  numero_aprobaciones: number;
+  lideres: LiderItem[];
 }
 
 
@@ -39,6 +40,9 @@ export default function RequestPage() {
   const mockSolicitudes: SolicitudItem[] = rawSolicitudes.map((s) => ({
     ...s,
     estado: s.estado as "P" | "A" | "R",
+    lideres: [
+    { id: 1, nombre: "Ana", aprobado: true },
+    { id: 2, nombre: "Carlos", aprobado: false },],
   }));
 
 
@@ -91,7 +95,7 @@ export default function RequestPage() {
 
   const columns = [
   {
-    key: "id_solicitud",
+    key: "id",
     label: "ID",
   },
   {
@@ -102,6 +106,18 @@ export default function RequestPage() {
   {
     key: "comentario",
     label: "Comentario",
+  },
+  {
+    key: "numero_aprobaciones",
+    label: "Aprobaciones",
+    render: (s: SolicitudItem) => {
+      const total = s.lideres.length;
+      return(
+      <span className="font-medium text-sm">
+        {s.numero_aprobaciones}/{total}
+      </span>
+      )
+    },
   },
   {
     key: "estado",
@@ -121,6 +137,18 @@ export default function RequestPage() {
         </span>
       );
     },
+  },
+  {
+    key: "acciones",
+    label: "Acciones",
+    render: (s: SolicitudItem) => (
+      <button
+        onClick={() => navigate(`/requests/${s.id}`)}
+        className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+      >
+        Editar
+      </button>
+    ),
   },
 ];
 
@@ -200,7 +228,7 @@ export default function RequestPage() {
             <DataTable
               data={solicitudes}
               columns={columns}
-              rowKey={(s) => s.id_solicitud}
+              rowKey={(s) => s.id}
               scrollable={false}
             />
           </div>

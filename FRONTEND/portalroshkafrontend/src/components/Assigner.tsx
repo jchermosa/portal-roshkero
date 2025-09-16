@@ -10,6 +10,7 @@ interface AsignadorEntidadProps<T extends Entidad> {
   setAsignados: React.Dispatch<React.SetStateAction<T[]>>;
   label: string;
   max?: number;
+  disabled?: boolean;
 }
 
 export function AsignadorEntidad<T extends { id: number; nombre: string }>({
