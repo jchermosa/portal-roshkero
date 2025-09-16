@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DynamicForm, { type FormSection } from "../components/DynamicForm";
+import FormLayout from "../layouts/FormLayout";
 
 const DIAS_TOTALES = 30;
 
 export default function SolicitudVacacionesPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  
   if (!user) {
     return <div className="p-10 text-center">Cargando usuario...</div>;
   }
@@ -108,41 +110,22 @@ export default function SolicitudVacacionesPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden">
-      {/* Fondo ilustrativo */}
-      <div
-        className="absolute inset-0 bg-brand-blue"
-        style={{
-          backgroundImage: "url('/src/assets/ilustracion-herov3.svg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <div className="absolute inset-0 bg-brand-blue/40"></div>
-      </div>
-
-      {/* Contenedor principal */}
-      <div className="relative z-10 flex flex-col h-full p-4">
-        <div className="max-w-3xl w-full mx-auto flex flex-col h-full">
-          {/* Tarjeta translúcida con scroll interno */}
-          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col w-full max-h-[96vh] overflow-hidden">
-            <DynamicForm
-              title="Solicitar Vacaciones"
-              subtitle="Completá la información para tu solicitud"
-              headerIcon="🌴"
-              sections={sections}
-              initialData={formData}
-              onChange={handleChange}
-              onSubmit={handleSubmit}
-              onCancel={() => navigate("/vacaciones")}
-              submitLabel="Enviar Solicitud"
-              cancelLabel="Cancelar"
-              className="flex-1 overflow-hidden"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <FormLayout
+      title="Solicitar Vacaciones"
+      subtitle="Completá la información para tu solicitud"
+      icon="🌴"
+      onCancel={() => navigate("/vacaciones")}
+      onSubmitLabel="Enviar Solicitud"
+      onCancelLabel="Cancelar"
+    >
+      <DynamicForm
+        id="dynamic-form"
+        sections={sections}
+        initialData={formData}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        className="flex-1 overflow-hidden"
+      />
+    </FormLayout>
   );
 }
