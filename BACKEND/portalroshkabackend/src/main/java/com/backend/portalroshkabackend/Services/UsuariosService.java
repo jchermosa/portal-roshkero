@@ -6,12 +6,9 @@ import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
@@ -115,15 +112,15 @@ public class UsuariosService {
     dto.setApellido(usuario.getApellido());
     dto.setNroCedula(usuario.getNroCedula());
     dto.setCorreo(usuario.getCorreo());
-    dto.setIdRol(usuario.getIdRol());
+    dto.setIdRol(usuario.getIdRol() != null ? usuario.getIdRol().getIdRol() : null);
     dto.setFechaIngreso(usuario.getFechaIngreso());
     dto.setAntiguedad(usuario.getAntiguedad());
     dto.setDiasVacaciones(usuario.getDiasVacaciones());
-    dto.setEstado(usuario.isEstado());
+    dto.setEstado(usuario.getEstado());
     dto.setContrasena(usuario.getContrasena());
     dto.setTelefono(usuario.getTelefono());
-    dto.setIdEquipo(usuario.getIdEquipo());
-    dto.setIdCargo(usuario.getIdCargo());
+    // dto.setIdEquipo(null); // Campo no disponible en el modelo Usuario actual
+    dto.setIdCargo(usuario.getIdCargo() != null ? usuario.getIdCargo().getIdCargo() : null);
     dto.setFechaNacimiento(usuario.getFechaNacimiento());
     dto.setDiasVacacionesRestante(usuario.getDiasVacacionesRestante());
     dto.setRequiereCambioContrasena(usuario.isRequiereCambioContrasena());
