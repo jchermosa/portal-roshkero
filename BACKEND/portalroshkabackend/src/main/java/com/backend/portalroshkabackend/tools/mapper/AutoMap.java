@@ -90,4 +90,18 @@ public class AutoMap {
 
         return user;
     }
+
+    public static void toUsuarioFromUpdateDto(Usuario user, UserUpdateDto updateDto){
+        user.setNombre(updateDto.getNombre());
+        user.setApellido(updateDto.getApellido());
+        user.setNroCedula(updateDto.getNroCedula());
+        user.setCorreo(updateDto.getCorreo());
+        user.setRoles(updateDto.getRoles());
+        user.setFechaIngreso(updateDto.getFechaIngreso()); // TODO: Preguntar si usar PUT o PATCH
+        user.setEstado(updateDto.getEstado());
+        user.setContrasena(updateDto.getContrasena());
+        user.setTelefono(updateDto.getTelefono());
+        user.setCargos(updateDto.getCargos());
+        user.setFechaNacimiento(updateDto.getFechaNacimiento());
+    }
 }
