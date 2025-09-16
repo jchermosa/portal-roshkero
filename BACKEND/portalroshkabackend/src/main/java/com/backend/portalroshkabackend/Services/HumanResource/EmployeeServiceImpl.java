@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Service("humanEmployeeService")
 public class EmployeeServiceImpl implements IEmployeeService, ITHService{
     private final UserRepository userRepository;
 
@@ -87,12 +87,12 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
         return users.map(AutoMap::toUserDto);
     }
 
-    @Override
-    public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
+    // @Override
+    // public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
+    //     Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
 
-        return users.map(AutoMap::toUserDto);
-    }
+    //     return users.map(AutoMap::toUserDto);
+    // }
 
     @Override
     public Page<UserDto> getAllEmployeesByPosition(Pageable pageable) {
@@ -141,13 +141,13 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
         user.setApellido(updateDto.getApellido());
         user.setNroCedula(updateDto.getNroCedula());
         user.setCorreo(updateDto.getCorreo());
-        user.setIdRol(updateDto.getIdRol());
+        // user.setIdRol(updateDto.getIdRol());
         user.setFechaIngreso(updateDto.getFechaIngreso()); // TODO: Preguntar si usar PUT o PATCH
-        user.setEstado(updateDto.isEstado());
+        // user.setEstado(updateDto.isEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
-        user.setIdEquipo(updateDto.getIdEquipo());
-        user.setIdCargo(updateDto.getIdCargo());
+        // user.setIdEquipo(updateDto.getIdEquipo());
+        // user.setIdCargo(updateDto.getIdCargo());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
 
         Usuario updatedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al actualizar el usuario: ");
@@ -161,9 +161,9 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
     public UserDto deleteEmployee(int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        if (!user.isEstado()) throw new UserAlreadyInactiveException(id);
+        // if (!user.isEstado()) throw new UserAlreadyInactiveException(id);
 
-        user.setEstado(false); // Da de baja el empleado de la base de datos
+        // user.setEstado(false); // Da de baja el empleado de la base de datos
 
         Usuario deletedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al eliminar el usuario: ");
 

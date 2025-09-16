@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Service("humanRequestService")
 public class RequestServiceImpl implements IRequestService{
     private final RequestRepository requestRepository;
 
@@ -43,7 +43,7 @@ public class RequestServiceImpl implements IRequestService{
 
         // Si se acepta la solicitud, rechazado y estado de la solicitu se setea a false
         request.setRechazado(false);
-        request.setEstado(false);
+        // request.setEstado(false);
 
         return true;
     }

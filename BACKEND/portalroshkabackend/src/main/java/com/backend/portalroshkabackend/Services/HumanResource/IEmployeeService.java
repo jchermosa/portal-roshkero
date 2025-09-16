@@ -11,7 +11,7 @@ public interface IEmployeeService {
     Page<UserDto> getAllActiveEmployees(Pageable pageable);
     Page<UserDto> getAllInactiveEmployees(Pageable pageable);
     Page<UserDto> getAllEmployeesByRol(Pageable pageable);
-    Page<UserDto> getAllEmployeesByTeam(Pageable pageable);
+    // Page<UserDto> getAllEmployeesByTeam(Pageable pageable);
     Page<UserDto> getAllEmployeesByPosition(Pageable pageable);
     UserDto getEmployeeById(int id);
     UserDto addEmployee(UserInsertDto insertDto);

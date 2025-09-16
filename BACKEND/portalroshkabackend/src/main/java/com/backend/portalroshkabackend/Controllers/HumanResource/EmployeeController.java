@@ -16,7 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Set;
 
-@RestController
+@RestController("employeeController")
 @RequestMapping("/api/v1/admin")
 public class EmployeeController {
     private final IEmployeeService employeeService;
@@ -73,7 +73,7 @@ public class EmployeeController {
             case "active" -> users = employeeService.getAllActiveEmployees(pageable);
             case "inactive" -> users = employeeService.getAllInactiveEmployees(pageable);
             case "rol" -> users = employeeService.getAllEmployeesByRol(pageable);
-            case "equipo" -> users = employeeService.getAllEmployeesByTeam(pageable);
+            // case "equipo" -> users = employeeService.getAllEmployeesByTeam(pageable);
             case "cargo" -> users = employeeService.getAllEmployeesByPosition(pageable);
             default -> throw new IllegalArgumentException("Argumento del parametro invalido: " + sortBy);
         }

@@ -16,7 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
-@RestController
+@RestController("cargosController")
 @RequestMapping("/api/v1/admin")
 public class CargosController {
     private final ICargosService cargosService;

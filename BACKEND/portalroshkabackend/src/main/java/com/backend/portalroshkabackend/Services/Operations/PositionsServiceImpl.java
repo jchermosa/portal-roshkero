@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.backend.portalroshkabackend.DTO.Operationes.CargosResponseDto;
 import com.backend.portalroshkabackend.Repositories.CargosRepository;
 
-@Service
+@Service("operationsPositionsService")
 public class PositionsServiceImpl implements IPositionsService {
 
     private final CargosRepository cargosRepository;

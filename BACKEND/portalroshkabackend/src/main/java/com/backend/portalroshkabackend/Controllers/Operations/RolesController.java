@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.DTO.Operationes.RolesResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.IRolesService;
 
-@RestController
+@RestController("rolesController")
 @RequestMapping("/api/v1/admin/operations/rols")
 public class RolesController {
     private final IRolesService rolsService;

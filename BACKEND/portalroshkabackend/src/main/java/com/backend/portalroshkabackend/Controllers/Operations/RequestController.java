@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.DTO.Operationes.RequestResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.IRequestService;
 
-@RestController
+@RestController("operationesRequestController")
 @RequestMapping("/api/v1/admin/operations/request")
 public class RequestController {
     private final IRequestService requestService;

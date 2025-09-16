@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("operationsRequestService")
 public class RequestServiceImpl implements IRequestService {
     private final RequestRepository requestRepository;
 
@@ -30,9 +30,9 @@ public class RequestServiceImpl implements IRequestService {
                     dto.setCantidadDias(request.getCantidadDias());
                     dto.setNumeroAprobaciones(request.getNumeroAprobaciones());
                     dto.setComentario(request.getComentario());
-                    dto.setidSolicitudTipo(request.getidSolicitudTipo());
-                    dto.setEstado(request.getEstado());
-                    dto.setFechaCreacion(request.getFechaCreacion());
+                    // dto.setidSolicitudTipo(request.getidSolicitudTipo());
+                    // dto.setEstado(request.getEstado());
+                    // dto.setFechaCreacion(request.getFechaCreacion());
 
                     return dto;
                 });

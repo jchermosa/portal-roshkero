@@ -19,14 +19,14 @@ public class EquiposRequestDto {
     private Date fechaLimite;
 
     @NotNull(message = "El ID del cliente es obligatorio")
-    private Clientes idCliente;
+    private Integer idCliente;
 
     private EstadoActivoInactivo estado;
 
     public EquiposRequestDto() {
     }
 
-    public EquiposRequestDto(String nombre, Date fechaInicio, Date fechaLimite, Clientes idCliente, EstadoActivoInactivo estado) {
+    public EquiposRequestDto(String nombre, Date fechaInicio, Date fechaLimite, Integer idCliente, EstadoActivoInactivo estado) {
         this.nombre = nombre;
         this.fechaInicio = fechaInicio;
         this.fechaLimite = fechaLimite;
@@ -58,11 +58,11 @@ public class EquiposRequestDto {
         this.fechaLimite = fechaLimite;
     }
 
-    public Clientes getIdCliente() {
+    public Integer getIdCliente() {
         return idCliente;
     }
 
-    public void setIdCliente(Clientes idCliente) {
+    public void setIdCliente(Integer idCliente) {
         this.idCliente = idCliente;
     }
 

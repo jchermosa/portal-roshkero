@@ -15,10 +15,10 @@ import org.springframework.data.domain.Pageable;
 public interface IHumanResourceService {
     // ------ Employees ------
     Page<UserDto> getAllEmployees(Pageable pageable);
-    Page<UserDto> getAllActiveEmployees(Pageable pageable);
-    Page<UserDto> getAllInactiveEmployees(Pageable pageable);
+    // Page<UserDto> getAllActiveEmployees(Pageable pageable);
+    // Page<UserDto> getAllInactiveEmployees(Pageable pageable);
     Page<UserDto> getAllEmployeesByRol(Pageable pageable);
-    Page<UserDto> getAllEmployeesByTeam(Pageable pageable);
+    // Page<UserDto> getAllEmployeesByTeam(Pageable pageable);
     Page<UserDto> getAllEmployeesByPosition(Pageable pageable);
     UserDto getEmployeeById(int id);
     UserDto addEmployee(UserInsertDto insertDto);

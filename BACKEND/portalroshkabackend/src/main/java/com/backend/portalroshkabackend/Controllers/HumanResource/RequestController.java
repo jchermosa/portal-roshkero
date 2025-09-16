@@ -11,7 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController("humanRequestController")
 @RequestMapping("/api/v1/admin")
 public class RequestController {
     private final IRequestService requestService;

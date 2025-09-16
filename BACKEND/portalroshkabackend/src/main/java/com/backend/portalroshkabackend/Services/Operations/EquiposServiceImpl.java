@@ -2,7 +2,6 @@ package com.backend.portalroshkabackend.Services.Operations;
 
 import java.sql.Date;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +16,7 @@ import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 
-@Service
+@Service("operationsEquiposService")
 public class EquiposServiceImpl implements IEquiposService {
     private final EquiposRepository equiposRepository;
     private final ClientesRepository clientesRepository;
@@ -54,51 +53,51 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setNombre(requestDto.getNombre());
         equipo.setFechaInicio(requestDto.getFechaInicio());
         equipo.setFechaLimite(requestDto.getFechaLimite());
-        equipo.setIdCliente(cliente.getIdCliente());
+        equipo.setIdCliente(cliente);
         equipo.setEstado(requestDto.getEstado());
         equipo.setFechaCreacion(new Date(0));
 
-        equiposRepository.save(equipo);
-
-        Equipos savedWithCliente = equiposRepository.findByIdWithCliente(equipo.getIdEquipo())
-                .orElseThrow(() -> new RuntimeException("Team not found after save"));
+        Equipos savedEquipo = equiposRepository.save(equipo);
 
         EquiposResponseDto dto = new EquiposResponseDto();
-        dto.setIdEquipo(savedWithCliente.getIdEquipo());
-        dto.setNombre(savedWithCliente.getNombre());
-        dto.setFechaInicio(savedWithCliente.getFechaInicio());
-        dto.setFechaLimite(savedWithCliente.getFechaLimite());
-        dto.setCliente(savedWithCliente.getCliente()); 
-        dto.setFechaCreacion(savedWithCliente.getFechaCreacion());
-        dto.setEstado(savedWithCliente.getEstado());
+        dto.setIdEquipo(savedEquipo.getIdEquipo());
+        dto.setNombre(savedEquipo.getNombre());
+        dto.setFechaInicio(savedEquipo.getFechaInicio());
+        dto.setFechaLimite(savedEquipo.getFechaLimite());
+        dto.setCliente(savedEquipo.getCliente());
+        dto.setFechaCreacion(savedEquipo.getFechaCreacion());
+        dto.setEstado(savedEquipo.getEstado());
 
         return dto;
     }
 
     @Override
     public EquiposResponseDto updateTeam(int id_equipo, EquiposRequestDto requestDto) {
-        Equipos existingEquipo = equiposRepository.findByIdWithCliente(id_equipo)
+        Equipos existingEquipo = equiposRepository.findById(id_equipo)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
+                .orElseThrow(() -> new RuntimeException("Cliente not found"));
 
         existingEquipo.setNombre(requestDto.getNombre());
         existingEquipo.setFechaInicio(requestDto.getFechaInicio());
         existingEquipo.setFechaLimite(requestDto.getFechaLimite());
-        existingEquipo.setIdCliente(requestDto.getIdCliente());
+        existingEquipo.setIdCliente(cliente);
         existingEquipo.setEstado(requestDto.getEstado());
 
         equiposRepository.save(existingEquipo);
 
-        Equipos updatedWithCliente = equiposRepository.findByIdWithCliente(id_equipo)
+        Equipos updatedEquipo = equiposRepository.findById(id_equipo)
                 .orElseThrow(() -> new RuntimeException("Team not found after update"));
 
         EquiposResponseDto dto = new EquiposResponseDto();
-        dto.setIdEquipo(updatedWithCliente.getIdEquipo());
-        dto.setNombre(updatedWithCliente.getNombre());
-        dto.setFechaInicio(updatedWithCliente.getFechaInicio());
-        dto.setFechaLimite(updatedWithCliente.getFechaLimite());
-        dto.setCliente(updatedWithCliente.getCliente()); 
-        dto.setFechaCreacion(updatedWithCliente.getFechaCreacion());
-        dto.setEstado(updatedWithCliente.getEstado());
+        dto.setIdEquipo(updatedEquipo.getIdEquipo());
+        dto.setNombre(updatedEquipo.getNombre());
+        dto.setFechaInicio(updatedEquipo.getFechaInicio());
+        dto.setFechaLimite(updatedEquipo.getFechaLimite());
+        dto.setCliente(updatedEquipo.getCliente());
+        dto.setFechaCreacion(updatedEquipo.getFechaCreacion());
+        dto.setEstado(updatedEquipo.getEstado());
 
         return dto;
     }

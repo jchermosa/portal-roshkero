@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.backend.portalroshkabackend.DTO.Operationes.RolesResponseDto;
 import com.backend.portalroshkabackend.Repositories.RolesRepository;
 
-@Service
+@Service("operationsRolesService")
 public class RolesServiceImpl implements IRolesService {
     private final RolesRepository rolesRepository;
 

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.DTO.Operationes.CargosResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.IPositionsService;
 
-@RestController
+@RestController("positionsController")
 @RequestMapping("/api/v1/admin/operations/positions")
 public class PositionsController {
 

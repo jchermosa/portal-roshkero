@@ -21,7 +21,7 @@ import com.backend.portalroshkabackend.Services.Operations.IEquiposService;
 
 import jakarta.validation.Valid;
 
-@RestController
+@RestController("equiposController")
 @RequestMapping("/api/v1/admin/operations/teams")
 public class EquiposController {
 
