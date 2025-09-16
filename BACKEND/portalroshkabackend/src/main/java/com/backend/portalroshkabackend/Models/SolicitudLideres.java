@@ -2,15 +2,12 @@ package com.backend.portalroshkabackend.Models;
 
 import java.sql.Date;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 
 @Entity
@@ -19,23 +16,25 @@ import lombok.NoArgsConstructor;
 @Table(name = "solicitud_lideres")
 public class SolicitudLideres {
 
-
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Integer idSolicitudLideres;
+    private Integer idSolicitudLider;
 
-    @JoinColumn(name = "id_solicitud")
+    @JoinColumn(name = "id_lider")
+    @OneToOne
+    private Usuario usuario;
+
+    @JoinColumn(name = "id_solicitud_th")
     @ManyToOne
-    private SolicitudesTH idSolicitud;
+    private SolicitudesTH solicitudesTH;
 
-    
-    @JoinColumn(name = "id_usuario")
-    @ManyToOne
-    private  Usuario idUsuario;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", columnDefinition = "estado_solicitud_enum")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private EstadoSolicitudEnum estado;
 
-
-    @Column(name = "fecha_asignacion")
-    private Date finVigencia;
+    @Column(name = "fecha_creacion")
+    private Date fechaCreacion;
 
     
 }

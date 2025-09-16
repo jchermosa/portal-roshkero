@@ -1,8 +1,10 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Solicitudes;
+import com.backend.portalroshkabackend.Models.SolicitudesTH;
 import com.backend.portalroshkabackend.Models.Usuario;
 
 public class AutoMap {
@@ -43,6 +45,25 @@ public class AutoMap {
         return requestDto;
     }
 
+    public static SolicitudTHResponseDto toSolicitudTHResponseDto(SolicitudesTH solicitudesTH){
+        SolicitudTHResponseDto dto = new SolicitudTHResponseDto();
+
+        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
+        dto.setFechaInicio(solicitudesTH.getFechaInicio());
+        dto.setFechaFin(solicitudesTH.getFechaFin());
+        dto.setUsuario(solicitudesTH.getUsuario());
+        dto.setCantidadDias(solicitudesTH.getCantidadDias());
+        dto.setAprobacionTH(solicitudesTH.getAprobacionTH());
+        dto.setComentario(solicitudesTH.getComentario());
+        dto.setSolicitudThTipo(solicitudesTH.getSolicitudThTipo());
+        dto.setEstado(solicitudesTH.getEstado());
+        dto.setFechaCreacion(solicitudesTH.getFechaCreacion());
+        dto.setPermisos(solicitudesTH.getPermisos());
+        dto.setBeneficios(solicitudesTH.getBeneficios());
+
+        return dto;
+
+    }
     public static PositionDto toPositionDto(Cargos position){
         PositionDto positionDto = new PositionDto();
 

@@ -28,7 +28,7 @@ public class SolicitudesTH {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    @Column(name = "id_solicitud")
+    @Column(name = "id_solicitud_th")
     private Integer idSolicitudTH;
 
 
@@ -40,7 +40,7 @@ public class SolicitudesTH {
 
     @JoinColumn(name = "id_usuario")
     @ManyToOne
-    private Usuario idUsuario;
+    private Usuario usuario;
 
     @Column(name = "cantidad_dias")
     private Integer cantidadDias;
@@ -52,8 +52,8 @@ public class SolicitudesTH {
     private String comentario;
 
     @ManyToOne
-    @JoinColumn(name = "id_solicitud_tipo")
-    private SolicitudThTipo idSolicitudTipo;
+    @JoinColumn(name = "id_solicitud_th_tipo")
+    private SolicitudThTipo solicitudThTipo;
 
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente
     @Enumerated(EnumType.STRING)
@@ -66,9 +66,9 @@ public class SolicitudesTH {
 
     @ManyToOne
     @JoinColumn(name = "id_permiso")
-    private Permisos idPermiso;
+    private Permisos permisos;
 
     @ManyToOne
     @JoinColumn(name = "id_beneficio")
-    private Beneficios idBeneficio;
+    private Beneficios beneficios;
 }

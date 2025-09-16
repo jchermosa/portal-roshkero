@@ -2,6 +2,8 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
+import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
+import com.backend.portalroshkabackend.Models.SolicitudesTH;
 import com.backend.portalroshkabackend.Services.HumanResource.IRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,13 +26,24 @@ public class RequestController {
     }
 
     @GetMapping("/th/users/request")
-    public ResponseEntity<Page<RequestDto>> getAllRequests(
+    public ResponseEntity<Page<RequestDto>> getAllTHRequests(
             @PageableDefault(size = 10, sort = "idSolicitud", direction = Sort.Direction.ASC) Pageable pageable
     ){
-        Page<RequestDto> requests = requestService.getAllRequests(pageable);
+        Page<RequestDto> requests = requestService.getAllRequests(pageable); // Solicitud Enviar -> Aprueba Lider/es -> Aparece en TH para aprobar / rechazar
+
 
         return ResponseEntity.ok(requests);
     }
+
+    @GetMapping("/th/users/request/leader/approved")
+    public ResponseEntity<?> getApprovedByLeader(
+            @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
+    ){
+        Page<SolicitudTHResponseDto> requests = requestService.getApprovedByLeader(pageable);
+
+        return ResponseEntity.ok(requests);
+    }
+
 
     @PostMapping("/th/users/request/{id}/accept")
     public ResponseEntity<?> acceptRequest(@PathVariable int idRequest){
@@ -62,8 +75,8 @@ public class RequestController {
         return ResponseEntity.ok("agregar nuevo tipo de request") ;
     }
 
-    //TODO: Tipo de solicitudes, GET:Solicitudes aprobadas por lideres{
-    //  PENDIENTES, FECHA}
+    //TODO: Tipo de solicitudes,
+    // GET:Solicitudes aprobadas por lideres{PENDIENTES, FECHA}
 
 
     //TODO: dias disponibles{id}, dias totales de vacaciones, historial de solicitudes

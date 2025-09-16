@@ -2,9 +2,13 @@ package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
+import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.Models.SolicitudLideres;
 import com.backend.portalroshkabackend.Models.Solicitudes;
+import com.backend.portalroshkabackend.Models.SolicitudesTH;
 import com.backend.portalroshkabackend.Repositories.RequestRepository;
+import com.backend.portalroshkabackend.Repositories.SolicitudesTHRepository;
 import com.backend.portalroshkabackend.tools.SaveManager;
 import com.backend.portalroshkabackend.tools.errors.errorslist.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
@@ -18,13 +22,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class RequestServiceImpl implements IRequestService{
     private final RequestRepository requestRepository;
+    private final SolicitudesTHRepository solicitudesTHRepository;
 
     private final Validator validator;
 
     @Autowired
     public RequestServiceImpl (RequestRepository requestRepository,
+                              SolicitudesTHRepository solicitudesTHRepository,
                               Validator validator){
         this.requestRepository = requestRepository;
+        this.solicitudesTHRepository = solicitudesTHRepository;
 
         this.validator = validator;
     }
@@ -34,6 +41,13 @@ public class RequestServiceImpl implements IRequestService{
     public Page<RequestDto> getAllRequests(Pageable pageable) {
         Page<Solicitudes> requests = requestRepository.findAll(pageable);
         return requests.map(AutoMap::toRequestDto); // Retorna todas las solicitudes (DTOs)
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<SolicitudTHResponseDto> getApprovedByLeader(Pageable pageable) {
+        Page<SolicitudesTH> requests = solicitudesTHRepository.findAllByEstadoLiderAndEstadoTh(EstadoSolicitudEnum.P, EstadoSolicitudEnum.P, pageable);
+        return requests.map(AutoMap::toSolicitudTHResponseDto);
     }
 
     @Transactional

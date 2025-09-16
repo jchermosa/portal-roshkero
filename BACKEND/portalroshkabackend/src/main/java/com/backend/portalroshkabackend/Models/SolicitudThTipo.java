@@ -16,8 +16,8 @@ public class SolicitudThTipo {
     
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    @Column(name = "id_solicitud_tipo")
-    private Integer idSolicitudTipo;
+    @Column(name = "id_solicitud_th_tipo")
+    private Integer idSolicitudTHTipo;
 
     @Column(name = "nombre")
     private String nombre;
