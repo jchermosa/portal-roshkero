@@ -2,7 +2,7 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
-import com.backend.portalroshkabackend.Services.HumanResource.ITHService;
+import com.backend.portalroshkabackend.Services.HumanResource.IThSelfService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,33 +20,12 @@ import java.util.Set;
 @RequestMapping("/api/v1/admin")
 public class EmployeeController {
     private final IEmployeeService employeeService;
-    private final ITHService thService;
 
      @Autowired
     public EmployeeController(IEmployeeService employeeService,
-                              ITHService thService){
+                              IThSelfService thService){
          this.employeeService = employeeService;
-         this.thService = thService;
      }
-
-    // ----------------- Me -----------------
-    @PutMapping("th/me/update/{id}")
-    public ResponseEntity<?> updateMe(
-            @RequestParam(value = "newEmail", required = false) String newEmail,
-            @RequestParam(value = "newPhone", required = false) String newPhone,
-            @PathVariable int id
-    )
-    {
-        if (newEmail != null){
-            EmailUpdatedDto dto = thService.updateEmail(id, newEmail);
-            return ResponseEntity.ok(dto);
-        } else if (newPhone != null) {
-            PhoneUpdatedDto dto = thService.updatePhone(id, newPhone);
-            return ResponseEntity.ok(dto);
-        }
-
-        return ResponseEntity.badRequest().build();
-    }
 
     // ----------------- Users -----------------
     @GetMapping("/th/users")

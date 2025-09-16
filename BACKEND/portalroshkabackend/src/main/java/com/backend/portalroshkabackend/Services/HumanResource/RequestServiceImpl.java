@@ -2,10 +2,7 @@ package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
-import com.backend.portalroshkabackend.DTO.th.BenefitsTypesResponseDto;
-import com.backend.portalroshkabackend.DTO.th.DevicesTypesResponseDto;
-import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
-import com.backend.portalroshkabackend.DTO.th.SolicitudTHTipoResponseDto;
+import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.Models.Beneficios;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Solicitudes;
@@ -31,6 +28,7 @@ public class RequestServiceImpl implements IRequestService{
     private final BeneficiosRepository beneficiosRepository;
     private final TipoDispositivoRepository tipoDispositivoRepository;
     private final SolicitudTHTipoRepository solicitudTHTipoRepository;
+    private final PermisosRepository permisosRepository;
 
     private final Validator validator;
 
@@ -40,12 +38,14 @@ public class RequestServiceImpl implements IRequestService{
                               BeneficiosRepository beneficiosRepository,
                               TipoDispositivoRepository tipoDispositivoRepository,
                               SolicitudTHTipoRepository solicitudTHTipoRepository,
+                              PermisosRepository permisosRepository,
                               Validator validator){
         this.requestRepository = requestRepository;
         this.solicitudesTHRepository = solicitudesTHRepository;
         this.beneficiosRepository = beneficiosRepository;
         this.tipoDispositivoRepository = tipoDispositivoRepository;
         this.solicitudTHTipoRepository = solicitudTHTipoRepository;
+        this.permisosRepository = permisosRepository;
 
         this.validator = validator;
     }
@@ -64,21 +64,7 @@ public class RequestServiceImpl implements IRequestService{
         return requests.map(AutoMap::toSolicitudTHResponseDto);
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public List<BenefitsTypesResponseDto> getAllBenefitsTypes() {
-        return beneficiosRepository.findAll().stream().map(AutoMap::toBenefitsResponseDto).toList();
-    }
 
-    @Override
-    public List<DevicesTypesResponseDto> getAllDevicesTypes() {
-        return tipoDispositivoRepository.findAll().stream().map(AutoMap::toDevicesTypesResponseDto).toList();
-    }
-
-    @Override
-    public List<SolicitudTHTipoResponseDto> getAllPermissionsTypes() {
-        return solicitudTHTipoRepository.findAll().stream().map(AutoMap::toSolicitudTHTipoResponseDto).toList();
-    }
 
     @Override
     public Page<SolicitudTHResponseDto> getByEstado(EstadoSolicitudEnum estado, Pageable pageable) {

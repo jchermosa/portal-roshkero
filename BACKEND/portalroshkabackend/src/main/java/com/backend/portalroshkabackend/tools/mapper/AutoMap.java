@@ -1,11 +1,12 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.*;
-import com.backend.portalroshkabackend.DTO.th.BenefitsTypesResponseDto;
-import com.backend.portalroshkabackend.DTO.th.DevicesTypesResponseDto;
-import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
-import com.backend.portalroshkabackend.DTO.th.SolicitudTHTipoResponseDto;
+import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.Models.*;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+
+import java.sql.Date;
+import java.time.LocalDate;
 
 public class AutoMap {
     public static UserDto toUserDto(Usuario user) {
@@ -101,6 +102,16 @@ public class AutoMap {
         return dto;
     }
 
+    public static PermissionsTypesResponseDto toPermissionsTypesResponseDto(Permisos permisos){
+        PermissionsTypesResponseDto dto = new PermissionsTypesResponseDto();
+
+        dto.setIdPermiso(permisos.getIdPermiso());
+        dto.setNombre(permisos.getNombre());
+        dto.setCantDias(permisos.getCantDias());
+
+        return dto;
+    }
+
     public static PositionDto toPositionDto(Cargos position){
         PositionDto positionDto = new PositionDto();
 
@@ -155,11 +166,25 @@ public class AutoMap {
         user.setNroCedula(updateDto.getNroCedula());
         user.setCorreo(updateDto.getCorreo());
         user.setRoles(updateDto.getRoles());
-        user.setFechaIngreso(updateDto.getFechaIngreso()); // TODO: Preguntar si usar PUT o PATCH
+        user.setFechaIngreso(updateDto.getFechaIngreso());
         user.setEstado(updateDto.getEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
         user.setCargos(updateDto.getCargos());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
+    }
+
+    public static void toSolicitudesThFromSendDto(SolicitudesTH solicitudesTH, SendSolicitudDto dto){
+        solicitudesTH.setFechaInicio(dto.getFechaInicio());
+        solicitudesTH.setUsuario(dto.getUsuario());
+        solicitudesTH.setCantidadDias(dto.getCantidadDias());
+        solicitudesTH.setAprobacionTH(false);
+        solicitudesTH.setComentario(dto.getComentario());
+        solicitudesTH.setSolicitudThTipo(dto.getSolicitudThTipo());
+        solicitudesTH.setEstado(EstadoSolicitudEnum.P);
+        solicitudesTH.setFechaCreacion(Date.valueOf(LocalDate.now()));
+        solicitudesTH.setPermisos(dto.getPermisos());
+        solicitudesTH.setBeneficios(dto.getBeneficios());
+
     }
 }
