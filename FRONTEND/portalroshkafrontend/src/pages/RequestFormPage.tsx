@@ -2,180 +2,109 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DynamicForm from "../components/DynamicForm";
-import type { FormSection } from "../components/DynamicForm";
-import mockTipos from "../data/mockTipoSolicitudes.json";
-import { AsignadorEntidad } from "../components/Assigner";
 import FormLayout from "../layouts/FormLayout";
+import { AsignadorEntidad } from "../components/Assigner";
+import mockTipos from "../data/mockTipoSolicitudes.json";
+import mockLideres from "../data/mockLideres.json";
+import mockSolicitudes from "../data/mockSolicitudes.json";
+import type { CatalogItem } from "../types";
 
-interface CatalogItem {
+interface LiderItem extends CatalogItem {
+  aprobado: boolean;
+}
+
+interface SolicitudItem {
   id: number;
-  nombre: string;
+  id_usuario: number;
+  id_solicitud_tipo: number | null; // <-- ahora acepta null
+  tipo?: CatalogItem;
+  cantidad_dias: number | null;
+  fecha_inicio: string;
+  fecha_fin: string;
+  comentario: string;
+  estado: "P" | "A" | "R";
+  numero_aprobaciones: number;
+  lideres: LiderItem[];
 }
 
 export default function SolicitudFormPage() {
-  const { token, user } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const { id } = useParams();
+  const navigate = useNavigate();
   const isEditing = !!id;
 
-  const [tipos, setTipos] = useState<CatalogItem[]>([]);
-  const [lideres, setLideres] = useState<CatalogItem[]>([]);
-  const [lideresAsignados, setLideresAsignados] = useState<CatalogItem[]>([]);
+  const modoDesarrollo = true; // 👈 cambiar a false cuando haya backend
+
+  const [solicitudes, setSolicitudes] = useState<SolicitudItem[]>(
+      mockSolicitudes.map((s) => ({
+        ...s,
+        estado: s.estado as "P" | "A" | "R", // forzar tipo
+        tipo: s.tipo ?? mockTipos.find((t) => t.id === s.id_solicitud_tipo), // opcional
+    }))
+  );
+  const [tipos, setTipos] = useState<CatalogItem[]>(mockTipos);
+  const [lideres, setLideres] = useState<LiderItem[]>(mockLideres as LiderItem[]);
+  const [lideresAsignados, setLideresAsignados] = useState<LiderItem[]>([]);
   const [tipoSeleccionado, setTipoSeleccionado] = useState<number | null>(null);
-  const [cantidadDias, setCantidadDias] = useState<number | null>(null);
   const [cantidadEditable, setCantidadEditable] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
-  const [initialData, setInitialData] = useState<Record<string, any>>({
-    id_solicitud_tipo: "",
+  const [formData, setFormData] = useState<Partial<SolicitudItem>>({
+    id_solicitud_tipo: null,
     cantidad_dias: null,
     fecha_inicio: "",
     fecha_fin: "",
     comentario: "",
-    id_lideres: [],
   });
 
-  const modoDesarrollo = true;
-
-  // Cargar tipos de solicitud
+  // --- Cargar datos si es edición ---
   useEffect(() => {
-    if (modoDesarrollo) {
-      setTipos(mockTipos);
-      return;
+    if (isEditing && id) {
+      if (modoDesarrollo) {
+        const s = solicitudes.find((sol) => sol.id === Number(id));
+        if (s) {
+          setFormData(s);
+          setLideresAsignados(s.lideres);
+          setTipoSeleccionado(s.id_solicitud_tipo);
+        } else {
+          alert("Solicitud no encontrada (mock).");
+          navigate("/requests");
+        }
+      } else {
+        // Aquí iría el fetch a la API cuando esté disponible
+      }
     }
+  }, [id]);
 
-    if (!token) return;
+  // --- Calcular cantidad de días según tipo ---
+  const calcularCantidadDias = (nombre: string): { dias: number | null; editable: boolean } => {
+    let dias: number | null = null;
+    let editable = false;
+    if (nombre.includes("Paternidad")) dias = 14;
+    else if (nombre.includes("Maternidad")) dias = 150;
+    else if (nombre.includes("Cumpleanos")) dias = 1;
+    else if (nombre.includes("Matrimonio")) dias = 5;
+    else if (nombre.includes("Luto(1er grado)")) dias = 5;
+    else if (nombre.includes("Luto(2do grado)")) dias = 3;
+    else if (["Capacitacion", "Examenes", "Reposo", "Otros"].some((k) => nombre.includes(k)))
+      editable = true;
 
-    setLoading(true);
-    fetch("/api/tipo-solicitud", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setTipos(data))
-      .catch((err) => console.error("Error al cargar tipos:", err))
-      .finally(() => setLoading(false));
-  }, [token]);
+    return { dias, editable };
+  };
 
-  // Cargar líderes disponibles
-  useEffect(() => {
-    if (modoDesarrollo) {
-      setLideres([
-        { id: 1, nombre: "Ana" },
-        { id: 2, nombre: "Carlos" },
-        { id: 3, nombre: "Lucía" },
-      ]);
-      return;
-    }
-
-    fetch("/api/lideres", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setLideres(data))
-      .catch((err) => console.error("Error al cargar líderes:", err));
-  }, [token]);
-
-  // Cargar datos si estás editando
-  useEffect(() => {
-    if (!isEditing || modoDesarrollo || !token) return;
-
-    setLoading(true);
-    fetch(`/api/solicitudes/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setInitialData({
-          id_solicitud_tipo: data.id_solicitud_tipo,
-          cantidad_dias: data.cantidad_dias,
-          fecha_inicio: data.fecha_inicio,
-          fecha_fin: data.fecha_fin,
-          comentario: data.comentario,
-          id_lideres: data.id_lideres ?? [],
-        });
-        setTipoSeleccionado(data.id_solicitud_tipo);
-        setLideresAsignados(data.id_lideres ?? []);
-      })
-      .catch((err) => console.error("Error al cargar solicitud:", err))
-      .finally(() => setLoading(false));
-  }, [id, isEditing, token]);
-
-  // Actualizar cantidad de días según tipo
+  // --- Actualizar cantidad y editable si cambió el tipo ---
   useEffect(() => {
     const tipo = tipos.find((t) => t.id === tipoSeleccionado);
     const nombre = tipo?.nombre ?? "";
-
-    let nuevaCantidad: number | null = null;
-    let editable = false;
-
-    if (nombre.includes("Paternidad")) {
-      nuevaCantidad = 14;
-    } else if (nombre.includes("Maternidad")) {
-      nuevaCantidad = 150;
-    } else if (nombre.includes("Cumpleanos")) {
-      nuevaCantidad = 1;
-    } else if (nombre.includes("Matrimonio")) {
-      nuevaCantidad = 5;
-    } else if (nombre.includes("Luto(1er grado)")) {
-      nuevaCantidad = 5;
-    } else if (nombre.includes("Luto(2do grado)")) {
-      nuevaCantidad = 3;
-    } else if (["Capacitacion", "Examenes", "Reposo", "Otros"].some((k) => nombre.includes(k))) {
-      editable = true;
-    }
-
+    const { dias, editable } = calcularCantidadDias(nombre);
     setCantidadEditable(editable);
-    setCantidadDias(nuevaCantidad);
+    setFormData((prev) => ({
+      ...prev,
+      id_solicitud_tipo: tipoSeleccionado ?? undefined, // ahora compatible
+      cantidad_dias: editable ? prev.cantidad_dias : dias,
+    }));
+  }, [tipoSeleccionado]);
 
-    if (!isEditing || !initialData.cantidad_dias) {
-      setInitialData((prev) => ({
-        ...prev,
-        id_solicitud_tipo: tipoSeleccionado ?? "",
-        cantidad_dias: editable ? undefined : nuevaCantidad,
-      }));
-    }
-  }, [tipoSeleccionado, tipos]);
-
-  // Enviar o actualizar solicitud
-  const handleSubmit = async (formData: Record<string, any>) => {
-    const payload = {
-      id_usuario: user?.id,
-      id_solicitud_tipo: formData.id_solicitud_tipo,
-      cantidad_dias: formData.cantidad_dias ?? cantidadDias,
-      fecha_inicio: formData.fecha_inicio,
-      fecha_fin: formData.fecha_fin,
-      comentario: formData.comentario,
-      estado: "P",
-      numero_aprobaciones: 0,
-      id_lideres: lideresAsignados.map((l) => l.id),
-    };
-
-    if (modoDesarrollo) {
-      console.log(isEditing ? "Edición simulada:" : "Creación simulada:", payload);
-      alert(isEditing ? "Solicitud simulada actualizada." : "Solicitud simulada enviada.");
-      navigate("/requests");
-      return;
-    }
-
-    const url = isEditing ? `/api/solicitudes/${id}` : "/api/solicitudes";
-    const method = isEditing ? "PUT" : "POST";
-
-    const res = await fetch(url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) throw new Error(await res.text());
-
-    alert(isEditing ? "Solicitud actualizada correctamente." : "Solicitud creada correctamente.");
-    navigate("/requests");
-  };
-
-  // Secciones del formulario
-  const getSections = (): FormSection[] => [
+  // --- Generar secciones para DynamicForm ---
+  const getSections = (): any[] => [
     {
       title: isEditing ? "Editar Solicitud" : "Nueva Solicitud",
       icon: "📅",
@@ -183,43 +112,41 @@ export default function SolicitudFormPage() {
         {
           name: "id_solicitud_tipo",
           label: "Tipo de solicitud",
-          type: "select",
+          type: "select" as const,
           required: true,
-          options: tipos
-            .filter((t) => t.nombre.toLowerCase() !== "vacaciones")
-            .map((t) => ({ value: t.id, label: t.nombre })),
+          options: tipos.map((t) => ({ value: t.id, label: t.nombre })),
           placeholder: "Seleccionar...",
         },
         {
           name: "cantidad_dias",
           label: "Cantidad de días",
-          type: "number",
+          type: "number" as const,
           required: false,
           disabled: !cantidadEditable,
         },
         {
           name: "fecha_inicio",
           label: "Fecha de inicio",
-          type: "date",
+          type: "date" as const,
           required: true,
         },
         {
           name: "fecha_fin",
           label: "Fecha de fin",
-          type: "date",
+          type: "date" as const,
           required: true,
         },
         {
           name: "comentario",
           label: "Comentario",
-          type: "textarea",
+          type: "textarea" as const,
           fullWidth: true,
           required: true,
         },
         {
           name: "lideres_custom",
           label: "Líderes asignados",
-          type: "custom",
+          type: "custom" as const,
           fullWidth: true,
           render: () => (
             <AsignadorEntidad
@@ -234,27 +161,54 @@ export default function SolicitudFormPage() {
     },
   ];
 
+  // --- Guardar la solicitud ---
+  const handleSubmit = async (data: Partial<SolicitudItem>) => {
+    const payload: SolicitudItem = {
+      ...data,
+      id_usuario: user?.id ?? 0,
+      estado: "P",
+      numero_aprobaciones: 0,
+      lideres: lideresAsignados,
+      id: isEditing ? Number(id) : Date.now(),
+    } as SolicitudItem;
+
+    if (modoDesarrollo) {
+      if (isEditing) {
+        setSolicitudes((prev) =>
+          prev.map((s) => (s.id === Number(id) ? payload : s))
+        );
+        alert("✅ Solicitud editada correctamente (mock).");
+      } else {
+        setSolicitudes((prev) => [...prev, payload]);
+        alert("✅ Solicitud creada correctamente (mock).");
+      }
+    } else {
+      // Aquí iría el fetch a la API
+    }
+
+    navigate("/requests");
+  };
+
   return (
     <FormLayout
       title={isEditing ? "Editar Solicitud" : "Crear Solicitud"}
-      subtitle={isEditing ? "Modifica los campos necesarios" : "Completá la información de la nueva solicitud"}
+      subtitle={
+        isEditing
+          ? "Modifica los campos necesarios"
+          : "Completá la información de la nueva solicitud"
+      }
       icon={isEditing ? "✏️" : "🧑‍💻"}
       onCancel={() => navigate("/requests")}
       onSubmitLabel={isEditing ? "Guardar cambios" : "Enviar solicitud"}
     >
       <DynamicForm
-        id="dynamic-form"
+        key={isEditing ? `form-${id}` : "form-nuevo"}
+        id="solicitud-form"
         sections={getSections()}
-        initialData={initialData}
-        onChange={(data) => {
-          const id = data.id_solicitud_tipo;
-          setTipoSeleccionado(id ? Number(id) : null);}}
-         onSubmit={handleSubmit}
-         onCancel={() => navigate("/requests")}
-         loading={loading}
-         submitLabel="Enviar solicitud"
-         className="flex-1 overflow-hidden"
-            />
-      </FormLayout>
+        initialData={formData}
+        onSubmit={handleSubmit}
+        onChange={(data) => setFormData(data)}
+      />
+    </FormLayout>
   );
 }
