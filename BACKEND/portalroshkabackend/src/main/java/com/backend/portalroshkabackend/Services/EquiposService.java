@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Repositories.EquiposRepository;
-import com.backend.portalroshkabackend.DTO.EquiposResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 
 @Service
 public class EquiposService {

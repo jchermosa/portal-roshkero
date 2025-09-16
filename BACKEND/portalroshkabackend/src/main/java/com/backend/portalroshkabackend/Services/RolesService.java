@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.backend.portalroshkabackend.Models.Roles;
 import com.backend.portalroshkabackend.Repositories.RolesRepository;
-import com.backend.portalroshkabackend.DTO.RolesResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.RolesResponseDto;
 
 @Service
 public class RolesService {
@@ -26,7 +26,7 @@ public class RolesService {
     
     private RolesResponseDto mapToRolesResponseDto(Roles rol) {
         RolesResponseDto dto = new RolesResponseDto();
-        dto.setIdRol(rol.getIdRol());
+        dto.setIdRole(rol.getIdRol());
         dto.setNombre(rol.getNombre());
         return dto;
     }

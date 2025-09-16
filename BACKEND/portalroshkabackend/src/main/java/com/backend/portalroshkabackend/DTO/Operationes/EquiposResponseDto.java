@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 
 import com.backend.portalroshkabackend.Models.Clientes;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 public class EquiposResponseDto {
 
@@ -13,14 +14,14 @@ public class EquiposResponseDto {
     private Date fechaLimite;
     // private int idCliente;
     private Clientes cliente;
-    private LocalDateTime fechaCreacion;
-    private boolean estado;
+    private Date fechaCreacion;
+    private EstadoActivoInactivo estado;
 
     public EquiposResponseDto() {
     }
 
     public EquiposResponseDto(String nombre, Date fechaInicio, Date fechaLimite,
-            Clientes cliente, LocalDateTime fechaCreacion, boolean estado) {
+            Clientes cliente, Date fechaCreacion, EstadoActivoInactivo estado) {
         this.nombre = nombre;
         this.fechaInicio = fechaInicio;
         this.fechaLimite = fechaLimite;
@@ -78,19 +79,19 @@ public class EquiposResponseDto {
         this.cliente = cliente;
     }
 
-    public LocalDateTime getFechaCreacion() {
+    public Date getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+    public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public boolean isEstado() {
+    public EstadoActivoInactivo isEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(EstadoActivoInactivo estado) {
         this.estado = estado;
     }
 }

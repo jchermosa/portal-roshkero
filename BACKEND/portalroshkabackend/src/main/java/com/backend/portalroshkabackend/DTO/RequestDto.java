@@ -7,13 +7,12 @@ public class RequestDto {
     private int idSolicitud;
     private Date fechaInicio;
     private Date fechaFin;
-    private EstadoSolicitudEnum estado;
     private int idUsuario;
     private int cantidadDias;
     private int numeroAprobaciones;
     private String comentario;
     private int idSolicitudTipo;
-    private EstadoSolicitud estado;
+    private EstadoSolicitudEnum estado;
     private Date fechaCreacion;
 
     public int getIdSolicitud() {
