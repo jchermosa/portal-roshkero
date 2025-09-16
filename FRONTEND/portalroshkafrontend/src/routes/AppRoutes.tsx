@@ -43,6 +43,7 @@ export default function AppRoutes() {
               <Route path="/benefits" element={<BeneficiosPage />} />
               <Route path="/configuracion" element={<Configuration />} />
               <Route path="/requests/nuevo" element={<RequestFormPage />} />
+              <Route path="/requests/:id" element={<RequestFormPage />} />
               <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
 
