@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Table(name = "tipo_dispositivo")
-public class tipoDispositivo {
+public class TipoDispositivo {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_tipo_inventario")
+    @Column(name = "id_tipo_dispositivo")
     private Integer idInventario;
 
     @Column(name = "nombre")

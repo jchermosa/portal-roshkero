@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.portalroshkabackend.DTO.InventarioAsignadoDto;
 import com.backend.portalroshkabackend.Models.DispositivoAsignado;
 import com.backend.portalroshkabackend.Repositories.InventarioAsignadoRepository;
-import com.backend.portalroshkabackend.Repositories.DispositivoRepository;
+import com.backend.portalroshkabackend.Repositories.TipoDispositivoRepository;
 
 @Service
 public class InventarioAsignadoService {
@@ -15,12 +15,12 @@ public class InventarioAsignadoService {
     private InventarioAsignadoRepository inventarioAsignadoRepository;
     
     @Autowired
-    private DispositivoRepository dispositivoRepository;
+    private TipoDispositivoRepository tipoDispositivoRepository;
 
     public InventarioAsignadoService(InventarioAsignadoRepository inventarioAsignadoRepository,
-                                   DispositivoRepository dispositivoRepository) {
+                                   TipoDispositivoRepository tipoDispositivoRepository) {
         this.inventarioAsignadoRepository = inventarioAsignadoRepository;
-        this.dispositivoRepository = dispositivoRepository;
+        this.tipoDispositivoRepository = tipoDispositivoRepository;
     }
 
     @Transactional
@@ -38,7 +38,7 @@ public class InventarioAsignadoService {
         
         // Buscar y asignar el tipo de dispositivo por ID
         if (inventarioAsignadoDto.getIdInventario() != null) {
-            dispositivoRepository.findById(inventarioAsignadoDto.getIdInventario())
+            tipoDispositivoRepository.findById(inventarioAsignadoDto.getIdInventario())
                 .ifPresent(inventarioAsignado::setIdTipoDispositivo);
         }
         

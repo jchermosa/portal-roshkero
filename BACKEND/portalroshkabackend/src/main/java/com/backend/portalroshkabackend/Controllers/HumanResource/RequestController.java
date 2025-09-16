@@ -2,8 +2,10 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
+import com.backend.portalroshkabackend.DTO.th.BenefitsTypesResponseDto;
+import com.backend.portalroshkabackend.DTO.th.DevicesTypesResponseDto;
 import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
-import com.backend.portalroshkabackend.Models.SolicitudesTH;
+import com.backend.portalroshkabackend.DTO.th.SolicitudTHTipoResponseDto;
 import com.backend.portalroshkabackend.Services.HumanResource.IRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,7 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.function.ToDoubleBiFunction;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -35,8 +37,8 @@ public class RequestController {
         return ResponseEntity.ok(requests);
     }
 
-    @GetMapping("/th/users/request/leader/approved")
-    public ResponseEntity<?> getApprovedByLeader(
+    @GetMapping("/th/users/requests/leader/approved")
+    public ResponseEntity<Page<SolicitudTHResponseDto>> getApprovedByLeader(
             @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
     ){
         Page<SolicitudTHResponseDto> requests = requestService.getApprovedByLeader(pageable);
@@ -44,6 +46,26 @@ public class RequestController {
         return ResponseEntity.ok(requests);
     }
 
+    @GetMapping("/th/benefits/types")
+    public ResponseEntity<List<BenefitsTypesResponseDto>> getAllBenefitsTypes(){
+        List<BenefitsTypesResponseDto> benefits = requestService.getAllBenefitsTypes();
+
+        return ResponseEntity.ok(benefits);
+    }
+
+    @GetMapping("/th/devices/types")
+    public ResponseEntity<List<DevicesTypesResponseDto>> getAllDevicesTypes(){
+        List<DevicesTypesResponseDto> benefits = requestService.getAllDevicesTypes();
+
+        return ResponseEntity.ok(benefits);
+    }
+
+    @GetMapping("/th/permission/types")
+    public ResponseEntity<List<SolicitudTHTipoResponseDto>> getAllPermissionsTypes(){
+        List<SolicitudTHTipoResponseDto> permissions = requestService.getAllPermissionsTypes();
+
+        return ResponseEntity.ok(permissions);
+    }
 
     @PostMapping("/th/users/request/{id}/accept")
     public ResponseEntity<?> acceptRequest(@PathVariable int idRequest){
@@ -76,7 +98,7 @@ public class RequestController {
     }
 
     //TODO: Tipo de solicitudes,
-    // GET:Solicitudes aprobadas por lideres{PENDIENTES, FECHA}
+    // GET:Solicitudes aprobadas por lideres{PENDIENTES, FECHA} - CREADO
 
 
     //TODO: dias disponibles{id}, dias totales de vacaciones, historial de solicitudes

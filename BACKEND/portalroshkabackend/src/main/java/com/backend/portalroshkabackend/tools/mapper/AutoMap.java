@@ -1,11 +1,11 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.DTO.th.BenefitsTypesResponseDto;
+import com.backend.portalroshkabackend.DTO.th.DevicesTypesResponseDto;
 import com.backend.portalroshkabackend.DTO.th.SolicitudTHResponseDto;
-import com.backend.portalroshkabackend.Models.Cargos;
-import com.backend.portalroshkabackend.Models.Solicitudes;
-import com.backend.portalroshkabackend.Models.SolicitudesTH;
-import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.DTO.th.SolicitudTHTipoResponseDto;
+import com.backend.portalroshkabackend.Models.*;
 
 public class AutoMap {
     public static UserDto toUserDto(Usuario user) {
@@ -64,6 +64,43 @@ public class AutoMap {
         return dto;
 
     }
+
+    public static BenefitsTypesResponseDto toBenefitsResponseDto(Beneficios beneficios ){
+        BenefitsTypesResponseDto dto = new BenefitsTypesResponseDto();
+
+        dto.setIdBeneficio(beneficios.getIdBeneficio());
+        dto.setNombre(beneficios.getNombre());
+        dto.setDescripcion(beneficios.getDescripcion());
+        dto.setInicioVigencia(beneficios.getInicioVigencia());
+        dto.setFinVigencia(beneficios.getFinVigencia());
+        dto.setFechaCreacion(beneficios.getFechaCreacion());
+
+        return dto;
+
+    }
+
+    public static DevicesTypesResponseDto toDevicesTypesResponseDto(TipoDispositivo tipoDispositivo){
+        DevicesTypesResponseDto dto = new DevicesTypesResponseDto();
+
+        dto.setIdInventario(tipoDispositivo.getIdInventario());
+        dto.setNombre(tipoDispositivo.getNombre());
+        dto.setDetalle(tipoDispositivo.getDetalle());
+        dto.setFechaCreacion(tipoDispositivo.getFechaCreacion());
+
+        return dto;
+
+    }
+
+    public static SolicitudTHTipoResponseDto toSolicitudTHTipoResponseDto(SolicitudThTipo solicitudThTipo){
+        SolicitudTHTipoResponseDto dto = new SolicitudTHTipoResponseDto();
+
+        dto.setIdSolicitudTHTipo(solicitudThTipo.getIdSolicitudTHTipo());
+        dto.setNombre(solicitudThTipo.getNombre());
+        dto.setFechaCreacion(solicitudThTipo.getFechaCreacion());
+
+        return dto;
+    }
+
     public static PositionDto toPositionDto(Cargos position){
         PositionDto positionDto = new PositionDto();
 
