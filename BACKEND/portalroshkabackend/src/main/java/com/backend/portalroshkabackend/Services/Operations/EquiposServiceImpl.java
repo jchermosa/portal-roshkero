@@ -36,7 +36,6 @@ public class EquiposServiceImpl implements IEquiposService {
                     Dto.setNombre(equipo.getNombre());
                     Dto.setFechaInicio(equipo.getFechaInicio());
                     Dto.setFechaLimite(equipo.getFechaLimite());
-                    // Dto.setIdCliente(equipo.getIdCliente());
                     Dto.setCliente(equipo.getCliente());
                     Dto.setFechaCreacion(equipo.getFechaCreacion());
                     Dto.setEstado(equipo.getEstado());

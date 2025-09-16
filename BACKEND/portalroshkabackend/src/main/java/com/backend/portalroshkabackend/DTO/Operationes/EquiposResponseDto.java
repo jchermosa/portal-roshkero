@@ -12,7 +12,6 @@ public class EquiposResponseDto {
     private String nombre;
     private Date fechaInicio;
     private Date fechaLimite;
-    // private int idCliente;
     private Clientes cliente;
     private Date fechaCreacion;
     private EstadoActivoInactivo estado;
@@ -63,14 +62,6 @@ public class EquiposResponseDto {
         this.fechaLimite = fechaLimite;
     }
 
-    // public int getIdCliente() {
-    //     return idCliente;
-    // }
-
-    // public void setIdCliente(int idCliente) {
-    //     this.idCliente = idCliente;
-    // }
-
     public Clientes getCliente() {
         return cliente;
     }
@@ -87,7 +78,7 @@ public class EquiposResponseDto {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public EstadoActivoInactivo isEstado() {
+    public EstadoActivoInactivo getEstado() {
         return estado;
     }
 
