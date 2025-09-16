@@ -1,23 +1,64 @@
 [
   {
-    "id_solicitud": 1,
+    "id": 1,
+    "id_usuario": 42,
+    "id_solicitud_tipo": 1,
     "tipo": { "id": 1, "nombre": "Vacaciones" },
+    "cantidad_dias": 5,
+    "fecha_inicio": "2025-09-10",
+    "fecha_fin": "2025-09-15",
     "comentario": "Solicito 5 días por viaje familiar",
     "estado": "P",
-    "aprobaciones": 1
+    "numero_aprobaciones": 1,
+    "lideres": [
+      { "id": 1, "nombre": "Ana", "aprobado": true },
+      { "id": 2, "nombre": "Carlos", "aprobado": false }
+    ]
   },
   {
-    "id_solicitud": 2,
+    "id": 2,
+    "id_usuario": 42,
+    "id_solicitud_tipo": 2,
     "tipo": { "id": 2, "nombre": "Inventario" },
+    "cantidad_dias": null,
+    "fecha_inicio": "2025-08-01",
+    "fecha_fin": "2025-08-01",
     "comentario": "Notebook nueva por falla técnica",
     "estado": "A",
-    "aprobaciones": 2
+    "numero_aprobaciones": 2,
+    "lideres": [
+      { "id": 1, "nombre": "Ana", "aprobado": true },
+      { "id": 3, "nombre": "Lucía", "aprobado": true }
+    ]
   },
   {
-    "id_solicitud": 3,
+    "id": 3,
+    "id_usuario": 42,
+    "id_solicitud_tipo": 3,
     "tipo": { "id": 3, "nombre": "Matrimonio" },
-    "comentario": "Me case, me voy de luna de miel a Villa Elisa",
+    "cantidad_dias": 5,
+    "fecha_inicio": "2025-09-20",
+    "fecha_fin": "2025-09-25",
+    "comentario": "Me casé, me voy de luna de miel a Villa Elisa",
     "estado": "R",
-    "aprobaciones": 0
+    "numero_aprobaciones": 0,
+    "lideres": [
+      { "id": 2, "nombre": "Carlos", "aprobado": false }
+    ]
+  },
+  {
+    "id": 4,
+    "id_usuario": 12,
+    "id_solicitud_tipo": 3,
+    "tipo": { "id": 3, "nombre": "Matrimonio" },
+    "cantidad_dias": 5,
+    "fecha_inicio": "2025-01-21",
+    "fecha_fin": "2025-01-26",
+    "comentario": "Me casé, chau",
+    "estado": "P",
+    "numero_aprobaciones": 0,
+    "lideres": [
+      { "id": 2, "nombre": "Carlos", "aprobado": false }
+    ]
   }
 ]

@@ -6,25 +6,23 @@ import DataTable from "../components/DataTable";
 import PaginationFooter from "../components/PaginationFooter";
 import IconButton from "../components/IconButton";
 import rawSolicitudes from "../data/mockSolicitudes.json";
+import type { LiderItem } from "../types";
+import { useFormResource } from "../hooks/useFormResource";
 
-interface LiderItem {
-  id: number;
-  nombre: string;
-  aprobado: boolean;
-}
 
 interface SolicitudItem {
-  id_solicitud: number;
-  tipo: {
-    id: number;
-    nombre: string;
-  };
+  id: number;
+  id_usuario: number;
+  id_solicitud_tipo: number;
+  tipo: { id: number; nombre: string };
+  cantidad_dias: number | null;
+  fecha_inicio: string;
+  fecha_fin: string;
   comentario: string;
   estado: "P" | "A" | "R";
+  numero_aprobaciones: number;
   lideres: LiderItem[];
-  aprobaciones: number;
 }
-
 
 
 
@@ -97,7 +95,7 @@ export default function RequestPage() {
 
   const columns = [
   {
-    key: "id_solicitud",
+    key: "id",
     label: "ID",
   },
   {
@@ -110,13 +108,13 @@ export default function RequestPage() {
     label: "Comentario",
   },
   {
-    key: "aprobaciones",
+    key: "numero_aprobaciones",
     label: "Aprobaciones",
     render: (s: SolicitudItem) => {
       const total = s.lideres.length;
       return(
       <span className="font-medium text-sm">
-        {s.aprobaciones}/{total}
+        {s.numero_aprobaciones}/{total}
       </span>
       )
     },
@@ -145,7 +143,7 @@ export default function RequestPage() {
     label: "Acciones",
     render: (s: SolicitudItem) => (
       <button
-        onClick={() => navigate(`/requests/editar/${s.id_solicitud}`)}
+        onClick={() => navigate(`/requests/${s.id}`)}
         className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
       >
         Editar
@@ -230,7 +228,7 @@ export default function RequestPage() {
             <DataTable
               data={solicitudes}
               columns={columns}
-              rowKey={(s) => s.id_solicitud}
+              rowKey={(s) => s.id}
               scrollable={false}
             />
           </div>
