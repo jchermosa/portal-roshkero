@@ -11,7 +11,8 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Equipos;
-
+import com.backend.portalroshkabackend.Models.EstadoEquipo;
+import com.backend.portalroshkabackend.Models.EstadoSolicitud;
 import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 
@@ -38,7 +39,7 @@ public class EquiposServiceImpl implements IEquiposService {
                     // Dto.setIdCliente(equipo.getIdCliente());
                     Dto.setCliente(equipo.getCliente());
                     Dto.setFechaCreacion(equipo.getFechaCreacion());
-                    Dto.setEstado(equipo.isEstado());
+                    Dto.setEstado(equipo.getEstado());
                     return Dto;
                 });
     }
@@ -53,7 +54,7 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setFechaInicio(requestDto.getFechaInicio());
         equipo.setFechaLimite(requestDto.getFechaLimite());
         equipo.setIdCliente(cliente.getIdCliente());
-        equipo.setEstado(requestDto.isEstado());
+        equipo.setEstado(requestDto.getEstado());
         equipo.setFechaCreacion(LocalDateTime.now().withNano(0));
 
         equiposRepository.save(equipo);
@@ -68,7 +69,7 @@ public class EquiposServiceImpl implements IEquiposService {
         dto.setFechaLimite(savedWithCliente.getFechaLimite());
         dto.setCliente(savedWithCliente.getCliente()); 
         dto.setFechaCreacion(savedWithCliente.getFechaCreacion());
-        dto.setEstado(savedWithCliente.isEstado());
+        dto.setEstado(savedWithCliente.getEstado());
 
         return dto;
     }
@@ -82,7 +83,7 @@ public class EquiposServiceImpl implements IEquiposService {
         existingEquipo.setFechaInicio(requestDto.getFechaInicio());
         existingEquipo.setFechaLimite(requestDto.getFechaLimite());
         existingEquipo.setIdCliente(requestDto.getIdCliente());
-        existingEquipo.setEstado(requestDto.isEstado());
+        existingEquipo.setEstado(requestDto.getEstado());
 
         equiposRepository.save(existingEquipo);
 
@@ -96,7 +97,7 @@ public class EquiposServiceImpl implements IEquiposService {
         dto.setFechaLimite(updatedWithCliente.getFechaLimite());
         dto.setCliente(updatedWithCliente.getCliente()); 
         dto.setFechaCreacion(updatedWithCliente.getFechaCreacion());
-        dto.setEstado(updatedWithCliente.isEstado());
+        dto.setEstado(updatedWithCliente.getEstado());
 
         return dto;
     }
@@ -105,7 +106,7 @@ public class EquiposServiceImpl implements IEquiposService {
     public void deleteTeam(int id_equipo) {
         Equipos equipo = equiposRepository.findById(id_equipo)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
-        equipo.setEstado(false); //
+        equipo.setEstado(EstadoEquipo.I); //
         equiposRepository.save(equipo);
     }
 }

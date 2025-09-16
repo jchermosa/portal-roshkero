@@ -16,7 +16,7 @@ public class Clientes {
     private String nombre;
 
     @Column(name = "nro_telefono")
-    private int nroTelefono;
+    private String nroTelefono;
 
     @Column(name = "correo")
     private String correo;
@@ -43,11 +43,11 @@ public class Clientes {
         this.nombre = nombre;
     }
 
-    public int getNroTelefono() {
+    public String getNroTelefono() {
         return nroTelefono;
     }
 
-    public void setNroTelefono(int nroTelefono) {
+    public void setNroTelefono(String nroTelefono) {
         this.nroTelefono = nroTelefono;
     }
 

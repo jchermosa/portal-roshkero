@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
     Page<Usuario> findAllInactiveEmployees(Pageable pageable); // Busca todos los usuarios inactivos
 
     Page<Usuario> findAllByOrderByIdRolAsc(Pageable pageable); // Retona los usuarios ordenados por rol
-    Page<Usuario> findAllByOrderByIdEquipoAsc(Pageable pageable); // Retona los usuarios ordenados por equipo
+
     Page<Usuario> findAllByOrderByIdCargoAsc(Pageable pageable); // Retona los usuarios ordenados por cargo
 
      Optional<Usuario> findByNroCedula(Integer nroCedula);

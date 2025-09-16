@@ -72,9 +72,6 @@ public class UserInsertDto {
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
 
-    public int getIdEquipo() { return idEquipo; }
-    public void setIdEquipo(int idEquipo) { this.idEquipo = idEquipo; }
-
     public int getIdCargo() { return idCargo; }
     public void setIdCargo(int idCargo) { this.idCargo = idCargo; }
 

@@ -42,17 +42,14 @@ public class Usuario {
     @Column(name = "dias_vacaciones", insertable = false, updatable = false)
     private int diasVacaciones;
 
-    @Column(name = "estado")
-    private boolean estado;
+    // @Column(name = "estado")
+    // private boolean estado;
 
     @Column(name = "contrasena")
     private String contrasena;
 
     @Column(name = "telefono")
     private String telefono;
-
-    @Column(name = "id_equipos")
-    private int idEquipo;
 
     @Column(name = "id_cargo")
     private int idCargo;
@@ -138,13 +135,13 @@ public class Usuario {
         this.diasVacaciones = diasVacaciones;
     }
 
-    public boolean isEstado() {
-        return estado;
-    }
+    // public boolean isEstado() {
+    //     return estado;
+    // }
 
-    public void setEstado(boolean estado) {
-        this.estado = estado;
-    }
+    // public void setEstado(boolean estado) {
+    //     this.estado = estado;
+    // }
 
     public String getContrasena() {
         return contrasena;
@@ -160,14 +157,6 @@ public class Usuario {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    public int getIdEquipo() {
-        return idEquipo;
-    }
-
-    public void setIdEquipo(int idEquipo) {
-        this.idEquipo = idEquipo;
     }
 
     public int getIdCargo() {

@@ -11,7 +11,7 @@ public class Equipos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_equipos")
+    @Column(name = "id_equipo")
     private Integer idEquipo;
 
     @Column(name = "nombre")
@@ -26,15 +26,16 @@ public class Equipos {
     @Column(name = "id_cliente")
     private int idCliente;
 
-    @ManyToOne (fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_cliente", insertable = false, updatable = false)
     private Clientes cliente;
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado")
-    private boolean estado;
+    private EstadoEquipo estado;
 
     public Equipos() {
     }
@@ -99,11 +100,11 @@ public class Equipos {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public boolean isEstado() {
+    public EstadoEquipo getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(EstadoEquipo estado) {
         this.estado = estado;
     }
 

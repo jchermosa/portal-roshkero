@@ -20,7 +20,6 @@ public class UserDto {
     private boolean estado;
     private String contrasena;
     private String telefono;
-    private int idEquipo;
     private int idCargo;
     private Date fechaNacimiento;
     private int diasVacacionesRestante;
@@ -122,13 +121,6 @@ public class UserDto {
         this.telefono = telefono;
     }
 
-    public int getIdEquipo() {
-        return idEquipo;
-    }
-
-    public void setIdEquipo(int idEquipo) {
-        this.idEquipo = idEquipo;
-    }
 
     public int getIdCargo() {
         return idCargo;

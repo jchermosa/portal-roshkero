@@ -28,11 +28,14 @@ public class RequestServiceImpl implements IRequestService {
                     dto.setFechaFin(request.getFechaFin());
                     dto.setIdUsuario(request.getIdUsuario());
                     dto.setCantidadDias(request.getCantidadDias());
-                    dto.setNumeroAprobaciones(request.getNumeroAprobaciones());
+                    dto.setAprobationTh(request.isAprobationTh());
+                    // dto.setNumeroAprobaciones(request.getNumeroAprobaciones());
                     dto.setComentario(request.getComentario());
-                    dto.setidSolicitudTipo(request.getidSolicitudTipo());
+                    dto.setidSolicitudTipo(request.getIdSolicitudTipo());
                     dto.setEstado(request.getEstado());
                     dto.setFechaCreacion(request.getFechaCreacion());
+                    dto.setIdPermiso(request.getIdPermiso());
+                    dto.setIdBenefito(request.getIdBenefito());
 
                     return dto;
                 });

@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Date;
 
+import com.backend.portalroshkabackend.Models.EstadoEquipo;
+import com.backend.portalroshkabackend.Models.EstadoSolicitud;
+
 public class EquiposRequestDto {
 
     @NotBlank(message = "El nombre no puede estar vacio")
@@ -18,12 +21,12 @@ public class EquiposRequestDto {
     @NotNull(message = "El ID del cliente es obligatorio")
     private Integer idCliente;
 
-    private boolean estado = true;
+    private EstadoEquipo estado;
 
     public EquiposRequestDto() {
     }
 
-    public EquiposRequestDto(String nombre, Date fechaInicio, Date fechaLimite, Integer idCliente, boolean estado) {
+    public EquiposRequestDto(String nombre, Date fechaInicio, Date fechaLimite, Integer idCliente, EstadoEquipo estado) {
         this.nombre = nombre;
         this.fechaInicio = fechaInicio;
         this.fechaLimite = fechaLimite;
@@ -63,11 +66,11 @@ public class EquiposRequestDto {
         this.idCliente = idCliente;
     }
 
-    public boolean isEstado() {
+    public EstadoEquipo getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(EstadoEquipo estado) {
         this.estado = estado;
     }
 }

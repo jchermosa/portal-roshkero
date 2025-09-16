@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 
 import com.backend.portalroshkabackend.Models.Clientes;
+import com.backend.portalroshkabackend.Models.EstadoEquipo;
+import com.backend.portalroshkabackend.Models.EstadoSolicitud;
 
 public class EquiposResponseDto {
 
@@ -14,13 +16,13 @@ public class EquiposResponseDto {
     // private int idCliente;
     private Clientes cliente;
     private LocalDateTime fechaCreacion;
-    private boolean estado;
+    private EstadoEquipo estado;
 
     public EquiposResponseDto() {
     }
 
     public EquiposResponseDto(String nombre, Date fechaInicio, Date fechaLimite,
-            Clientes cliente, LocalDateTime fechaCreacion, boolean estado) {
+            Clientes cliente, LocalDateTime fechaCreacion, EstadoEquipo estado) {
         this.nombre = nombre;
         this.fechaInicio = fechaInicio;
         this.fechaLimite = fechaLimite;
@@ -86,11 +88,11 @@ public class EquiposResponseDto {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public boolean isEstado() {
+    public EstadoEquipo getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(EstadoEquipo estado) {
         this.estado = estado;
     }
 }

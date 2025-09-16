@@ -21,8 +21,6 @@ public class UserUpdateDto {
 
     private String telefono;
 
-    private int idEquipo;
-
     private int idCargo;
 
     private Date fechaNacimiento;
@@ -99,14 +97,6 @@ public class UserUpdateDto {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    public int getIdEquipo() {
-        return idEquipo;
-    }
-
-    public void setIdEquipo(int idEquipo) {
-        this.idEquipo = idEquipo;
     }
 
     public int getIdCargo() {

@@ -62,19 +62,19 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         return users.map(this::mapToUserDto); // Retorna la lista de empleados inactivos
     }
 
-    @Override
-    public Page<UserDto> getAllEmployeesByRol(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByIdRolAsc(pageable);
+    // @Override
+    // public Page<UserDto> getAllEmployeesByRol(Pageable pageable) {
+    //     Page<Usuario> users = userRepository.findAllByOrderByIdRolAsc(pageable);
 
-        return users.map(this::mapToUserDto);
-    }
+    //     return users.map(this::mapToUserDto);
+    // }
 
-    @Override
-    public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
+    // @Override
+    // public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
+    //     Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
 
-        return users.map(this::mapToUserDto);
-    }
+    //     return users.map(this::mapToUserDto);
+    // }
 
     @Override
     public Page<UserDto> getAllEmployeesByPosition(Pageable pageable) {
@@ -103,10 +103,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setCorreo(insertDto.getCorreo());
         user.setIdRol(insertDto.getIdRol());
         user.setFechaIngreso(insertDto.getFechaIngreso());
-        user.setEstado(insertDto.isEstado());
+        // user.setEstado(insertDto.isEstado());
         user.setContrasena(insertDto.getContrasena());
         user.setTelefono(insertDto.getTelefono());
-        user.setIdEquipo(insertDto.getIdEquipo());
         user.setIdCargo(insertDto.getIdCargo());
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
         user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
@@ -134,10 +133,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         user.setCorreo(updateDto.getCorreo());
         user.setIdRol(updateDto.getIdRol());
         user.setFechaIngreso(updateDto.getFechaIngreso());
-        user.setEstado(updateDto.isEstado());
+        // user.setEstado(updateDto.isEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
-        user.setIdEquipo(updateDto.getIdEquipo());
         user.setIdCargo(updateDto.getIdCargo());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
 
@@ -151,13 +149,13 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
     public UserDto deleteEmployee(int id) {
         Optional<Usuario> userExists = userRepository.findById(id);
 
-        if (userExists.isEmpty() || userExists.get().isEstado() == false){
-            return null;
-        }
+        // if (userExists.isEmpty() || userExists.get().isEstado() == false){
+        //     return null;
+        // }
 
         Usuario user = userExists.get();
 
-        user.setEstado(false); // Da de baja el empleado de la base de datos
+        // user.setEstado(false); // Da de baja el empleado de la base de datos
 
         userRepository.save(user);
 
@@ -286,13 +284,9 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         dto.setIdRol(user.getIdRol());
         dto.setFechaIngreso(user.getFechaIngreso());
         dto.setAntiguedad(user.getAntiguedad());
-
-
         dto.setDiasVacaciones(user.getDiasVacaciones());
-        dto.setEstado(user.isEstado());
         dto.setContrasena(user.getContrasena());
         dto.setTelefono(user.getTelefono());
-        dto.setIdEquipo(user.getIdEquipo());
         dto.setIdCargo(user.getIdCargo());
         dto.setFechaNacimiento(user.getFechaNacimiento());
         dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
@@ -309,9 +303,7 @@ public class HumanResourceServiceImpl implements IHumanResourceService{
         requestDto.setEstado(request.getEstado());
         requestDto.setIdUsuario(request.getIdUsuario());
         requestDto.setCantidadDias(request.getCantidadDias());
-        requestDto.setNumeroAprobaciones(request.getNumeroAprobaciones());
         requestDto.setComentario(request.getComentario());
-        // requestDto.setRechazado(request.isRechazado());
 
         return requestDto;
     }

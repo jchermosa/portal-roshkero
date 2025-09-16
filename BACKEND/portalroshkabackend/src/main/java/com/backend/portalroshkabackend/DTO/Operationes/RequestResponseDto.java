@@ -11,11 +11,14 @@ public class RequestResponseDto {
     private Date fechaFin;
     private int idUsuario;
     private int cantidadDias;
-    private int numeroAprobaciones;
+    private Boolean aprobationTh;
+    // private int numeroAprobaciones;
     private String comentario;
     private int idSolicitudTipo;
     private EstadoSolicitud estado;
     private LocalDateTime fechaCreacion;
+    private int idPermiso;
+    private Integer idBenefito;
 
     public int getIdSolicitud() {
         return idSolicitud;
@@ -65,13 +68,21 @@ public class RequestResponseDto {
         this.cantidadDias = cantidadDias;
     }
 
-    public int getNumeroAprobaciones() {
-        return numeroAprobaciones;
+    public Boolean isAprobationTh() {
+        return aprobationTh;
     }
 
-    public void setNumeroAprobaciones(int numeroAprobaciones) {
-        this.numeroAprobaciones = numeroAprobaciones;
+    public void setAprobationTh(Boolean aprobationTh) {
+        this.aprobationTh = aprobationTh;
     }
+
+    // public int getNumeroAprobaciones() {
+    // return numeroAprobaciones;
+    // }
+
+    // public void setNumeroAprobaciones(int numeroAprobaciones) {
+    // this.numeroAprobaciones = numeroAprobaciones;
+    // }
 
     public int getidSolicitudTipo() {
         return idSolicitudTipo;
@@ -95,5 +106,21 @@ public class RequestResponseDto {
 
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public int getIdPermiso() {
+        return idPermiso;
+    }
+
+    public void setIdPermiso(int idPermiso) {
+        this.idPermiso = idPermiso;
+    }
+
+    public Integer getIdBenefito() {
+        return idBenefito;
+    }
+
+    public void setIdBenefito(Integer idBenefito) {
+        this.idBenefito = idBenefito;
     }
 }

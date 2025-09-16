@@ -6,12 +6,12 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "solicitudes")
+@Table(name = "solicitudes_th")
 public class Solicitudes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_solicitud")
+    @Column(name = "id_solicitud_th")
     private int idSolicitud;
 
     @Column(name = "fecha_inicio")
@@ -26,13 +26,16 @@ public class Solicitudes {
     @Column(name = "cantidad_dias")
     private int cantidadDias;
 
-    @Column(name = "numero_aprobaciones")
-    private int numeroAprobaciones;
+    @Column(name = "aprobacion_th")
+    private Boolean aprobationTh;
+
+    // @Column(name = "numero_aprobaciones")
+    // private int numeroAprobaciones;
 
     @Column(name = "comentario")
     private String comentario;
 
-    @Column(name = "id_solicitud_tipo")
+    @Column(name = "id_solicitud_th_tipo")
     private int idSolicitudTipo;
 
     @Enumerated(EnumType.STRING) // string enum
@@ -41,6 +44,12 @@ public class Solicitudes {
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
+
+    @Column(name = "id_permiso")
+    private int idPermiso;
+
+    @Column(name = "id_beneficio")
+    private Integer idBenefito;
 
     public int getIdSolicitud() {
         return idSolicitud;
@@ -90,13 +99,21 @@ public class Solicitudes {
         this.cantidadDias = cantidadDias;
     }
 
-    public int getNumeroAprobaciones() {
-        return numeroAprobaciones;
+    public Boolean isAprobationTh() {
+        return aprobationTh;
     }
 
-    public void setNumeroAprobaciones(int numeroAprobaciones) {
-        this.numeroAprobaciones = numeroAprobaciones;
+    public void setAprobationTh(Boolean aprobationTh) {
+        this.aprobationTh = aprobationTh;
     }
+
+    // public int getNumeroAprobaciones() {
+    // return numeroAprobaciones;
+    // }
+
+    // public void setNumeroAprobaciones(int numeroAprobaciones) {
+    // this.numeroAprobaciones = numeroAprobaciones;
+    // }
 
     public String getComentario() {
         return comentario;
@@ -106,11 +123,11 @@ public class Solicitudes {
         this.comentario = comentario;
     }
 
-    public int getidSolicitudTipo() {
+    public int getIdSolicitudTipo() {
         return idSolicitudTipo;
     }
 
-    public void setidSolicitudTipo(int idSolicitudTipo) {
+    public void setIdSolicitudTipo(int idSolicitudTipo) {
         this.idSolicitudTipo = idSolicitudTipo;
     }
 
@@ -120,6 +137,22 @@ public class Solicitudes {
 
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public int getIdPermiso() {
+        return idPermiso;
+    }
+
+    public void setIdPermiso(int idPermiso) {
+        this.idPermiso = idPermiso;
+    }
+
+    public Integer getIdBenefito() {
+        return idBenefito;
+    }
+
+    public void setIdBenefito(Integer idBenefito) {
+        this.idBenefito = idBenefito;
     }
 
 }
