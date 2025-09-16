@@ -13,20 +13,18 @@ public class AutoMap {
         dto.setApellido(user.getApellido());
         dto.setNroCedula(user.getNroCedula());
         dto.setCorreo(user.getCorreo());
-        dto.setIdRol(user.getIdRol());
+        dto.setRoles(user.getRoles());
         dto.setFechaIngreso(user.getFechaIngreso());
         dto.setAntiguedad(user.getAntiguedad());
-
-
         dto.setDiasVacaciones(user.getDiasVacaciones());
-        dto.setEstado(user.isEstado());
+        dto.setEstado(user.getEstado());
         dto.setContrasena(user.getContrasena());
         dto.setTelefono(user.getTelefono());
-        dto.setIdEquipo(user.getIdEquipo());
-        dto.setIdCargo(user.getIdCargo());
+        dto.setCargos(user.getCargos());
         dto.setFechaNacimiento(user.getFechaNacimiento());
         dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
         dto.setRequiereCambioContrasena(user.isRequiereCambioContrasena());
+        dto.setDisponibilidad(user.getDisponibilidad());
         return dto;
     }
 
@@ -36,12 +34,11 @@ public class AutoMap {
         requestDto.setIdSolicitud(request.getIdSolicitud());
         requestDto.setFechaInicio(request.getFechaInicio());
         requestDto.setFechaFin(request.getFechaFin());
-        requestDto.setEstado(request.isEstado());
+        requestDto.setEstado(request.getEstado());
         requestDto.setIdUsuario(request.getIdUsuario());
         requestDto.setCantidadDias(request.getCantidadDias());
         requestDto.setNumeroAprobaciones(request.getNumeroAprobaciones());
         requestDto.setComentario(request.getComentario());
-        requestDto.setRechazado(request.isRechazado());
 
         return requestDto;
     }
@@ -79,15 +76,17 @@ public class AutoMap {
         user.setApellido(insertDto.getApellido());
         user.setNroCedula(insertDto.getNroCedula());
         user.setCorreo(insertDto.getCorreo());
-        user.setIdRol(insertDto.getIdRol());
+        user.setRoles(insertDto.getRoles());
         user.setFechaIngreso(insertDto.getFechaIngreso());
-        user.setEstado(insertDto.isEstado());
+        user.setEstado(insertDto.getEstado());
         user.setContrasena(insertDto.getContrasena());
         user.setTelefono(insertDto.getTelefono());
-        user.setIdEquipo(insertDto.getIdEquipo());
-        user.setIdCargo(insertDto.getIdCargo());
+        user.setCargos(insertDto.getCargos());
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
-        user.setRequiereCambioContrasena(insertDto.isRequiere_cambio_contrasena());
+        user.setRequiereCambioContrasena(insertDto.isRequiereCambioContrasena());
+        user.setUrl(insertDto.getUrl_perfil());
+        user.setDiasVacaciones(insertDto.getDisponibilidad());
+        user.setDisponibilidad(insertDto.getDisponibilidad());
 
         return user;
     }

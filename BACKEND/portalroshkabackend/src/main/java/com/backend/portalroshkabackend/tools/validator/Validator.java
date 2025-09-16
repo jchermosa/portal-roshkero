@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.tools.validator;
 
+import com.backend.portalroshkabackend.Models.Cargos;
+import com.backend.portalroshkabackend.Models.Roles;
 import com.backend.portalroshkabackend.Repositories.CargosRepository;
 import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.RolesRepository;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class Validator {
     private final UserRepository userRepository;
     private final RolesRepository rolesRepository;
-    private final EquiposRepository equiposRepository;
     private final CargosRepository cargosRepository;
 
     public Validator(UserRepository userRepository,
@@ -20,7 +21,6 @@ public class Validator {
                      CargosRepository cargosRepository){
         this.userRepository = userRepository;
         this.rolesRepository = rolesRepository;
-        this.equiposRepository = equiposRepository;
         this.cargosRepository = cargosRepository;
     }
 
@@ -54,12 +54,12 @@ public class Validator {
         }
     }
 
-    public void validateRelatedEntities(Integer idRol, Integer idEquipo, Integer idCargo){
-        if (!rolesRepository.existsById(idRol)) throw new RolesNotFoundException(idRol);
+    public void validateRelatedEntities(Roles idRol, Cargos idCargo){
+        if (!rolesRepository.existsById(idRol.getIdRol())) throw new RolesNotFoundException(idRol.getIdRol());
 
-        if (!equiposRepository.existsById(idEquipo)) throw new EquipoNotFoundException(idEquipo);
+        //if (!equiposRepository.existsById(idEquipo)) throw new EquipoNotFoundException(idEquipo);
 
-        if (!cargosRepository.existsById(idCargo)) throw new CargoNotFoundException(idCargo);
+        if (!cargosRepository.existsById(idCargo.getIdCargo())) throw new CargoNotFoundException(idCargo.getIdCargo());
     }
 
 

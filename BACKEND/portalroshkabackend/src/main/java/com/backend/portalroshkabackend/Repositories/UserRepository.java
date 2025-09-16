@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Repositories;
 
 
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +14,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<Usuario, Integer> {
 
 
-    Page<Usuario> findAllByEstadoTrue(Pageable pageable); //Busca todos los usuarios activos
-    Page<Usuario> findAllByEstadoFalse(Pageable pageable); // Busca todos los usuarios inactivos
-    Page<Usuario> findAllByOrderByIdRolAsc(Pageable pageable); // Retona los usuarios ordenados por rol
-    // Page<Usuario> findAllByOrderByIdEquipoAsc(Pageable pageable); // Retona los usuarios ordenados por equipo
-    Page<Usuario> findAllByOrderByIdCargoAsc(Pageable pageable); // Retona los usuarios ordenados por cargo
+    Page<Usuario> findAllByEstado(EstadoActivoInactivo estado, Pageable pageable); //Busca todos los usuarios activos
+    Page<Usuario> findAllByOrderByRolesAsc(Pageable pageable); // Retona los usuarios ordenados por rol// Retona los usuarios ordenados por equipo
+    Page<Usuario> findAllByOrderByCargosAsc(Pageable pageable); // Retona los usuarios ordenados por cargo
 
     boolean existsByCorreo(String correo);
     boolean existsByNroCedula(int nroCedula);

@@ -112,7 +112,7 @@ public class UsuariosService {
     dto.setApellido(usuario.getApellido());
     dto.setNroCedula(usuario.getNroCedula());
     dto.setCorreo(usuario.getCorreo());
-    dto.setIdRol(usuario.getIdRol() != null ? usuario.getIdRol().getIdRol() : null);
+    //dto.setIdRol(usuario.getIdRol() != null ? usuario.getIdRol().getIdRol() : null);
     dto.setFechaIngreso(usuario.getFechaIngreso());
     dto.setAntiguedad(usuario.getAntiguedad());
     dto.setDiasVacaciones(usuario.getDiasVacaciones());
@@ -120,7 +120,7 @@ public class UsuariosService {
     dto.setContrasena(usuario.getContrasena());
     dto.setTelefono(usuario.getTelefono());
     // dto.setIdEquipo(null); // Campo no disponible en el modelo Usuario actual
-    dto.setIdCargo(usuario.getIdCargo() != null ? usuario.getIdCargo().getIdCargo() : null);
+    //dto.setIdCargo(usuario.getIdCargo() != null ? usuario.getIdCargo().getIdCargo() : null);
     dto.setFechaNacimiento(usuario.getFechaNacimiento());
     dto.setDiasVacacionesRestante(usuario.getDiasVacacionesRestante());
     dto.setRequiereCambioContrasena(usuario.isRequiereCambioContrasena());

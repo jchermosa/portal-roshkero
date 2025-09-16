@@ -38,7 +38,7 @@ public class JpaUserDetailsService implements UserDetailsService {
         Usuario user = optionalUser.get();
         
         // Obtener el rol del usuario directamente del objeto
-        Roles userRol = user.getIdRol();
+        Roles userRol = user.getRoles();
         
         // Buscar el rol del usuario directamente
         Collection<GrantedAuthority> authorities = new ArrayList<>();

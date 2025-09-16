@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.DTO;
 
+import com.backend.portalroshkabackend.Models.Cargos;
+import com.backend.portalroshkabackend.Models.Roles;
 import jakarta.validation.constraints.*;
 import java.sql.Date;
 
@@ -25,28 +27,27 @@ public class UserInsertDto {
     @NotBlank(message = "El correo es obligatorio")
     private String correo;
 
-    private Integer idRol;
-
-    @PastOrPresent(message = "La fecha de ingreso no puede ser futura")
-    private Date fechaIngreso;
-
-
-    private EstadoActivoInactivo estado;
+    private Roles roles;
 
     @NotBlank(message = "La contraseña es obligatoria")
     private String contrasena;
 
+    @PastOrPresent(message = "La fecha de ingreso no puede ser futura")
+    private Date fechaIngreso;
+
     @Pattern(regexp = "^[0-9]{9,15}$", message = "Teléfono inválido")
     private String telefono;
 
-    private Integer idEquipo;
-
-    private Integer idCargo;
+    private Cargos Cargos;
 
     @Past(message = "La fecha de nacimiento debe ser en el pasado")
     private Date fechaNacimiento;
 
     private boolean requiereCambioContrasena;
 
+    private EstadoActivoInactivo estado;
 
+    private String url_perfil;
+
+    private Integer disponibilidad;
 }

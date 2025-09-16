@@ -73,7 +73,6 @@ public class EmployeeController {
             case "active" -> users = employeeService.getAllActiveEmployees(pageable);
             case "inactive" -> users = employeeService.getAllInactiveEmployees(pageable);
             case "rol" -> users = employeeService.getAllEmployeesByRol(pageable);
-            case "equipo" -> users = employeeService.getAllEmployeesByTeam(pageable);
             case "cargo" -> users = employeeService.getAllEmployeesByPosition(pageable);
             default -> throw new IllegalArgumentException("Argumento del parametro invalido: " + sortBy);
         }

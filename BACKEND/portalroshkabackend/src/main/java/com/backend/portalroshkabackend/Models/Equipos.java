@@ -32,7 +32,7 @@ public class Equipos {
 
     @ManyToOne
     @JoinColumn(name = "id_cliente")
-    private Clientes idCliente;
+    private Clientes cliente;
 
     @Column(name = "fecha_inicio")
     private Date fechaInicio;

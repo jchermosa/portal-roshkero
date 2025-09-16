@@ -2,6 +2,7 @@ package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Solicitudes;
 import com.backend.portalroshkabackend.Repositories.RequestRepository;
 import com.backend.portalroshkabackend.tools.SaveManager;
@@ -42,8 +43,7 @@ public class RequestServiceImpl implements IRequestService{
                 .orElseThrow(() -> new RequestNotFoundException(idRequest));
 
         // Si se acepta la solicitud, rechazado y estado de la solicitu se setea a false
-        request.setRechazado(false);
-        request.setEstado(false);
+        request.setEstado(EstadoSolicitudEnum.A);
 
         return true;
     }
@@ -54,7 +54,7 @@ public class RequestServiceImpl implements IRequestService{
         Solicitudes request = requestRepository.findById(idRequest)
                 .orElseThrow(() -> new RequestNotFoundException(idRequest));
 
-        request.setRechazado(true); // Setea la solicitud como rechazada
+        request.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
         request.setComentario(rejectedDto.getComentario());
 
         SaveManager.saveEntity( () -> requestRepository.save(request), "Error al rechazar la solicitud: ");

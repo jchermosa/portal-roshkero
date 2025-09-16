@@ -11,6 +11,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.function.ToDoubleBiFunction;
+
 @RestController
 @RequestMapping("/api/v1/admin")
 public class RequestController {
@@ -59,4 +61,24 @@ public class RequestController {
         // TODO: Implementar cuando la base de datos tenga tipo de solicitudes
         return ResponseEntity.ok("agregar nuevo tipo de request") ;
     }
+
+    //TODO: Tipo de solicitudes, GET:Solicitudes aprobadas por lideres{
+    //  PENDIENTES, FECHA}
+
+
+    //TODO: dias disponibles{id}, dias totales de vacaciones, historial de solicitudes
+
+    //TODO: POST- Solicitar vaciones
+
+    //TODO: GET-LIDERES ASIGNADOS AL USUARIO(active)
+
+    //TODO; mis solicitudes.GET
+
+    //TODO: Listar por tipo de solicitud, listar por estado de la solicitud (A,I,P)
+    //TODO: POST-Solicitar BENEFICIO.
+
+    //TODO: GET-Tipos de BENEFICIO, DISPOSITIVOS, PERMISOS.
+
+
+
 }

@@ -35,7 +35,7 @@ public class Usuario {
 
     @ManyToOne
     @JoinColumn(name = "id_rol",  nullable = false)
-    private Roles idRol;
+    private Roles roles;
 
     @Column(name = "fecha_ingreso")
     private Date fechaIngreso;
@@ -59,7 +59,7 @@ public class Usuario {
 
     @ManyToOne
     @JoinColumn(name = "id_cargo",  nullable = false)
-    private Cargos idCargo;
+    private Cargos cargos;
 
     @Column(name = "fecha_nacimiento")
     private java.sql.Date fechaNacimiento;

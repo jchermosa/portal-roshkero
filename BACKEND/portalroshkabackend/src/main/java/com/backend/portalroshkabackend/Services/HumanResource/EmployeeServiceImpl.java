@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.SaveManager;
@@ -67,7 +68,7 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
     @Transactional(readOnly = true)
     @Override
     public Page<UserDto> getAllActiveEmployees(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByEstadoTrue(pageable);
+        Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.A, pageable);
 
         return users.map(AutoMap::toUserDto); // Retorna una lista de empleados activos (DTOs)
     }
@@ -75,28 +76,22 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
     @Transactional(readOnly = true)
     @Override
     public Page<UserDto> getAllInactiveEmployees(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByEstadoFalse(pageable);
+        Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.I, pageable);
 
         return users.map(AutoMap::toUserDto); // Retorna la lista de empleados inactivos
     }
 
     @Override
     public Page<UserDto> getAllEmployeesByRol(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByIdRolAsc(pageable);
+        Page<Usuario> users = userRepository.findAllByOrderByRolesAsc(pageable);
 
         return users.map(AutoMap::toUserDto);
     }
 
-    @Override
-    public Page<UserDto> getAllEmployeesByTeam(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByIdEquipoAsc(pageable);
-
-        return users.map(AutoMap::toUserDto);
-    }
 
     @Override
     public Page<UserDto> getAllEmployeesByPosition(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByIdCargoAsc(pageable);
+        Page<Usuario> users = userRepository.findAllByOrderByCargosAsc(pageable);
 
         return users.map(AutoMap::toUserDto);
     }
@@ -117,7 +112,7 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
         validator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
         validator.validateUniqueEmail(insertDto.getCorreo(), null);
         validator.validateUniquePhone(insertDto.getTelefono(), null);
-        validator.validateRelatedEntities(insertDto.getIdRol(), insertDto.getIdEquipo(), insertDto.getIdCargo());  // LLama al metodo que verifica si el rol/equipo o cargo asignado existen
+        validator.validateRelatedEntities(insertDto.getRoles(), insertDto.getCargos());  // LLama al metodo que verifica si el rol/equipo o cargo asignado existen
 
         Usuario user = AutoMap.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
@@ -135,19 +130,18 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
         validator.validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
         validator.validateUniqueEmail(updateDto.getCorreo(), id);
         validator.validateUniquePhone(updateDto.getTelefono(), id);
-        validator.validateRelatedEntities(updateDto.getIdRol(), updateDto.getIdEquipo(), updateDto.getIdCargo());
+        validator.validateRelatedEntities(updateDto.getRoles(), updateDto.getCargos());
 
         user.setNombre(updateDto.getNombre());
         user.setApellido(updateDto.getApellido());
         user.setNroCedula(updateDto.getNroCedula());
         user.setCorreo(updateDto.getCorreo());
-        user.setIdRol(updateDto.getIdRol());
+        user.setRoles(updateDto.getRoles());
         user.setFechaIngreso(updateDto.getFechaIngreso()); // TODO: Preguntar si usar PUT o PATCH
-        user.setEstado(updateDto.isEstado());
+        user.setEstado(updateDto.getEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
-        user.setIdEquipo(updateDto.getIdEquipo());
-        user.setIdCargo(updateDto.getIdCargo());
+        user.setCargos(updateDto.getCargos());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
 
         Usuario updatedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al actualizar el usuario: ");
@@ -161,9 +155,11 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
     public UserDto deleteEmployee(int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        if (!user.isEstado()) throw new UserAlreadyInactiveException(id);
+        if (user.getEstado()== EstadoActivoInactivo.I) {
+            throw new UserAlreadyInactiveException(id);
+        }
 
-        user.setEstado(false); // Da de baja el empleado de la base de datos
+        user.setEstado(EstadoActivoInactivo.I); // Da de baja el empleado de la base de datos
 
         Usuario deletedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al eliminar el usuario: ");
 

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Repositories.CargosRepository;
-import com.backend.portalroshkabackend.DTO.CargosResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.CargosResponseDto;
 import java.util.List;
 import java.util.stream.Collectors;
 
