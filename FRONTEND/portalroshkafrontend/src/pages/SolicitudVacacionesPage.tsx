@@ -14,10 +14,8 @@ export default function SolicitudVacacionesPage() {
     return <div className="p-10 text-center">Cargando usuario...</div>;
   }
 
-  // Simulación de días disponibles (puedes traerlo de tu API/contexto)
   const [diasDisponibles, setDiasDisponibles] = useState<number>(15);
 
-  // Estado para calcular cantidad de días y destinatario
   const [formData, setFormData] = useState({
     fechaInicio: "",
     fechaFin: "",
@@ -25,25 +23,44 @@ export default function SolicitudVacacionesPage() {
     destinatario: "",
   });
 
-  // Calcula la cantidad de días automáticamente
+  // Función auxiliar para verificar si un día es fin de semana
+  const esFinDeSemana = (fecha: Date): boolean => {
+    const dia = fecha.getDay();
+    return dia === 0 || dia === 6; // 0 es domingo, 6 es sábado
+  };
+
+  // Calcula la cantidad de días hábiles entre dos fechas
+  const calcularDiasHabiles = (inicio: Date, fin: Date): number => {
+    let cantidadDias = 0;
+    const actual = new Date(inicio);
+    
+    while (actual <= fin) {
+      if (!esFinDeSemana(actual)) {
+        cantidadDias++;
+      }
+      actual.setDate(actual.getDate() + 1);
+    }
+    
+    return cantidadDias;
+  };
+
   const handleChange = (data: any) => {
     let cantidadDias = 0;
     if (data.fechaInicio && data.fechaFin) {
       const inicio = new Date(data.fechaInicio);
       const fin = new Date(data.fechaFin);
-      cantidadDias =
-        Math.max(
-          0,
-          Math.ceil((fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24)) + 1
-        );
+      
+      if (inicio <= fin) {
+        cantidadDias = calcularDiasHabiles(inicio, fin);
+      }
     }
+    
     setFormData({
       ...data,
       cantidadDias,
     });
   };
 
-  // Secciones del formulario
   const sections: FormSection[] = [
     {
       title: "Datos de la solicitud",
@@ -63,12 +80,12 @@ export default function SolicitudVacacionesPage() {
         },
         {
           name: "cantidadDias",
-          label: "Cantidad de días",
+          label: "Cantidad de días hábiles",
           type: "number",
           required: true,
           disabled: true,
           value: formData.cantidadDias,
-          helperText: "Se calcula automáticamente",
+          helperText: "Se calcula automáticamente (excluye sábados y domingos)",
         },
         {
           name: "diasDisponibles",
@@ -99,12 +116,10 @@ export default function SolicitudVacacionesPage() {
     },
   ];
 
-  // Lógica de envío
   const handleSubmit = async (data: any) => {
     if (data.cantidadDias > diasDisponibles) {
       throw new Error("No tienes suficientes días disponibles.");
     }
-    // Aquí iría la llamada a tu API para guardar la solicitud
     setDiasDisponibles((prev) => prev - data.cantidadDias);
     navigate("/vacaciones");
   };
