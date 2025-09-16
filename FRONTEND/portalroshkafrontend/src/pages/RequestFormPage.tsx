@@ -57,31 +57,6 @@ export default function SolicitudFormPage() {
   });
   const [editable, setEditable] = useState<boolean>(true); // controla si se puede editar
 
-useEffect(() => {
-  if (isEditing && id) {
-    const s = solicitudes.find((sol) => sol.id === Number(id));
-    if (!s) return;
-
-    const bloqueada = s.numero_aprobaciones > 0 || s.estado !== "P";
-    setEditable(!bloqueada);
-
-    // Calcular cantidad_dias según tipo
-    const tipo = tipos.find((t) => t.id === s.id_solicitud_tipo);
-    const nombre = tipo?.nombre ?? "";
-    const { dias, editable: editableCampo } = calcularCantidadDias(nombre);
-
-    setCantidadEditable(editableCampo);
-
-    setFormData({
-      ...s,
-      cantidad_dias: editableCampo ? s.cantidad_dias : dias,  
-    });
-
-    setTipoSeleccionado(s.id_solicitud_tipo);
-    setLideresAsignados(s.lideres);
-  }
-}, [id]);
-
   const calcularCantidadDias = (nombre: string): { dias: number | null; editable: boolean } => {
     let dias: number | null = null;
     let editableCampo = false;
@@ -97,17 +72,57 @@ useEffect(() => {
     return { dias, editable: editableCampo };
   };
 
-  // --- Actualizar cantidad y editable si cambió el tipo ---
   useEffect(() => {
-    const tipo = tipos.find((t) => t.id === tipoSeleccionado);
-    const nombre = tipo?.nombre ?? "";
-    const { dias, editable: editableCampo } = calcularCantidadDias(nombre);
-    setCantidadEditable(editableCampo);
-    setFormData((prev) => ({
-      ...prev,
-      id_solicitud_tipo: tipoSeleccionado ?? undefined,
-      cantidad_dias: editableCampo ? prev.cantidad_dias : dias, // asigna correctamente
-    }));
+    if (isEditing && id) {
+      const s = solicitudes.find((sol) => sol.id === Number(id));
+      if (!s) return;
+
+      const bloqueada = s.numero_aprobaciones > 0 || s.estado !== "P";
+      setEditable(!bloqueada);
+
+      // Calcular cantidad_dias según tipo
+      const tipo = tipos.find((t) => t.id === s.id_solicitud_tipo);
+      const nombre = tipo?.nombre ?? "";
+      const { dias, editable: editableCampo } = calcularCantidadDias(nombre);
+
+      setCantidadEditable(editableCampo);
+
+      // IMPORTANTE: Determinar el valor correcto de cantidad_dias
+      let cantidadDiasValue = s.cantidad_dias;
+      
+      // Si el campo es editable, usar el valor guardado
+      // Si no es editable, usar el valor calculado o el guardado si existe
+      if (!editableCampo && dias !== null) {
+        cantidadDiasValue = dias;
+      } else if (editableCampo && s.cantidad_dias === null) {
+        cantidadDiasValue = null; // Mantener null si es editable y no hay valor
+      }
+
+      setFormData({
+        ...s,
+        cantidad_dias: cantidadDiasValue,
+      });
+
+      setTipoSeleccionado(s.id_solicitud_tipo);
+      setLideresAsignados(s.lideres);
+    }
+  }, [id, solicitudes]); // Agregar solicitudes como dependencia
+
+  // --- Actualizar cantidad y editable si cambió el tipo (solo para nuevos registros) ---
+  useEffect(() => {
+    // Solo actualizar si no estamos editando o si el tipo cambió manualmente
+    if (!isEditing || (isEditing && tipoSeleccionado !== formData.id_solicitud_tipo)) {
+      const tipo = tipos.find((t) => t.id === tipoSeleccionado);
+      const nombre = tipo?.nombre ?? "";
+      const { dias, editable: editableCampo } = calcularCantidadDias(nombre);
+      setCantidadEditable(editableCampo);
+      
+      setFormData((prev) => ({
+        ...prev,
+        id_solicitud_tipo: tipoSeleccionado ?? undefined,
+        cantidad_dias: editableCampo ? (isEditing ? prev.cantidad_dias : null) : dias,
+      }));
+    }
   }, [tipoSeleccionado]);
 
   // --- Generar secciones para DynamicForm ---
@@ -124,15 +139,16 @@ useEffect(() => {
           options: tipos.map((t) => ({ value: t.id, label: t.nombre })),
           placeholder: "Seleccionar...",
           disabled: !editable,
-          value: formData.id_solicitud_tipo, // 👈 liga el valor al formData
+          value: formData.id_solicitud_tipo || "", // Asegurar que no sea null
         },
         {
           name: "cantidad_dias",
           label: "Cantidad de días",
           type: "number" as const,
-          required: false,
+          required: cantidadEditable, // Solo requerido si es editable
           disabled: !cantidadEditable || !editable,
-          value: formData.cantidad_dias, // 👈 liga el valor al formData
+          value: formData.cantidad_dias ?? "", // Convertir null a string vacío para el input
+          min: 1, // Agregar validación mínima
         },
         {
           name: "fecha_inicio",
@@ -140,7 +156,7 @@ useEffect(() => {
           type: "date" as const,
           required: true,
           disabled: !editable,
-          value: formData.fecha_inicio,
+          value: formData.fecha_inicio || "",
         },
         {
           name: "comentario",
@@ -149,7 +165,7 @@ useEffect(() => {
           fullWidth: true,
           required: true,
           disabled: !editable,
-          value: formData.comentario,
+          value: formData.comentario || "",
         },
         {
           name: "lideres_custom",
@@ -177,6 +193,12 @@ useEffect(() => {
       return;
     }
 
+    // Validar cantidad_dias si es editable y requerido
+    if (cantidadEditable && (!data.cantidad_dias || data.cantidad_dias <= 0)) {
+      alert("Por favor ingrese una cantidad de días válida.");
+      return;
+    }
+
     const payload: SolicitudItem = {
       ...data,
       id_usuario: user?.id ?? 0,
@@ -185,6 +207,7 @@ useEffect(() => {
       lideres: lideresAsignados,
       id: isEditing ? Number(id) : Date.now(),
       tipo: tipos.find((t) => t.id === data.id_solicitud_tipo) ?? undefined,
+      cantidad_dias: data.cantidad_dias ? Number(data.cantidad_dias) : null, // Asegurar que sea número
       // NOTA: fecha_fin se elimina, el backend la calculará
     } as SolicitudItem;
 
@@ -205,6 +228,16 @@ useEffect(() => {
     navigate("/requests");
   };
 
+  // --- Manejar cambios en el formulario ---
+  const handleFormChange = (data: Partial<SolicitudItem>) => {
+    setFormData(data);
+    
+    // Si el tipo de solicitud cambió, actualizar el tipo seleccionado
+    if (data.id_solicitud_tipo !== undefined && data.id_solicitud_tipo !== tipoSeleccionado) {
+      setTipoSeleccionado(data.id_solicitud_tipo);
+    }
+  };
+
   return (
     <FormLayout
       title={isEditing ? "Editar Solicitud" : "Crear Solicitud"}
@@ -218,12 +251,12 @@ useEffect(() => {
       onSubmitLabel={isEditing ? "Guardar cambios" : "Enviar solicitud"}
     >
       <DynamicForm
-        key={isEditing ? `form-${id}` : "form-nuevo"}
+        key={isEditing ? `form-${id}-${tipoSeleccionado}` : "form-nuevo"} // Agregar tipoSeleccionado al key
         id="solicitud-form"
         sections={getSections()}
-        initialData={formData} // 👈 ahora los valores se reflejan
+        initialData={formData}
         onSubmit={handleSubmit}
-        onChange={(data) => setFormData(data)}
+        onChange={handleFormChange}
       />
     </FormLayout>
   );
