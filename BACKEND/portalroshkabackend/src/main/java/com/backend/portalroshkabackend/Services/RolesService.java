@@ -7,8 +7,9 @@ import java.util.stream.Collectors;
 
 import com.backend.portalroshkabackend.Models.Roles;
 import com.backend.portalroshkabackend.Repositories.RolesRepository;
-import com.backend.portalroshkabackend.DTO.RolesResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.RolesResponseDto;;
 
+/* 
 @Service
 public class RolesService {
 
@@ -23,11 +24,13 @@ public class RolesService {
         List<Roles> roles = (List<Roles>) rolesRepository.findAll();
         return roles.stream().map(this::mapToRolesResponseDto).collect(Collectors.toList());
     }
-    
+
     private RolesResponseDto mapToRolesResponseDto(Roles rol) {
         RolesResponseDto dto = new RolesResponseDto();
         dto.setIdRol(rol.getIdRol());
         dto.setNombre(rol.getNombre());
         return dto;
     }
+    
 }
+    */

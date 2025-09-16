@@ -1,3 +1,4 @@
+/*
 package com.backend.portalroshkabackend.Services;
 
 import com.backend.portalroshkabackend.DTO.PositionDto;
@@ -38,3 +39,4 @@ public interface IHumanResourceService {
     PositionDto updatePosition(PositionUpdateDto positionUpdateDto, int id);
     PositionDto deletePosition(int id);
 }
+*/

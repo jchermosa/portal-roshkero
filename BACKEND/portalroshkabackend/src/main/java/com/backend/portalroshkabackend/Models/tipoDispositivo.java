@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Table(name = "tipo_dispositivo")
-public class tipoDispositivo {
+public class TipoDispositivo {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_tipo_inventario")
-    private Integer idInventario;
+    @Column(name = "id_tipo_dispositivo")
+    private Integer idTipoDispositivo;
 
     @Column(name = "nombre")
     private String nombre;

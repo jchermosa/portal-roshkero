@@ -31,7 +31,7 @@ public class Inventario {
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_dispositivo")
-    private tipoDispositivo idTipoInventario;
+    private TipoDispositivo idTipoInventario;
 
     @Column(name = "nro_serie")
     private String nroSerie;

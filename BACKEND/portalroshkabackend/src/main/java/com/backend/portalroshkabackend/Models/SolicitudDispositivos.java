@@ -5,7 +5,8 @@ import java.sql.Date;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,16 +50,16 @@ public class SolicitudDispositivos {
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "estado_ac_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private EstadoActivoInactivo estado;
+    private EstadoSolicitudEnum estado;
 
     @Column(name = "fecha_creacion")
     private Date fechaCreacion;
 
     @ManyToOne
-    @JoinColumn(name = "id_tipo_inventario")
-    private tipoDispositivo idTipoInventario;
+    @JoinColumn(name = "id_tipo_dispositivo")
+    private TipoDispositivo tipoDispositivo;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
-    private Usuario idUsuario;
+    private Usuario usuario;
 }

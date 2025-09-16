@@ -1,3 +1,4 @@
+/* 
 package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.*;
@@ -92,3 +93,4 @@ public class AutoMap {
         return user;
     }
 }
+*/

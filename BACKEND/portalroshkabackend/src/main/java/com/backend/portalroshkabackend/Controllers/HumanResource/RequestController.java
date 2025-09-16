@@ -1,3 +1,4 @@
+/*
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.RequestDto;
@@ -60,3 +61,4 @@ public class RequestController {
         return ResponseEntity.ok("agregar nuevo tipo de request") ;
     }
 }
+*/

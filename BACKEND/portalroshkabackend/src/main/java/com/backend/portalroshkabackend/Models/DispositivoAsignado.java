@@ -39,7 +39,7 @@ public class DispositivoAsignado {
     
     @ManyToOne
     @JoinColumn(name = "id_tipo_dispositivo")
-    private tipoDispositivo idTipoDispositivo;
+    private TipoDispositivo idTipoDispositivo;
 
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente
     @Enumerated(EnumType.STRING)
