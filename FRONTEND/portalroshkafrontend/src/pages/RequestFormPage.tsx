@@ -16,7 +16,7 @@ interface LiderItem extends CatalogItem {
 interface SolicitudItem {
   id: number;
   id_usuario: number;
-  id_solicitud_tipo: number | null; // <-- ahora acepta null
+  id_solicitud_tipo: number | null;
   tipo?: CatalogItem;
   cantidad_dias: number | null;
   fecha_inicio: string;
@@ -36,12 +36,13 @@ export default function SolicitudFormPage() {
   const modoDesarrollo = true; // 👈 cambiar a false cuando haya backend
 
   const [solicitudes, setSolicitudes] = useState<SolicitudItem[]>(
-      mockSolicitudes.map((s) => ({
-        ...s,
-        estado: s.estado as "P" | "A" | "R", // forzar tipo
-        tipo: s.tipo ?? mockTipos.find((t) => t.id === s.id_solicitud_tipo), // opcional
+    mockSolicitudes.map((s) => ({
+      ...s,
+      estado: s.estado as "P" | "A" | "R",
+      tipo: s.tipo ?? mockTipos.find((t) => t.id === s.id_solicitud_tipo),
     }))
   );
+
   const [tipos, setTipos] = useState<CatalogItem[]>(mockTipos);
   const [lideres, setLideres] = useState<LiderItem[]>(mockLideres as LiderItem[]);
   const [lideresAsignados, setLideresAsignados] = useState<LiderItem[]>([]);
@@ -54,30 +55,36 @@ export default function SolicitudFormPage() {
     fecha_fin: "",
     comentario: "",
   });
+  const [editable, setEditable] = useState<boolean>(true); // controla si se puede editar
 
-  // --- Cargar datos si es edición ---
-  useEffect(() => {
-    if (isEditing && id) {
-      if (modoDesarrollo) {
-        const s = solicitudes.find((sol) => sol.id === Number(id));
-        if (s) {
-          setFormData(s);
-          setLideresAsignados(s.lideres);
-          setTipoSeleccionado(s.id_solicitud_tipo);
-        } else {
-          alert("Solicitud no encontrada (mock).");
-          navigate("/requests");
-        }
-      } else {
-        // Aquí iría el fetch a la API cuando esté disponible
-      }
-    }
-  }, [id]);
+useEffect(() => {
+  if (isEditing && id) {
+    const s = solicitudes.find((sol) => sol.id === Number(id));
+    if (!s) return;
 
-  // --- Calcular cantidad de días según tipo ---
+    const bloqueada = s.numero_aprobaciones > 0 || s.estado !== "P";
+    setEditable(!bloqueada);
+
+    // Calcular cantidad_dias según tipo
+    const tipo = tipos.find((t) => t.id === s.id_solicitud_tipo);
+    const nombre = tipo?.nombre ?? "";
+    const { dias, editable: editableCampo } = calcularCantidadDias(nombre);
+
+    setCantidadEditable(editableCampo);
+
+    setFormData({
+      ...s,
+      cantidad_dias: editableCampo ? s.cantidad_dias : dias,  
+    });
+
+    setTipoSeleccionado(s.id_solicitud_tipo);
+    setLideresAsignados(s.lideres);
+  }
+}, [id]);
+
   const calcularCantidadDias = (nombre: string): { dias: number | null; editable: boolean } => {
     let dias: number | null = null;
-    let editable = false;
+    let editableCampo = false;
     if (nombre.includes("Paternidad")) dias = 14;
     else if (nombre.includes("Maternidad")) dias = 150;
     else if (nombre.includes("Cumpleanos")) dias = 1;
@@ -85,21 +92,21 @@ export default function SolicitudFormPage() {
     else if (nombre.includes("Luto(1er grado)")) dias = 5;
     else if (nombre.includes("Luto(2do grado)")) dias = 3;
     else if (["Capacitacion", "Examenes", "Reposo", "Otros"].some((k) => nombre.includes(k)))
-      editable = true;
+      editableCampo = true;
 
-    return { dias, editable };
+    return { dias, editable: editableCampo };
   };
 
   // --- Actualizar cantidad y editable si cambió el tipo ---
   useEffect(() => {
     const tipo = tipos.find((t) => t.id === tipoSeleccionado);
     const nombre = tipo?.nombre ?? "";
-    const { dias, editable } = calcularCantidadDias(nombre);
-    setCantidadEditable(editable);
+    const { dias, editable: editableCampo } = calcularCantidadDias(nombre);
+    setCantidadEditable(editableCampo);
     setFormData((prev) => ({
       ...prev,
-      id_solicitud_tipo: tipoSeleccionado ?? undefined, // ahora compatible
-      cantidad_dias: editable ? prev.cantidad_dias : dias,
+      id_solicitud_tipo: tipoSeleccionado ?? undefined,
+      cantidad_dias: editableCampo ? prev.cantidad_dias : dias, // asigna correctamente
     }));
   }, [tipoSeleccionado]);
 
@@ -116,25 +123,24 @@ export default function SolicitudFormPage() {
           required: true,
           options: tipos.map((t) => ({ value: t.id, label: t.nombre })),
           placeholder: "Seleccionar...",
+          disabled: !editable,
+          value: formData.id_solicitud_tipo, // 👈 liga el valor al formData
         },
         {
           name: "cantidad_dias",
           label: "Cantidad de días",
           type: "number" as const,
           required: false,
-          disabled: !cantidadEditable,
+          disabled: !cantidadEditable || !editable,
+          value: formData.cantidad_dias, // 👈 liga el valor al formData
         },
         {
           name: "fecha_inicio",
           label: "Fecha de inicio",
           type: "date" as const,
           required: true,
-        },
-        {
-          name: "fecha_fin",
-          label: "Fecha de fin",
-          type: "date" as const,
-          required: true,
+          disabled: !editable,
+          value: formData.fecha_inicio,
         },
         {
           name: "comentario",
@@ -142,6 +148,8 @@ export default function SolicitudFormPage() {
           type: "textarea" as const,
           fullWidth: true,
           required: true,
+          disabled: !editable,
+          value: formData.comentario,
         },
         {
           name: "lideres_custom",
@@ -152,8 +160,9 @@ export default function SolicitudFormPage() {
             <AsignadorEntidad
               disponibles={lideres}
               asignados={lideresAsignados}
-              setAsignados={setLideresAsignados}
+              setAsignados={editable ? setLideresAsignados : () => {}} 
               label="Líderes asignados"
+              disabled={!editable}
             />
           ),
         },
@@ -163,6 +172,11 @@ export default function SolicitudFormPage() {
 
   // --- Guardar la solicitud ---
   const handleSubmit = async (data: Partial<SolicitudItem>) => {
+    if (!editable) {
+      alert("No se puede editar esta solicitud.");
+      return;
+    }
+
     const payload: SolicitudItem = {
       ...data,
       id_usuario: user?.id ?? 0,
@@ -170,6 +184,8 @@ export default function SolicitudFormPage() {
       numero_aprobaciones: 0,
       lideres: lideresAsignados,
       id: isEditing ? Number(id) : Date.now(),
+      tipo: tipos.find((t) => t.id === data.id_solicitud_tipo) ?? undefined,
+      // NOTA: fecha_fin se elimina, el backend la calculará
     } as SolicitudItem;
 
     if (modoDesarrollo) {
@@ -205,7 +221,7 @@ export default function SolicitudFormPage() {
         key={isEditing ? `form-${id}` : "form-nuevo"}
         id="solicitud-form"
         sections={getSections()}
-        initialData={formData}
+        initialData={formData} // 👈 ahora los valores se reflejan
         onSubmit={handleSubmit}
         onChange={(data) => setFormData(data)}
       />
