@@ -1,14 +1,14 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.Operationes;
 
 public class CargosResponseDto {
-    private Integer idCargo;
+    private int idCargo;
     private String nombre;
 
-    public Integer getIdCargo() {
+    public int getIdCargo() {
         return idCargo;
     }
 
-    public void setIdCargo(Integer idCargo) {
+    public void setIdCargo(int idCargo) {
         this.idCargo = idCargo;
     }
 
@@ -20,3 +20,5 @@ public class CargosResponseDto {
         this.nombre = nombre;
     }
 }
+
+
