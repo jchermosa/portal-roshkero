@@ -52,16 +52,11 @@ public class AutoMap {
 
         dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
         dto.setFechaInicio(solicitudesTH.getFechaInicio());
-        dto.setFechaFin(solicitudesTH.getFechaFin());
-        dto.setUsuario(solicitudesTH.getUsuario());
+        dto.setUsuario(solicitudesTH.getUsuario().getNombre() + " " + solicitudesTH.getUsuario().getApellido());
         dto.setCantidadDias(solicitudesTH.getCantidadDias());
-        dto.setAprobacionTH(solicitudesTH.getAprobacionTH());
-        dto.setComentario(solicitudesTH.getComentario());
-        dto.setSolicitudThTipo(solicitudesTH.getSolicitudThTipo());
+        dto.setSolicitudThTipo(solicitudesTH.getSolicitudThTipo().getNombre());
         dto.setEstado(solicitudesTH.getEstado());
         dto.setFechaCreacion(solicitudesTH.getFechaCreacion());
-        dto.setPermisos(solicitudesTH.getPermisos());
-        dto.setBeneficios(solicitudesTH.getBeneficios());
 
         return dto;
 

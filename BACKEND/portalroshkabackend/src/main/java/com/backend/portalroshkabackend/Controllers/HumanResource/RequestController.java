@@ -46,7 +46,6 @@ public class RequestController {
     ){
         Page<RequestDto> requests = requestService.getAllRequests(pageable); // Solicitud Enviar -> Aprueba Lider/es -> Aparece en TH para aprobar / rechazar
 
-
         return ResponseEntity.ok(requests);
     }
 

@@ -17,26 +17,16 @@ public class SolicitudTHResponseDto {
 
     private Integer idSolicitudTH;
 
+    private String usuario;
+
+    private String solicitudThTipo;
+
     private Date fechaInicio;
-
-    private Date fechaFin;
-
-    private Usuario usuario;
 
     private Integer cantidadDias;
 
-    private Boolean aprobacionTH;
-
-    private String comentario;
-
-    private SolicitudThTipo solicitudThTipo;
-
-    private EstadoSolicitudEnum estado;
-
     private Date fechaCreacion;
 
-    private Permisos permisos;
-
-    private Beneficios beneficios;
+    private EstadoSolicitudEnum estado;
 
 }
