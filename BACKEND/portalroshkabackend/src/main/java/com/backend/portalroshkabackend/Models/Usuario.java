@@ -35,7 +35,7 @@ public class Usuario {
 
     @ManyToOne
     @JoinColumn(name = "id_rol",  nullable = false)
-    private Roles idRol;
+    private Roles idRol; //se debe llamar ROL porque es la tabla a la que hace referencia
 
     @Column(name = "fecha_ingreso")
     private Date fechaIngreso;

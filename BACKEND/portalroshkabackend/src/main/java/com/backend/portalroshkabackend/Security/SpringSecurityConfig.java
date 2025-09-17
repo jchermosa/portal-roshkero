@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import com.backend.portalroshkabackend.Security.filter.JwtAuthenticationFilter;
 import com.backend.portalroshkabackend.Security.filter.JwtValidationFilter;
-import com.backend.portalroshkabackend.Services.UsuariosService;
+import com.backend.portalroshkabackend.Services.UsuariosService.UsuariosService;
 
 @Configuration
 public class SpringSecurityConfig {

@@ -13,7 +13,7 @@ public class RequestDto {
     private int numeroAprobaciones;
     private String comentario;
     private int idSolicitudTipo;
-    private EstadoSolicitud estado;
+//    private EstadoSolicitud estado;
     private Date fechaCreacion;
 
     public int getIdSolicitud() {

@@ -1,35 +1,34 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.UsuarioDTO;
 
 import java.sql.Date;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
-public class UserDto {
-    private Integer idUsuario;
-
+public class UserUpdateDto {
     private String nombre;
+
     private String apellido;
+
     private int nroCedula;
+
     private String correo;
+
     private Integer idRol;
+
     private Date fechaIngreso;
-    private String antiguedad;
-    private int diasVacaciones;
+
     private EstadoActivoInactivo estado;
-    private String contrasena;
+
+    // private String contrasena;
+
     private String telefono;
+
     private Integer idEquipo;
+
     private Integer idCargo;
+
     private Date fechaNacimiento;
-    private int diasVacacionesRestante;
+
     private boolean requiereCambioContrasena;
-
-    public Integer getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(Integer idUsuario) {
-        this.idUsuario = idUsuario;
-    }
 
     public String getNombre() {
         return nombre;
@@ -79,22 +78,6 @@ public class UserDto {
         this.fechaIngreso = fechaIngreso;
     }
 
-    public String getAntiguedad() {
-        return antiguedad;
-    }
-
-    public void setAntiguedad(String antiguedad) {
-        this.antiguedad = antiguedad;
-    }
-
-    public int getDiasVacaciones() {
-        return diasVacaciones;
-    }
-
-    public void setDiasVacaciones(int diasVacaciones) {
-        this.diasVacaciones = diasVacaciones;
-    }
-
     public EstadoActivoInactivo getEstado() {
         return estado;
     }
@@ -103,13 +86,13 @@ public class UserDto {
         this.estado = estado;
     }
 
-    public String getContrasena() {
-        return contrasena;
-    }
+    // public String getContrasena() {
+    //     return contrasena;
+    // }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
-    }
+    // public void setContrasena(String contrasena) {
+    //     this.contrasena = contrasena;
+    // }
 
     public String getTelefono() {
         return telefono;
@@ -141,14 +124,6 @@ public class UserDto {
 
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
-    }
-
-    public int getDiasVacacionesRestante() {
-        return diasVacacionesRestante;
-    }
-
-    public void setDiasVacacionesRestante(int diasVacacionesRestante) {
-        this.diasVacacionesRestante = diasVacacionesRestante;
     }
 
     public boolean isRequiereCambioContrasena() {
