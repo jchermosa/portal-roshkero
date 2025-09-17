@@ -1,8 +1,9 @@
+// src/pages/UsuariosPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { usePaginatedFetch } from "../hooks/usePaginatedFetch";
-import { useCatalogos } from "../hooks/useCatalogos";
+import { useUsuarios } from "../hooks/usuarios/useUsuarios";
+import { useCatalogos } from "../hooks/catalogos/useCatalogos";
 import { tieneRol } from "../utils/permisos";
 import { Roles } from "../types/roles";
 
@@ -29,19 +30,18 @@ export default function UsuariosPage() {
   // Catálogos
   const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogos(token);
 
-  // Usuarios
+  // Usuarios (hook especializado)
   const {
     data: usuarios,
     totalPages,
     loading: loadingUsuarios,
     error,
-  } = usePaginatedFetch<UsuarioItem>("usuarios", token, {
-    rolId,
-    equipoId,
-    cargoId,
+  } = useUsuarios(
+    token,
+    { rolId, equipoId, cargoId }, // filtros
     page,
-    size: 10,
-  });
+    10
+  );
 
   const limpiarFiltros = () => {
     setRolId("");

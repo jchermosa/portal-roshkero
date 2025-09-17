@@ -1,6 +1,8 @@
+// src/pages/UserSearchPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getUsuarioByCedula } from "../services/UserService";
 import heroBg from "../assets/ilustracion-herov3.svg";
 
 export default function UserSearchPage() {
@@ -11,32 +13,18 @@ export default function UserSearchPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async () => {
-    if (!cedula.trim()) return;
+    if (!cedula.trim() || !token) return;
     setError(null);
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/usuarios/cedula/${cedula}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.status === 404) {
-        // Usuario no existe → ir a crear con cédula precargada
-        navigate(`/usuarios/nuevo?cedula=${cedula}`);
-        return;
-      }
-
-      if (!res.ok) {
-        throw new Error(await res.text());
-      }
-
-      const data = await res.json();
+      const data = await getUsuarioByCedula(token, cedula);
 
       if (data && data.id) {
         // Usuario ya existe → ir a editar
         navigate(`/usuarios/${data.id}`);
       } else {
-        // Fallback de seguridad
+        // Usuario no existe o no tiene ID → crear con cédula precargada
         navigate(`/usuarios/nuevo?cedula=${cedula}`);
       }
     } catch (err: any) {
