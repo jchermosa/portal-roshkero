@@ -6,16 +6,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EquiposRepository extends JpaRepository<Equipos, Integer> {
-
+    
     boolean existsByNombre(String nombre);//для обработки повторяющизся имен.
-
-    @Query("SELECT e FROM Equipos e LEFT JOIN FETCH e.cliente WHERE e.idEquipo = :id")
-    Optional<Equipos> findByIdWithCliente(@Param("id") int id);// no trabajo
+    List<Equipos> findAllByNombre(String nombre);
+    Optional<Equipos> findByNombre(String nombre);
+    boolean existsByNombreAndIdEquipoNot(String nuevoNombre, Integer idEquipo);
 
 }

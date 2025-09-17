@@ -1,11 +1,16 @@
 package com.backend.portalroshkabackend.Services.Operations;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
@@ -16,6 +21,7 @@ import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 
 @Service("operationsEquiposService")
+@Validated
 public class EquiposServiceImpl implements IEquiposService {
     private final EquiposRepository equiposRepository;
     private final ClientesRepository clientesRepository;
@@ -44,15 +50,21 @@ public class EquiposServiceImpl implements IEquiposService {
 
     @Override
     public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
+
         Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+                .orElseThrow(() -> new RuntimeException("Cliente not found")); // для подстановки в клиенте
+
+        List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
+        if (!existentes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
+        }
 
         Equipos equipo = new Equipos();
         equipo.setNombre(requestDto.getNombre());
         equipo.setFechaInicio(requestDto.getFechaInicio());
         equipo.setFechaLimite(requestDto.getFechaLimite());
         equipo.setIdCliente(cliente);
-        equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));;
+        equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
         equipo.setFechaCreacion(new Date(System.currentTimeMillis()));
 
         Equipos savedEquipo = equiposRepository.save(equipo);
@@ -70,32 +82,38 @@ public class EquiposServiceImpl implements IEquiposService {
     }
 
     @Override
-    public EquiposResponseDto updateTeam(int id_equipo, EquiposRequestDto requestDto) {
-        Equipos existingEquipo = equiposRepository.findById(id_equipo)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+    public EquiposResponseDto updateTeam(int idEquipo, EquiposRequestDto requestDto) {
 
         Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
                 .orElseThrow(() -> new RuntimeException("Cliente not found"));
 
+        Equipos existingEquipo = equiposRepository.findById(idEquipo)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        // Проверка уникальности имени среди других записей
+        Optional<Equipos> otro = equiposRepository.findByNombre(requestDto.getNombre().trim());
+        if (otro.isPresent() && !otro.get().getIdEquipo().equals(idEquipo)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
+        }
+
+        // Обновляем поля
         existingEquipo.setNombre(requestDto.getNombre());
         existingEquipo.setFechaInicio(requestDto.getFechaInicio());
         existingEquipo.setFechaLimite(requestDto.getFechaLimite());
         existingEquipo.setIdCliente(cliente);
         existingEquipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
 
-        equiposRepository.save(existingEquipo);
+        Equipos savedEquipo = equiposRepository.save(existingEquipo);
 
-        Equipos updatedEquipo = equiposRepository.findById(id_equipo)
-                .orElseThrow(() -> new RuntimeException("Team not found after update"));
-
+        // Формируем DTO для ответа
         EquiposResponseDto dto = new EquiposResponseDto();
-        dto.setIdEquipo(updatedEquipo.getIdEquipo());
-        dto.setNombre(updatedEquipo.getNombre());
-        dto.setFechaInicio(updatedEquipo.getFechaInicio());
-        dto.setFechaLimite(updatedEquipo.getFechaLimite());
-        dto.setCliente(updatedEquipo.getCliente());
-        dto.setFechaCreacion(updatedEquipo.getFechaCreacion());
-        dto.setEstado(updatedEquipo.getEstado());
+        dto.setIdEquipo(savedEquipo.getIdEquipo());
+        dto.setNombre(savedEquipo.getNombre());
+        dto.setFechaInicio(savedEquipo.getFechaInicio());
+        dto.setFechaLimite(savedEquipo.getFechaLimite());
+        dto.setCliente(savedEquipo.getCliente());
+        dto.setFechaCreacion(savedEquipo.getFechaCreacion());
+        dto.setEstado(savedEquipo.getEstado());
 
         return dto;
     }

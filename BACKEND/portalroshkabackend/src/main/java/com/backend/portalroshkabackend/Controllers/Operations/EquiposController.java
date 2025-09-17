@@ -53,7 +53,10 @@ public class EquiposController {
 
     // ----------------- UPDATE -----------------
     @PutMapping("/{id}")
-    public EquiposResponseDto updateTeam(@PathVariable int id, @Valid @RequestBody EquiposRequestDto equipoRequest) {
+    public EquiposResponseDto updateTeam(
+            @PathVariable int id,
+            @Valid @RequestBody EquiposRequestDto equipoRequest) {
+
         return equiposService.updateTeam(id, equipoRequest);
     }
 
