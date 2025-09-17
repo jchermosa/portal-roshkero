@@ -6,7 +6,7 @@ import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <AuthProvider> {/* ✅ Envolvés toda la app con el contexto */}
+    <AuthProvider> 
       <App />
     </AuthProvider>
   </React.StrictMode>,
