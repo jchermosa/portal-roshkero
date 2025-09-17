@@ -2,12 +2,18 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.EmailUpdatedDto;
 import com.backend.portalroshkabackend.DTO.PhoneUpdatedDto;
-import com.backend.portalroshkabackend.DTO.th.*;
+import com.backend.portalroshkabackend.DTO.th.self.*;
 import com.backend.portalroshkabackend.Services.HumanResource.IThSelfService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -65,13 +71,39 @@ public class SelfController {
         return ResponseEntity.ok(requestsTypesDto);
     }
 
+    @GetMapping("/th/me/{id}/requests") // "id" se refiere a la ID DEL USUARIO
+    public ResponseEntity<Page<MisSolicitudesResponseDto>> getSelfRequests(
+            @PathVariable int id,
+            @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
+    ){
+        Page<MisSolicitudesResponseDto> selfRequestsDto = selfService.getAllSelfRequests(id, pageable);
+
+        return ResponseEntity.ok(selfRequestsDto);
+    }
+
+    @GetMapping("/th/me/{idUsuario}/requests/{idSolicitudTh}") // la segunda "id" se refiere al ID DE LA SOLICITUD
+    public ResponseEntity<SolicitudEspecificaResponseDto> getSelfRequestById(
+            @PathVariable int idUsuario,
+            @PathVariable int idSolicitudTh
+    ){
+        SolicitudEspecificaResponseDto solicitudEspecificaResponseDto = selfService.getRequestById(idUsuario, idSolicitudTh);
+
+        return ResponseEntity.ok(solicitudEspecificaResponseDto);
+    }
+
     @PostMapping("/th/me/request/{id}")
     public ResponseEntity<RequestResponseDto> sendRequest(@PathVariable int id,
-                                         @RequestBody SendSolicitudDto sendSolicitudDto
+                                                          @RequestBody SendSolicitudDto sendSolicitudDto
     ){
 
         RequestResponseDto response = selfService.sendRequest(id, sendSolicitudDto);
 
-        return ResponseEntity.ok(response);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("th/me/requests/{id}")
+                .buildAndExpand(response.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
     }
 }

@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO.th;
+package com.backend.portalroshkabackend.DTO.th.self;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

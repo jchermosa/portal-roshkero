@@ -1,7 +1,7 @@
-package com.backend.portalroshkabackend.DTO.th;
+package com.backend.portalroshkabackend.DTO.th.self;
 
 import com.backend.portalroshkabackend.Models.Beneficios;
-
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Permisos;
 import com.backend.portalroshkabackend.Models.SolicitudThTipo;
 import com.backend.portalroshkabackend.Models.Usuario;
@@ -13,19 +13,18 @@ import java.sql.Date;
 
 @Data
 @NoArgsConstructor
-public class SendSolicitudDto {
+public class MisSolicitudesResponseDto {
 
-    private Date fechaInicio;
-
-    private Usuario usuario;
-
-    private Integer cantidadDias;
-
-    private String comentario;
+    private Integer idSolicitudTH;
 
     private SolicitudThTipo solicitudThTipo;
 
-    private Permisos permisos;
+    private String comentario;
 
-    private Beneficios beneficios;
+    private Boolean aprobacionTH;
+
+    private EstadoSolicitudEnum estado;
+
+    private Date fechaCreacion;
+
 }

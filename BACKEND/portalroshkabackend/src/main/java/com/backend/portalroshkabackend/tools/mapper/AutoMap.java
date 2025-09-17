@@ -2,6 +2,7 @@ package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.DTO.th.*;
+import com.backend.portalroshkabackend.DTO.th.self.*;
 import com.backend.portalroshkabackend.Models.*;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 
@@ -185,6 +186,32 @@ public class AutoMap {
         solicitudesTH.setFechaCreacion(Date.valueOf(LocalDate.now()));
         solicitudesTH.setPermisos(dto.getPermisos());
         solicitudesTH.setBeneficios(dto.getBeneficios());
+
+    }
+
+    public static MisSolicitudesResponseDto toMisSolicitudesResponseDto(SolicitudesTH solicitudesTH){
+        MisSolicitudesResponseDto dto = new MisSolicitudesResponseDto();
+
+        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
+        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
+        dto.setComentario(solicitudesTH.getComentario());
+        dto.setAprobacionTH(solicitudesTH.getAprobacionTH());
+        dto.setEstado(solicitudesTH.getEstado());
+        dto.setFechaCreacion(solicitudesTH.getFechaCreacion());
+
+        return dto;
+    }
+
+    public static SolicitudEspecificaResponseDto toSolicitudEspecificaResponseDto(SolicitudesTH solicitudesTH){
+        SolicitudEspecificaResponseDto dto = new SolicitudEspecificaResponseDto();
+
+        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
+        dto.setSolicitudThTipo(solicitudesTH.getSolicitudThTipo());
+        dto.setCantidadDias(solicitudesTH.getCantidadDias());
+        dto.setFechaInicio(solicitudesTH.getFechaInicio());
+        dto.setComentario(solicitudesTH.getComentario());
+
+        return dto;
 
     }
 }

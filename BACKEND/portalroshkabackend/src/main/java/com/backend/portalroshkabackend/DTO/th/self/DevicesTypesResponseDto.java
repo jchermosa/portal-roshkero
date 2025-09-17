@@ -1,9 +1,5 @@
-package com.backend.portalroshkabackend.DTO.th;
+package com.backend.portalroshkabackend.DTO.th.self;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
