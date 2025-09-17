@@ -91,6 +91,21 @@ public class ThSelfServiceImpl implements IThSelfService {
         return responseDto;
     }
 
+    @Override
+    public RequestResponseDto updateRequest(int idSolicitudTh, UpdateSolicitudDto updateSolicitudDto) {
+        SolicitudesTH request  = solicitudesTHRepository.findById(idSolicitudTh).orElseThrow(() -> new RequestNotFoundException(idSolicitudTh));
+
+        AutoMap.toSolicitudesThFromUpdateSolicitudDto(request, updateSolicitudDto);
+
+        SaveManager.saveEntity(() -> solicitudesTHRepository.save(request), "Error al actualizar la solicitud: ");
+
+        RequestResponseDto responseDto = new RequestResponseDto();
+        responseDto.setId(request.getIdSolicitudTH());
+        responseDto.setMessage("Solicitud actualizada con exito");
+
+        return responseDto;
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<BenefitsTypesResponseDto> getAllBenefitsTypes() {

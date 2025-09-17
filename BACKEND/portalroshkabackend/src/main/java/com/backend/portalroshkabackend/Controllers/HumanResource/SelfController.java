@@ -91,12 +91,12 @@ public class SelfController {
         return ResponseEntity.ok(solicitudEspecificaResponseDto);
     }
 
-    @PostMapping("/th/me/request/{id}")
-    public ResponseEntity<RequestResponseDto> sendRequest(@PathVariable int id,
+    @PostMapping("/th/me/request/{idUsuario}")
+    public ResponseEntity<RequestResponseDto> sendRequest(@PathVariable int idUsuario,
                                                           @RequestBody SendSolicitudDto sendSolicitudDto
     ){
 
-        RequestResponseDto response = selfService.sendRequest(id, sendSolicitudDto);
+        RequestResponseDto response = selfService.sendRequest(idUsuario, sendSolicitudDto);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
@@ -105,5 +105,14 @@ public class SelfController {
                 .toUri();
 
         return ResponseEntity.created(location).body(response);
+    }
+
+    @PutMapping("/th/me/requests/{idSolicitudTh}/update")
+    public ResponseEntity<RequestResponseDto> updateRequest(@PathVariable int idSolicitudTh,
+                                                            @RequestBody UpdateSolicitudDto updateSolicitudDto
+    ){
+        RequestResponseDto responseDto = selfService.updateRequest(idSolicitudTh, updateSolicitudDto);
+
+        return ResponseEntity.ok(responseDto);
     }
 }

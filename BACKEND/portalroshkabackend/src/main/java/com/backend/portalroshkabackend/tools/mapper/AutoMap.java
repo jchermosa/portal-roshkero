@@ -189,6 +189,14 @@ public class AutoMap {
 
     }
 
+    public static void toSolicitudesThFromUpdateSolicitudDto(SolicitudesTH solicitudesTH, UpdateSolicitudDto dto){
+        solicitudesTH.setSolicitudThTipo(dto.getSolicitudThTipo());
+        solicitudesTH.setCantidadDias(dto.getCantidadDias());
+        solicitudesTH.setFechaInicio(dto.getFechaInicio());
+        solicitudesTH.setComentario(dto.getComentario());
+
+    }
+
     public static MisSolicitudesResponseDto toMisSolicitudesResponseDto(SolicitudesTH solicitudesTH){
         MisSolicitudesResponseDto dto = new MisSolicitudesResponseDto();
 

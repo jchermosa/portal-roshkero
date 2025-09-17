@@ -13,6 +13,7 @@ public interface IThSelfService {
     PhoneUpdatedDto updatePhone(int id, String newPhone);
 
     RequestResponseDto sendRequest(int id, SendSolicitudDto sendSolicitudDto);
+    RequestResponseDto updateRequest(int idSolicitudTh, UpdateSolicitudDto updateSolicitudDto);
 
     List<BenefitsTypesResponseDto> getAllBenefitsTypes();
     List<DevicesTypesResponseDto> getAllDevicesTypes();
