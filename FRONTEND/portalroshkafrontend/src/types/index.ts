@@ -30,11 +30,21 @@ export interface LiderItem {
   aprobado: boolean;
 }
 
+
 export interface SolicitudItem {
-  id_solicitud: number;
-  tipo: CatalogItem;
+  id: number;
+  id_usuario: number;
+  nombre: string;
+  apellido:string;
+  id_solicitud_tipo: number;
+  tipo: { id: number; nombre: string };
+  cantidad_dias: number | null;
+  fecha_inicio: string;
+  fecha_fin: string;
   comentario: string;
-  estado: SolicitudEstado;
+  estado: "P" | "A" | "R";
+  numero_aprobaciones: number;
+  lideres: LiderItem[];
 }
 
 

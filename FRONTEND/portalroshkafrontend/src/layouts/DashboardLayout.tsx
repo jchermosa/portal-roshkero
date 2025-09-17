@@ -20,7 +20,7 @@ export default function DashboardLayout() {
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
     { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: isThOrGth },
-    { id: "/gestion-solicitudes", label: "Gestión de Solicitudes", icon: "📤", available: isThOrGth },
+    { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: isThOrGth },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },

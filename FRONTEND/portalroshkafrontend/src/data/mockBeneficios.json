@@ -1,0 +1,26 @@
+[
+  {
+    "id": 101,
+    "usuario": "Laura ",
+    "tipo": "Nutricionista",
+    "apellido": "Cacio",
+    "comentario": "Atención mensual incluida",
+    "estado": "A"
+  },
+  {
+    "id": 102,
+    "usuario": "Pedro",
+    "apellido": "Cacio",
+    "tipo": "Gimnasio",
+    "comentario": "Acceso ilimitado",
+    "estado": "P"
+  },
+  {
+    "id": 103,
+    "usuario": "Ana",
+    "apellido": "Cacio",
+    "tipo": "Nutricionista",
+    "comentario": "Plan anual con 20% descuento",
+    "estado": "R"
+  }
+]
