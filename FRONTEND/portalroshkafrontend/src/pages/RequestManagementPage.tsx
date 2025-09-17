@@ -9,7 +9,6 @@ import PageLayout from "../layouts/PageLayout";
 import mockSolicitudes from "../data/mockSolicitudes.json";
 import mockBeneficios from "../data/mockBeneficios.json";
 
-// Tipos separados
 type SolicitudPermiso = {
   id: number;
   usuario: string;
@@ -27,7 +26,7 @@ type SolicitudBeneficio = {
   estado: "Pendiente" | "Aprobada" | "Rechazada";
 };
 
-// Hook de mock
+// Hook mock
 function useMockSolicitudes(
   tipoVista: "beneficios" | "permisos",
   { page, size, estado }: { page: number; size: number; estado: string }
@@ -37,10 +36,8 @@ function useMockSolicitudes(
       ? (mockBeneficios as SolicitudBeneficio[])
       : (mockSolicitudes as SolicitudPermiso[]);
 
-  // Filtrar por estado
-  let filtered = estado ? data.filter((s: any) => s.estado === estado) : data;
+  const filtered = estado ? data.filter((s) => s.estado === estado) : data;
 
-  // Paginación
   const start = page * size;
   const paginated = filtered.slice(start, start + size);
 
@@ -63,7 +60,6 @@ export default function SolicitudesPage({
   const [estado, setEstado] = useState("");
   const [page, setPage] = useState(0);
 
-  // Mock fetch según vista
   const { data: solicitudes, totalPages, loading, error } = useMockSolicitudes(
     tipoVista,
     { page, size: 10, estado }
@@ -74,7 +70,20 @@ export default function SolicitudesPage({
     setPage(0);
   };
 
-  // Columnas dinámicas
+  // Render del estado con badge
+  const renderEstado = (estado: "Pendiente" | "Aprobada" | "Rechazada") => {
+    const base = "px-2 py-1 text-xs font-medium rounded-full";
+    switch (estado) {
+      case "Pendiente":
+        return <span className={`${base} bg-yellow-100 text-yellow-700`}>Pendiente</span>;
+      case "Aprobada":
+        return <span className={`${base} bg-green-100 text-green-700`}>Aprobada</span>;
+      case "Rechazada":
+        return <span className={`${base} bg-red-100 text-red-700`}>Rechazada</span>;
+    }
+  };
+
+  // Columnas
   const columns =
     tipoVista === "beneficios"
       ? [
@@ -82,11 +91,7 @@ export default function SolicitudesPage({
           { key: "usuario", label: "Usuario" },
           { key: "tipo", label: "Tipo Beneficio" },
           { key: "comentario", label: "Comentario" },
-          {
-            key: "estado",
-            label: "Estado",
-            render: (s: SolicitudBeneficio) => renderEstado(s.estado),
-          },
+          { key: "estado", label: "Estado", render: (s: SolicitudBeneficio) => renderEstado(s.estado) },
         ]
       : [
           { key: "id", label: "ID" },
@@ -94,38 +99,19 @@ export default function SolicitudesPage({
           { key: "tipo", label: "Tipo Permiso" },
           { key: "fechaInicio", label: "Fecha Inicio" },
           { key: "dias", label: "Días" },
-          {
-            key: "estado",
-            label: "Estado",
-            render: (s: SolicitudPermiso) => renderEstado(s.estado),
-          },
+          { key: "estado", label: "Estado", render: (s: SolicitudPermiso) => renderEstado(s.estado) },
         ];
 
-  // Estado con estilos
-  function renderEstado(estado: "Pendiente" | "Aprobada" | "Rechazada") {
-    const base = "px-2 py-1 text-xs font-medium rounded-full";
-    if (estado === "Pendiente") {
-      return <span className={`${base} bg-yellow-100 text-yellow-700`}>Pendiente</span>;
-    } else if (estado === "Aprobada") {
-      return <span className={`${base} bg-green-100 text-green-700`}>Aprobada</span>;
-    } else {
-      return <span className={`${base} bg-red-100 text-red-700`}>Rechazada</span>;
-    }
-  }
-
-  // Botones de acción
-  const renderActions = (s: any) => {
-    if (s.estado === "Pendiente") {
-      return (
-        <button
-          onClick={() => navigate(`/solicitudes/${tipoVista}/${s.id}/evaluar`)}
-          className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-        >
-          Evaluar
-        </button>
-      );
-    }
-    return (
+  // Acciones por fila
+  const renderActions = (s: any) =>
+    s.estado === "Pendiente" ? (
+      <button
+        onClick={() => navigate(`/solicitudes/${tipoVista}/${s.id}/evaluar`)}
+        className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
+      >
+        Evaluar
+      </button>
+    ) : (
       <button
         onClick={() => navigate(`/solicitudes/${tipoVista}/${s.id}`)}
         className="px-3 py-1 bg-gray-400 text-white rounded-lg text-xs cursor-pointer"
@@ -133,13 +119,23 @@ export default function SolicitudesPage({
         Ver
       </button>
     );
-  };
 
   if (loading) return <p>Cargando solicitudes...</p>;
   if (error) return <p>{error}</p>;
 
   return (
-    <PageLayout title={`Solicitudes de ${tipoVista}`}>
+    <PageLayout
+      title={`Solicitudes de ${tipoVista}`}
+      actions={
+        <IconButton
+          label="Nueva Solicitud"
+          icon={<span>➕</span>}
+          variant="primary"
+          onClick={() => navigate(`/solicitudes/${tipoVista}/crear`)}
+          className="h-10 text-sm px-4 flex items-center"
+        />
+      }
+    >
       {/* Filtros */}
       <div className="flex items-center gap-4 mb-4">
         <SelectDropdown
@@ -173,15 +169,13 @@ export default function SolicitudesPage({
         scrollable={false}
       />
 
-      {/* Footer con paginación y botón atrás */}
-      <div className="flex justify-between items-center mt-4">
-        <PaginationFooter
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          onCancel={() => navigate(-1)}
-        />
-      </div>
+      {/* Footer */}
+      <PaginationFooter
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onCancel={() => navigate(-1)}
+      />
     </PageLayout>
   );
 }
