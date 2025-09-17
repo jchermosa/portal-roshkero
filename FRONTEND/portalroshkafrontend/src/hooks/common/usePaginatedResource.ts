@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 
 export interface PaginatedResponse<T> {
-  content: T[];
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number; // página actual
+  content?: T[];
+  totalPages?: number;
+  totalElements?: number;
+  size?: number;
+  number?: number; // página actual
 }
 
 export function usePaginatedResource<T>(
-  fetchFn: (params: Record<string, any>) => Promise<PaginatedResponse<T>>,
+  fetchFn: (params: Record<string, any>) => Promise<any>,
   token: string | null,
   filtros: Record<string, string | number | undefined> = {},
   page: number = 0,
@@ -31,9 +31,21 @@ export function usePaginatedResource<T>(
     fetchFn({ ...filtros, page, size: pageSize })
       .then((res) => {
         if (!isMounted) return;
-        setData(res.content ?? []);
-        setTotalPages(res.totalPages ?? 1);
-        setTotalElements(res.totalElements ?? 0);
+
+        let items: T[] = [];
+        if (Array.isArray(res)) {
+          // ✅ caso array plano
+          items = res;
+          setTotalPages(1);
+          setTotalElements(res.length);
+        } else {
+          // ✅ caso pageable
+          items = res.content ?? [];
+          setTotalPages(res.totalPages ?? 1);
+          setTotalElements(res.totalElements ?? items.length);
+        }
+
+        setData(items);
       })
       .catch((err) => isMounted && setError(err.message))
       .finally(() => isMounted && setLoading(false));
