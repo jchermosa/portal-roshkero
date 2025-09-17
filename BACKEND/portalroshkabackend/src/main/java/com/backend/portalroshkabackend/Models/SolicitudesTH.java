@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -33,7 +34,7 @@ public class SolicitudesTH {
 
 
     @Column(name = "fecha_inicio")
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     @Column(name = "fecha_fin")
     private Date fechaFin;

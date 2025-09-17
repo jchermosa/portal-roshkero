@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 public class SolicitudEspecificaResponseDto {
@@ -15,7 +17,7 @@ public class SolicitudEspecificaResponseDto {
 
     private Integer cantidadDias;
 
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     private String comentario;
 

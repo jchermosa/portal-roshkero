@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -38,7 +39,7 @@ public class Usuario {
     private Roles roles;
 
     @Column(name = "fecha_ingreso")
-    private Date fechaIngreso;
+    private LocalDate fechaIngreso;
 
     @Column(name = "antiguedad", insertable = false, updatable = false)
     private String antiguedad;

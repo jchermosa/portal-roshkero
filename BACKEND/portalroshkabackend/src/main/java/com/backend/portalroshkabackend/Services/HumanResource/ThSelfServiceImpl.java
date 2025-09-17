@@ -80,13 +80,19 @@ public class ThSelfServiceImpl implements IThSelfService {
     public RequestResponseDto sendRequest(int id, SendSolicitudDto sendSolicitudDto) {
         SolicitudesTH solicitudesTH = new SolicitudesTH();
 
+        System.out.println(sendSolicitudDto.getFechaInicio());
+
         AutoMap.toSolicitudesThFromSendDto(solicitudesTH, sendSolicitudDto);
+
+        System.out.println(solicitudesTH.getFechaInicio());
 
         SaveManager.saveEntity(() -> solicitudesTHRepository.save(solicitudesTH), "Error al guardar la solicitud: ");
 
         RequestResponseDto responseDto = new RequestResponseDto();
         responseDto.setId(solicitudesTH.getIdSolicitudTH());
         responseDto.setMessage("Solicitud enviada con exito");
+
+        System.out.println(solicitudesTH.getFechaInicio());
 
         return responseDto;
     }

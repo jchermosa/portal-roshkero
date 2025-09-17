@@ -4,7 +4,7 @@ import com.backend.portalroshkabackend.Models.SolicitudThTipo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 
 @Data
@@ -15,7 +15,7 @@ public class UpdateSolicitudDto {
 
     private Integer cantidadDias;
 
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     private String comentario;
 

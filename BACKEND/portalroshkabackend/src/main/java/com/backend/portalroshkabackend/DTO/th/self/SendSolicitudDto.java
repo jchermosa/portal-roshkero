@@ -10,12 +10,13 @@ import lombok.NoArgsConstructor;
 
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
 public class SendSolicitudDto {
 
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     private Usuario usuario;
 

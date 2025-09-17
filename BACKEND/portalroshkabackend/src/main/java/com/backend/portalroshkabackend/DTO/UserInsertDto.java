@@ -4,6 +4,7 @@ import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Roles;
 import jakarta.validation.constraints.*;
 import java.sql.Date;
+import java.time.LocalDate;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
@@ -33,7 +34,7 @@ public class UserInsertDto {
     private String contrasena;
 
     @PastOrPresent(message = "La fecha de ingreso no puede ser futura")
-    private Date fechaIngreso;
+    private LocalDate fechaIngreso;
 
     @Pattern(regexp = "^[0-9]{9,15}$", message = "Teléfono inválido")
     private String telefono;

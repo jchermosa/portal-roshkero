@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.DTO;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
@@ -18,7 +19,7 @@ public class UserDto {
     private int nroCedula;
     private String correo;
     private Roles roles;
-    private Date fechaIngreso;
+    private LocalDate fechaIngreso;
     private String antiguedad;
     private int diasVacaciones;
     private EstadoActivoInactivo estado;

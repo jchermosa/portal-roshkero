@@ -119,11 +119,9 @@ public class RequestController {
 
     //TODO: POST- Solicitar vaciones
 
-    //TODO: GET-LIDERES ASIGNADOS AL USUARIO(active)
+    // mis solicitudes.GET
 
-    //TODO; mis solicitudes.GET
-
-    //TODO: Listar por tipo de solicitud,
+    // Listar por tipo de solicitud,
 
     //TODO: POST-Solicitar BENEFICIO.
 

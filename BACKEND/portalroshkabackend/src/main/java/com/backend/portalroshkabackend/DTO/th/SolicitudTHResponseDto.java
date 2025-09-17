@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -21,7 +22,7 @@ public class SolicitudTHResponseDto {
 
     private String solicitudThTipo;
 
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     private Integer cantidadDias;
 
