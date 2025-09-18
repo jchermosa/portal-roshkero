@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "nombre": "Desarrollador",
+    "fechaCreacion": "2022-02-10T08:00:00Z"
+  },
+  {
+    "id": 2,
+    "nombre": "Analista",
+    "fechaCreacion": "2022-04-22T11:00:00Z"
+  },
+  {
+    "id": 3,
+    "nombre": "Tester",
+    "fechaCreacion": "2022-09-05T14:30:00Z"
+  }
+]
