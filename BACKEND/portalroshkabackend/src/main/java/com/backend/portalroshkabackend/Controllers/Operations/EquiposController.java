@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoRequestDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoUpdateRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoCombinedResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoPostResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.IEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.IUsuarioisEquipoService;
@@ -96,21 +98,25 @@ public class EquiposController {
     }
 
     // @PutMapping("teams/{idEquipo}/users/{idAsignacionUsuario}")
-    // public ResponseEntity<UsuariosEquipoResponseDto> updateUsuarioEquipo(
+    // public ResponseEntity<UsuarioisResponseDto> updateUsuarioEquipo(
     //         @PathVariable Integer idEquipo,
     //         @PathVariable Integer idAsignacionUsuario,
-    //         @RequestBody @Valid UsuarioEquipoRequestDto dto) {
+    //         @RequestBody @Valid UsuarioEquipoUpdateRequestDto dto) {
 
-    //     return ResponseEntity.ok(usuariosEquipoService.updateUsuarioEnEquipo(idEquipo, idAsignacionUsuario, dto));
+    //     UsuariosEquipoUpdateResponseDto updated = usuariosEquipoService.updateUsuarioEnEquipo(
+    //             idEquipo,
+    //             idAsignacionUsuario,
+    //             dto);
+    //     return ResponseEntity.ok(updated);
     // }
 
     // @DeleteMapping("teams/{idEquipo}/users/{idAsignacionUsuario}")
     // public ResponseEntity<Void> deleteUsuarioEquipo(
-    //         @PathVariable Integer idEquipo,
-    //         @PathVariable Integer idAsignacionUsuario) {
+    // @PathVariable Integer idEquipo,
+    // @PathVariable Integer idAsignacionUsuario) {
 
-    //     usuariosEquipoService.removeUsuarioDeEquipo(idEquipo, idAsignacionUsuario);
-    //     return ResponseEntity.noContent().build();
+    // usuariosEquipoService.removeUsuarioDeEquipo(idEquipo, idAsignacionUsuario);
+    // return ResponseEntity.noContent().build();
     // }
 
 }

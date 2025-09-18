@@ -1,8 +1,11 @@
 package com.backend.portalroshkabackend.Services.Operations;
 
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,29 +26,48 @@ import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 @Service("operationsEquiposService")
 @Validated
 public class EquiposServiceImpl implements IEquiposService {
+
     private final EquiposRepository equiposRepository;
     private final ClientesRepository clientesRepository;
+
+    private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
 
     @Autowired
     public EquiposServiceImpl(EquiposRepository equiposRepository, ClientesRepository clientesRepository) {
         this.equiposRepository = equiposRepository;
         this.clientesRepository = clientesRepository;
+
+        // Инициализация Map сортировок
+        sortingMap = new HashMap<>();
+        sortingMap.put("nombre", equiposRepository::findAllByOrderByNombreAsc);
+        sortingMap.put("cliente", equiposRepository::findAllByOrderByCliente_NombreAsc);
+        sortingMap.put("nombreCliente", equiposRepository::findAllByOrderByNombreAscCliente_NombreAsc);
+        sortingMap.put("default", equiposRepository::findAll);
+    }
+
+    // Метод для получения команд с сортировкой
+    public Page<EquiposResponseDto> getTeamsSorted(Pageable pageable, String sortBy) {
+        Function<Pageable, Page<Equipos>> func = sortingMap.getOrDefault(sortBy, sortingMap.get("default"));
+        Page<Equipos> page = func.apply(pageable);
+        return page.map(this::mapToDto);
+    }
+
+    // Метод маппинга сущности в DTO
+    public EquiposResponseDto mapToDto(Equipos e) {
+        EquiposResponseDto dto = new EquiposResponseDto();
+        dto.setIdEquipo(e.getIdEquipo());
+        dto.setNombre(e.getNombre());
+        dto.setFechaInicio(e.getFechaInicio());
+        dto.setFechaLimite(e.getFechaLimite());
+        dto.setCliente(e.getCliente());
+        dto.setFechaCreacion(e.getFechaCreacion());
+        dto.setEstado(e.getEstado());
+        return dto;
     }
 
     @Override
     public Page<EquiposResponseDto> getAllTeams(Pageable pageable) {
-        return equiposRepository.findAll(pageable)
-                .map(equipo -> {
-                    EquiposResponseDto Dto = new EquiposResponseDto();
-                    Dto.setIdEquipo(equipo.getIdEquipo());
-                    Dto.setNombre(equipo.getNombre());
-                    Dto.setFechaInicio(equipo.getFechaInicio());
-                    Dto.setFechaLimite(equipo.getFechaLimite());
-                    Dto.setCliente(equipo.getCliente());
-                    Dto.setFechaCreacion(equipo.getFechaCreacion());
-                    Dto.setEstado(equipo.getEstado());
-                    return Dto;
-                });
+        return equiposRepository.findAll(pageable).map(this::mapToDto);
     }
 
     @Override
