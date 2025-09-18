@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoCombinedResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
@@ -85,5 +86,31 @@ public class EquiposController {
                 pageable);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("teams/{idEquipo}/users")
+    public ResponseEntity<UsuariosEquipoResponseDto> addUsuarioEquipo(
+            @PathVariable Integer idEquipo,
+            @RequestBody @Valid UsuarioEquipoRequestDto dto) {
+
+        return ResponseEntity.ok(usuariosEquipoService.addUsuarioToEquipo(idEquipo, dto));
+    }
+
+    // @PutMapping("teams/{idEquipo}/users/{idAsignacionUsuario}")
+    // public ResponseEntity<UsuariosEquipoResponseDto> updateUsuarioEquipo(
+    //         @PathVariable Integer idEquipo,
+    //         @PathVariable Integer idAsignacionUsuario,
+    //         @RequestBody @Valid UsuarioEquipoRequestDto dto) {
+
+    //     return ResponseEntity.ok(usuariosEquipoService.updateUsuarioEnEquipo(idEquipo, idAsignacionUsuario, dto));
+    // }
+
+    // @DeleteMapping("teams/{idEquipo}/users/{idAsignacionUsuario}")
+    // public ResponseEntity<Void> deleteUsuarioEquipo(
+    //         @PathVariable Integer idEquipo,
+    //         @PathVariable Integer idAsignacionUsuario) {
+
+    //     usuariosEquipoService.removeUsuarioDeEquipo(idEquipo, idAsignacionUsuario);
+    //     return ResponseEntity.noContent().build();
+    // }
 
 }
