@@ -1,17 +1,24 @@
 // src/hooks/solicitudes/useSolicitudesTH.ts
 import { useState, useEffect } from "react";
 import { getSolicitudesTH } from "../../services/RequestTHService";
-import type { SolicitudItem } from "../../types";
 
-// Mock data import
-import rawMockSolicitudes from "../../data/mockSolicitudes.json";
+// Importar los mocks directamente
+import mockSolicitudes from "../../data/mockSolicitudes.json";
+import mockBeneficios from "../../data/mockBeneficios.json";
 
-// Mock data con estructura correcta
-const mockSolicitudes: SolicitudItem[] = rawMockSolicitudes.map((s) => ({
-  ...s,
-  estado: s.estado as "P" | "A" | "R",
-  lideres: s.lideres || []
-}));
+// Tipo normalizado que usará la tabla
+export interface SolicitudData {
+  id: number;
+  nombre: string;
+  apellido: string;
+  tipoNombre: string;
+  cantidad_dias?: number | null;
+  fecha_inicio?: string | null;
+  lideres?: any[];
+  numero_aprobaciones?: number;
+  estado: "P" | "A" | "R";
+  comentario?: string;
+}
 
 export function useSolicitudesTH(
   token: string | null,
@@ -19,12 +26,12 @@ export function useSolicitudesTH(
   page: number,
   size: number = 10
 ) {
-  const [data, setData] = useState<SolicitudItem[]>([]);
+  const [data, setData] = useState<SolicitudData[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Modo desarrollo - cambiar a false cuando el backend esté listo
+  // Modo desarrollo
   const modoDesarrollo = true;
 
   useEffect(() => {
@@ -38,37 +45,82 @@ export function useSolicitudesTH(
     setError(null);
 
     if (modoDesarrollo) {
-      // Usar datos mock
+      // Simular delay
       setTimeout(() => {
-        let solicitudesFiltradas = mockSolicitudes;
+        try {
+          let rawData: any[] = [];
 
-        // Aplicar filtros
-        if (filtros.tipoId) {
-          solicitudesFiltradas = solicitudesFiltradas.filter(
-            (s) => s.tipo?.nombre === filtros.tipoId
-          );
-        }
-        if (filtros.usuarioNombre) {
-          solicitudesFiltradas = solicitudesFiltradas.filter((s) =>
-            `${s.nombre || ''} ${s.apellido || ''}`
-              .toLowerCase()
-              .includes((filtros.usuarioNombre || '').toLowerCase())
-          );
-        }
-        if (filtros.estado) {
-          solicitudesFiltradas = solicitudesFiltradas.filter(
-            (s) => s.estado === filtros.estado
-          );
-        }
+          // Combinar ambos mocks o filtrar por tipo
+          if (filtros.tipoSolicitud === "PERMISO") {
+            rawData = [...mockSolicitudes];
+          } else if (filtros.tipoSolicitud === "BENEFICIO") {
+            rawData = [...mockBeneficios];
+          } else {
+            rawData = [...mockSolicitudes, ...mockBeneficios];
+          }
 
-        // Simular paginación
-        const start = page * size;
-        const paginatedData = solicitudesFiltradas.slice(start, start + size);
-        
-        setData(paginatedData);
-        setTotalPages(Math.ceil(solicitudesFiltradas.length / size));
-        setLoading(false);
-      }, 500);
+          console.log("Raw data:", rawData); // Debug
+
+          // Aplicar filtros
+          if (filtros.tipoId) {
+            rawData = rawData.filter((s) => {
+              // Para permisos: comparar con id_solicitud_tipo
+              if (filtros.tipoSolicitud === "PERMISO") {
+                return s.id_solicitud_tipo === Number(filtros.tipoId);
+              }
+              // Para beneficios: comparar con tipo.id
+              if (filtros.tipoSolicitud === "BENEFICIO") {
+                return s.tipo?.id === Number(filtros.tipoId);
+              }
+              return false;
+            });
+          }
+
+          if (filtros.usuarioNombre) {
+            const searchText = filtros.usuarioNombre.toLowerCase();
+            rawData = rawData.filter((s) =>
+              s.nombre?.toLowerCase().includes(searchText) ||
+              s.apellido?.toLowerCase().includes(searchText)
+            );
+          }
+
+          if (filtros.estado) {
+            rawData = rawData.filter((s) => s.estado === filtros.estado);
+          }
+
+          console.log("Filtered data:", rawData); // Debug
+
+          // Paginación
+          const totalElements = rawData.length;
+          const start = page * size;
+          const paginatedData = rawData.slice(start, start + size);
+
+          // Normalizar datos para la tabla
+          const normalizedData: SolicitudData[] = paginatedData.map((s) => ({
+            id: s.id,
+            nombre: s.nombre || "",
+            apellido: s.apellido || "",
+            tipoNombre: s.tipo?.nombre || s.tipo || "",
+            cantidad_dias: s.cantidad_dias ?? null,
+            fecha_inicio: s.fecha_inicio ?? null,
+            lideres: s.lideres ?? [],
+            numero_aprobaciones: s.numero_aprobaciones ?? 0,
+            estado: s.estado,
+            comentario: s.comentario || "",
+          }));
+
+          console.log("Normalized data:", normalizedData); // Debug
+
+          setData(normalizedData);
+          setTotalPages(Math.ceil(totalElements / size));
+          setLoading(false);
+        } catch (err) {
+          console.error("Error processing mock data:", err);
+          setError("Error al procesar datos mock");
+          setLoading(false);
+        }
+      }, 300); // Reducido el delay
+
       return;
     }
 
@@ -83,7 +135,21 @@ export function useSolicitudesTH(
 
         const response = await getSolicitudesTH(token, params);
         
-        setData(response.content);
+        // Normalizar datos del backend
+        const normalizedData: SolicitudData[] = response.content.map((s: any) => ({
+          id: s.id,
+          nombre: s.nombre || "",
+          apellido: s.apellido || "",
+          tipoNombre: s.tipo?.nombre || "",
+          cantidad_dias: s.cantidad_dias ?? null,
+          fecha_inicio: s.fecha_inicio ?? null,
+          lideres: s.lideres ?? [],
+          numero_aprobaciones: s.numero_aprobaciones ?? 0,
+          estado: s.estado,
+          comentario: s.comentario || "",
+        }));
+
+        setData(normalizedData);
         setTotalPages(response.totalPages);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -93,19 +159,12 @@ export function useSolicitudesTH(
     };
 
     fetchData();
-  }, [token, filtros, page, size, modoDesarrollo]);
-
-  const refetch = () => {
-    setLoading(true);
-    setError(null);
-    // Re-ejecutar el effect
-  };
+  }, [token, JSON.stringify(filtros), page, size, modoDesarrollo]);
 
   return {
     data,
     totalPages,
     loading,
     error,
-    refetch,
   };
 }
