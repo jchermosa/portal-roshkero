@@ -65,8 +65,9 @@ export default function Login() {
     setError(null);
     setLoading(true);
 
+    // ${import.meta.env.VITE_API_URL}
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      const res = await fetch(`http://localhost:8080/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, contrasena }),
