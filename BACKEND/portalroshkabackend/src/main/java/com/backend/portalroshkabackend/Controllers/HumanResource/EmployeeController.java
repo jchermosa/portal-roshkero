@@ -1,6 +1,8 @@
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.DTO.th.UserByIdResponseDto;
+import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
 import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
 import com.backend.portalroshkabackend.Services.HumanResource.IThSelfService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +48,7 @@ public class EmployeeController {
 
         if (sortBy.isBlank()) throw new IllegalArgumentException("El argumento del parametro no debe estar vacio");
 
-        Page<UserDto> users;
+        Page<UserResponseDto> users;
 
          switch (sortBy) {
             case "active" -> users = employeeService.getAllActiveEmployees(pageable);
@@ -60,15 +62,15 @@ public class EmployeeController {
     }
 
     @GetMapping("/th/users/{id}")
-    public ResponseEntity<UserDto> getEmployeeById(@PathVariable int id){
-        UserDto user = employeeService.getEmployeeById(id);
+    public ResponseEntity<UserByIdResponseDto> getEmployeeById(@PathVariable int id){
+        UserByIdResponseDto user = employeeService.getEmployeeById(id);
 
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/th/users")
-    public ResponseEntity<UserDto> addEmployee(@RequestBody UserInsertDto insertDto){
-        UserDto user = employeeService.addEmployee(insertDto);
+    public ResponseEntity<UserResponseDto> addEmployee(@RequestBody UserInsertDto insertDto){
+        UserResponseDto user = employeeService.addEmployee(insertDto);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
@@ -79,15 +81,15 @@ public class EmployeeController {
     }
 
     @PutMapping("/th/users/{id}")
-    public ResponseEntity<UserDto> updateEmployee(@RequestBody UserUpdateDto updateDto, @PathVariable int id){
-        UserDto user = employeeService.updateEmployee(updateDto, id);
+    public ResponseEntity<UserResponseDto> updateEmployee(@RequestBody UserUpdateDto updateDto, @PathVariable int id){
+        UserResponseDto user = employeeService.updateEmployee(updateDto, id);
 
         return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/th/users/{id}")
-    public ResponseEntity<UserDto> deleteEmployee(@PathVariable int id){
-        UserDto user = employeeService.deleteEmployee(id);
+    public ResponseEntity<UserResponseDto> deleteEmployee(@PathVariable int id){
+        UserResponseDto user = employeeService.deleteEmployee(id);
 
         return ResponseEntity.ok(user);
     }

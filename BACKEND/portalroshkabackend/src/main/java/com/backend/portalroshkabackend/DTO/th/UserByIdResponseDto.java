@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.th;
 
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
@@ -11,8 +11,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-public class UserDto {
-
+public class UserByIdResponseDto {
     private Integer idUsuario;
 
     private String nombre;
@@ -23,29 +22,16 @@ public class UserDto {
 
     private String correo;
 
-    private Roles roles;
+    private String telefono;
 
     private LocalDate fechaIngreso;
 
-    private String antiguedad;
+    private java.sql.Date fechaNacimiento;
 
-    private int diasVacaciones;
-
-    private EstadoActivoInactivo estado;
-
-    private String contrasena;
-
-    private String telefono;
+    private Roles roles;
 
     private Cargos cargos;
 
-    private java.sql.Date fechaNacimiento;
+    private EstadoActivoInactivo estado;
 
-    private int diasVacacionesRestante;
-
-    private boolean requiereCambioContrasena;
-
-    private String url;
-
-    private Integer disponibilidad;
 }

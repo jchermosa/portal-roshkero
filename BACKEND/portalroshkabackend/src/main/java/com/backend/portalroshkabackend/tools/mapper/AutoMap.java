@@ -10,25 +10,32 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 public class AutoMap {
-    public static UserDto toUserDto(Usuario user) {
-        UserDto dto = new UserDto();
+    public static UserResponseDto toUserDto(Usuario user) {
+        UserResponseDto dto = new UserResponseDto();
+        dto.setIdUsuario(user.getIdUsuario());
+        dto.setNombreApellido(user.getNombre() + " " + user.getApellido());
+        dto.setCorreo(user.getCorreo());
+        dto.setAntiguedad(user.getAntiguedad());
+        dto.setEstado(user.getEstado());
+
+        return dto;
+    }
+
+    public static UserByIdResponseDto toUserByIdDto(Usuario user){
+        UserByIdResponseDto dto = new UserByIdResponseDto();
+
         dto.setIdUsuario(user.getIdUsuario());
         dto.setNombre(user.getNombre());
         dto.setApellido(user.getApellido());
         dto.setNroCedula(user.getNroCedula());
         dto.setCorreo(user.getCorreo());
-        dto.setRoles(user.getRoles());
-        dto.setFechaIngreso(user.getFechaIngreso());
-        dto.setAntiguedad(user.getAntiguedad());
-        dto.setDiasVacaciones(user.getDiasVacaciones());
-        dto.setEstado(user.getEstado());
-        dto.setContrasena(user.getContrasena());
         dto.setTelefono(user.getTelefono());
-        dto.setCargos(user.getCargos());
+        dto.setFechaIngreso(user.getFechaIngreso());
         dto.setFechaNacimiento(user.getFechaNacimiento());
-        dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
-        dto.setRequiereCambioContrasena(user.isRequiereCambioContrasena());
-        dto.setDisponibilidad(user.getDisponibilidad());
+        dto.setRoles(user.getRoles());
+        dto.setCargos(user.getCargos());
+        dto.setEstado(user.getEstado());
+
         return dto;
     }
 

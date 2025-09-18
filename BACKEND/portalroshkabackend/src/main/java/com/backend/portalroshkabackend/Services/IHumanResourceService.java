@@ -5,7 +5,7 @@ import com.backend.portalroshkabackend.DTO.PositionInsertDto;
 import com.backend.portalroshkabackend.DTO.PositionUpdateDto;
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
-import com.backend.portalroshkabackend.DTO.UserDto;
+import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
 import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 
@@ -14,16 +14,16 @@ import org.springframework.data.domain.Pageable;
 
 public interface IHumanResourceService {
     // ------ Employees ------
-    Page<UserDto> getAllEmployees(Pageable pageable);
-    Page<UserDto> getAllActiveEmployees(Pageable pageable);
-    Page<UserDto> getAllInactiveEmployees(Pageable pageable);
-    Page<UserDto> getAllEmployeesByRol(Pageable pageable);
-    Page<UserDto> getAllEmployeesByTeam(Pageable pageable);
-    Page<UserDto> getAllEmployeesByPosition(Pageable pageable);
-    UserDto getEmployeeById(int id);
-    UserDto addEmployee(UserInsertDto insertDto);
-    UserDto updateEmployee(UserUpdateDto updateDto, int id);
-    UserDto deleteEmployee(int id);
+    Page<UserResponseDto> getAllEmployees(Pageable pageable);
+    Page<UserResponseDto> getAllActiveEmployees(Pageable pageable);
+    Page<UserResponseDto> getAllInactiveEmployees(Pageable pageable);
+    Page<UserResponseDto> getAllEmployeesByRol(Pageable pageable);
+    Page<UserResponseDto> getAllEmployeesByTeam(Pageable pageable);
+    Page<UserResponseDto> getAllEmployeesByPosition(Pageable pageable);
+    UserResponseDto getEmployeeById(int id);
+    UserResponseDto addEmployee(UserInsertDto insertDto);
+    UserResponseDto updateEmployee(UserUpdateDto updateDto, int id);
+    UserResponseDto deleteEmployee(int id);
 
     // ------ Requests ------
     Page<RequestDto> getAllRequests(Pageable pageable);

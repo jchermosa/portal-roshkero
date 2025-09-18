@@ -1,6 +1,8 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.DTO.th.UserByIdResponseDto;
+import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
@@ -33,7 +35,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserDto> getAllEmployees(Pageable pageable) {
+    public Page<UserResponseDto> getAllEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAll(pageable); // Guarda todos los usuarios en users
 
         return users.map(AutoMap::toUserDto); //Retorna una lista de dtos
@@ -41,7 +43,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserDto> getAllActiveEmployees(Pageable pageable) {
+    public Page<UserResponseDto> getAllActiveEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.A, pageable);
 
         return users.map(AutoMap::toUserDto); // Retorna una lista de empleados activos (DTOs)
@@ -49,14 +51,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserDto> getAllInactiveEmployees(Pageable pageable) {
+    public Page<UserResponseDto> getAllInactiveEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.I, pageable);
 
         return users.map(AutoMap::toUserDto); // Retorna la lista de empleados inactivos
     }
 
     @Override
-    public Page<UserDto> getAllEmployeesByRol(Pageable pageable) {
+    public Page<UserResponseDto> getAllEmployeesByRol(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByRolesAsc(pageable);
 
         return users.map(AutoMap::toUserDto);
@@ -64,7 +66,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
 
     @Override
-    public Page<UserDto> getAllEmployeesByPosition(Pageable pageable) {
+    public Page<UserResponseDto> getAllEmployeesByPosition(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByCargosAsc(pageable);
 
         return users.map(AutoMap::toUserDto);
@@ -72,16 +74,16 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Transactional(readOnly = true)
     @Override
-    public UserDto getEmployeeById(int id) {
+    public UserByIdResponseDto getEmployeeById(int id) {
         var user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)); //Lanza una excepcion personalizada
 
-        return AutoMap.toUserDto(user); //Si no existe usuario con esa id retorna null, sino retorna un Dto
+        return AutoMap.toUserByIdDto(user); //Si no existe usuario con esa id retorna null, sino retorna un Dto
 
     }
 
     @Transactional
     @Override
-    public UserDto addEmployee(UserInsertDto insertDto) {
+    public UserResponseDto addEmployee(UserInsertDto insertDto) {
 
         validator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
         validator.validateUniqueEmail(insertDto.getCorreo(), null);
@@ -98,7 +100,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Transactional
     @Override
-    public UserDto updateEmployee(UserUpdateDto updateDto, int id) {
+    public UserResponseDto updateEmployee(UserUpdateDto updateDto, int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
         validator.validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
@@ -116,7 +118,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Transactional
     @Override
-    public UserDto deleteEmployee(int id) {
+    public UserResponseDto deleteEmployee(int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
         if (user.getEstado()== EstadoActivoInactivo.I) {
