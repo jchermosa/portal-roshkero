@@ -1,16 +1,11 @@
+// src/services/CatalogService.ts
 import type { CatalogItem } from "../types";
-import type { PaginatedResponse } from "../hooks/common/usePaginatedResource";
 
 export async function getRoles(
   token: string,
-  params: Record<string, string | number | undefined> = {}
-): Promise<PaginatedResponse<CatalogItem>> {
-  const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
-
-  const res = await fetch(`/api/catalogos/roles?${query.toString()}`, {
+  _params: Record<string, string | number | undefined> = {}
+): Promise<CatalogItem[]> {
+  const res = await fetch(`/api/catalogos/roles`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -20,14 +15,9 @@ export async function getRoles(
 
 export async function getCargos(
   token: string,
-  params: Record<string, string | number | undefined> = {}
-): Promise<PaginatedResponse<CatalogItem>> {
-  const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
-
-  const res = await fetch(`/api/catalogos/cargos?${query.toString()}`, {
+  _params: Record<string, string | number | undefined> = {}
+): Promise<CatalogItem[]> {
+  const res = await fetch(`/api/catalogos/cargos`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -37,14 +27,9 @@ export async function getCargos(
 
 export async function getEquipos(
   token: string,
-  params: Record<string, string | number | undefined> = {}
-): Promise<PaginatedResponse<CatalogItem>> {
-  const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
-
-  const res = await fetch(`/api/catalogos/equipos?${query.toString()}`, {
+  _params: Record<string, string | number | undefined> = {}
+): Promise<CatalogItem[]> {
+  const res = await fetch(`/api/catalogos/equipos`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
