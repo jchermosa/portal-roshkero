@@ -1,14 +1,13 @@
-// src/pages/ChangePasswordPage.tsx
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import heroBg from "../assets/ilustracion-herov3.svg";
-import { updatePassword } from "../services/AuthService"; 
-import { updatePasswordMock } from "../services/AuthService";
-
-const useMock = import.meta.env.VITE_USE_MOCK === "true";
-
+// o mock
+import { updatePasswordMock as updatePassword } from "../services/AuthService";
 export default function ChangePasswordPage() {
-  const { token, logout } = useAuth();
+  const { token, logout, login } = useAuth();
+  const navigate = useNavigate();
+
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,12 +29,27 @@ export default function ChangePasswordPage() {
 
     try {
       if (!token) throw new Error("Token inválido");
-      await updatePassword(token, password);
+
+      // 📌 Llamada real (cuando el backend esté listo)
+      const newToken = await updatePassword(token, password);
 
       setSuccess(true);
+
+      // 👇 Variante A: mock o frontend sin backend
+      // Redirige al home manteniendo la sesión
+      // setTimeout(() => navigate("/"), 2000);
+
+      // 👇 Variante B: producción con backend real
+      // Guardamos el nuevo token que ya no requiere cambio de contraseña
       setTimeout(() => {
-        logout(); // 👈 obligamos a re-loguearse con la nueva clave
+        if (newToken) {
+          login(newToken); // refresca el token
+          navigate("/");   // va al Home
+        } else {
+          logout(); // fallback → vuelve al login
+        }
       }, 2000);
+
     } catch (err: any) {
       setError(err.message || "Error al actualizar contraseña");
     } finally {
@@ -58,7 +72,7 @@ export default function ChangePasswordPage() {
         <div className="absolute inset-0 bg-brand-blue/40"></div>
       </div>
 
-      {/* Card central */}
+      {/* Card */}
       <div className="relative z-10 w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-2xl rounded-2xl p-8">
         <h1 className="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-white">
           Cambio de contraseña
