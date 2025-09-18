@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -63,7 +65,7 @@ public class Usuario {
     private Cargos cargos;
 
     @Column(name = "fecha_nacimiento")
-    private java.sql.Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     @Column(name = "dias_vacaciones_restante")
     private int diasVacacionesRestante;

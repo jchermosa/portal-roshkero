@@ -8,6 +8,7 @@ import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class AutoMap {
     public static UserResponseDto toUserDto(Usuario user) {
@@ -185,7 +186,7 @@ public class AutoMap {
         solicitudesTH.setComentario(dto.getComentario());
         solicitudesTH.setSolicitudThTipo(dto.getSolicitudThTipo());
         solicitudesTH.setEstado(EstadoSolicitudEnum.P);
-        solicitudesTH.setFechaCreacion(Date.valueOf(LocalDate.now()));
+        solicitudesTH.setFechaCreacion(LocalDateTime.now());
         solicitudesTH.setPermisos(dto.getPermisos());
         solicitudesTH.setBeneficios(dto.getBeneficios());
 

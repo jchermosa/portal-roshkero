@@ -1,9 +1,12 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.cglib.core.Local;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import jakarta.persistence.Column;
@@ -32,10 +35,10 @@ public class SolicitudDispositivos {
     private Integer idSolicitudDispositivo;
 
     @Column(name = "fecha_inicio")
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     @Column(name = "fecha_fin")
-    private Date fechaFin;
+    private LocalDate fechaFin;
 
     @Column(name = "cantidad_dias")
     private Integer cantidadDias;
@@ -52,10 +55,10 @@ public class SolicitudDispositivos {
     private EstadoActivoInactivo estado;
 
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     @ManyToOne
-    @JoinColumn(name = "id_tipo_inventario")
+    @JoinColumn(name = "id_tipo_dispositivo")
     private TipoDispositivo idTipoInventario;
 
     @ManyToOne

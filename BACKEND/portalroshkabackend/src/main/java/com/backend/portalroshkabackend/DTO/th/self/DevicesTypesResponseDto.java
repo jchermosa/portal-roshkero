@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.DTO.th.self;
 
+import java.time.LocalDateTime;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,5 +15,5 @@ public class DevicesTypesResponseDto {
 
     private String detalle;
 
-    private java.util.Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 }

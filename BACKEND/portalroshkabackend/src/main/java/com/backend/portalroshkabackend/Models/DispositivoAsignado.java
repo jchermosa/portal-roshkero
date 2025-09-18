@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -30,15 +31,15 @@ public class DispositivoAsignado {
     private Integer idDispositivoAsignado;
 
     @Column(name = "fecha_asignacion")
-    private Date fechaAsignacion;
+    private LocalDate fechaAsignacion;
     @Column(name = "fecha_devolucion")
-    private Date fechaDevolucion;
+    private LocalDate fechaDevolucion;
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     
     @ManyToOne
-    @JoinColumn(name = "id_tipo_dispositivo")
+    @JoinColumn(name = "id_dispositivo")
     private TipoDispositivo idTipoDispositivo;
 
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente

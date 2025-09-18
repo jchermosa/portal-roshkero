@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -24,10 +24,10 @@ public class Solicitudes {
     private int idSolicitud;
 
     @Column(name = "fecha_inicio")
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     @Column(name = "fecha_fin")
-    private Date fechaFin;
+    private LocalDate fechaFin;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "estado_sol_enum")

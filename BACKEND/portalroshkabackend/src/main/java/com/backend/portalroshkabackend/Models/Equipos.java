@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
@@ -35,11 +36,11 @@ public class Equipos {
     private Clientes cliente;
 
     @Column(name = "fecha_inicio")
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
     @Column(name = "fecha_limite")
-    private Date fechaLimite;
+    private LocalDate fechaLimite;
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "estado_ac_enum")

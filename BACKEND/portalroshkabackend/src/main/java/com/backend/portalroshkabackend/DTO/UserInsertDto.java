@@ -42,7 +42,7 @@ public class UserInsertDto {
     private Cargos Cargos;
 
     @Past(message = "La fecha de nacimiento debe ser en el pasado")
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private boolean requiereCambioContrasena;
 

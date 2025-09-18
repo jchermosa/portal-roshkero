@@ -1,7 +1,9 @@
 package com.backend.portalroshkabackend.Models;
 
 import com.backend.portalroshkabackend.Models.Enum.*;
-import java.sql.Date;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -43,7 +45,7 @@ public class Inventario {
     private String detalles;
 
     @Column(name = "fecha_fabricacion")
-    private Date fechaFabricacion;
+    private LocalDate fechaFabricacion;
 
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente
     @Enumerated(EnumType.STRING)
@@ -52,6 +54,6 @@ public class Inventario {
     private EstadoInventario estado;
 
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
     
 }

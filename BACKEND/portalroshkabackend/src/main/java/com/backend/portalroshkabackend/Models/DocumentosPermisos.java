@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,12 +24,12 @@ public class DocumentosPermisos {
     private Integer idDocumento;
 
     @ManyToOne
-    @JoinColumn(name = "id_solicitud")
+    @JoinColumn(name = "id_solicitud_th")
     private SolicitudesTH idSolicitud;
 
     @Column(name = "url_documento")
     private String urlDocumento;
 
     @Column(name = "fecha_subida")
-    private Date fechaSubida;
+    private LocalDateTime fechaSubida;
 }

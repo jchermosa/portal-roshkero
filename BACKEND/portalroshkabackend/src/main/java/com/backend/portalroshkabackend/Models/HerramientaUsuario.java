@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,7 +32,7 @@ public class HerramientaUsuario {
     @JoinColumn(name = "id_usuario")
     private Usuario idUsuario;
 
-    @Column(name = "fecha_asignacion")
-    private java.sql.Date fechaAsignacion;
+    @Column(name = "fecha_creacion")
+    private LocalDateTime fechaCreacion;
 
 }

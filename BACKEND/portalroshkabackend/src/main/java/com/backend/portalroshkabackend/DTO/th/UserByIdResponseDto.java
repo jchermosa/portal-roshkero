@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+import org.springframework.cglib.core.Local;
+
 @Data
 @NoArgsConstructor
 public class UserByIdResponseDto {
@@ -26,7 +28,7 @@ public class UserByIdResponseDto {
 
     private LocalDate fechaIngreso;
 
-    private java.sql.Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private Roles roles;
 

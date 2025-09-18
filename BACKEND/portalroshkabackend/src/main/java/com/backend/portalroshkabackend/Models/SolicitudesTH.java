@@ -1,7 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -37,7 +37,7 @@ public class SolicitudesTH {
     private LocalDate fechaInicio;
 
     @Column(name = "fecha_fin")
-    private Date fechaFin;
+    private LocalDate fechaFin;
 
     @JoinColumn(name = "id_usuario")
     @ManyToOne
@@ -63,7 +63,7 @@ public class SolicitudesTH {
     private EstadoSolicitudEnum estado;
 
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     @ManyToOne
     @JoinColumn(name = "id_permiso")

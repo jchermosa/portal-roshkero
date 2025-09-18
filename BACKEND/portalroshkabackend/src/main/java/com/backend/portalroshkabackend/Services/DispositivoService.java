@@ -2,7 +2,7 @@ package com.backend.portalroshkabackend.Services;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,14 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.portalroshkabackend.DTO.DispositivoDto;
 import com.backend.portalroshkabackend.Models.TipoDispositivo;
 import com.backend.portalroshkabackend.Repositories.TipoDispositivoRepository;
+import com.backend.portalroshkabackend.Exceptions.ResourceNotFoundException;
 
 
 @Service
 public class DispositivoService {
 
-    @Autowired
-    TipoDispositivoRepository tipoDispositivoRepository;
+    private final TipoDispositivoRepository tipoDispositivoRepository;
 
+    @Autowired
     public DispositivoService(TipoDispositivoRepository tipoDispositivoRepository) {
         this.tipoDispositivoRepository = tipoDispositivoRepository;
     }
@@ -31,7 +32,7 @@ public class DispositivoService {
         TipoDispositivo newDispositivo = new TipoDispositivo();
         newDispositivo.setNombre(dispositivo.getNombre());
         newDispositivo.setDetalle(dispositivo.getDetalle());
-        newDispositivo.setFechaCreacion(new Date());
+        newDispositivo.setFechaCreacion(LocalDateTime.now());
 
         TipoDispositivo savedDispositivo = tipoDispositivoRepository.save(newDispositivo);
         
@@ -47,7 +48,7 @@ public class DispositivoService {
     @Transactional
     public DispositivoDto updateDevice(Integer id, DispositivoDto dispositivoDto) {
         TipoDispositivo existingDispositivo = tipoDispositivoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dispositivo not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Dispositivo not found with id: " + id));
 
         existingDispositivo.setNombre(dispositivoDto.getNombre());
         existingDispositivo.setDetalle(dispositivoDto.getDetalle());
@@ -57,8 +58,18 @@ public class DispositivoService {
         return mapToDispositivoDto(updatedDispositivo);
     }
 
+    @Transactional(readOnly = true)
+    public DispositivoDto getDeviceById(Integer id) {
+        TipoDispositivo dispositivo = tipoDispositivoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Dispositivo not found with id: " + id));
+        return mapToDispositivoDto(dispositivo);
+    }
+
     @Transactional
     public void deleteDeviceById(Integer id) {
+        if (!tipoDispositivoRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Dispositivo not found with id: " + id);
+        }
         tipoDispositivoRepository.deleteById(id);
     }
     
@@ -67,7 +78,10 @@ public class DispositivoService {
         dto.setIdTipoInventario(dispositivo.getIdInventario());
         dto.setNombre(dispositivo.getNombre());
         dto.setDetalle(dispositivo.getDetalle());
-        dto.setFechaCreacion(dispositivo.getFechaCreacion());
+        // Convert LocalDateTime to Date
+        java.util.Date fechaCreacion = dispositivo.getFechaCreacion() != null ? 
+                java.util.Date.from(dispositivo.getFechaCreacion().atZone(java.time.ZoneId.systemDefault()).toInstant()) : null;
+        dto.setFechaCreacion(fechaCreacion);
         return dto;
     }
 }

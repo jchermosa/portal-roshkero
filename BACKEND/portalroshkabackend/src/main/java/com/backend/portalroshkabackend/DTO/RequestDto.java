@@ -1,19 +1,22 @@
 package com.backend.portalroshkabackend.DTO;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 
 public class RequestDto {
     private int idSolicitud;
-    private Date fechaInicio;
-    private Date fechaFin;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
     private EstadoSolicitudEnum estado;
     private int idUsuario;
     private int cantidadDias;
     private int numeroAprobaciones;
     private String comentario;
     private int idSolicitudTipo;
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     public int getIdSolicitud() {
         return idSolicitud;
@@ -23,19 +26,19 @@ public class RequestDto {
         this.idSolicitud = idSolicitud;
     }
 
-    public Date getFechaInicio() {
+    public LocalDate getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDate fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDate getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
     }
 
@@ -87,11 +90,11 @@ public class RequestDto {
         this.comentario = comentario;
     }
 
-    public Date getFechaCreacion() {
+    public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(Date fechaCreacion) {
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 }

@@ -32,7 +32,7 @@ public class UserUpdateDto {
 
     private Cargos cargos;
 
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private boolean requiereCambioContrasena;
 

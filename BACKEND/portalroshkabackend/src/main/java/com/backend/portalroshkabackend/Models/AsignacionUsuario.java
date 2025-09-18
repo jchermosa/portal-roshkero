@@ -1,6 +1,10 @@
 package com.backend.portalroshkabackend.Models;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.sql.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,22 +19,22 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Data
-@Table(name = "asignacion_usuario")
+@Table(name = "asignacion_usuario_equipo")
 public class AsignacionUsuario {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_asignacion")
+    @Column(name = "id_asignacion_usuario_equipo")
     private Integer idAsignacionUsuario;
 
     @Column(name = "fecha_entrada")
-    private Date fechaEntrada;
+    private LocalDate fechaEntrada;
 
     @Column(name = "fecha_fin")
-    private Date fechaFin;
+    private LocalDate fechaFin;
 
     @Column(name ="porcentaje_trabajo")
-    private Float porcentajeTrabajo;
+    private BigDecimal porcentajeTrabajo;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
@@ -45,5 +49,5 @@ public class AsignacionUsuario {
     private Equipos equipos;
 
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 }

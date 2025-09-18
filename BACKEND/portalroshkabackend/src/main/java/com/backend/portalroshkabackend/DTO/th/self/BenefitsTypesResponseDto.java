@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -15,9 +17,9 @@ public class BenefitsTypesResponseDto {
 
     private String descripcion;
 
-    private Date inicioVigencia;
+    private LocalDate inicioVigencia;
 
-    private Date finVigencia;
+    private LocalDate finVigencia;
 
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 }

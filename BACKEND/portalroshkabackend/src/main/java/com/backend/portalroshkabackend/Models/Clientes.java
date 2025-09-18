@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,5 +28,5 @@ public class Clientes {
     @Column(name = "ruc")
     private String ruc;
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 }

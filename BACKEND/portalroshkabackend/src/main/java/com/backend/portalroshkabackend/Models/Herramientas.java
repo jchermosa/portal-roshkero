@@ -1,5 +1,6 @@
 package com.backend.portalroshkabackend.Models;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -23,6 +24,6 @@ public class Herramientas {
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
 }

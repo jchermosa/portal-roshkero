@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,12 +31,12 @@ public class Beneficios {
     private String descripcion;
 
     @Column(name = "inicio_vigencia")
-    private Date inicioVigencia;
+    private LocalDate inicioVigencia;
 
     @Column(name = "fin_vigencia")
-    private Date finVigencia;
+    private LocalDate finVigencia;
 
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion; 
+    private LocalDateTime fechaCreacion; 
 
 }

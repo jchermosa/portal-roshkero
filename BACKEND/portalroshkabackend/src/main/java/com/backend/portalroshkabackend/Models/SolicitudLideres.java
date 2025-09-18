@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import jakarta.persistence.*;
@@ -34,7 +34,7 @@ public class SolicitudLideres {
     private EstadoSolicitudEnum estado;
 
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -25,6 +26,6 @@ public class MisSolicitudesResponseDto {
 
     private EstadoSolicitudEnum estado;
 
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
 }

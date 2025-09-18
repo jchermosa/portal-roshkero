@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +30,7 @@ public class TipoDispositivo {
     private String detalle;   
 
     @Column(name = "fecha_creacion")
-    private java.util.Date fechaCreacion; 
+    private LocalDateTime fechaCreacion; 
 
 
 }
