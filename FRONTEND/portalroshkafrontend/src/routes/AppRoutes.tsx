@@ -18,6 +18,8 @@ import RequestFormPage from "../pages/RequestFormPage";
 import SolicitudVacacionesPage from "../pages/SolicitudVacacionesPage";
 import BeneficioFormPage from "../pages/BenefitsFormPage.tsx";
 import RequestManagementPage from "../pages/RequestManagementPage.tsx";
+import RequestSearchPage from "../pages/RequestSearchPage.tsx";
+
 import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
 
 export default function AppRoutes() {
@@ -32,6 +34,27 @@ export default function AppRoutes() {
       {/* Rutas privadas dentro del DashboardLayout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
+
+              <Route path="/requests" element={<RequestPage />} />
+              <Route index element={<HomePage />} />
+              <Route path="/profile" element={<ProfilePage />} /> 
+              <Route path="/usuarios" element={<UsuariosPage />} />
+              <Route path="/usuarios/buscar" element={<UserSearchPage />} />
+              <Route path="/usuarios/nuevo" element={<UserFormPage />} />
+              <Route path="/usuarios/:id" element={<UserFormPage />} />
+              <Route path="/vacaciones" element={<VacacionesPage />} />
+              <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
+              <Route path="/benefits" element={<BeneficiosPage />} />
+              <Route path="/configuracion" element={<Configuration />} />
+              <Route path="/requests/nuevo" element={<RequestFormPage />} />
+              <Route path="/requests/:id" element={<RequestFormPage />} />
+              <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
+              <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage/>} />
+              <Route path="/solicitudesTH/permisos" element={<RequestManagementPage tipoVista="permisos"/>} />
+              <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage tipoVista="beneficios"/>} />
+          {/*<Route path="/usuarios" element={<UsuariosPage />} />
+
+          < */}
           <Route index element={<HomePage />} />
           <Route path="/requests" element={<RequestPage />} />
           <Route path="/requests/nuevo" element={<RequestFormPage />} />
