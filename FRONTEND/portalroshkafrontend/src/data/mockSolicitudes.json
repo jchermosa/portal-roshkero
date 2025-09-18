@@ -2,6 +2,8 @@
   {
     "id": 1,
     "id_usuario": 42,
+    "nombre": "Pedro",
+    "apellido": "Cacio",
     "id_solicitud_tipo": 1,
     "tipo": { "id": 1, "nombre": "Vacaciones" },
     "cantidad_dias": 5,
@@ -18,6 +20,8 @@
   {
     "id": 2,
     "id_usuario": 42,
+    "nombre": "David",
+    "apellido": "Cacio",
     "id_solicitud_tipo": 2,
     "tipo": { "id": 2, "nombre": "Inventario" },
     "cantidad_dias": null,
@@ -33,7 +37,9 @@
   },
   {
     "id": 3,
-    "id_usuario": 42,
+    "id_usuario": 48,
+    "nombre": "Sandra",
+    "apellido": "Cacio",
     "id_solicitud_tipo": 3,
     "tipo": { "id": 3, "nombre": "Matrimonio" },
     "cantidad_dias": 5,
@@ -49,6 +55,8 @@
   {
     "id": 4,
     "id_usuario": 12,
+    "nombre": "Alexis",
+    "apellido": "Cacio",
     "id_solicitud_tipo": 3,
     "tipo": { "id": 3, "nombre": "Matrimonio" },
     "cantidad_dias": 5,
