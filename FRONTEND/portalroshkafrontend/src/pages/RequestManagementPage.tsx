@@ -6,8 +6,9 @@ import PaginationFooter from "../components/PaginationFooter";
 import SelectDropdown from "../components/SelectDropdown";
 import IconButton from "../components/IconButton";
 import PageLayout from "../layouts/PageLayout";
-import mockSolicitudes from "../data/mockSolicitudes.json";
-import mockBeneficios from "../data/mockBeneficios.json";
+
+import rawSolicitudes from "../data/mockSolicitudes.json";
+import rawBeneficios from "../data/mockBeneficios.json";
 
 type SolicitudPermiso = {
   id: number;
@@ -26,15 +27,16 @@ type SolicitudBeneficio = {
   estado: "Pendiente" | "Aprobada" | "Rechazada";
 };
 
+// ✅ Mocks tipados
+const mockSolicitudes = rawSolicitudes as SolicitudPermiso[];
+const mockBeneficios = rawBeneficios as SolicitudBeneficio[];
+
 // Hook mock
 function useMockSolicitudes(
   tipoVista: "beneficios" | "permisos",
   { page, size, estado }: { page: number; size: number; estado: string }
 ) {
-  const data =
-    tipoVista === "beneficios"
-      ? (mockBeneficios as SolicitudBeneficio[])
-      : (mockSolicitudes as SolicitudPermiso[]);
+  const data = tipoVista === "beneficios" ? mockBeneficios : mockSolicitudes;
 
   const filtered = estado ? data.filter((s) => s.estado === estado) : data;
 
@@ -75,35 +77,61 @@ export default function SolicitudesPage({
     const base = "px-2 py-1 text-xs font-medium rounded-full";
     switch (estado) {
       case "Pendiente":
-        return <span className={`${base} bg-yellow-100 text-yellow-700`}>Pendiente</span>;
+        return (
+          <span className={`${base} bg-yellow-100 text-yellow-700`}>
+            Pendiente
+          </span>
+        );
       case "Aprobada":
-        return <span className={`${base} bg-green-100 text-green-700`}>Aprobada</span>;
+        return (
+          <span className={`${base} bg-green-100 text-green-700`}>
+            Aprobada
+          </span>
+        );
       case "Rechazada":
-        return <span className={`${base} bg-red-100 text-red-700`}>Rechazada</span>;
+        return (
+          <span className={`${base} bg-red-100 text-red-700`}>Rechazada</span>
+        );
     }
   };
 
-  // Columnas
+  // ✅ Columnas tipadas
   const columns =
     tipoVista === "beneficios"
-      ? [
+      ? ([
           { key: "id", label: "ID" },
           { key: "usuario", label: "Usuario" },
           { key: "tipo", label: "Tipo Beneficio" },
           { key: "comentario", label: "Comentario" },
-          { key: "estado", label: "Estado", render: (s: SolicitudBeneficio) => renderEstado(s.estado) },
-        ]
-      : [
+          {
+            key: "estado",
+            label: "Estado",
+            render: (s: SolicitudBeneficio) => renderEstado(s.estado),
+          },
+        ] as {
+          key: keyof SolicitudBeneficio;
+          label: string;
+          render?: (s: SolicitudBeneficio) => React.ReactNode;
+        }[])
+      : ([
           { key: "id", label: "ID" },
           { key: "usuario", label: "Usuario" },
           { key: "tipo", label: "Tipo Permiso" },
           { key: "fechaInicio", label: "Fecha Inicio" },
           { key: "dias", label: "Días" },
-          { key: "estado", label: "Estado", render: (s: SolicitudPermiso) => renderEstado(s.estado) },
-        ];
+          {
+            key: "estado",
+            label: "Estado",
+            render: (s: SolicitudPermiso) => renderEstado(s.estado),
+          },
+        ] as {
+          key: keyof SolicitudPermiso;
+          label: string;
+          render?: (s: SolicitudPermiso) => React.ReactNode;
+        }[]);
 
   // Acciones por fila
-  const renderActions = (s: any) =>
+  const renderActions = (s: SolicitudBeneficio | SolicitudPermiso) =>
     s.estado === "Pendiente" ? (
       <button
         onClick={() => navigate(`/solicitudes/${tipoVista}/${s.id}/evaluar`)}
