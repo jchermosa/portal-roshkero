@@ -1,0 +1,30 @@
+[
+  { 
+    "id": 1, 
+    "nombre": "Gimnasio", 
+    "descripcion": "Acceso al convenio de gimnasio corporativo", 
+    "estado": "A", 
+    "requiereAprobacionLider": true 
+  },
+  { 
+    "id": 2, 
+    "nombre": "Nutricionista", 
+    "descripcion": "Sesiones de nutrición subvencionadas por la empresa", 
+    "estado": "A", 
+    "requiereAprobacionLider": false 
+  },
+  { 
+    "id": 3, 
+    "nombre": "Transporte", 
+    "descripcion": "Subsidio parcial de transporte para empleados", 
+    "estado": "I", 
+    "requiereAprobacionLider": false 
+  },
+  { 
+    "id": 4, 
+    "nombre": "Capacitación externa", 
+    "descripcion": "Cursos y talleres financiados por la compañía", 
+    "estado": "A", 
+    "requiereAprobacionLider": true 
+  }
+]

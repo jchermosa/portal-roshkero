@@ -1,25 +1,31 @@
 [
   {
     "id": 101,
-    "usuario": "Laura ",
-    "tipo": "Nutricionista",
+    "id_usuario": 1,
+    "nombre": "Laura",
     "apellido": "Cacio",
+    "id_solicitud_tipo": 1,
+    "tipo": { "id": 1, "nombre": "Nutricionista" },
     "comentario": "Atención mensual incluida",
     "estado": "A"
   },
   {
     "id": 102,
-    "usuario": "Pedro",
+    "id_usuario": 2,
+    "nombre": "Pedro",
     "apellido": "Cacio",
-    "tipo": "Gimnasio",
+    "id_solicitud_tipo": 2,
+    "tipo": { "id": 2, "nombre": "Gimnasio" },
     "comentario": "Acceso ilimitado",
     "estado": "P"
   },
   {
     "id": 103,
-    "usuario": "Ana",
+    "id_usuario": 3,
+    "nombre": "Ana",
     "apellido": "Cacio",
-    "tipo": "Nutricionista",
+    "id_solicitud_tipo": 1,
+    "tipo": { "id": 1, "nombre": "Nutricionista" },
     "comentario": "Plan anual con 20% descuento",
     "estado": "R"
   }
