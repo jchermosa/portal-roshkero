@@ -11,7 +11,9 @@ export default function UserFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const cedulaParam = new URLSearchParams(location.search).get("cedula") || undefined;
+  const cedulaParamStr = new URLSearchParams(location.search).get("cedula");
+  const cedulaParam = cedulaParamStr ? Number(cedulaParamStr) : undefined;
+
 
   // ✅ Catálogos
   const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogos(token);
@@ -31,27 +33,37 @@ export default function UserFormPage() {
   // ✅ Configuración de secciones
   const sections = buildUsuarioSections(equipos, roles, cargos);
 
+  // 🚀 Render
+  const readonly = new URLSearchParams(location.search).get("readonly") === "true";
+
+
   return (
     <FormLayout
-      title={isEditing ? "Editar usuario" : "Crear usuario"}
-      subtitle={
-        isEditing
-          ? "Modifica los campos necesarios"
-          : "Completá la información del nuevo usuario"
-      }
-      icon={isEditing ? "✏️" : "🧑‍💻"}
-      onCancel={() => navigate("/usuarios")}
-      onSubmitLabel={isEditing ? "Guardar cambios" : "Crear usuario"}
-    >
+  title={isEditing ? (readonly ? "Detalle usuario" : "Editar usuario") : "Crear usuario"}
+  subtitle={
+    readonly
+      ? "Vista de solo lectura"
+      : isEditing
+        ? "Modifica los campos necesarios"
+        : "Completá la información del nuevo usuario"
+  }
+  icon={isEditing ? (readonly ? "👀" : "✏️") : "🧑‍💻"}
+  onCancel={() => navigate("/usuarios")}
+  onSubmitLabel={readonly ? undefined : (isEditing ? "Guardar cambios" : "Crear usuario")}
+  onCancelLabel={readonly ? "Volver" : "Cancelar"}   // 👈 cambiamos acá
+>
       <DynamicForm
         id="dynamic-form"
         sections={sections}
         initialData={data}
         onSubmit={async (formData) => {
-          await handleSubmit(formData);
-          navigate("/usuarios");
+          if (!readonly) {
+            await handleSubmit(formData);
+            navigate("/usuarios");
+          }
         }}
         loading={loading}
+        readonly={readonly}
         className="flex-1 overflow-hidden"
       />
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}

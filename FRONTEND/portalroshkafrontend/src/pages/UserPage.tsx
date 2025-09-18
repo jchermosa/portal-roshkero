@@ -13,6 +13,8 @@ import PaginationFooter from "../components/PaginationFooter";
 import SelectDropdown from "../components/SelectDropdown";
 import IconButton from "../components/IconButton";
 import PageLayout from "../layouts/PageLayout";
+import { usuariosColumns } from "../config/forms/usuariosTableConfig";
+
 
 export default function UsuariosPage() {
   const { token, user } = useAuth();
@@ -50,43 +52,32 @@ export default function UsuariosPage() {
     setPage(0);
   };
 
-  const columns = [
-    { key: "id", label: "ID" },
-    {
-      key: "nombre",
-      label: "Nombre",
-      render: (u: UsuarioItem) => `${u.nombre} ${u.apellido}`,
-    },
-    { key: "correo", label: "Correo" },
-    {
-      key: "antiguedadPretty",
-      label: "Antigüedad",
-      render: (u: UsuarioItem) => u.antiguedadPretty ?? "-",
-    },
-    {
-      key: "estado",
-      label: "Estado",
-      render: (u: UsuarioItem) =>
-        u.estado ? (
-          <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-            Activo
-          </span>
-        ) : (
-          <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
-            Inactivo
-          </span>
-        ),
-    },
-  ];
+  const columns = usuariosColumns;
 
-  const renderActions = (u: UsuarioItem) => (
-    <button
-      onClick={() => navigate(`/usuarios/${u.id}`)}
-      className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-    >
-      Editar
-    </button>
-  );
+    const renderActions = (u: UsuarioItem) => {
+    if (tieneRol(user, Roles.OPERACIONES)) {
+      // Solo ver
+      return (
+        <button
+          onClick={() => navigate(`/usuarios/${u.id}?readonly=true`)}
+          className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition"
+        >
+          Ver
+        </button>
+      );
+    }
+
+    // Editar para otros roles
+    return (
+      <button
+        onClick={() => navigate(`/usuarios/${u.id}`)}
+        className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
+      >
+        Editar
+      </button>
+    );
+  };
+
 
   if (!puedeVerUsuarios) return <p>No tenés permisos para ver esta página.</p>;
   if (loadingUsuarios || loadingCatalogos) return <p>Cargando usuarios...</p>;
@@ -151,7 +142,7 @@ export default function UsuariosPage() {
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
-        onCancel={() => navigate(-1)}
+        onCancel={() => navigate("/home")}
       />
     </PageLayout>
   );
