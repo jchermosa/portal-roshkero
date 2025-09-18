@@ -20,9 +20,10 @@ export interface UsuarioItem {
   diasVacacionesRestante?: number | null;
   requiereCambioContrasena: boolean;
   fechaCreacion?: string; // timestamp
-  estado: "ACTIVO" | "INACTIVO" | "VACACIONES"; // enum real
+  estado: "ACTIVO" | "INACTIVO"; // enum real
   urlPerfil?: string;
   disponibilidad?: number;
+  antiguedadPretty?: string; 
 }
 
 export type SolicitudEstado = "P" | "A" | "R";
