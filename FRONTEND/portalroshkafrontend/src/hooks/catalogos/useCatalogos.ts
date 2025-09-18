@@ -4,22 +4,13 @@ import { getRoles, getCargos, getEquipos } from "../../services/CatalogService";
 
 export function useCatalogos(token: string | null) {
   const { data: roles, loading: loadingRoles, error: errorRoles } =
-    usePaginatedResource<CatalogItem>(
-      (params) => getRoles(token!, params),
-      token
-    );
+    usePaginatedResource<CatalogItem>((_params) => getRoles(token!), token);
 
   const { data: cargos, loading: loadingCargos, error: errorCargos } =
-    usePaginatedResource<CatalogItem>(
-      (params) => getCargos(token!, params),
-      token
-    );
+    usePaginatedResource<CatalogItem>((_params) => getCargos(token!), token);
 
   const { data: equipos, loading: loadingEquipos, error: errorEquipos } =
-    usePaginatedResource<CatalogItem>(
-      (params) => getEquipos(token!, params),
-      token
-    );
+    usePaginatedResource<CatalogItem>((_params) => getEquipos(token!), token);
 
   return {
     roles,
