@@ -87,8 +87,6 @@ public class UsuariosEquipoImpl implements IUsuarioisEquipoService {
                 response.setUsuariosEnEquipo(usuariosEnEquipo); // Page с пагинацией
                 response.setUsuariosFueraEquipo(usuariosFueraEquipo); // List без пагинации
                 response.setTecnologias(tecnologias);
-                                
-                
 
                 return response;
         }
@@ -119,17 +117,29 @@ public class UsuariosEquipoImpl implements IUsuarioisEquipoService {
 
                 // Создание новой ассоциации
                 AsignacionUsuario asignacion = new AsignacionUsuario();
+                Float porcentajeAsignado = requestDto.getPorcentajeTrabajo();
+                int disponibilidadActual = usuario.getDisponibilidad();
+
+                if (porcentajeAsignado > disponibilidadActual) {
+                        throw new RuntimeException("El usuario no tiene suficiente disponibilidad");
+                }
+
+                // Вычитаем проценты
+                usuario.setDisponibilidad(disponibilidadActual - porcentajeAsignado.intValue());
+                userRepository.save(usuario);
+
+                // Создаём назначение
                 asignacion.setEquipos(equipo);
                 asignacion.setIdUsuario(usuario);
                 asignacion.setIdTecnologia(tecnologia);
                 asignacion.setFechaEntrada(requestDto.getFechaEntrada());
                 asignacion.setFechaFin(requestDto.getFechaFin());
-                asignacion.setPorcentajeTrabajo(requestDto.getPorcentajeTrabajo());
+                asignacion.setPorcentajeTrabajo(porcentajeAsignado);
                 asignacion.setFechaCreacion(new Date(System.currentTimeMillis()));
 
                 asignacionUsuarioRepository.save(asignacion);
 
-                // Преобразование в DTO
+                // Преобразуем в DTO
                 UsuariosEquipoResponseDto response = new UsuariosEquipoResponseDto();
                 response.setIdAsignacionUsuarioEquipo(asignacion.getIdAsignacionUsuarioEquipo());
                 response.setIdUsuario(usuario);

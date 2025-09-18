@@ -89,7 +89,7 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
         equipo.setFechaCreacion(new Date(System.currentTimeMillis()));
 
-        Equipos savedEquipo = equiposRepository.save(equipo);
+        Equipos savedEquipo = equiposRepository.save(equipo);   //save in bd
 
         EquiposResponseDto dto = new EquiposResponseDto();
         dto.setIdEquipo(savedEquipo.getIdEquipo());

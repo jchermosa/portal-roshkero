@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
@@ -45,7 +46,8 @@ public class EquiposController {
 
     @GetMapping("/teams")
     public ResponseEntity<Page<EquiposResponseDto>> getAllTeams(
-            @PageableDefault(size = 10, sort = "idEquipo", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "idEquipo", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false, defaultValue = "default") String sortBy) {
         Page<EquiposResponseDto> teams = equiposService.getAllTeams(pageable);
         return ResponseEntity.ok(teams);
     }
@@ -99,15 +101,16 @@ public class EquiposController {
 
     // @PutMapping("teams/{idEquipo}/users/{idAsignacionUsuario}")
     // public ResponseEntity<UsuarioisResponseDto> updateUsuarioEquipo(
-    //         @PathVariable Integer idEquipo,
-    //         @PathVariable Integer idAsignacionUsuario,
-    //         @RequestBody @Valid UsuarioEquipoUpdateRequestDto dto) {
+    // @PathVariable Integer idEquipo,
+    // @PathVariable Integer idAsignacionUsuario,
+    // @RequestBody @Valid UsuarioEquipoUpdateRequestDto dto) {
 
-    //     UsuariosEquipoUpdateResponseDto updated = usuariosEquipoService.updateUsuarioEnEquipo(
-    //             idEquipo,
-    //             idAsignacionUsuario,
-    //             dto);
-    //     return ResponseEntity.ok(updated);
+    // UsuariosEquipoUpdateResponseDto updated =
+    // usuariosEquipoService.updateUsuarioEnEquipo(
+    // idEquipo,
+    // idAsignacionUsuario,
+    // dto);
+    // return ResponseEntity.ok(updated);
     // }
 
     // @DeleteMapping("teams/{idEquipo}/users/{idAsignacionUsuario}")
