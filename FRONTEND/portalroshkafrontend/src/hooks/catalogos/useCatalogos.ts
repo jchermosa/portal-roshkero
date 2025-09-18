@@ -1,22 +1,27 @@
-import { usePaginatedResource } from "../common/usePaginatedResource";
-import type { CatalogItem } from "../../types";
+import { useEffect, useState } from "react";
 import { getRoles, getCargos, getEquipos } from "../../services/CatalogService";
+import type { RolItem, CargoItem, EquipoItem } from "../../types";
 
 export function useCatalogos(token: string | null) {
-  const { data: roles, loading: loadingRoles, error: errorRoles } =
-    usePaginatedResource<CatalogItem>((_params) => getRoles(token!), token);
+  const [roles, setRoles] = useState<RolItem[]>([]);
+  const [cargos, setCargos] = useState<CargoItem[]>([]);
+  const [equipos, setEquipos] = useState<EquipoItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const { data: cargos, loading: loadingCargos, error: errorCargos } =
-    usePaginatedResource<CatalogItem>((_params) => getCargos(token!), token);
+  useEffect(() => {
+    if (!token) return;
+    setLoading(true);
 
-  const { data: equipos, loading: loadingEquipos, error: errorEquipos } =
-    usePaginatedResource<CatalogItem>((_params) => getEquipos(token!), token);
+    Promise.all([getRoles(token), getCargos(token), getEquipos(token)])
+      .then(([rolesRes, cargosRes, equiposRes]) => {
+        setRoles(rolesRes);
+        setCargos(cargosRes);
+        setEquipos(equiposRes);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [token]);
 
-  return {
-    roles,
-    cargos,
-    equipos,
-    loading: loadingRoles || loadingCargos || loadingEquipos,
-    error: errorRoles || errorCargos || errorEquipos,
-  };
+  return { roles, cargos, equipos, loading, error };
 }

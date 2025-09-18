@@ -7,19 +7,22 @@ export interface UsuarioItem {
   id: number;
   nombre: string;
   apellido: string;
+  nroCedula: number;
   correo: string;
-  nroCedula: string;
+  idRol: number;
+  fechaIngreso: string | null;
+  antiguedad?: string | null;
+  diasVacaciones?: number | null;
   contrasena?: string;
   telefono?: string;
-  fechaIngreso?: string; 
-  fechaNacimiento?: string; 
-  estado: boolean;
+  idCargo: number;
+  fechaNacimiento?: string | null;
+  diasVacacionesRestante?: number | null;
   requiereCambioContrasena: boolean;
-  rolId?: number;
-  equipoId?: number;
-  cargoId?: number;
-  antiguedad?: string;
-  antiguedadPretty?: string;
+  fechaCreacion?: string; // timestamp
+  estado: "ACTIVO" | "INACTIVO" | "VACACIONES"; // enum real
+  urlPerfil?: string;
+  disponibilidad?: number;
 }
 
 export type SolicitudEstado = "P" | "A" | "R";
@@ -38,3 +41,24 @@ export interface SolicitudItem {
 }
 
 
+export interface EquipoItem {
+  id: number;
+  nombre: string;
+  fechaInicio?: string | null;
+  fechaLimite?: string | null;
+  idCliente: number;
+  fechaCreacion?: string;
+  estado: "ACTIVO" | "INACTIVO"; // enum real
+}
+
+export interface RolItem {
+  id: number;
+  nombre: string;
+  fechaCreacion?: string;
+}
+
+export interface CargoItem {
+  id: number;
+  nombre: string;
+  fechaCreacion?: string;
+}
