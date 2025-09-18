@@ -1,7 +1,6 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DynamicForm from "../components/DynamicForm";
-import type { FormSection } from "../components/DynamicForm";
 import { useCatalogos } from "../hooks/catalogos/useCatalogos";
 import { useUsuarioForm } from "../hooks/usuarios/useUsuarioForm.ts";
 import FormLayout from "../layouts/FormLayout";
@@ -50,7 +49,7 @@ export default function UserFormPage() {
   icon={isEditing ? (readonly ? "👀" : "✏️") : "🧑‍💻"}
   onCancel={() => navigate("/usuarios")}
   onSubmitLabel={readonly ? undefined : (isEditing ? "Guardar cambios" : "Crear usuario")}
-  onCancelLabel={readonly ? "Volver" : "Cancelar"}   // 👈 cambiamos acá
+  onCancelLabel={readonly ? "Volver" : "Cancelar"}   
 >
       <DynamicForm
         id="dynamic-form"

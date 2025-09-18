@@ -15,11 +15,11 @@ export type User = {
   equipo?: Equipo;
   dias_vacaciones?: number;
   dias_vacaciones_restante?: number;
-  // nuevos opcionales para ProfilePage
   telefono?: string;
   fecha_ingreso?: string;
   nro_cedula?: string;
   estado?: boolean;
+  requiereCambioContrasena?: boolean;
 };
 
 type AuthContextType = {
@@ -28,6 +28,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
+  refreshUser: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,42 +62,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const decodeAndSetUser = (jwtToken: string) => {
-try {
-const base = jwtToken.split(".")[1];
-const json = decodeURIComponent(
-atob(base)
-.split("")
-.map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-.join("")
-);
-const payload = JSON.parse(json);
+    try {
+      const payload = parseJwt(jwtToken);
 
+      const usuario: User = {
+        id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
+        nombre: payload.nombre ?? "",
+        apellido: payload.apellido ?? "",
+        correo: payload.email ?? payload.sub ?? "",
+        rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
+        cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
+        equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
+        telefono: payload.telefono ?? undefined,
+        fecha_ingreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
+        dias_vacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
+        dias_vacaciones_restante:
+          payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante,
+        requiereCambioContrasena: payload.requiereCambioContrasena ?? false,
+      };
 
-const usuario: User = {
-id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
-nombre: payload.nombre ?? "",
-apellido: payload.apellido ?? "",
-correo: payload.email ?? payload.sub ?? "",
-
-
-rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
-cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
-equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
-
-
-telefono: payload.telefono ?? undefined,
-fecha_ingreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
-
-dias_vacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
-dias_vacaciones_restante:payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante
-};
-
-
-setUser(usuario);
-} catch (e) {
-  console.error("Error al decodificar el token:", e);
-}
-};
+      setUser(usuario);
+    } catch (e) {
+      console.error("Error al decodificar el token:", e);
+    }
+  };
 
   const login = (jwtToken: string) => {
     localStorage.setItem("auth_token", jwtToken);
@@ -110,6 +99,10 @@ setUser(usuario);
     setToken(null);
   };
 
+  const refreshUser = () => {
+    if (token) decodeAndSetUser(token);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -118,6 +111,7 @@ setUser(usuario);
         isAuthenticated: !!token,
         login,
         logout,
+        refreshUser, 
       }}
     >
       {children}
