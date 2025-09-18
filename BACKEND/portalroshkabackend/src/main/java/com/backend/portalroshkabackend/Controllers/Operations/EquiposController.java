@@ -17,22 +17,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.IEquiposService;
+import com.backend.portalroshkabackend.Services.Operations.IUsuarioisEquipoService;
 
 import jakarta.validation.Valid;
 
 @RestController("equiposController")
-@RequestMapping("/api/v1/admin/operations/teams")
+@RequestMapping("/api/v1/admin/operations")
 public class EquiposController {
 
     private final IEquiposService equiposService;
+    private final IUsuarioisEquipoService usuariosEquipoService;
 
     @Autowired
-    public EquiposController(IEquiposService equiposService) {
+    public EquiposController(IEquiposService equiposService, IUsuarioisEquipoService usuariosEquipoService) {
         this.equiposService = equiposService;
+        this.usuariosEquipoService = usuariosEquipoService;
     }
 
-    @GetMapping("")
+    @GetMapping("/teams")
     public ResponseEntity<Page<EquiposResponseDto>> getAllTeams(
             @PageableDefault(size = 10, sort = "idEquipo", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<EquiposResponseDto> teams = equiposService.getAllTeams(pageable);
@@ -40,24 +45,41 @@ public class EquiposController {
     }
 
     // ----------------- CREATE -----------------
-    @PostMapping("")
+    @PostMapping("/teams")
     public EquiposResponseDto postNewTeam(@Valid @RequestBody EquiposRequestDto equipoRequest) {
         return equiposService.postNewTeam(equipoRequest);
     }
 
     // ----------------- DELETE -----------------
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/teams/{id}")
     public void deleteTeam(@PathVariable int id) {
         equiposService.deleteTeam(id);
     }
 
     // ----------------- UPDATE -----------------
-    @PutMapping("/{id}")
+    @PutMapping("/teams/{id}")
     public EquiposResponseDto updateTeam(
             @PathVariable int id,
             @Valid @RequestBody EquiposRequestDto equipoRequest) {
 
         return equiposService.updateTeam(id, equipoRequest);
+    }
+
+    // /api/v1/admin/operations/teams/{id}/users -> GET: все пользователи команды
+    // /api/v1/admin/operations/teams/{id}/users -> POST: добавить пользователя в
+    // команду
+    // /api/v1/admin/operations/teams/{id}/users/{userId} -> PUT: обновить
+    // пользователя в команде
+    // /api/v1/admin/operations/teams/{id}/users/{userId} -> DELETE: удалить
+    // пользователя из команды
+
+    @GetMapping("teams/{idEquipo}/users")
+    public ResponseEntity<Page<UsuariosEquipoResponseDto>> getAllUsuariosEquipo(
+            @PathVariable Integer idEquipo,
+            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC) Pageable pageable) {
+
+        Page<UsuariosEquipoResponseDto> usuarios = usuariosEquipoService.getAllUsuariosEquipo(idEquipo, pageable);
+        return ResponseEntity.ok(usuarios);
     }
 
 }
