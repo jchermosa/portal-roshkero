@@ -19,7 +19,6 @@ import SolicitudVacacionesPage from "../pages/SolicitudVacacionesPage";
 import BeneficioFormPage from "../pages/BenefitsFormPage.tsx";
 import RequestManagementPage from "../pages/RequestManagementPage.tsx";
 import RequestSearchPage from "../pages/RequestSearchPage.tsx";
-
 import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
 
 export default function AppRoutes() {
@@ -31,49 +30,39 @@ export default function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/cambiar-contraseña" element={<ChangePasswordPage />} />
 
-      {/* Rutas privadas dentro del DashboardLayout */}
+      {/* Rutas privadas */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
-
-              <Route path="/requests" element={<RequestPage />} />
-              <Route index element={<HomePage />} />
-              <Route path="/profile" element={<ProfilePage />} /> 
-              <Route path="/usuarios" element={<UsuariosPage />} />
-              <Route path="/usuarios/buscar" element={<UserSearchPage />} />
-              <Route path="/usuarios/nuevo" element={<UserFormPage />} />
-              <Route path="/usuarios/:id" element={<UserFormPage />} />
-              <Route path="/vacaciones" element={<VacacionesPage />} />
-              <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
-              <Route path="/benefits" element={<BeneficiosPage />} />
-              <Route path="/configuracion" element={<Configuration />} />
-              <Route path="/requests/nuevo" element={<RequestFormPage />} />
-              <Route path="/requests/:id" element={<RequestFormPage />} />
-              <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
-              <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage/>} />
-              <Route path="/solicitudesTH/permisos" element={<RequestManagementPage tipoVista="permisos"/>} />
-              <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage tipoVista="beneficios"/>} />
-          {/*<Route path="/usuarios" element={<UsuariosPage />} />
-
-          < */}
           <Route index element={<HomePage />} />
+
+          {/* Solicitudes */}
           <Route path="/requests" element={<RequestPage />} />
           <Route path="/requests/nuevo" element={<RequestFormPage />} />
           <Route path="/requests/:id" element={<RequestFormPage />} />
+          <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage />} />
+          <Route path="/solicitudesTH/permisos" element={<RequestManagementPage tipoVista="permisos" />} />
+          <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage tipoVista="beneficios" />} />
 
-          <Route path="/profile" element={<ProfilePage />} />
+          {/* Usuarios */}
           <Route path="/usuarios" element={<UsuariosPage />} />
           <Route path="/usuarios/buscar" element={<UserSearchPage />} />
           <Route path="/usuarios/nuevo" element={<UserFormPage />} />
           <Route path="/usuarios/:id" element={<UserFormPage />} />
 
+          {/* Vacaciones */}
           <Route path="/vacaciones" element={<VacacionesPage />} />
           <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
 
+          {/* Beneficios */}
           <Route path="/benefits" element={<BeneficiosPage />} />
           <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
 
+          {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />
           <Route path="/gestion-solicitudes" element={<RequestManagementPage />} />
+
+          {/* Perfil */}
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
 
