@@ -30,7 +30,7 @@ public class AsignacionServiceImpl implements IAsignacionService {
         return asignacionUsuarioRepository.findAll(pageable)
                 .map(asignacion -> {
                     AsignacionResponseDto Dto = new AsignacionResponseDto();
-                    Dto.setIdAsignacionUsuario(asignacion.getIdAsignacionUsuario());
+                    Dto.setIdAsignacionUsuarioEquipo(asignacion.getIdAsignacionUsuarioEquipo());
                     Dto.setFechaEntrada(asignacion.getFechaEntrada());
                     Dto.setFechaFin(asignacion.getFechaFin());
                     Dto.setPorcentajeTrabajo(asignacion.getPorcentajeTrabajo());

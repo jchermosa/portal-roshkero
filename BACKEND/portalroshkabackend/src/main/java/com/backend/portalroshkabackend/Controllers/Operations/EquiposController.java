@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.Controllers.Operations;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoCombinedResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.IEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.IUsuarioisEquipoService;
@@ -74,12 +77,13 @@ public class EquiposController {
     // пользователя из команды
 
     @GetMapping("teams/{idEquipo}/users")
-    public ResponseEntity<Page<UsuariosEquipoResponseDto>> getAllUsuariosEquipo(
+    public ResponseEntity<UsuariosEquipoCombinedResponseDto> getUsuariosEquipo(
             @PathVariable Integer idEquipo,
             @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC) Pageable pageable) {
 
-        Page<UsuariosEquipoResponseDto> usuarios = usuariosEquipoService.getAllUsuariosEquipo(idEquipo, pageable);
-        return ResponseEntity.ok(usuarios);
+        UsuariosEquipoCombinedResponseDto response = usuariosEquipoService.getUsuariosEnYFueraDeEquipo(idEquipo,
+                pageable);
+        return ResponseEntity.ok(response);
     }
 
 }

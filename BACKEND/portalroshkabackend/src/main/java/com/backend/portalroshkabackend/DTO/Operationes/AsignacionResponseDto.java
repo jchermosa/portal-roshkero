@@ -9,7 +9,7 @@ import com.backend.portalroshkabackend.Models.Usuario;
 
 @Data
 public class AsignacionResponseDto {
-    private Integer idAsignacionUsuario;
+    private Integer IdAsignacionUsuarioEquipo;
     private Date fechaEntrada;
     private Date fechaFin;
     private Float porcentajeTrabajo;

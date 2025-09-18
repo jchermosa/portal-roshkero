@@ -22,7 +22,7 @@ public class AsignacionUsuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_asignacion_usuario_equipo")
-    private Integer idAsignacionUsuario;
+    private Integer idAsignacionUsuarioEquipo;
 
     @Column(name = "fecha_entrada")
     private Date fechaEntrada;
