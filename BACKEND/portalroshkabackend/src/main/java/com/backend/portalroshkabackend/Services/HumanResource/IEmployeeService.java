@@ -4,6 +4,7 @@ import com.backend.portalroshkabackend.DTO.th.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
 import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.th.self.DefaultResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +15,7 @@ public interface IEmployeeService {
     Page<UserResponseDto> getAllEmployeesByRol(Pageable pageable);
     Page<UserResponseDto> getAllEmployeesByPosition(Pageable pageable);
     UserByIdResponseDto getEmployeeById(int id);
-    UserResponseDto addEmployee(UserInsertDto insertDto);
-    UserResponseDto updateEmployee(UserUpdateDto updateDto, int id);
-    UserResponseDto deleteEmployee(int id);
+    DefaultResponseDto addEmployee(UserInsertDto insertDto);
+    DefaultResponseDto updateEmployee(UserUpdateDto updateDto, int id);
+    DefaultResponseDto deleteEmployee(int id);
 }

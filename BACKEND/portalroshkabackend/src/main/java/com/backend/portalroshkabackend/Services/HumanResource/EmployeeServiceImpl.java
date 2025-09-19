@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.Services.HumanResource;
 import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.DTO.th.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
+import com.backend.portalroshkabackend.DTO.th.self.DefaultResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
@@ -83,7 +84,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Transactional
     @Override
-    public UserResponseDto addEmployee(UserInsertDto insertDto) {
+    public DefaultResponseDto addEmployee(UserInsertDto insertDto) {
 
         validator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
         validator.validateUniqueEmail(insertDto.getCorreo(), null);
@@ -94,13 +95,13 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         Usuario savedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al guardar el usuario: ");
 
-        return AutoMap.toUserDto(savedUser);
+        return AutoMap.toDefaultResponseDto(savedUser.getIdUsuario(), "Usuario creado con exito.");
 
     }
 
     @Transactional
     @Override
-    public UserResponseDto updateEmployee(UserUpdateDto updateDto, int id) {
+    public DefaultResponseDto updateEmployee(UserUpdateDto updateDto, int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
         validator.validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
@@ -112,24 +113,22 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         Usuario updatedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al actualizar el usuario: ");
 
-        return AutoMap.toUserDto(updatedUser);
+        return AutoMap.toDefaultResponseDto(updatedUser.getIdUsuario(), "Usuario actualizado con exito.");
 
     }
 
     @Transactional
     @Override
-    public UserResponseDto deleteEmployee(int id) {
+    public DefaultResponseDto deleteEmployee(int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        if (user.getEstado()== EstadoActivoInactivo.I) {
-            throw new UserAlreadyInactiveException(id);
-        }
+        if (user.getEstado() == EstadoActivoInactivo.I) throw new UserAlreadyInactiveException(id);
 
         user.setEstado(EstadoActivoInactivo.I); // Da de baja el empleado de la base de datos
 
         Usuario deletedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al eliminar el usuario: ");
 
-        return AutoMap.toUserDto(deletedUser);
+        return AutoMap.toDefaultResponseDto(deletedUser.getIdUsuario(), "Usuario eliminado con exito.");
 
     }
 }

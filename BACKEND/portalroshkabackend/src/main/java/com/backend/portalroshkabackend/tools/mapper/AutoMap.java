@@ -10,6 +10,15 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 public class AutoMap {
+    public static DefaultResponseDto toDefaultResponseDto(Integer idUsuario, String message){
+        DefaultResponseDto dto = new DefaultResponseDto();
+
+        dto.setIdUsuario(idUsuario);
+        dto.setMessage(message);
+
+        return dto;
+    }
+
     public static UserResponseDto toUserDto(Usuario user) {
         UserResponseDto dto = new UserResponseDto();
         dto.setIdUsuario(user.getIdUsuario());

@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.DTO.th.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
+import com.backend.portalroshkabackend.DTO.th.self.DefaultResponseDto;
 import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
 import com.backend.portalroshkabackend.Services.HumanResource.IThSelfService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,8 +70,8 @@ public class EmployeeController {
     }
 
     @PostMapping("/th/users")
-    public ResponseEntity<UserResponseDto> addEmployee(@RequestBody UserInsertDto insertDto){
-        UserResponseDto user = employeeService.addEmployee(insertDto);
+    public ResponseEntity<DefaultResponseDto> addEmployee(@RequestBody UserInsertDto insertDto){
+        DefaultResponseDto user = employeeService.addEmployee(insertDto);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
@@ -81,15 +82,15 @@ public class EmployeeController {
     }
 
     @PutMapping("/th/users/{id}")
-    public ResponseEntity<UserResponseDto> updateEmployee(@RequestBody UserUpdateDto updateDto, @PathVariable int id){
-        UserResponseDto user = employeeService.updateEmployee(updateDto, id);
+    public ResponseEntity<DefaultResponseDto> updateEmployee(@RequestBody UserUpdateDto updateDto, @PathVariable int id){
+        DefaultResponseDto user = employeeService.updateEmployee(updateDto, id);
 
         return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/th/users/{id}")
-    public ResponseEntity<UserResponseDto> deleteEmployee(@PathVariable int id){
-        UserResponseDto user = employeeService.deleteEmployee(id);
+    public ResponseEntity<DefaultResponseDto> deleteEmployee(@PathVariable int id){
+        DefaultResponseDto user = employeeService.deleteEmployee(id);
 
         return ResponseEntity.ok(user);
     }

@@ -119,14 +119,14 @@ public class RequestController {
 
     //TODO: POST- Solicitar vaciones
 
-    // mis solicitudes.GET
 
-    // Listar por tipo de solicitud,
 
-    //TODO: POST-Solicitar BENEFICIO.
+    //TODO: POST-Solicitar BENEFICIO. - Cuando este la nueva DB
 
     // ---------------------
 
+    // mis solicitudes.GET
+    // Listar por tipo de solicitud,
     // GET-Tipos de BENEFICIO, DISPOSITIVOS, PERMISOS. - LISTO
     // GET:Solicitudes aprobadas por lideres{PENDIENTES, FECHA} - LISTO
     // GET: listar por estado de la solicitud (A,I,P)
