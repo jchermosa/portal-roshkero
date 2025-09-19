@@ -19,7 +19,7 @@ public class AutoMap {
         return dto;
     }
 
-    public static UserResponseDto toUserDto(Usuario user) {
+    public static UserResponseDto toUserResponseDto(Usuario user) {
         UserResponseDto dto = new UserResponseDto();
         dto.setIdUsuario(user.getIdUsuario());
         dto.setNombreApellido(user.getNombre() + " " + user.getApellido());

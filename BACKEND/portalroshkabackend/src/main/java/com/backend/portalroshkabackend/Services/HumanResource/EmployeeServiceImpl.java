@@ -37,9 +37,9 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Transactional(readOnly = true)
     @Override
     public Page<UserResponseDto> getAllEmployees(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAll(pageable); // Guarda todos los usuarios en users
+        Page<Usuario> users = userRepository.findAll(pageable);
 
-        return users.map(AutoMap::toUserDto); //Retorna una lista de dtos
+        return users.map(AutoMap::toUserResponseDto);
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +47,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public Page<UserResponseDto> getAllActiveEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.A, pageable);
 
-        return users.map(AutoMap::toUserDto); // Retorna una lista de empleados activos (DTOs)
+        return users.map(AutoMap::toUserResponseDto); // Retorna una lista de empleados activos (DTOs)
     }
 
     @Transactional(readOnly = true)
@@ -55,14 +55,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public Page<UserResponseDto> getAllInactiveEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.I, pageable);
 
-        return users.map(AutoMap::toUserDto); // Retorna la lista de empleados inactivos
+        return users.map(AutoMap::toUserResponseDto); // Retorna la lista de empleados inactivos
     }
 
     @Override
     public Page<UserResponseDto> getAllEmployeesByRol(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByRolesAsc(pageable);
 
-        return users.map(AutoMap::toUserDto);
+        return users.map(AutoMap::toUserResponseDto);
     }
 
 
@@ -70,7 +70,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public Page<UserResponseDto> getAllEmployeesByPosition(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByCargosAsc(pageable);
 
-        return users.map(AutoMap::toUserDto);
+        return users.map(AutoMap::toUserResponseDto);
     }
 
     @Transactional(readOnly = true)
@@ -78,7 +78,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public UserByIdResponseDto getEmployeeById(int id) {
         var user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)); //Lanza una excepcion personalizada
 
-        return AutoMap.toUserByIdDto(user); //Si no existe usuario con esa id retorna null, sino retorna un Dto
+        return AutoMap.toUserByIdDto(user);
 
     }
 
