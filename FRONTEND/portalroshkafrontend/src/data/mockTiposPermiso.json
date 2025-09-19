@@ -1,0 +1,8 @@
+[
+  { "id": 1, "nombre": "Luto 1er grado", "cantidadDias": 5 },
+  { "id": 2, "nombre": "Luto 2do grado", "cantidadDias": 3 },
+  { "id": 3, "nombre": "Reposo médico", "cantidadDias": null },
+  { "id": 4, "nombre": "Capacitación", "cantidadDias": null },
+  { "id": 5, "nombre": "Maternidad", "cantidadDias": 150 },
+  { "id": 6, "nombre": "Paternidad", "cantidadDias": 14 }
+]
