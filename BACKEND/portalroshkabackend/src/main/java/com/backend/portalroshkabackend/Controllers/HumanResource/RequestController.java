@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
 import com.backend.portalroshkabackend.DTO.th.*;
+import com.backend.portalroshkabackend.DTO.th.self.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Services.HumanResource.IRequestService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,16 +41,7 @@ public class RequestController {
         return ResponseEntity.ok(requests);
     }
 
-    @GetMapping("/th/users/request")
-    public ResponseEntity<Page<RequestDto>> getAllTHRequests(
-            @PageableDefault(size = 10, sort = "idSolicitud", direction = Sort.Direction.ASC) Pageable pageable
-    ){
-        Page<RequestDto> requests = requestService.getAllRequests(pageable); // Solicitud Enviar -> Aprueba Lider/es -> Aparece en TH para aprobar / rechazar
-
-        return ResponseEntity.ok(requests);
-    }
-
-    @GetMapping("/th/users/request/sortby")
+    @GetMapping("/th/users/requests/sortby")
     public ResponseEntity<Page<SolicitudTHResponseDto>> getRequestSortByEstado(
             @RequestParam(value = "estado", required = true) String estado,
             @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable,
@@ -79,32 +71,24 @@ public class RequestController {
     }
 
 
+    @PostMapping("/th/users/requests/{idRequest}/accept")
+    public ResponseEntity<RequestResponseDto> acceptRequest(@PathVariable int idRequest){
 
+        RequestResponseDto response = requestService.acceptRequest(idRequest);
 
-    @PostMapping("/th/users/request/{id}/accept")
-    public ResponseEntity<?> acceptRequest(@PathVariable int idRequest){
+        return ResponseEntity.ok(response);
 
-        boolean isAccepted = requestService.acceptRequest(idRequest);
-
-        if (!isAccepted){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/th/users/request/{id}/reject")
-    public ResponseEntity<?> rejectRequest(@PathVariable int idRequest, @RequestBody RequestRejectedDto rejectedDto){
+    @PostMapping("/th/users/requests/{idRequest}/reject")
+    public ResponseEntity<RequestResponseDto> rejectRequest(@PathVariable int idRequest){
 
-        boolean isRejected = requestService.rejectRequest(idRequest, rejectedDto);
+        RequestResponseDto response  = requestService.rejectRequest(idRequest);
 
-        if (!isRejected){
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/th/users/request")
+    @PostMapping("/th/users/requests")
     public ResponseEntity<?> addNewRequestType(){
 
         // TODO: Implementar cuando la base de datos tenga tipo de solicitudes

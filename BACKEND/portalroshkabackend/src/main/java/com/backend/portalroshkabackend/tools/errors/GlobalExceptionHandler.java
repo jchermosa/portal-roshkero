@@ -34,6 +34,15 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(RequestAlreadyRejectedException.class)
+    public ResponseEntity<ErrorResponseDto> handleRequestAlreadyRejected(RequestAlreadyRejectedException ex){
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(RequestAlreadyAcceptedException.class)
+    public ResponseEntity<ErrorResponseDto> handleRequestAlreadyAccepted(RequestAlreadyAcceptedException ex){
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
     // --- CARGOS EXCEPTIONS HANDLER ---
 
     @ExceptionHandler(CargoNotFoundException.class)

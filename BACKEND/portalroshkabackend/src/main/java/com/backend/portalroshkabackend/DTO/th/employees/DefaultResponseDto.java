@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO.th.self;
+package com.backend.portalroshkabackend.DTO.th.employees;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

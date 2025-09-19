@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.Services.HumanResource;
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
 import com.backend.portalroshkabackend.DTO.th.*;
+import com.backend.portalroshkabackend.DTO.th.self.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Beneficios;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Solicitudes;
@@ -10,6 +11,8 @@ import com.backend.portalroshkabackend.Models.SolicitudesTH;
 import com.backend.portalroshkabackend.Models.TipoDispositivo;
 import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.SaveManager;
+import com.backend.portalroshkabackend.tools.errors.errorslist.RequestAlreadyAcceptedException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.RequestAlreadyRejectedException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
 import com.backend.portalroshkabackend.tools.validator.Validator;
@@ -52,20 +55,12 @@ public class RequestServiceImpl implements IRequestService{
 
     @Transactional(readOnly = true)
     @Override
-    public Page<RequestDto> getAllRequests(Pageable pageable) {
-        Page<Solicitudes> requests = requestRepository.findAll(pageable);
-        return requests.map(AutoMap::toRequestDto); // Retorna todas las solicitudes (DTOs)
-    }
-
-    @Transactional(readOnly = true)
-    @Override
     public Page<SolicitudTHResponseDto> getApprovedByLeader(Pageable pageable) {
         Page<SolicitudesTH> requests = solicitudesTHRepository.findAllByEstadoLiderAndEstadoTh(EstadoSolicitudEnum.P, EstadoSolicitudEnum.P, pageable);
         return requests.map(AutoMap::toSolicitudTHResponseDto);
     }
 
-
-
+    @Transactional(readOnly = true)
     @Override
     public Page<SolicitudTHResponseDto> getByEstado(EstadoSolicitudEnum estado, Pageable pageable) {
         Page<SolicitudesTH> requestSorted = solicitudesTHRepository.findAllByEstado(estado, pageable);
@@ -73,30 +68,34 @@ public class RequestServiceImpl implements IRequestService{
         return requestSorted.map(AutoMap::toSolicitudTHResponseDto);
     }
 
-
     @Transactional
     @Override
-    public boolean acceptRequest(int idRequest) {
-        Solicitudes request = requestRepository.findById(idRequest)
-                .orElseThrow(() -> new RequestNotFoundException(idRequest));
+    public RequestResponseDto acceptRequest(int idRequest) {
+        SolicitudesTH request = solicitudesTHRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
 
-        // Si se acepta la solicitud, rechazado y estado de la solicitu se setea a false
+        if (request.getEstado() == EstadoSolicitudEnum.A) throw new RequestAlreadyAcceptedException(idRequest);
+        if (request.getEstado() == EstadoSolicitudEnum.R) throw new RequestAlreadyRejectedException("La solicitud con ID " + idRequest + " ya ha sido rechazada por otro administrador");
+
         request.setEstado(EstadoSolicitudEnum.A);
 
-        return true;
+        SolicitudesTH acceptedRequest = SaveManager.saveEntity( () -> solicitudesTHRepository.save(request), "Error al aceptar la solicitud: ");
+
+        return AutoMap.toRequestResponseDto(acceptedRequest.getIdSolicitudTH(), "Solicitud aceptada.");
     }
 
     @Transactional
     @Override
-    public boolean rejectRequest(int idRequest, RequestRejectedDto rejectedDto) {
-        Solicitudes request = requestRepository.findById(idRequest)
-                .orElseThrow(() -> new RequestNotFoundException(idRequest));
+    public RequestResponseDto rejectRequest(int idRequest) {
+        SolicitudesTH request = solicitudesTHRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
+
+        if (request.getEstado() == EstadoSolicitudEnum.R) throw new RequestAlreadyRejectedException(idRequest);
+        if (request.getEstado() == EstadoSolicitudEnum.A) throw new RequestAlreadyAcceptedException("La solicitud con ID " + idRequest + " ya ha sido aceptada por otro administrador.");
 
         request.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
-        request.setComentario(rejectedDto.getComentario());
 
-        SaveManager.saveEntity( () -> requestRepository.save(request), "Error al rechazar la solicitud: ");
-        return true;
+        SolicitudesTH rejectedRequest =  SaveManager.saveEntity( () -> solicitudesTHRepository.save(request), "Error al rechazar la solicitud: ");
+
+        return AutoMap.toRequestResponseDto(rejectedRequest.getIdSolicitudTH(), "Solicitud rechazada");
 
     }
 

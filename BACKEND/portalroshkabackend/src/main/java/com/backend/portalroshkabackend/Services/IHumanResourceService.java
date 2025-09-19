@@ -5,7 +5,7 @@ import com.backend.portalroshkabackend.DTO.PositionInsertDto;
 import com.backend.portalroshkabackend.DTO.PositionUpdateDto;
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
-import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
 import com.backend.portalroshkabackend.DTO.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 

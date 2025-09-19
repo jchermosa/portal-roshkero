@@ -2,6 +2,9 @@ package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.DTO.th.*;
+import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
 import com.backend.portalroshkabackend.DTO.th.self.*;
 import com.backend.portalroshkabackend.Models.*;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
@@ -61,6 +64,15 @@ public class AutoMap {
         requestDto.setComentario(request.getComentario());
 
         return requestDto;
+    }
+
+    public static RequestResponseDto toRequestResponseDto(Integer idSolicitud, String message){
+        RequestResponseDto dto = new RequestResponseDto();
+
+        dto.setId(idSolicitud);
+        dto.setMessage(message);
+
+        return dto;
     }
 
     public static SolicitudTHResponseDto toSolicitudTHResponseDto(SolicitudesTH solicitudesTH){

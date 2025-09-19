@@ -1,9 +1,9 @@
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
-import com.backend.portalroshkabackend.DTO.th.UserByIdResponseDto;
-import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
-import com.backend.portalroshkabackend.DTO.th.self.DefaultResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
 import com.backend.portalroshkabackend.Services.HumanResource.IThSelfService;
 import jakarta.servlet.http.HttpServletRequest;

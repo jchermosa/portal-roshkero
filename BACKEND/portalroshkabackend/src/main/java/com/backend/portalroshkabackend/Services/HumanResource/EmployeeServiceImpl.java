@@ -1,9 +1,9 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
-import com.backend.portalroshkabackend.DTO.th.UserByIdResponseDto;
-import com.backend.portalroshkabackend.DTO.th.UserResponseDto;
-import com.backend.portalroshkabackend.DTO.th.self.DefaultResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
+import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
