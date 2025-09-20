@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 import com.backend.portalroshkabackend.Models.Clientes;
+import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
@@ -13,6 +14,7 @@ public class EquiposResponseDto {
 
     private Integer idEquipo;
     private UsuarioisResponseDto lider;
+    private Tecnologias tecnologia;
     private String nombre;
     private Date fechaInicio;
     private Date fechaLimite;

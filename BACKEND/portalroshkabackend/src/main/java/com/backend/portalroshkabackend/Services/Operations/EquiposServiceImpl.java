@@ -2,6 +2,7 @@ package com.backend.portalroshkabackend.Services.Operations;
 
 import java.sql.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,9 +22,14 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Equipos;
+import com.backend.portalroshkabackend.Models.Tecnologias;
+import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Repositories.EquiposRepository;
+import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
+import com.backend.portalroshkabackend.Repositories.TecnologiasEquiposRepository;
+import com.backend.portalroshkabackend.Repositories.UsuarioisRepository;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 
 @Service("operationsEquiposService")
@@ -31,13 +38,20 @@ public class EquiposServiceImpl implements IEquiposService {
 
     private final EquiposRepository equiposRepository;
     private final ClientesRepository clientesRepository;
+    private final TecnologiaRepository tecnologiasRepository;
+    private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
+    private final UsuarioisRepository usuarioisRepository;
 
     private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
 
     @Autowired
-    public EquiposServiceImpl(EquiposRepository equiposRepository, ClientesRepository clientesRepository) {
+    public EquiposServiceImpl(EquiposRepository equiposRepository, ClientesRepository clientesRepository,
+            TecnologiaRepository tecnologiasRepository, TecnologiasEquiposRepository tecnologiasEquiposRepository, UsuarioisRepository usuarioisRepository) {
         this.equiposRepository = equiposRepository;
         this.clientesRepository = clientesRepository;
+        this.tecnologiasRepository = tecnologiasRepository;
+        this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
+        this.usuarioisRepository = usuarioisRepository;
 
         sortingMap = new HashMap<>();
 
@@ -92,72 +106,100 @@ public class EquiposServiceImpl implements IEquiposService {
     @Override
     public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
 
-        Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
-                .orElseThrow(() -> new RuntimeException("Cliente not found")); // для подстановки в клиенте
+        Usuario lider = usuarioisRepository.findById(requestDto.getIdLider())
+                .orElseThrow(() -> new RuntimeException("Lider not found"));
 
+        // Находим клиента
+        Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
+                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+
+        // Находим технологию
+        Tecnologias tecnologia = tecnologiasRepository.findById(requestDto.getIdTecnologia())
+                .orElseThrow(() -> new RuntimeException("Tecnologia not found"));
+
+        // Проверка уникальности имени команды
         List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
         if (!existentes.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
         }
 
+        // Создаем команду
         Equipos equipo = new Equipos();
         equipo.setNombre(requestDto.getNombre());
+        equipo.setLider(lider);
         equipo.setFechaInicio(requestDto.getFechaInicio());
         equipo.setFechaLimite(requestDto.getFechaLimite());
-        equipo.setIdCliente(cliente);
+        equipo.setCliente(cliente);
         equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
         equipo.setFechaCreacion(new Date(System.currentTimeMillis()));
+        System.out.println(equipo);
+        // Сохраняем команду
+        Equipos savedEquipo = equiposRepository.save(equipo);
 
-        Equipos savedEquipo = equiposRepository.save(equipo); // save in bd
+        Usuario liderEntity = savedEquipo.getLider();
 
-        EquiposResponseDto dto = new EquiposResponseDto();
-        dto.setIdEquipo(savedEquipo.getIdEquipo());
-        dto.setNombre(savedEquipo.getNombre());
-        dto.setFechaInicio(savedEquipo.getFechaInicio());
-        dto.setFechaLimite(savedEquipo.getFechaLimite());
-        dto.setCliente(savedEquipo.getCliente());
-        dto.setFechaCreacion(savedEquipo.getFechaCreacion());
-        dto.setEstado(savedEquipo.getEstado());
+        UsuarioisResponseDto liderDto = new UsuarioisResponseDto();
+        liderDto.setIdUsuario(liderEntity.getIdUsuario());
+        liderDto.setNombre(liderEntity.getNombre());
+        liderDto.setApellido(liderEntity.getApellido());
+        liderDto.setCorreo(liderEntity.getCorreo());
 
-        return dto;
-    }
-
-    @Override
-    public EquiposResponseDto updateTeam(int idEquipo, EquiposRequestDto requestDto) {
-
-        Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
-
-        Equipos existingEquipo = equiposRepository.findById(idEquipo)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
-
-        // Проверка уникальности имени среди других записей
-        Optional<Equipos> otro = equiposRepository.findByNombre(requestDto.getNombre().trim());
-        if (otro.isPresent() && !otro.get().getIdEquipo().equals(idEquipo)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
-        }
-
-        // Обновляем поля
-        existingEquipo.setNombre(requestDto.getNombre());
-        existingEquipo.setFechaInicio(requestDto.getFechaInicio());
-        existingEquipo.setFechaLimite(requestDto.getFechaLimite());
-        existingEquipo.setIdCliente(cliente);
-        existingEquipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
-
-        Equipos savedEquipo = equiposRepository.save(existingEquipo);
+        // Создаем связь с технологией через таблицу tecnologias_equipos
+        TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
+        tecEquipo.setEquipo(savedEquipo);
+        tecEquipo.setTecnologia(tecnologia);
+        TecnologiasEquipos savedTecEquipo = tecnologiasEquiposRepository.save(tecEquipo);
 
         // Формируем DTO для ответа
-        EquiposResponseDto dto = new EquiposResponseDto();
-        dto.setIdEquipo(savedEquipo.getIdEquipo());
-        dto.setNombre(savedEquipo.getNombre());
-        dto.setFechaInicio(savedEquipo.getFechaInicio());
-        dto.setFechaLimite(savedEquipo.getFechaLimite());
-        dto.setCliente(savedEquipo.getCliente());
-        dto.setFechaCreacion(savedEquipo.getFechaCreacion());
-        dto.setEstado(savedEquipo.getEstado());
+        EquiposResponseDto responseDto = new EquiposResponseDto();
+        responseDto.setIdEquipo(savedEquipo.getIdEquipo());
+        responseDto.setNombre(savedEquipo.getNombre());
+        responseDto.setCliente(savedEquipo.getCliente());
+        responseDto.setLider(liderDto);
+        responseDto.setFechaInicio(savedEquipo.getFechaInicio());
+        responseDto.setFechaLimite(savedEquipo.getFechaLimite());
+        responseDto.setEstado(savedEquipo.getEstado());
+        responseDto.setTecnologia(tecnologia); // возвращаем технологию, выбранную пользователем
 
-        return dto;
+        return responseDto;
     }
+
+    // @Override
+    // public EquiposResponseDto updateTeam(int idEquipo, EquiposRequestDto requestDto) {
+
+    //     Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
+    //             .orElseThrow(() -> new RuntimeException("Cliente not found"));
+
+    //     Equipos existingEquipo = equiposRepository.findById(idEquipo)
+    //             .orElseThrow(() -> new RuntimeException("Team not found"));
+
+    //     // Проверка уникальности имени среди других записей
+    //     Optional<Equipos> otro = equiposRepository.findByNombre(requestDto.getNombre().trim());
+    //     if (otro.isPresent() && !otro.get().getIdEquipo().equals(idEquipo)) {
+    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
+    //     }
+
+    //     // Обновляем поля
+    //     existingEquipo.setNombre(requestDto.getNombre());
+    //     existingEquipo.setFechaInicio(requestDto.getFechaInicio());
+    //     existingEquipo.setFechaLimite(requestDto.getFechaLimite());
+    //     existingEquipo.setIdCliente(cliente);
+    //     existingEquipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
+
+    //     Equipos savedEquipo = equiposRepository.save(existingEquipo);
+
+    //     // Формируем DTO для ответа
+    //     EquiposResponseDto dto = new EquiposResponseDto();
+    //     dto.setIdEquipo(savedEquipo.getIdEquipo());
+    //     dto.setNombre(savedEquipo.getNombre());
+    //     dto.setFechaInicio(savedEquipo.getFechaInicio());
+    //     dto.setFechaLimite(savedEquipo.getFechaLimite());
+    //     dto.setCliente(savedEquipo.getCliente());
+    //     dto.setFechaCreacion(savedEquipo.getFechaCreacion());
+    //     dto.setEstado(savedEquipo.getEstado());
+
+    //     return dto;
+    // }
 
     @Override
     public void deleteTeam(int id_equipo) {

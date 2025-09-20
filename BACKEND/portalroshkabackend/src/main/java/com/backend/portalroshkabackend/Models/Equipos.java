@@ -35,9 +35,9 @@ public class Equipos {
 
     private String nombre;
 
-    @ManyToOne
-    @JoinColumn(name = "id_cliente")
-    private Clientes idCliente;
+    // @ManyToOne
+    // @JoinColumn(name = "id_cliente")
+    // private Clientes idCliente;
 
     @Column(name = "fecha_inicio")
     private Date fechaInicio;
@@ -47,7 +47,7 @@ public class Equipos {
     private Date fechaCreacion;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_cliente", insertable = false, updatable = false)
+    @JoinColumn(name = "id_cliente")
     private Clientes cliente;
 
     @Enumerated(EnumType.STRING)

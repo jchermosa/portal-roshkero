@@ -77,13 +77,13 @@ public class EquiposController {
     }
 
     // ----------------- UPDATE -----------------
-    @PutMapping("/team/{id}")
-    public EquiposResponseDto updateTeam(
-            @PathVariable int id,
-            @Valid @RequestBody EquiposRequestDto equipoRequest) {
+    // @PutMapping("/team/{id}")
+    // public EquiposResponseDto updateTeam(
+    //         @PathVariable int id,
+    //         @Valid @RequestBody EquiposRequestDto equipoRequest) {
 
-        return equiposService.updateTeam(id, equipoRequest);
-    }
+    //     return equiposService.updateTeam(id, equipoRequest);
+    // }
 
     // Asignacion
     @GetMapping("teams/{idEquipo}/users")

@@ -12,7 +12,7 @@ public interface IEquiposService {
 
     void deleteTeam(int id_equipo);
 
-    EquiposResponseDto updateTeam(int id_equipo, EquiposRequestDto equipoDetails);
+    // EquiposResponseDto updateTeam(int id_equipo, EquiposRequestDto equipoDetails);
 
     Page<EquiposResponseDto> getTeamsSorted(Pageable pageable, String sortBy);
 }
