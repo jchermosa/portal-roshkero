@@ -29,6 +29,10 @@ public class Equipos {
     @Column(name = "id_equipo")
     private Integer idEquipo;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_lider", referencedColumnName = "id_usuario")
+    private Usuario lider;
+
     private String nombre;
 
     @ManyToOne

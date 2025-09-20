@@ -54,7 +54,8 @@ public class EquiposController {
     public ResponseEntity<Page<EquiposResponseDto>> getAllTeams(
             @PageableDefault(size = 10, sort = "idEquipo", direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam(required = false, defaultValue = "default") String sortBy) {
-        Page<EquiposResponseDto> teams = equiposService.getAllTeams(pageable);
+
+        Page<EquiposResponseDto> teams = equiposService.getTeamsSorted(pageable, sortBy);
         return ResponseEntity.ok(teams);
     }
 

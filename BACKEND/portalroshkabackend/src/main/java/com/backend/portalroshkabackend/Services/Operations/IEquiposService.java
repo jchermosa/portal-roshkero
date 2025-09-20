@@ -7,11 +7,12 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 
 public interface IEquiposService {
-    Page<EquiposResponseDto> getAllTeams(Pageable pageable);
 
     EquiposResponseDto postNewTeam(EquiposRequestDto equipo);
 
     void deleteTeam(int id_equipo);
 
     EquiposResponseDto updateTeam(int id_equipo, EquiposRequestDto equipoDetails);
+
+    Page<EquiposResponseDto> getTeamsSorted(Pageable pageable, String sortBy);
 }

@@ -11,11 +11,21 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EquiposRepository extends JpaRepository<Equipos, Integer> {
+    // по имени команды
     Page<Equipos> findAllByOrderByNombreAsc(Pageable pageable);
+    Page<Equipos> findAllByOrderByNombreDesc(Pageable pageable);
 
+    // по имени клиента
     Page<Equipos> findAllByOrderByCliente_NombreAsc(Pageable pageable);
+    Page<Equipos> findAllByOrderByCliente_NombreDesc(Pageable pageable);
 
-    Page<Equipos> findAllByOrderByNombreAscCliente_NombreAsc(Pageable pageable);
+    // по имени лидера
+    Page<Equipos> findAllByOrderByLider_NombreAsc(Pageable pageable);
+    Page<Equipos> findAllByOrderByLider_NombreDesc(Pageable pageable);
+
+    // по estado
+    Page<Equipos> findAllByOrderByEstadoAsc(Pageable pageable);
+    Page<Equipos> findAllByOrderByEstadoDesc(Pageable pageable);
 
     boolean existsByNombre(String nombre);// для обработки повторяющизся имен.
 
