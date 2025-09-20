@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.MetaDatasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoUpdateRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
@@ -27,7 +28,9 @@ import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoCombinedRes
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoPostResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.IEquiposService;
+import com.backend.portalroshkabackend.Services.Operations.IMetaDatasService;
 import com.backend.portalroshkabackend.Services.Operations.IUsuarioisEquipoService;
+import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasResponseDto;
 
 import jakarta.validation.Valid;
 
@@ -35,13 +38,16 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/admin/operations")
 public class EquiposController {
 
+    private final IMetaDatasService metaDatasService;
     private final IEquiposService equiposService;
     private final IUsuarioisEquipoService usuariosEquipoService;
 
     @Autowired
-    public EquiposController(IEquiposService equiposService, IUsuarioisEquipoService usuariosEquipoService) {
+    public EquiposController(IEquiposService equiposService, IUsuarioisEquipoService usuariosEquipoService,
+            IMetaDatasService metaDatasService) {
         this.equiposService = equiposService;
         this.usuariosEquipoService = usuariosEquipoService;
+        this.metaDatasService = metaDatasService;
     }
 
     @GetMapping("/teams")
@@ -52,20 +58,25 @@ public class EquiposController {
         return ResponseEntity.ok(teams);
     }
 
+    @GetMapping("/metadatas") // info for "form Create team"
+    public MetaDatasDto getMetaDatas() {
+        return metaDatasService.getMetaDatas();
+    }
+
     // ----------------- CREATE -----------------
-    @PostMapping("/teams")
+    @PostMapping("/team")
     public EquiposResponseDto postNewTeam(@Valid @RequestBody EquiposRequestDto equipoRequest) {
         return equiposService.postNewTeam(equipoRequest);
     }
 
     // ----------------- DELETE -----------------
-    @DeleteMapping("/teams/{id}")
+    @DeleteMapping("/team/{id}")
     public void deleteTeam(@PathVariable int id) {
         equiposService.deleteTeam(id);
     }
 
     // ----------------- UPDATE -----------------
-    @PutMapping("/teams/{id}")
+    @PutMapping("/team/{id}")
     public EquiposResponseDto updateTeam(
             @PathVariable int id,
             @Valid @RequestBody EquiposRequestDto equipoRequest) {
@@ -73,14 +84,7 @@ public class EquiposController {
         return equiposService.updateTeam(id, equipoRequest);
     }
 
-    // /api/v1/admin/operations/teams/{id}/users -> GET: все пользователи команды
-    // /api/v1/admin/operations/teams/{id}/users -> POST: добавить пользователя в
-    // команду
-    // /api/v1/admin/operations/teams/{id}/users/{userId} -> PUT: обновить
-    // пользователя в команде
-    // /api/v1/admin/operations/teams/{id}/users/{userId} -> DELETE: удалить
-    // пользователя из команды
-
+    // Asignacion
     @GetMapping("teams/{idEquipo}/users")
     public ResponseEntity<UsuariosEquipoCombinedResponseDto> getUsuariosEquipo(
             @PathVariable Integer idEquipo,

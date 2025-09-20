@@ -1,6 +1,8 @@
 package com.backend.portalroshkabackend.DTO.Operationes;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 
@@ -10,8 +12,9 @@ import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Roles;
 
 @Data
+@NoArgsConstructor
 public class UsuarioisResponseDto {
-    
+
     private Integer idUsuario;
     private String nombre;
     private String apellido;
@@ -31,6 +34,10 @@ public class UsuarioisResponseDto {
     private String url;
     private Integer disponibilidad;
 
-    public UsuarioisResponseDto() {
+    public UsuarioisResponseDto(Integer idUsuario, String nombre, String apellido, String correo) {
+        this.idUsuario = idUsuario;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.correo = correo;
     }
 }
