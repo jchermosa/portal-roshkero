@@ -11,6 +11,8 @@ import com.backend.portalroshkabackend.Models.Tecnologias;
 
 public interface IEquiposService {
 
+    EquiposResponseDto getTeamById(Integer idEquipo);
+
     EquiposResponseDto postNewTeam(EquiposRequestDto equipo);
 
     void deleteTeam(int id_equipo);

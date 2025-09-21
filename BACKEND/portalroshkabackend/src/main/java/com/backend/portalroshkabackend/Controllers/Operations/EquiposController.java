@@ -59,6 +59,13 @@ public class EquiposController {
         return ResponseEntity.ok(teams);
     }
 
+    @GetMapping("/team/{id}")
+    public ResponseEntity<EquiposResponseDto> getTeamById(@PathVariable Integer id) {
+        EquiposResponseDto team = equiposService.getTeamById(id);
+        return ResponseEntity.ok(team);
+
+    }
+
     @GetMapping("/metadatas") // info for "form Create team"
     public MetaDatasDto getMetaDatas() {
         return metaDatasService.getMetaDatas();
@@ -79,10 +86,10 @@ public class EquiposController {
     // ----------------- UPDATE -----------------
     // @PutMapping("/team/{id}")
     // public EquiposResponseDto updateTeam(
-    //         @PathVariable int id,
-    //         @Valid @RequestBody EquiposRequestDto equipoRequest) {
+    // @PathVariable int id,
+    // @Valid @RequestBody EquiposRequestDto equipoRequest) {
 
-    //     return equiposService.updateTeam(id, equipoRequest);
+    // return equiposService.updateTeam(id, equipoRequest);
     // }
 
     // Asignacion

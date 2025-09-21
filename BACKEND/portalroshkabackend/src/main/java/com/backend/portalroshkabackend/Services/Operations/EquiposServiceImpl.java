@@ -76,6 +76,38 @@ public class EquiposServiceImpl implements IEquiposService {
         sortingMap.put("default", equiposRepository::findAll);
     }
 
+    @Override
+    public EquiposResponseDto getTeamById(Integer id) {
+        Equipos e = equiposRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("E"));
+
+        EquiposResponseDto dto = new EquiposResponseDto();
+        dto.setIdEquipo(e.getIdEquipo());
+
+        if (e.getLider() != null) {
+            Usuario u = e.getLider();
+            dto.setLider(new UsuarioisResponseDto(
+                    u.getIdUsuario(),
+                    u.getNombre(),
+                    u.getApellido(),
+                    u.getCorreo()));
+        }
+
+        dto.setNombre(e.getNombre());
+        dto.setFechaInicio(e.getFechaInicio());
+        dto.setFechaLimite(e.getFechaLimite());
+        dto.setCliente(e.getCliente());
+        dto.setFechaCreacion(e.getFechaCreacion());
+        dto.setEstado(e.getEstado());
+
+        List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(e.getIdEquipo());
+        List<Tecnologias> tecnologias = tecs.stream()
+                .map(TecnologiasEquipos::getTecnologia)
+                .toList();
+        dto.setTecnologias(tecnologias);
+        return dto;
+    }
+
     // Метод для получения команд с сортировкой
     @Override
     public Page<EquiposResponseDto> getTeamsSorted(Pageable pageable, String sortBy) {
