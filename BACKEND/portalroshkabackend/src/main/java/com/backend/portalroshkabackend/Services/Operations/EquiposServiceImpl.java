@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Services.Operations;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +47,8 @@ public class EquiposServiceImpl implements IEquiposService {
 
     @Autowired
     public EquiposServiceImpl(EquiposRepository equiposRepository, ClientesRepository clientesRepository,
-            TecnologiaRepository tecnologiasRepository, TecnologiasEquiposRepository tecnologiasEquiposRepository, UsuarioisRepository usuarioisRepository) {
+            TecnologiaRepository tecnologiasRepository, TecnologiasEquiposRepository tecnologiasEquiposRepository,
+            UsuarioisRepository usuarioisRepository) {
         this.equiposRepository = equiposRepository;
         this.clientesRepository = clientesRepository;
         this.tecnologiasRepository = tecnologiasRepository;
@@ -113,10 +115,6 @@ public class EquiposServiceImpl implements IEquiposService {
         Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
                 .orElseThrow(() -> new RuntimeException("Cliente not found"));
 
-        // Находим технологию
-        Tecnologias tecnologia = tecnologiasRepository.findById(requestDto.getIdTecnologia())
-                .orElseThrow(() -> new RuntimeException("Tecnologia not found"));
-
         // Проверка уникальности имени команды
         List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
         if (!existentes.isEmpty()) {
@@ -144,13 +142,23 @@ public class EquiposServiceImpl implements IEquiposService {
         liderDto.setApellido(liderEntity.getApellido());
         liderDto.setCorreo(liderEntity.getCorreo());
 
-        // Создаем связь с технологией через таблицу tecnologias_equipos
-        TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
-        tecEquipo.setEquipo(savedEquipo);
-        tecEquipo.setTecnologia(tecnologia);
-        TecnologiasEquipos savedTecEquipo = tecnologiasEquiposRepository.save(tecEquipo);
+        // Создаем связи с технологиями через таблицу tecnologias_equipos
+        List<Tecnologias> tecnologias = new ArrayList<>();
 
-        // Формируем DTO для ответа
+        // Создаем связи с технологиями через таблицу tecnologias_equipos
+        for (Integer idTec : requestDto.getIdTecnologias()) {
+            Tecnologias tecnologia = tecnologiasRepository.findByIdTecnologia(idTec);
+
+            TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
+            tecEquipo.setEquipo(savedEquipo);
+            tecEquipo.setTecnologia(tecnologia);
+
+            tecnologiasEquiposRepository.save(tecEquipo); // сохраняем связь
+
+            tecnologias.add(tecnologia); // для ответа в DTO
+        }
+
+        // Теперь responseDto можно вернуть с полем tecnologias
         EquiposResponseDto responseDto = new EquiposResponseDto();
         responseDto.setIdEquipo(savedEquipo.getIdEquipo());
         responseDto.setNombre(savedEquipo.getNombre());
@@ -159,46 +167,49 @@ public class EquiposServiceImpl implements IEquiposService {
         responseDto.setFechaInicio(savedEquipo.getFechaInicio());
         responseDto.setFechaLimite(savedEquipo.getFechaLimite());
         responseDto.setEstado(savedEquipo.getEstado());
-        responseDto.setTecnologia(tecnologia); // возвращаем технологию, выбранную пользователем
+        responseDto.setTecnologias(tecnologias);
 
         return responseDto;
     }
 
     // @Override
-    // public EquiposResponseDto updateTeam(int idEquipo, EquiposRequestDto requestDto) {
+    // public EquiposResponseDto updateTeam(int idEquipo, EquiposRequestDto
+    // requestDto) {
 
-    //     Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
-    //             .orElseThrow(() -> new RuntimeException("Cliente not found"));
+    // Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
+    // .orElseThrow(() -> new RuntimeException("Cliente not found"));
 
-    //     Equipos existingEquipo = equiposRepository.findById(idEquipo)
-    //             .orElseThrow(() -> new RuntimeException("Team not found"));
+    // Equipos existingEquipo = equiposRepository.findById(idEquipo)
+    // .orElseThrow(() -> new RuntimeException("Team not found"));
 
-    //     // Проверка уникальности имени среди других записей
-    //     Optional<Equipos> otro = equiposRepository.findByNombre(requestDto.getNombre().trim());
-    //     if (otro.isPresent() && !otro.get().getIdEquipo().equals(idEquipo)) {
-    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
-    //     }
+    // // Проверка уникальности имени среди других записей
+    // Optional<Equipos> otro =
+    // equiposRepository.findByNombre(requestDto.getNombre().trim());
+    // if (otro.isPresent() && !otro.get().getIdEquipo().equals(idEquipo)) {
+    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre
+    // ya existe");
+    // }
 
-    //     // Обновляем поля
-    //     existingEquipo.setNombre(requestDto.getNombre());
-    //     existingEquipo.setFechaInicio(requestDto.getFechaInicio());
-    //     existingEquipo.setFechaLimite(requestDto.getFechaLimite());
-    //     existingEquipo.setIdCliente(cliente);
-    //     existingEquipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
+    // // Обновляем поля
+    // existingEquipo.setNombre(requestDto.getNombre());
+    // existingEquipo.setFechaInicio(requestDto.getFechaInicio());
+    // existingEquipo.setFechaLimite(requestDto.getFechaLimite());
+    // existingEquipo.setIdCliente(cliente);
+    // existingEquipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
 
-    //     Equipos savedEquipo = equiposRepository.save(existingEquipo);
+    // Equipos savedEquipo = equiposRepository.save(existingEquipo);
 
-    //     // Формируем DTO для ответа
-    //     EquiposResponseDto dto = new EquiposResponseDto();
-    //     dto.setIdEquipo(savedEquipo.getIdEquipo());
-    //     dto.setNombre(savedEquipo.getNombre());
-    //     dto.setFechaInicio(savedEquipo.getFechaInicio());
-    //     dto.setFechaLimite(savedEquipo.getFechaLimite());
-    //     dto.setCliente(savedEquipo.getCliente());
-    //     dto.setFechaCreacion(savedEquipo.getFechaCreacion());
-    //     dto.setEstado(savedEquipo.getEstado());
+    // // Формируем DTO для ответа
+    // EquiposResponseDto dto = new EquiposResponseDto();
+    // dto.setIdEquipo(savedEquipo.getIdEquipo());
+    // dto.setNombre(savedEquipo.getNombre());
+    // dto.setFechaInicio(savedEquipo.getFechaInicio());
+    // dto.setFechaLimite(savedEquipo.getFechaLimite());
+    // dto.setCliente(savedEquipo.getCliente());
+    // dto.setFechaCreacion(savedEquipo.getFechaCreacion());
+    // dto.setEstado(savedEquipo.getEstado());
 
-    //     return dto;
+    // return dto;
     // }
 
     @Override
@@ -208,4 +219,5 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setEstado(EstadoActivoInactivo.I); //
         equiposRepository.save(equipo);
     }
+
 }
