@@ -5,12 +5,11 @@ import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
-import com.backend.portalroshkabackend.Models.SolicitudesTH;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.SaveManager;
-import com.backend.portalroshkabackend.tools.errors.errorslist.UserAlreadyInactiveException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.UserNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserAlreadyInactiveException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
 import com.backend.portalroshkabackend.tools.validator.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +31,6 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         this.validator = validator;
     }
-
-    // ----------- TH COMO ADMINISTRADOR -----------
 
     @Transactional(readOnly = true)
     @Override
@@ -123,9 +120,9 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public DefaultResponseDto deleteEmployee(int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        validator.validateUserDontHavePendientRequests(id);
+        validator.validateUserDontHavePendientRequests(id, user.getNombre() + user.getApellido());
 
-        if (user.getEstado() == EstadoActivoInactivo.I) throw new UserAlreadyInactiveException(id);
+        if (user.getEstado() == EstadoActivoInactivo.I) throw new UserAlreadyInactiveException(user.getNombre() + user.getApellido());
 
 
         user.setEstado(EstadoActivoInactivo.I); // Da de baja el empleado de la base de datos

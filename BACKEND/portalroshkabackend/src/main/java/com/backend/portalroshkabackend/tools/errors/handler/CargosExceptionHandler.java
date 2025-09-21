@@ -1,8 +1,8 @@
 package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.ErrorResponseDto;
-import com.backend.portalroshkabackend.tools.errors.errorslist.CargoAlreadyInactiveException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.CargoNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoAlreadyInactiveException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

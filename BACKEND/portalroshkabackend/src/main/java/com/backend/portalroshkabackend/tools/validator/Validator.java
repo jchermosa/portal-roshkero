@@ -4,7 +4,12 @@ import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Roles;
 import com.backend.portalroshkabackend.Repositories.*;
-import com.backend.portalroshkabackend.tools.errors.errorslist.*;
+import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.roles.RolesNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.DuplicateCedulaException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.DuplicateEmailException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.DuplicateTelefonoException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserHavePendientRequestsException;
 import org.springframework.stereotype.Component;
 
 @Component //Esta clase se debe inyectar por constructor en las clases que la quieren utilizar
@@ -55,11 +60,11 @@ public class Validator {
         }
     }
 
-    public void validateUserDontHavePendientRequests(Integer idUsuario){
+    public void validateUserDontHavePendientRequests(Integer idUsuario, String username){
         boolean havePendientRequests = solicitudesTHRepository.existsByUsuario_idUsuarioAndEstado(idUsuario, EstadoSolicitudEnum.P);
 
         if (havePendientRequests){
-            throw new UserHavePendientRequestsException();
+            throw new UserHavePendientRequestsException(username);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.tools.errors.errorslist;
+package com.backend.portalroshkabackend.tools.errors.errorslist.user;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(int id) {

@@ -1,19 +1,15 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.RequestDto;
-import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
 import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.DTO.th.self.RequestResponseDto;
-import com.backend.portalroshkabackend.Models.Beneficios;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
-import com.backend.portalroshkabackend.Models.Solicitudes;
 import com.backend.portalroshkabackend.Models.SolicitudesTH;
-import com.backend.portalroshkabackend.Models.TipoDispositivo;
 import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.SaveManager;
-import com.backend.portalroshkabackend.tools.errors.errorslist.RequestAlreadyAcceptedException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.RequestAlreadyRejectedException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.RequestNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyAcceptedException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyRejectedException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
 import com.backend.portalroshkabackend.tools.validator.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class RequestServiceImpl implements IRequestService{

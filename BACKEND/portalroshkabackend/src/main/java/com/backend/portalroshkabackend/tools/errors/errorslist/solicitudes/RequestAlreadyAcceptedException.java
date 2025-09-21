@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.tools.errors.errorslist;
+package com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes;
 
 public class RequestAlreadyAcceptedException extends RuntimeException{
     public RequestAlreadyAcceptedException(int idSolicitud){

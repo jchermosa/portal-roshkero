@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.tools.errors.errorslist;
+package com.backend.portalroshkabackend.tools.errors.errorslist.cargos;
 
 public class CargoAlreadyInactiveException extends RuntimeException{
     public CargoAlreadyInactiveException(int id){

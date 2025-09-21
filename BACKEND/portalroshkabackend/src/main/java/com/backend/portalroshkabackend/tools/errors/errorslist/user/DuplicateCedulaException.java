@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.tools.errors.errorslist;
+package com.backend.portalroshkabackend.tools.errors.errorslist.user;
 
 public class DuplicateCedulaException extends RuntimeException{
     public DuplicateCedulaException(int nroCedula){

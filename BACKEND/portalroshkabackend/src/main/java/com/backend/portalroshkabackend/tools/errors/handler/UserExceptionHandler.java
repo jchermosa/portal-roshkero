@@ -1,7 +1,7 @@
 package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.ErrorResponseDto;
-import com.backend.portalroshkabackend.tools.errors.errorslist.*;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

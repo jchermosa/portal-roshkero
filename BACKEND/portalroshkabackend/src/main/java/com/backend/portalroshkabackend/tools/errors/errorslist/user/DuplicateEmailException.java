@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.tools.errors.errorslist;
+package com.backend.portalroshkabackend.tools.errors.errorslist.user;
 
 public class DuplicateEmailException extends RuntimeException{
 

@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.tools.errors.errorslist;
+package com.backend.portalroshkabackend.tools.errors.errorslist.equipos;
 
 public class EquipoNotFoundException  extends RuntimeException {
     public EquipoNotFoundException(int id) {

@@ -1,9 +1,9 @@
 package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.ErrorResponseDto;
-import com.backend.portalroshkabackend.tools.errors.errorslist.RequestAlreadyAcceptedException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.RequestAlreadyRejectedException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.RequestNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyAcceptedException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyRejectedException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
