@@ -2,6 +2,7 @@ package com.backend.portalroshkabackend.Repositories;
 
 import com.backend.portalroshkabackend.DTO.th.self.MisSolicitudesResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.Models.EstadoSolicitud;
 import com.backend.portalroshkabackend.Models.SolicitudLideres;
 import com.backend.portalroshkabackend.Models.SolicitudesTH;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,8 @@ public interface SolicitudesTHRepository extends JpaRepository<SolicitudesTH, In
 
     Page<SolicitudesTH> findAllByEstado(EstadoSolicitudEnum estado, Pageable pageable);
     Page<SolicitudesTH> findAllByUsuario_idUsuario(int idUsuario, Pageable pageable);
+
+    Boolean existsByUsuario_idUsuarioAndEstado(int idUsuario, EstadoSolicitudEnum estado);
 
     SolicitudesTH findByUsuario_IdUsuarioAndIdSolicitudTH(int idUsuario, int idSolicitudTh);
 

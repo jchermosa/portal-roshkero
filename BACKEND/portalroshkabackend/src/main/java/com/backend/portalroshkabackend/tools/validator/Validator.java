@@ -1,11 +1,9 @@
 package com.backend.portalroshkabackend.tools.validator;
 
 import com.backend.portalroshkabackend.Models.Cargos;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Roles;
-import com.backend.portalroshkabackend.Repositories.CargosRepository;
-import com.backend.portalroshkabackend.Repositories.EquiposRepository;
-import com.backend.portalroshkabackend.Repositories.RolesRepository;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +12,17 @@ public class Validator {
     private final UserRepository userRepository;
     private final RolesRepository rolesRepository;
     private final CargosRepository cargosRepository;
+    private final SolicitudesTHRepository solicitudesTHRepository;
 
     public Validator(UserRepository userRepository,
                      RolesRepository rolesRepository,
                      EquiposRepository equiposRepository,
-                     CargosRepository cargosRepository){
+                     CargosRepository cargosRepository,
+                     SolicitudesTHRepository solicitudesTHRepository){
         this.userRepository = userRepository;
         this.rolesRepository = rolesRepository;
         this.cargosRepository = cargosRepository;
+        this.solicitudesTHRepository = solicitudesTHRepository;
     }
 
     public void validateUniqueEmail(String correo, Integer excludeUserId){
@@ -51,6 +52,14 @@ public class Validator {
 
         if (exists){
             throw new DuplicateTelefonoException(phone);
+        }
+    }
+
+    public void validateUserDontHavePendientRequests(Integer idUsuario){
+        boolean havePendientRequests = solicitudesTHRepository.existsByUsuario_idUsuarioAndEstado(idUsuario, EstadoSolicitudEnum.P);
+
+        if (havePendientRequests){
+            throw new UserHavePendientRequestsException();
         }
     }
 

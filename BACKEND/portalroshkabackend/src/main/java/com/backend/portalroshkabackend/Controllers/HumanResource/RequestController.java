@@ -18,10 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 
-// /th/users -> Cuando TH gestiona otros usuarios y sus solicitudes, etc
-// /th/ -> cuanto TH necesita crear sus propias solicitudes
-
-
 @RestController
 @RequestMapping("/api/v1/admin")
 public class RequestController {
@@ -101,11 +97,6 @@ public class RequestController {
 
     //TODO: dias disponibles{id}, dias totales de vacaciones, historial de solicitudes
 
-    //TODO: POST- Solicitar vaciones
-
-
-
-    //TODO: POST-Solicitar BENEFICIO. - Cuando este la nueva DB
 
     // ---------------------
 

@@ -4,6 +4,7 @@ package com.backend.portalroshkabackend.tools.errors;
 import com.backend.portalroshkabackend.DTO.ErrorResponseDto;
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
 import com.sun.net.httpserver.HttpsServer;
+import org.apache.coyote.Response;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -25,6 +26,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserAlreadyInactiveException.class)
     public ResponseEntity<ErrorResponseDto> handleUserAlreadyInactive(UserAlreadyInactiveException ex){
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(UserHavePendientRequestsException.class)
+    public ResponseEntity<ErrorResponseDto> handleUserHavePendientRequestException(UserHavePendientRequestsException ex){
+        return buildError(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     // --- SOLICITUDES EXCEPTIONS HANDLER ---
