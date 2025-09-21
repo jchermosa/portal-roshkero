@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Table(name = "asignacion_usuario")
-public class AsignacionUsuario {
+public class AsignacionUsuarioEquipo {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,26 +24,22 @@ public class AsignacionUsuario {
     private Integer idAsignacionUsuario;
 
     @Column(name = "fecha_entrada")
-    private Date fechaEntrada;
+    private LocalDate fechaEntrada;
 
     @Column(name = "fecha_fin")
-    private Date fechaFin;
+    private LocalDate fechaFin;
 
     @Column(name ="porcentaje_trabajo")
-    private Float porcentajeTrabajo;
+    private int porcentajeTrabajo;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
-    private Usuario idUsuario;
-
-    @ManyToOne
-    @JoinColumn(name = "id_tecnologia")
-    private Tecnologias idTecnologia;
+    private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "id_equipo")
-    private Equipos equipos;
+    private Equipos equipo;
 
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private LocalDate fechaCreacion;
 }

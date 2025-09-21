@@ -86,7 +86,7 @@ public class DeviceRequest {
         dto.setEstado(solicitud.getEstado());
         dto.setComentario(solicitud.getComentario());
         dto.setIdUsuario(solicitud.getUsuario().getIdUsuario());
-        dto.setIdTipoDispositivo(solicitud.getTipoDispositivo().getIdInventario());
+        dto.setIdTipoDispositivo(solicitud.getTipoDispositivo().getIdTipoDispositivo());
         return dto;
     }
 }

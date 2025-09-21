@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.Models;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -16,12 +16,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "dispositivo_asignado")
+@Table(name = "dispositivos_asignados")
 public class DispositivoAsignado {
 
     @Id
@@ -29,26 +30,32 @@ public class DispositivoAsignado {
     @Column(name = "id_dispositivo_asignado")
     private Integer idDispositivoAsignado;
 
-    @Column(name = "fecha_asignacion")
-    private Date fechaAsignacion;
-    @Column(name = "fecha_devolucion")
-    private Date fechaDevolucion;
-    @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    @Column(name = "fecha_entrega")
+    private LocalDate fechaEntrega;
 
-    
-    @ManyToOne
-    @JoinColumn(name = "id_tipo_dispositivo")
-    private TipoDispositivo idTipoDispositivo;
+    @Column(name = "fecha_devolucion")
+    private LocalDate fechaDevolucion;
+
+    @Column(name = "fecha_creacion")
+    private LocalDate fechaCreacion;
 
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", columnDefinition = "estado_asignacion_enum")
+    @Column(name = "estado_asignacion", columnDefinition = "estado_asignacion_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private EstadoAsignacion estado;
 
     @ManyToOne
-    @JoinColumn(name = "id_solicitud_dispositivos")
-    private SolicitudDispositivos idSolicitudDispositivos;
+    @JoinColumn(name = "id_dispositivo")
+    private Dispositivo dispositivo;
+
+    @OneToOne
+    @JoinColumn(name = "id_solicitud")
+    private Solicitud solicitud;
+
+    @Column(name = "observaciones")
+    private String observaciones;
+
+    
 
 }

@@ -57,7 +57,7 @@ public class DispositivoAsignadoService {
         dto.setFechaAsignacion(inventarioAsignado.getFechaAsignacion());
         dto.setFechaDevolucion(inventarioAsignado.getFechaDevolucion());
         dto.setIdInventario(inventarioAsignado.getIdTipoDispositivo() != null ? 
-            inventarioAsignado.getIdTipoDispositivo().getIdInventario() : null);
+            inventarioAsignado.getIdTipoDispositivo().getIdTipoDispositivo() : null);
         dto.setEstado(inventarioAsignado.getEstado());
         dto.setIdSolicitudDispositivos(inventarioAsignado.getIdSolicitudDispositivos() != null ? 
             inventarioAsignado.getIdSolicitudDispositivos().getIdSolicitudDispositivo() : null);

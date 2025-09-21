@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.DTO;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 public class UserUpdateDto {

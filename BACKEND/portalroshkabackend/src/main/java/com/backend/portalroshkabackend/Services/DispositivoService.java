@@ -64,7 +64,7 @@ public class DispositivoService {
     
     private DispositivoDto mapToDispositivoDto(TipoDispositivo dispositivo) {
         DispositivoDto dto = new DispositivoDto();
-        dto.setIdTipoInventario(dispositivo.getIdInventario());
+        dto.setIdTipoInventario(dispositivo.getIdTipoDispositivo());
         dto.setNombre(dispositivo.getNombre());
         dto.setDetalle(dispositivo.getDetalle());
         dto.setFechaCreacion(dispositivo.getFechaCreacion());
