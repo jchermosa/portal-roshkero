@@ -60,11 +60,11 @@ public class Validator {
         }
     }
 
-    public void validateUserDontHavePendientRequests(Integer idUsuario, String username){
+    public void validateUserDontHavePendientRequests(Integer idUsuario, String nombre, String apellido){
         boolean havePendientRequests = solicitudesTHRepository.existsByUsuario_idUsuarioAndEstado(idUsuario, EstadoSolicitudEnum.P);
 
         if (havePendientRequests){
-            throw new UserHavePendientRequestsException(username);
+            throw new UserHavePendientRequestsException(nombre, apellido);
         }
     }
 

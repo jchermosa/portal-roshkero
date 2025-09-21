@@ -120,9 +120,9 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public DefaultResponseDto deleteEmployee(int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        validator.validateUserDontHavePendientRequests(id, user.getNombre() + user.getApellido());
+        validator.validateUserDontHavePendientRequests(id, user.getNombre(), user.getApellido());
 
-        if (user.getEstado() == EstadoActivoInactivo.I) throw new UserAlreadyInactiveException(user.getNombre() + user.getApellido());
+        if (user.getEstado() == EstadoActivoInactivo.I) throw new UserAlreadyInactiveException(user.getNombre(), user.getApellido());
 
 
         user.setEstado(EstadoActivoInactivo.I); // Da de baja el empleado de la base de datos
