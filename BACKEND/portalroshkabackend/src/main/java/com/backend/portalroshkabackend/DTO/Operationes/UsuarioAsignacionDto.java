@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UsuarioAsignacionDto {
     private Integer idUsuario;
+    private String nombre;
+    private String apellido;
+    private String correo;
     private Float porcentajeTrabajo;
     private Date fechaEntrada;
     private Date fechaFin;
-    private String estado;
 }

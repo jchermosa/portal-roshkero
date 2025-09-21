@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,4 +19,8 @@ public interface AsignacionUsuarioRepository extends JpaRepository<AsignacionUsu
     List<AsignacionUsuario> findAllByEquipo_IdEquipo(Integer idEquipo);
     // boolean existsByIdUsuarioAndEquiposIdEquipo(Integer idUsuario, Integer
     // idEquipo);
+     // Получить все назначения для команды
+
+    // Получить конкретного пользователя в конкретной команде
+    Optional<AsignacionUsuario> findByEquipo_IdEquipoAndUsuario_IdUsuario(Integer idEquipo, Integer idUsuario);
 }

@@ -86,7 +86,7 @@ public class EquiposServiceImpl implements IEquiposService {
     @Override
     public EquiposResponseDto getTeamById(Integer id) {
         Equipos e = equiposRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("E"));
+                .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
         EquiposResponseDto dto = new EquiposResponseDto();
         dto.setIdEquipo(e.getIdEquipo());
@@ -114,19 +114,21 @@ public class EquiposServiceImpl implements IEquiposService {
                 .toList();
         dto.setTecnologias(tecnologias);
 
+        // --- Пользователи с porcentaje_trabajo ---
         List<AsignacionUsuario> asignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(id);
-
-        List<UsuarioisResponseDto> usuariosDto = asignaciones.stream()
-                .map(AsignacionUsuario::getUsuario) // take user
-                .map(u -> new UsuarioisResponseDto(
-                        u.getIdUsuario(),
-                        u.getNombre(),
-                        u.getApellido(),
-                        u.getCorreo(),
-                        u.getDisponibilidad()))
+        List<UsuarioAsignacionDto> usuariosAsignacion = asignaciones.stream()
+                .map(asig -> new UsuarioAsignacionDto(
+                        asig.getUsuario().getIdUsuario(),
+                        asig.getUsuario().getNombre(),
+                        asig.getUsuario().getApellido(),
+                        asig.getUsuario().getCorreo(),
+                        asig.getPorcentajeTrabajo(),
+                        asig.getFechaEntrada(),
+                        asig.getFechaFin()))
                 .toList();
 
-        dto.setUsuarios(usuariosDto);
+        dto.setUsuariosAsignacion(usuariosAsignacion);
+
         return dto;
     }
 
@@ -170,20 +172,38 @@ public class EquiposServiceImpl implements IEquiposService {
     @Override
     public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
 
-        Usuario lider = usuarioisRepository.findById(requestDto.getIdLider())
-                .orElseThrow(() -> new RuntimeException("Lider not found"));
-
-        // Находим клиента
-        Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
-
-        // Проверка уникальности имени команды
+        // --- Проверка имени команды ---
         List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
         if (!existentes.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
         }
 
-        // Создаем команду
+        // --- Проверка лидера ---
+        Usuario lider = usuarioisRepository.findById(requestDto.getIdLider())
+                .orElseThrow(() -> new RuntimeException("Lider not found"));
+
+        // --- Проверка клиента ---
+        Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
+                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+
+        // --- Проверка пользователей ---
+        if (requestDto.getUsuarios() != null) {
+            for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
+                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
+                        .orElseThrow(() -> new RuntimeException("Usuario not found: " + uDto.getIdUsuario()));
+
+                if (uDto.getPorcentajeTrabajo() == null) {
+                    throw new RuntimeException("PorcentajeTrabajo obligatorio para usuario " + usuario.getIdUsuario());
+                }
+
+                if (usuario.getDisponibilidad() == null || usuario.getDisponibilidad() < uDto.getPorcentajeTrabajo()) {
+                    throw new RuntimeException(
+                            "Usuario " + usuario.getIdUsuario() + " no tiene suficiente disponibilidad");
+                }
+            }
+        }
+
+        // --- Создание команды ---
         Equipos equipo = new Equipos();
         equipo.setNombre(requestDto.getNombre());
         equipo.setLider(lider);
@@ -192,49 +212,37 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setCliente(cliente);
         equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
         equipo.setFechaCreacion(new Date(System.currentTimeMillis()));
-        // Сохраняем команду
+
         Equipos savedEquipo = equiposRepository.save(equipo);
 
-        Usuario liderEntity = savedEquipo.getLider();
         // --- DTO лидера ---
-        UsuarioisResponseDto liderDto = new UsuarioisResponseDto();
-        liderDto.setIdUsuario(liderEntity.getIdUsuario());
-        liderDto.setNombre(liderEntity.getNombre());
-        liderDto.setApellido(liderEntity.getApellido());
-        liderDto.setCorreo(liderEntity.getCorreo());
-        liderDto.setDisponibilidad(liderEntity.getDisponibilidad());
+        UsuarioisResponseDto liderDto = new UsuarioisResponseDto(
+                lider.getIdUsuario(),
+                lider.getNombre(),
+                lider.getApellido(),
+                lider.getCorreo(),
+                lider.getDisponibilidad());
 
-        // Создаем связи с технологиями через таблицу tecnologias_equipos
+        // --- Технологии ---
         List<Tecnologias> tecnologias = new ArrayList<>();
+        if (requestDto.getIdTecnologias() != null) {
+            for (Integer idTec : requestDto.getIdTecnologias()) {
+                Tecnologias tecnologia = tecnologiasRepository.findByIdTecnologia(idTec);
 
-        // Создаем связи с технологиями через таблицу tecnologias_equipos
-        for (Integer idTec : requestDto.getIdTecnologias()) {
-            Tecnologias tecnologia = tecnologiasRepository.findByIdTecnologia(idTec);
+                TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
+                tecEquipo.setEquipo(savedEquipo);
+                tecEquipo.setTecnologia(tecnologia);
+                tecnologiasEquiposRepository.save(tecEquipo);
 
-            TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
-            tecEquipo.setEquipo(savedEquipo);
-            tecEquipo.setTecnologia(tecnologia);
-
-            tecnologiasEquiposRepository.save(tecEquipo); // сохраняем связь
-
-            tecnologias.add(tecnologia); // для ответа в DTO
+                tecnologias.add(tecnologia);
+            }
         }
 
-
+        // --- Привязка пользователей к команде ---
         List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
-
         if (requestDto.getUsuarios() != null) {
             for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
-                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
-                        .orElseThrow(() -> new RuntimeException("Usuario not found: " + uDto.getIdUsuario()));
-
-                // Проверка доступности
-                if (usuario.getDisponibilidad() == null) {
-                    throw new RuntimeException("Usuario " + usuario.getIdUsuario() + " no tiene disponibilidad definida");
-                }
-                if (usuario.getDisponibilidad() < uDto.getPorcentajeTrabajo()) {
-                    throw new RuntimeException("Usuario " + usuario.getIdUsuario() + " no tiene suficiente disponibilidad");
-                }
+                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario()).get();
 
                 // Уменьшаем disponibilidad у пользователя
                 usuario.setDisponibilidad(usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue());
@@ -250,18 +258,19 @@ public class EquiposServiceImpl implements IEquiposService {
                 asignacion.setFechaCreacion(new Date(System.currentTimeMillis()));
                 asignacionUsuarioRepository.save(asignacion);
 
+                // DTO для ответа
                 usuariosDto.add(new UsuarioAsignacionDto(
                         usuario.getIdUsuario(),
+                        usuario.getNombre(),
+                        usuario.getApellido(),
+                        usuario.getCorreo(),
                         uDto.getPorcentajeTrabajo(),
                         uDto.getFechaEntrada(),
-                        uDto.getFechaFin(),
-                        uDto.getEstado()
-                ));
+                        uDto.getFechaFin()));
             }
         }
 
-        
-        // Теперь responseDto можно вернуть с полем tecnologias
+        // --- Формирование ответа ---
         EquiposResponseDto responseDto = new EquiposResponseDto();
         responseDto.setIdEquipo(savedEquipo.getIdEquipo());
         responseDto.setNombre(savedEquipo.getNombre());
@@ -279,76 +288,85 @@ public class EquiposServiceImpl implements IEquiposService {
 
     @Override
     public EquiposResponseDto updateTeam(Integer id, EquiposRequestDto requestDto) {
-
-        // Находим команду
+        // 1️⃣ Находим команду
         Equipos equipo = equiposRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
-        // --- Имя ---
+        // 2️⃣ Проверка уникальности имени
         if (requestDto.getNombre() != null && !requestDto.getNombre().trim().isEmpty()
                 && !equipo.getNombre().equals(requestDto.getNombre().trim())) {
-
             List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
             if (!existentes.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
             }
-            equipo.setNombre(requestDto.getNombre().trim());
         }
 
-        // --- Лидер ---
+        // 3️⃣ Проверка пользователей и их disponibilidad (без изменения базы)
+        Map<Integer, Float> usuarioDeltaMap = new HashMap<>();
+        if (requestDto.getUsuarios() != null) {
+            for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
+                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
+                        .orElseThrow(() -> new RuntimeException("Usuario not found: " + uDto.getIdUsuario()));
+
+                if (uDto.getPorcentajeTrabajo() == null)
+                    throw new RuntimeException("PorcentajeTrabajo obligatorio para usuario " + usuario.getIdUsuario());
+
+                // Получаем текущую asignacion (если есть)
+                AsignacionUsuario asignacionExistente = asignacionUsuarioRepository
+                        .findByEquipo_IdEquipoAndUsuario_IdUsuario(id, usuario.getIdUsuario()).orElse(null);
+
+                float viejoPorcentaje = asignacionExistente != null ? asignacionExistente.getPorcentajeTrabajo() : 0f;
+                float delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
+
+                if (usuario.getDisponibilidad() == null || usuario.getDisponibilidad() < delta)
+                    throw new RuntimeException(
+                            "Usuario " + usuario.getIdUsuario() + " no tiene suficiente disponibilidad");
+
+                usuarioDeltaMap.put(usuario.getIdUsuario(), delta);
+            }
+        }
+
+        // 4️⃣ Сохраняем изменения команды (имя, лидер, клиент, даты, статус,
+        // технологии)
+        if (requestDto.getNombre() != null && !requestDto.getNombre().trim().isEmpty()) {
+            equipo.setNombre(requestDto.getNombre().trim());
+        }
         if (requestDto.getIdLider() != null
                 && !equipo.getLider().getIdUsuario().equals(requestDto.getIdLider())) {
             Usuario nuevoLider = usuarioisRepository.findById(requestDto.getIdLider())
                     .orElseThrow(() -> new RuntimeException("Lider not found"));
             equipo.setLider(nuevoLider);
         }
-
-        // --- Клиент ---
         if (requestDto.getIdCliente() != null
                 && !equipo.getCliente().getIdCliente().equals(requestDto.getIdCliente())) {
             Clientes nuevoCliente = clientesRepository.findById(requestDto.getIdCliente())
                     .orElseThrow(() -> new RuntimeException("Cliente not found"));
             equipo.setCliente(nuevoCliente);
         }
-
-        // --- Даты ---
-        if (requestDto.getFechaInicio() != null
-                && !requestDto.getFechaInicio().equals(equipo.getFechaInicio())) {
+        if (requestDto.getFechaInicio() != null)
             equipo.setFechaInicio(requestDto.getFechaInicio());
-        }
-
-        if (requestDto.getFechaLimite() != null
-                && !requestDto.getFechaLimite().equals(equipo.getFechaLimite())) {
+        if (requestDto.getFechaLimite() != null)
             equipo.setFechaLimite(requestDto.getFechaLimite());
-        }
-
-        // --- Статус ---
-        if (requestDto.getEstado() != null
-                && !equipo.getEstado().name().equals(requestDto.getEstado())) {
+        if (requestDto.getEstado() != null)
             equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
-        }
 
         // --- Технологии ---
         if (requestDto.getIdTecnologias() != null) {
             List<Integer> nuevasTecnologiasIds = requestDto.getIdTecnologias();
-
             List<TecnologiasEquipos> actualesTecnologias = tecnologiasEquiposRepository
                     .findAllByEquipo_IdEquipo(equipo.getIdEquipo());
-
             Set<Integer> actualesIds = actualesTecnologias.stream()
                     .map(te -> te.getTecnologia().getIdTecnologia())
                     .collect(Collectors.toSet());
-
             Set<Integer> nuevasIds = new HashSet<>(nuevasTecnologiasIds);
 
-            // Удаляем только лишние
+            // Удаляем лишние
             for (TecnologiasEquipos te : actualesTecnologias) {
                 if (!nuevasIds.contains(te.getTecnologia().getIdTecnologia())) {
                     tecnologiasEquiposRepository.delete(te);
                 }
             }
-
-            // Добавляем только новые
+            // Добавляем новые
             for (Integer idTec : nuevasTecnologiasIds) {
                 if (!actualesIds.contains(idTec)) {
                     Tecnologias tecnologia = tecnologiasRepository.findByIdTecnologia(idTec);
@@ -360,10 +378,63 @@ public class EquiposServiceImpl implements IEquiposService {
             }
         }
 
-        // Сохраняем обновления
+        // 5️⃣ Сохраняем команду
         Equipos savedEquipo = equiposRepository.save(equipo);
 
-        // --- DTO ---
+        // 6️⃣ Обновляем пользователей и asignaciones
+        List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
+        List<AsignacionUsuario> actualesAsignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(id);
+        Map<Integer, AsignacionUsuario> mapActuales = actualesAsignaciones.stream()
+                .collect(Collectors.toMap(a -> a.getUsuario().getIdUsuario(), a -> a));
+
+        if (requestDto.getUsuarios() != null) {
+            for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
+                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario()).get();
+                float delta = usuarioDeltaMap.get(usuario.getIdUsuario());
+                usuario.setDisponibilidad(usuario.getDisponibilidad() - (int) delta);
+                usuarioisRepository.save(usuario);
+
+                if (mapActuales.containsKey(usuario.getIdUsuario())) {
+                    AsignacionUsuario asignacionExistente = mapActuales.get(usuario.getIdUsuario());
+                    asignacionExistente.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
+                    asignacionExistente.setFechaEntrada(uDto.getFechaEntrada());
+                    asignacionExistente.setFechaFin(uDto.getFechaFin());
+                    asignacionUsuarioRepository.save(asignacionExistente);
+                } else {
+                    AsignacionUsuario nuevaAsignacion = new AsignacionUsuario();
+                    nuevaAsignacion.setEquipo(savedEquipo);
+                    nuevaAsignacion.setUsuario(usuario);
+                    nuevaAsignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
+                    nuevaAsignacion.setFechaEntrada(uDto.getFechaEntrada());
+                    nuevaAsignacion.setFechaFin(uDto.getFechaFin());
+                    nuevaAsignacion.setFechaCreacion(new Date(System.currentTimeMillis()));
+                    asignacionUsuarioRepository.save(nuevaAsignacion);
+                }
+
+                usuariosDto.add(new UsuarioAsignacionDto(
+                        usuario.getIdUsuario(),
+                        usuario.getNombre(),
+                        usuario.getApellido(),
+                        usuario.getCorreo(),
+                        uDto.getPorcentajeTrabajo(),
+                        uDto.getFechaEntrada(),
+                        uDto.getFechaFin()));
+            }
+
+            // Удаляем пользователей, которых нет в запросе
+            for (AsignacionUsuario asignacion : actualesAsignaciones) {
+                if (requestDto.getUsuarios().stream()
+                        .noneMatch(u -> u.getIdUsuario().equals(asignacion.getUsuario().getIdUsuario()))) {
+                    Usuario usuario = asignacion.getUsuario();
+                    usuario.setDisponibilidad(
+                            usuario.getDisponibilidad() + asignacion.getPorcentajeTrabajo().intValue());
+                    usuarioisRepository.save(usuario);
+                    asignacionUsuarioRepository.delete(asignacion);
+                }
+            }
+        }
+
+        // 7️⃣ Формируем DTO для ответа
         Usuario liderEntity = savedEquipo.getLider();
         UsuarioisResponseDto liderDto = new UsuarioisResponseDto(
                 liderEntity.getIdUsuario(),
@@ -373,9 +444,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 liderEntity.getDisponibilidad());
 
         List<Tecnologias> tecnologias = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(savedEquipo.getIdEquipo())
-                .stream()
-                .map(TecnologiasEquipos::getTecnologia)
-                .toList();
+                .stream().map(TecnologiasEquipos::getTecnologia).toList();
 
         EquiposResponseDto responseDto = new EquiposResponseDto();
         responseDto.setIdEquipo(savedEquipo.getIdEquipo());
@@ -386,6 +455,7 @@ public class EquiposServiceImpl implements IEquiposService {
         responseDto.setFechaLimite(savedEquipo.getFechaLimite());
         responseDto.setEstado(savedEquipo.getEstado());
         responseDto.setTecnologias(tecnologias);
+        responseDto.setUsuariosAsignacion(usuariosDto);
         responseDto.setFechaCreacion(savedEquipo.getFechaCreacion());
 
         return responseDto;
