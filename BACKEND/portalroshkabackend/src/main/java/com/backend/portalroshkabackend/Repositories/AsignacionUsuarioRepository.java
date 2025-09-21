@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.Repositories;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +13,9 @@ import com.backend.portalroshkabackend.Models.Usuario;
 
 @Repository
 public interface AsignacionUsuarioRepository extends JpaRepository<AsignacionUsuario, Integer> {
-    Page<AsignacionUsuario> findByEquiposIdEquipo(Integer idEquipo, Pageable pageable);
+    Page<AsignacionUsuario> findByEquipo_IdEquipo(Integer idEquipo, Pageable pageable);
 
-    // boolean existsByIdUsuarioAndEquiposIdEquipo(Integer idUsuario, Integer idEquipo);
+    List<AsignacionUsuario> findAllByEquipo_IdEquipo(Integer idEquipo);
+    // boolean existsByIdUsuarioAndEquiposIdEquipo(Integer idUsuario, Integer
+    // idEquipo);
 }

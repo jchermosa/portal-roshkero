@@ -34,9 +34,8 @@ public class AsignacionServiceImpl implements IAsignacionService {
                     Dto.setFechaEntrada(asignacion.getFechaEntrada());
                     Dto.setFechaFin(asignacion.getFechaFin());
                     Dto.setPorcentajeTrabajo(asignacion.getPorcentajeTrabajo());
-                    Dto.setIdUsuario(asignacion.getIdUsuario());
-                    Dto.setIdTecnologia(asignacion.getIdTecnologia());
-                    Dto.setEquipo(asignacion.getEquipos());
+                    Dto.setIdUsuario(asignacion.getUsuario());
+                    Dto.setEquipo(asignacion.getEquipo());
                     Dto.setFechaCreacion(asignacion.getFechaCreacion());
                     return Dto;
                 });

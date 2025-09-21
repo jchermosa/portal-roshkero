@@ -7,7 +7,7 @@ import lombok.Data;
 
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Tecnologias;
-import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
+import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 @Data
@@ -23,6 +23,7 @@ public class EquiposResponseDto {
     private Clientes cliente;
     private Date fechaCreacion;
     private EstadoActivoInactivo estado;
+    private List<UsuarioisResponseDto> usuarios;
 
     // getters & setters
     public UsuarioisResponseDto getLider() {

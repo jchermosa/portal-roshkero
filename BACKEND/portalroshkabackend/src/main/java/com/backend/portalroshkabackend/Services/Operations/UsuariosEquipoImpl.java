@@ -47,13 +47,12 @@ public class UsuariosEquipoImpl implements IUsuarioisEquipoService {
 
                 // 1️⃣ Пагинированные пользователи в команде
                 Page<UsuariosEquipoResponseDto> usuariosEnEquipo = asignacionUsuarioRepository
-                                .findByEquiposIdEquipo(idEquipo, pageable)
+                                .findByEquipo_IdEquipo(idEquipo, pageable)
                                 .map(asignacion -> {
                                         UsuariosEquipoResponseDto dto = new UsuariosEquipoResponseDto();
                                         dto.setIdAsignacionUsuarioEquipo(asignacion.getIdAsignacionUsuarioEquipo());
-                                        dto.setIdUsuario(asignacion.getIdUsuario());
-                                        dto.setIdTecnologia(asignacion.getIdTecnologia());
-                                        dto.setEquipos(asignacion.getEquipos());
+                                        dto.setIdUsuario(asignacion.getUsuario());
+                                        dto.setEquipos(asignacion.getEquipo());
                                         dto.setFechaEntrada(asignacion.getFechaEntrada());
                                         dto.setFechaFin(asignacion.getFechaFin());
                                         dto.setPorcentajeTrabajo(asignacion.getPorcentajeTrabajo());
@@ -129,9 +128,8 @@ public class UsuariosEquipoImpl implements IUsuarioisEquipoService {
                 userRepository.save(usuario);
 
                 // Создаём назначение
-                asignacion.setEquipos(equipo);
-                asignacion.setIdUsuario(usuario);
-                asignacion.setIdTecnologia(tecnologia);
+                asignacion.setEquipo(equipo);
+                asignacion.setUsuario(usuario);
                 asignacion.setFechaEntrada(requestDto.getFechaEntrada());
                 asignacion.setFechaFin(requestDto.getFechaFin());
                 asignacion.setPorcentajeTrabajo(porcentajeAsignado);

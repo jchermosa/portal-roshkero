@@ -22,15 +22,11 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.MetaDatasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoRequestDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoUpdateRequestDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoCombinedResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoPostResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.IEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.IMetaDatasService;
 import com.backend.portalroshkabackend.Services.Operations.IUsuarioisEquipoService;
-import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasResponseDto;
 
 import jakarta.validation.Valid;
 
@@ -63,7 +59,6 @@ public class EquiposController {
     public ResponseEntity<EquiposResponseDto> getTeamById(@PathVariable Integer id) {
         EquiposResponseDto team = equiposService.getTeamById(id);
         return ResponseEntity.ok(team);
-
     }
 
     @GetMapping("/metadatas") // info for "form Create team"

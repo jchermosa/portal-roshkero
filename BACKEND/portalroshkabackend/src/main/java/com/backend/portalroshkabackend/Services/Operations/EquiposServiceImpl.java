@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.Models.AsignacionUsuario;
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
@@ -31,6 +32,7 @@ import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiasEquiposRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioisRepository;
+import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 
 @Service("operationsEquiposService")
@@ -42,18 +44,20 @@ public class EquiposServiceImpl implements IEquiposService {
     private final TecnologiaRepository tecnologiasRepository;
     private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
     private final UsuarioisRepository usuarioisRepository;
+    private final AsignacionUsuarioRepository asignacionUsuarioRepository;
 
     private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
 
     @Autowired
     public EquiposServiceImpl(EquiposRepository equiposRepository, ClientesRepository clientesRepository,
             TecnologiaRepository tecnologiasRepository, TecnologiasEquiposRepository tecnologiasEquiposRepository,
-            UsuarioisRepository usuarioisRepository) {
+            UsuarioisRepository usuarioisRepository, AsignacionUsuarioRepository asignacionUsuarioRepository) {
         this.equiposRepository = equiposRepository;
         this.clientesRepository = clientesRepository;
         this.tecnologiasRepository = tecnologiasRepository;
         this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
         this.usuarioisRepository = usuarioisRepository;
+        this.asignacionUsuarioRepository = asignacionUsuarioRepository;
 
         sortingMap = new HashMap<>();
 
@@ -90,7 +94,8 @@ public class EquiposServiceImpl implements IEquiposService {
                     u.getIdUsuario(),
                     u.getNombre(),
                     u.getApellido(),
-                    u.getCorreo()));
+                    u.getCorreo(),
+                    u.getDisponibilidad()));
         }
 
         dto.setNombre(e.getNombre());
@@ -105,6 +110,20 @@ public class EquiposServiceImpl implements IEquiposService {
                 .map(TecnologiasEquipos::getTecnologia)
                 .toList();
         dto.setTecnologias(tecnologias);
+
+        List<AsignacionUsuario> asignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(id);
+
+        List<UsuarioisResponseDto> usuariosDto = asignaciones.stream()
+                .map(AsignacionUsuario::getUsuario) // достаем пользователя сразу
+                .map(u -> new UsuarioisResponseDto(
+                        u.getIdUsuario(),
+                        u.getNombre(),
+                        u.getApellido(),
+                        u.getCorreo(),
+                        u.getDisponibilidad()))
+                .toList();
+
+        dto.setUsuarios(usuariosDto);
         return dto;
     }
 
@@ -126,7 +145,8 @@ public class EquiposServiceImpl implements IEquiposService {
                     u.getIdUsuario(),
                     u.getNombre(),
                     u.getApellido(),
-                    u.getCorreo()));
+                    u.getCorreo(),
+                    u.getDisponibilidad()));
         }
         dto.setNombre(e.getNombre());
         dto.setFechaInicio(e.getFechaInicio());

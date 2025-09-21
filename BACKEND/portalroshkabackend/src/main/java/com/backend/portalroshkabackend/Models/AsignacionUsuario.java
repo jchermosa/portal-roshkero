@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "asignacion_usuario_equipo")
 public class AsignacionUsuario {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_asignacion_usuario_equipo")
@@ -30,20 +30,20 @@ public class AsignacionUsuario {
     @Column(name = "fecha_fin")
     private Date fechaFin;
 
-    @Column(name ="porcentaje_trabajo")
+    @Column(name = "porcentaje_trabajo")
     private Float porcentajeTrabajo;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario")
-    private Usuario idUsuario;
+    @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
+    private Usuario usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "id_tecnologia")
-    private Tecnologias idTecnologia;
+    // @ManyToOne
+    // @JoinColumn(name = "id_tecnologia")
+    // private Tecnologias tecnologia;
 
     @ManyToOne
     @JoinColumn(name = "id_equipo")
-    private Equipos equipos;
+    private Equipos equipo;
 
     @Column(name = "fecha_creacion")
     private Date fechaCreacion;
