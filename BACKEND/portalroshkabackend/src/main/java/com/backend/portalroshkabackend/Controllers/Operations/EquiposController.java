@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -79,13 +80,13 @@ public class EquiposController {
     }
 
     // ----------------- UPDATE -----------------
-    // @PutMapping("/team/{id}")
-    // public EquiposResponseDto updateTeam(
-    // @PathVariable int id,
-    // @Valid @RequestBody EquiposRequestDto equipoRequest) {
+    @PatchMapping("/team/{id}")
+    public EquiposResponseDto patchTeam(
+            @PathVariable int id,
+            @RequestBody EquiposRequestDto equipoRequest) { // Не @Valid!
 
-    // return equiposService.updateTeam(id, equipoRequest);
-    // }
+        return equiposService.updateTeam(id, equipoRequest);
+    }
 
     // Asignacion
     @GetMapping("teams/{idEquipo}/users")

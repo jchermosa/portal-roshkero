@@ -7,7 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -114,7 +116,7 @@ public class EquiposServiceImpl implements IEquiposService {
         List<AsignacionUsuario> asignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(id);
 
         List<UsuarioisResponseDto> usuariosDto = asignaciones.stream()
-                .map(AsignacionUsuario::getUsuario) // достаем пользователя сразу
+                .map(AsignacionUsuario::getUsuario) // take user
                 .map(u -> new UsuarioisResponseDto(
                         u.getIdUsuario(),
                         u.getNombre(),
@@ -189,7 +191,6 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setCliente(cliente);
         equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
         equipo.setFechaCreacion(new Date(System.currentTimeMillis()));
-        System.out.println(equipo);
         // Сохраняем команду
         Equipos savedEquipo = equiposRepository.save(equipo);
 
@@ -200,6 +201,7 @@ public class EquiposServiceImpl implements IEquiposService {
         liderDto.setNombre(liderEntity.getNombre());
         liderDto.setApellido(liderEntity.getApellido());
         liderDto.setCorreo(liderEntity.getCorreo());
+        liderDto.setDisponibilidad(liderEntity.getDisponibilidad());
 
         // Создаем связи с технологиями через таблицу tecnologias_equipos
         List<Tecnologias> tecnologias = new ArrayList<>();
@@ -227,49 +229,123 @@ public class EquiposServiceImpl implements IEquiposService {
         responseDto.setFechaLimite(savedEquipo.getFechaLimite());
         responseDto.setEstado(savedEquipo.getEstado());
         responseDto.setTecnologias(tecnologias);
+        responseDto.setFechaCreacion(savedEquipo.getFechaCreacion());
 
         return responseDto;
     }
 
-    // @Override
-    // public EquiposResponseDto updateTeam(int idEquipo, EquiposRequestDto
-    // requestDto) {
+    @Override
+    public EquiposResponseDto updateTeam(Integer id, EquiposRequestDto requestDto) {
 
-    // Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
-    // .orElseThrow(() -> new RuntimeException("Cliente not found"));
+        // Находим команду
+        Equipos equipo = equiposRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
-    // Equipos existingEquipo = equiposRepository.findById(idEquipo)
-    // .orElseThrow(() -> new RuntimeException("Team not found"));
+        // --- Имя ---
+        if (requestDto.getNombre() != null && !requestDto.getNombre().trim().isEmpty()
+                && !equipo.getNombre().equals(requestDto.getNombre().trim())) {
 
-    // // Проверка уникальности имени среди других записей
-    // Optional<Equipos> otro =
-    // equiposRepository.findByNombre(requestDto.getNombre().trim());
-    // if (otro.isPresent() && !otro.get().getIdEquipo().equals(idEquipo)) {
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre
-    // ya existe");
-    // }
+            List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
+            if (!existentes.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
+            }
+            equipo.setNombre(requestDto.getNombre().trim());
+        }
 
-    // // Обновляем поля
-    // existingEquipo.setNombre(requestDto.getNombre());
-    // existingEquipo.setFechaInicio(requestDto.getFechaInicio());
-    // existingEquipo.setFechaLimite(requestDto.getFechaLimite());
-    // existingEquipo.setIdCliente(cliente);
-    // existingEquipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
+        // --- Лидер ---
+        if (requestDto.getIdLider() != null
+                && !equipo.getLider().getIdUsuario().equals(requestDto.getIdLider())) {
+            Usuario nuevoLider = usuarioisRepository.findById(requestDto.getIdLider())
+                    .orElseThrow(() -> new RuntimeException("Lider not found"));
+            equipo.setLider(nuevoLider);
+        }
 
-    // Equipos savedEquipo = equiposRepository.save(existingEquipo);
+        // --- Клиент ---
+        if (requestDto.getIdCliente() != null
+                && !equipo.getCliente().getIdCliente().equals(requestDto.getIdCliente())) {
+            Clientes nuevoCliente = clientesRepository.findById(requestDto.getIdCliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente not found"));
+            equipo.setCliente(nuevoCliente);
+        }
 
-    // // Формируем DTO для ответа
-    // EquiposResponseDto dto = new EquiposResponseDto();
-    // dto.setIdEquipo(savedEquipo.getIdEquipo());
-    // dto.setNombre(savedEquipo.getNombre());
-    // dto.setFechaInicio(savedEquipo.getFechaInicio());
-    // dto.setFechaLimite(savedEquipo.getFechaLimite());
-    // dto.setCliente(savedEquipo.getCliente());
-    // dto.setFechaCreacion(savedEquipo.getFechaCreacion());
-    // dto.setEstado(savedEquipo.getEstado());
+        // --- Даты ---
+        if (requestDto.getFechaInicio() != null
+                && !requestDto.getFechaInicio().equals(equipo.getFechaInicio())) {
+            equipo.setFechaInicio(requestDto.getFechaInicio());
+        }
 
-    // return dto;
-    // }
+        if (requestDto.getFechaLimite() != null
+                && !requestDto.getFechaLimite().equals(equipo.getFechaLimite())) {
+            equipo.setFechaLimite(requestDto.getFechaLimite());
+        }
+
+        // --- Статус ---
+        if (requestDto.getEstado() != null
+                && !equipo.getEstado().name().equals(requestDto.getEstado())) {
+            equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
+        }
+
+        // --- Технологии ---
+        if (requestDto.getIdTecnologias() != null) {
+            List<Integer> nuevasTecnologiasIds = requestDto.getIdTecnologias();
+
+            List<TecnologiasEquipos> actualesTecnologias = tecnologiasEquiposRepository
+                    .findAllByEquipo_IdEquipo(equipo.getIdEquipo());
+
+            Set<Integer> actualesIds = actualesTecnologias.stream()
+                    .map(te -> te.getTecnologia().getIdTecnologia())
+                    .collect(Collectors.toSet());
+
+            Set<Integer> nuevasIds = new HashSet<>(nuevasTecnologiasIds);
+
+            // Удаляем только лишние
+            for (TecnologiasEquipos te : actualesTecnologias) {
+                if (!nuevasIds.contains(te.getTecnologia().getIdTecnologia())) {
+                    tecnologiasEquiposRepository.delete(te);
+                }
+            }
+
+            // Добавляем только новые
+            for (Integer idTec : nuevasTecnologiasIds) {
+                if (!actualesIds.contains(idTec)) {
+                    Tecnologias tecnologia = tecnologiasRepository.findByIdTecnologia(idTec);
+                    TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
+                    tecEquipo.setEquipo(equipo);
+                    tecEquipo.setTecnologia(tecnologia);
+                    tecnologiasEquiposRepository.save(tecEquipo);
+                }
+            }
+        }
+
+        // Сохраняем обновления
+        Equipos savedEquipo = equiposRepository.save(equipo);
+
+        // --- DTO ---
+        Usuario liderEntity = savedEquipo.getLider();
+        UsuarioisResponseDto liderDto = new UsuarioisResponseDto(
+                liderEntity.getIdUsuario(),
+                liderEntity.getNombre(),
+                liderEntity.getApellido(),
+                liderEntity.getCorreo(),
+                liderEntity.getDisponibilidad());
+
+        List<Tecnologias> tecnologias = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(savedEquipo.getIdEquipo())
+                .stream()
+                .map(TecnologiasEquipos::getTecnologia)
+                .toList();
+
+        EquiposResponseDto responseDto = new EquiposResponseDto();
+        responseDto.setIdEquipo(savedEquipo.getIdEquipo());
+        responseDto.setNombre(savedEquipo.getNombre());
+        responseDto.setCliente(savedEquipo.getCliente());
+        responseDto.setLider(liderDto);
+        responseDto.setFechaInicio(savedEquipo.getFechaInicio());
+        responseDto.setFechaLimite(savedEquipo.getFechaLimite());
+        responseDto.setEstado(savedEquipo.getEstado());
+        responseDto.setTecnologias(tecnologias);
+
+        return responseDto;
+    }
 
     @Override
     public void deleteTeam(int id_equipo) {

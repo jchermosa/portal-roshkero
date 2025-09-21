@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.DTO.Operationes;
 import java.sql.Date;
 import java.util.List;
 
+import jakarta.validation.constraints.NotNull; // Для POST обязательных полей
 import lombok.Data;
 
 import com.backend.portalroshkabackend.Models.Clientes;
