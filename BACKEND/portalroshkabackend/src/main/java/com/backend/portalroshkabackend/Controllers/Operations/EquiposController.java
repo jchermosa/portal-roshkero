@@ -25,9 +25,9 @@ import com.backend.portalroshkabackend.DTO.Operationes.MetaDatasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoCombinedResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
-import com.backend.portalroshkabackend.Services.Operations.IEquiposService;
-import com.backend.portalroshkabackend.Services.Operations.IMetaDatasService;
-import com.backend.portalroshkabackend.Services.Operations.IUsuarioisEquipoService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.IMetaDatasService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioisEquipoService;
 
 import jakarta.validation.Valid;
 
@@ -88,24 +88,26 @@ public class EquiposController {
         return equiposService.updateTeam(id, equipoRequest);
     }
 
-    // Asignacion
-    @GetMapping("teams/{idEquipo}/users")
-    public ResponseEntity<UsuariosEquipoCombinedResponseDto> getUsuariosEquipo(
-            @PathVariable Integer idEquipo,
-            @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC) Pageable pageable) {
+    // @PostMapping("teams/{idEquipo}/users")
+    // public ResponseEntity<UsuariosEquipoResponseDto> addUsuarioEquipo(
+    //         @PathVariable Integer idEquipo,
+    //         @RequestBody @Valid UsuarioEquipoRequestDto dto) {
 
-        UsuariosEquipoCombinedResponseDto response = usuariosEquipoService.getUsuariosEnYFueraDeEquipo(idEquipo,
-                pageable);
-        return ResponseEntity.ok(response);
-    }
+    //     return ResponseEntity.ok(usuariosEquipoService.addUsuarioToEquipo(idEquipo, dto));
+    // }
 
-    @PostMapping("teams/{idEquipo}/users")
-    public ResponseEntity<UsuariosEquipoResponseDto> addUsuarioEquipo(
-            @PathVariable Integer idEquipo,
-            @RequestBody @Valid UsuarioEquipoRequestDto dto) {
+    // // Asignacion
+    // @GetMapping("teams/{idEquipo}/users")
+    // public ResponseEntity<UsuariosEquipoCombinedResponseDto> getUsuariosEquipo(
+    //         @PathVariable Integer idEquipo,
+    //         @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC) Pageable pageable) {
 
-        return ResponseEntity.ok(usuariosEquipoService.addUsuarioToEquipo(idEquipo, dto));
-    }
+    //     UsuariosEquipoCombinedResponseDto response = usuariosEquipoService.getUsuariosEnYFueraDeEquipo(idEquipo,
+    //             pageable);
+    //     return ResponseEntity.ok(response);
+    // }
+
+
 
     // @PutMapping("teams/{idEquipo}/users/{idAsignacionUsuario}")
     // public ResponseEntity<UsuarioisResponseDto> updateUsuarioEquipo(

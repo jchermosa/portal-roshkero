@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("humanEmployeeService")
-public class EmployeeServiceImpl implements IEmployeeService, ITHService{
+public class EmployeeServiceImpl implements IEmployeeService{
     private final UserRepository userRepository;
 
     private final Validator validator;
@@ -28,33 +28,33 @@ public class EmployeeServiceImpl implements IEmployeeService, ITHService{
         this.validator = validator;
     }
 
-    @Transactional
-    @Override
-    public EmailUpdatedDto updateEmail(int id, String newEmail) {
-        Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    // @Transactional
+    // @Override
+    // public EmailUpdatedDto updateEmail(int id, String newEmail) {
+    //     Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        validator.validateUniqueEmail(newEmail, id); // Si el correo ya esta asginado a otro usuario, lanza excepcion
+    //     validator.validateUniqueEmail(newEmail, id); // Si el correo ya esta asginado a otro usuario, lanza excepcion
 
-        user.setCorreo(newEmail);
+    //     user.setCorreo(newEmail);
 
-        Usuario savedUser = SaveManager.saveEntity(() -> userRepository.save(user), "Error al guardar el usuario: ");// Este metodo recibe una funcion como primer parametro, y mensaje de error como segundo parametro, dentro de saveEntity se maneja el try/catch por si ocurre error al guardar la entidad.
+    //     Usuario savedUser = SaveManager.saveEntity(() -> userRepository.save(user), "Error al guardar el usuario: ");// Este metodo recibe una funcion como primer parametro, y mensaje de error como segundo parametro, dentro de saveEntity se maneja el try/catch por si ocurre error al guardar la entidad.
 
-        return AutoMap.toEmailUpdatedDto(savedUser);
-    }
+    //     return AutoMap.toEmailUpdatedDto(savedUser);
+    // }
 
-    @Transactional
-    @Override
-    public PhoneUpdatedDto updatePhone(int id, String newPhone) {
-        Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    // @Transactional
+    // @Override
+    // public PhoneUpdatedDto updatePhone(int id, String newPhone) {
+    //     Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        validator.validateUniquePhone(newPhone, id);
+    //     validator.validateUniquePhone(newPhone, id);
 
-        user.setTelefono(newPhone);
+    //     user.setTelefono(newPhone);
 
-        Usuario savedUser = SaveManager.saveEntity(() -> userRepository.save(user), "Error al guardar el usuario: ");
+    //     Usuario savedUser = SaveManager.saveEntity(() -> userRepository.save(user), "Error al guardar el usuario: ");
 
-        return AutoMap.toPhoneUpdatedDto(savedUser);
-    }
+    //     return AutoMap.toPhoneUpdatedDto(savedUser);
+    // }
 
     @Transactional(readOnly = true)
     @Override

@@ -3,7 +3,7 @@ package com.backend.portalroshkabackend.Services;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
 import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
-import com.backend.portalroshkabackend.Services.HumanResource.ITHService;
+// import com.backend.portalroshkabackend.Services.HumanResource.ITHService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.DatabaseOperationException;
 import com.backend.portalroshkabackend.tools.validator.Validator;
 import org.junit.jupiter.api.Test;
@@ -27,27 +27,27 @@ public class HumanResourceServiceImplTest {
     @Mock
     private Validator validator;
 
-    @InjectMocks
-    private ITHService service;
+    // @InjectMocks
+    // private ITHService service;
 
     HumanResourceServiceImplTest(){
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testUpdateEmail_ThrowsDatabaseOperationException() {
+    // @Test
+    // void testUpdateEmail_ThrowsDatabaseOperationException() {
 
-        Usuario fakeUser = new Usuario();
-        fakeUser.setIdUsuario(1);
+    //     Usuario fakeUser = new Usuario();
+    //     fakeUser.setIdUsuario(1);
 
-        when(userRepository.findById(1)).thenReturn(Optional.of(fakeUser));
-        doNothing().when(validator).validateUniqueEmail(any(), any());
-        when(userRepository.save(any(Usuario.class)))
-                .thenThrow(new JpaSystemException(new RuntimeException("DB error")));
+    //     when(userRepository.findById(1)).thenReturn(Optional.of(fakeUser));
+    //     doNothing().when(validator).validateUniqueEmail(any(), any());
+    //     when(userRepository.save(any(Usuario.class)))
+    //             .thenThrow(new JpaSystemException(new RuntimeException("DB error")));
 
-        assertThrows(DatabaseOperationException.class, () -> {
-            service.updateEmail(1, "test@test.com");
-        });
-    }
+    //     assertThrows(DatabaseOperationException.class, () -> {
+    //         service.updateEmail(1, "test@test.com");
+    //     });
+    // }
 
 }

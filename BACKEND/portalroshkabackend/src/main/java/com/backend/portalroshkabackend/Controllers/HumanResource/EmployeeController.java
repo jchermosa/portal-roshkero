@@ -2,7 +2,7 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
-import com.backend.portalroshkabackend.Services.HumanResource.ITHService;
+// import com.backend.portalroshkabackend.Services.HumanResource.ITHService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,13 +20,11 @@ import java.util.Set;
 @RequestMapping("/api/v1/admin")
 public class EmployeeController {
     private final IEmployeeService employeeService;
-    private final ITHService thService;
+    // private final ITHService thService;
 
      @Autowired
-    public EmployeeController(IEmployeeService employeeService,
-                              ITHService thService){
+    public EmployeeController(IEmployeeService employeeService){
          this.employeeService = employeeService;
-         this.thService = thService;
      }
 
     // ----------------- Me -----------------
@@ -37,13 +35,13 @@ public class EmployeeController {
             @PathVariable int id
     )
     {
-        if (newEmail != null){
-            EmailUpdatedDto dto = thService.updateEmail(id, newEmail);
-            return ResponseEntity.ok(dto);
-        } else if (newPhone != null) {
-            PhoneUpdatedDto dto = thService.updatePhone(id, newPhone);
-            return ResponseEntity.ok(dto);
-        }
+        // if (newEmail != null){
+        //     EmailUpdatedDto dto = thService.updateEmail(id, newEmail);
+        //     return ResponseEntity.ok(dto);
+        // } else if (newPhone != null) {
+        //     PhoneUpdatedDto dto = thService.updatePhone(id, newPhone);
+        //     return ResponseEntity.ok(dto);
+        // }
 
         return ResponseEntity.badRequest().build();
     }

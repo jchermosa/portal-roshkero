@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services.Operations;
+package com.backend.portalroshkabackend.Services.Operations.Service;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -35,6 +35,9 @@ import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiasEquiposRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioisRepository;
+import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
 import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 
@@ -48,19 +51,25 @@ public class EquiposServiceImpl implements IEquiposService {
     private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
     private final UsuarioisRepository usuarioisRepository;
     private final AsignacionUsuarioRepository asignacionUsuarioRepository;
+    private final IUsuarioService usuarioService;
+    private final ITecnologiaService tecnologiaService;
 
     private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
 
     @Autowired
     public EquiposServiceImpl(EquiposRepository equiposRepository, ClientesRepository clientesRepository,
             TecnologiaRepository tecnologiasRepository, TecnologiasEquiposRepository tecnologiasEquiposRepository,
-            UsuarioisRepository usuarioisRepository, AsignacionUsuarioRepository asignacionUsuarioRepository) {
+            UsuarioisRepository usuarioisRepository, AsignacionUsuarioRepository asignacionUsuarioRepository,
+            IUsuarioService usuarioService,
+            ITecnologiaService tecnologiaService) {
         this.equiposRepository = equiposRepository;
         this.clientesRepository = clientesRepository;
         this.tecnologiasRepository = tecnologiasRepository;
         this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
         this.usuarioisRepository = usuarioisRepository;
         this.asignacionUsuarioRepository = asignacionUsuarioRepository;
+        this.usuarioService = usuarioService;
+        this.tecnologiaService = tecnologiaService;
 
         sortingMap = new HashMap<>();
 
@@ -288,61 +297,31 @@ public class EquiposServiceImpl implements IEquiposService {
 
     @Override
     public EquiposResponseDto updateTeam(Integer id, EquiposRequestDto requestDto) {
-        // 1️⃣ Находим команду
         Equipos equipo = equiposRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
-        // 2️⃣ Проверка уникальности имени
+        // 1️⃣ Обновляем основные поля
         if (requestDto.getNombre() != null && !requestDto.getNombre().trim().isEmpty()
                 && !equipo.getNombre().equals(requestDto.getNombre().trim())) {
-            List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
-            if (!existentes.isEmpty()) {
+            if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
             }
-        }
-
-        // 3️⃣ Проверка пользователей и их disponibilidad (без изменения базы)
-        Map<Integer, Float> usuarioDeltaMap = new HashMap<>();
-        if (requestDto.getUsuarios() != null) {
-            for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
-                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
-                        .orElseThrow(() -> new RuntimeException("Usuario not found: " + uDto.getIdUsuario()));
-
-                if (uDto.getPorcentajeTrabajo() == null)
-                    throw new RuntimeException("PorcentajeTrabajo obligatorio para usuario " + usuario.getIdUsuario());
-
-                // Получаем текущую asignacion (если есть)
-                AsignacionUsuario asignacionExistente = asignacionUsuarioRepository
-                        .findByEquipo_IdEquipoAndUsuario_IdUsuario(id, usuario.getIdUsuario()).orElse(null);
-
-                float viejoPorcentaje = asignacionExistente != null ? asignacionExistente.getPorcentajeTrabajo() : 0f;
-                float delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
-
-                if (usuario.getDisponibilidad() == null || usuario.getDisponibilidad() < delta)
-                    throw new RuntimeException(
-                            "Usuario " + usuario.getIdUsuario() + " no tiene suficiente disponibilidad");
-
-                usuarioDeltaMap.put(usuario.getIdUsuario(), delta);
-            }
-        }
-
-        // 4️⃣ Сохраняем изменения команды (имя, лидер, клиент, даты, статус,
-        // технологии)
-        if (requestDto.getNombre() != null && !requestDto.getNombre().trim().isEmpty()) {
             equipo.setNombre(requestDto.getNombre().trim());
         }
+
         if (requestDto.getIdLider() != null
                 && !equipo.getLider().getIdUsuario().equals(requestDto.getIdLider())) {
-            Usuario nuevoLider = usuarioisRepository.findById(requestDto.getIdLider())
-                    .orElseThrow(() -> new RuntimeException("Lider not found"));
+            Usuario nuevoLider = usuarioService.getUsuarioById(requestDto.getIdLider());
             equipo.setLider(nuevoLider);
         }
+
         if (requestDto.getIdCliente() != null
                 && !equipo.getCliente().getIdCliente().equals(requestDto.getIdCliente())) {
             Clientes nuevoCliente = clientesRepository.findById(requestDto.getIdCliente())
                     .orElseThrow(() -> new RuntimeException("Cliente not found"));
             equipo.setCliente(nuevoCliente);
         }
+
         if (requestDto.getFechaInicio() != null)
             equipo.setFechaInicio(requestDto.getFechaInicio());
         if (requestDto.getFechaLimite() != null)
@@ -350,52 +329,37 @@ public class EquiposServiceImpl implements IEquiposService {
         if (requestDto.getEstado() != null)
             equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
 
-        // --- Технологии ---
+        // 2️⃣ Обновляем технологии
         if (requestDto.getIdTecnologias() != null) {
-            List<Integer> nuevasTecnologiasIds = requestDto.getIdTecnologias();
-            List<TecnologiasEquipos> actualesTecnologias = tecnologiasEquiposRepository
-                    .findAllByEquipo_IdEquipo(equipo.getIdEquipo());
-            Set<Integer> actualesIds = actualesTecnologias.stream()
-                    .map(te -> te.getTecnologia().getIdTecnologia())
-                    .collect(Collectors.toSet());
-            Set<Integer> nuevasIds = new HashSet<>(nuevasTecnologiasIds);
-
-            // Удаляем лишние
-            for (TecnologiasEquipos te : actualesTecnologias) {
-                if (!nuevasIds.contains(te.getTecnologia().getIdTecnologia())) {
-                    tecnologiasEquiposRepository.delete(te);
-                }
-            }
-            // Добавляем новые
-            for (Integer idTec : nuevasTecnologiasIds) {
-                if (!actualesIds.contains(idTec)) {
-                    Tecnologias tecnologia = tecnologiasRepository.findByIdTecnologia(idTec);
-                    TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
-                    tecEquipo.setEquipo(equipo);
-                    tecEquipo.setTecnologia(tecnologia);
-                    tecnologiasEquiposRepository.save(tecEquipo);
-                }
-            }
+            tecnologiaService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
         }
 
-        // 5️⃣ Сохраняем команду
+        // 3️⃣ Сохраняем команду
         Equipos savedEquipo = equiposRepository.save(equipo);
 
-        // 6️⃣ Обновляем пользователей и asignaciones
-        List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
-        List<AsignacionUsuario> actualesAsignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(id);
-        Map<Integer, AsignacionUsuario> mapActuales = actualesAsignaciones.stream()
+        // 4️⃣ Обновляем пользователей и их asignaciones
+        Map<Integer, AsignacionUsuario> actualesMap = asignacionUsuarioRepository
+                .findAllByEquipo_IdEquipo(id)
+                .stream()
                 .collect(Collectors.toMap(a -> a.getUsuario().getIdUsuario(), a -> a));
+
+        List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
 
         if (requestDto.getUsuarios() != null) {
             for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
-                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario()).get();
-                float delta = usuarioDeltaMap.get(usuario.getIdUsuario());
-                usuario.setDisponibilidad(usuario.getDisponibilidad() - (int) delta);
-                usuarioisRepository.save(usuario);
+                Usuario usuario = usuarioService.getUsuarioById(uDto.getIdUsuario());
 
-                if (mapActuales.containsKey(usuario.getIdUsuario())) {
-                    AsignacionUsuario asignacionExistente = mapActuales.get(usuario.getIdUsuario());
+                float viejoPorcentaje = actualesMap.containsKey(usuario.getIdUsuario())
+                        ? actualesMap.get(usuario.getIdUsuario()).getPorcentajeTrabajo()
+                        : 0f;
+
+                float delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
+
+                // Корректно обновляем disponibilidad
+                usuarioService.ajustarDisponibilidadConDelta(usuario, delta);
+
+                if (actualesMap.containsKey(usuario.getIdUsuario())) {
+                    AsignacionUsuario asignacionExistente = actualesMap.get(usuario.getIdUsuario());
                     asignacionExistente.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
                     asignacionExistente.setFechaEntrada(uDto.getFechaEntrada());
                     asignacionExistente.setFechaFin(uDto.getFechaFin());
@@ -411,18 +375,11 @@ public class EquiposServiceImpl implements IEquiposService {
                     asignacionUsuarioRepository.save(nuevaAsignacion);
                 }
 
-                usuariosDto.add(new UsuarioAsignacionDto(
-                        usuario.getIdUsuario(),
-                        usuario.getNombre(),
-                        usuario.getApellido(),
-                        usuario.getCorreo(),
-                        uDto.getPorcentajeTrabajo(),
-                        uDto.getFechaEntrada(),
-                        uDto.getFechaFin()));
+                usuariosDto.add(uDto);
             }
 
             // Удаляем пользователей, которых нет в запросе
-            for (AsignacionUsuario asignacion : actualesAsignaciones) {
+            for (AsignacionUsuario asignacion : actualesMap.values()) {
                 if (requestDto.getUsuarios().stream()
                         .noneMatch(u -> u.getIdUsuario().equals(asignacion.getUsuario().getIdUsuario()))) {
                     Usuario usuario = asignacion.getUsuario();
@@ -434,14 +391,13 @@ public class EquiposServiceImpl implements IEquiposService {
             }
         }
 
-        // 7️⃣ Формируем DTO для ответа
-        Usuario liderEntity = savedEquipo.getLider();
+        // 5️⃣ Формируем DTO ответа
         UsuarioisResponseDto liderDto = new UsuarioisResponseDto(
-                liderEntity.getIdUsuario(),
-                liderEntity.getNombre(),
-                liderEntity.getApellido(),
-                liderEntity.getCorreo(),
-                liderEntity.getDisponibilidad());
+                savedEquipo.getLider().getIdUsuario(),
+                savedEquipo.getLider().getNombre(),
+                savedEquipo.getLider().getApellido(),
+                savedEquipo.getLider().getCorreo(),
+                savedEquipo.getLider().getDisponibilidad());
 
         List<Tecnologias> tecnologias = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(savedEquipo.getIdEquipo())
                 .stream().map(TecnologiasEquipos::getTecnologia).toList();

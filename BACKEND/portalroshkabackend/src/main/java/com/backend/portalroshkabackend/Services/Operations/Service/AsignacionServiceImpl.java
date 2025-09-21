@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services.Operations;
+package com.backend.portalroshkabackend.Services.Operations.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +10,7 @@ import com.backend.portalroshkabackend.Models.AsignacionUsuario;
 import com.backend.portalroshkabackend.Repositories.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
 
 @Service("operationsAsignacionService")

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
-import com.backend.portalroshkabackend.Services.Operations.IAsignacionService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 
 @RestController("asignacionController")
 @RequestMapping("api/v1/admin/operatios/asignacion")

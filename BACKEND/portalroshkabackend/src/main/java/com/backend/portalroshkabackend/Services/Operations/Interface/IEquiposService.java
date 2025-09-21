@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services.Operations;
+package com.backend.portalroshkabackend.Services.Operations.Interface;
 
 import java.util.List;
 
