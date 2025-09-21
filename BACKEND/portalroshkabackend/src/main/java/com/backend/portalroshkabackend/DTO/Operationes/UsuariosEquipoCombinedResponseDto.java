@@ -4,12 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
 import com.backend.portalroshkabackend.Models.Tecnologias;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
-
-import java.util.List;
-import org.springframework.data.domain.Page;
 
 public class UsuariosEquipoCombinedResponseDto {
     private Page<UsuariosEquipoResponseDto> usuariosEnEquipo; // с пагинацией

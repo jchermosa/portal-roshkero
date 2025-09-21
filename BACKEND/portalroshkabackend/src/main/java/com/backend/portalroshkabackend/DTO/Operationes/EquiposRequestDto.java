@@ -10,12 +10,7 @@ import java.sql.Date;
 import java.util.List;
 
 import com.backend.portalroshkabackend.Exception.ClienteExists;
-// import com.backend.portalroshkabackend.Exception.UniqueNombre;
-// import com.backend.portalroshkabackend.Exception.UniqueNombre;
 import com.backend.portalroshkabackend.Exception.ValidEstado;
-import com.backend.portalroshkabackend.Models.Clientes;
-import com.backend.portalroshkabackend.Models.Tecnologias;
-import com.backend.portalroshkabackend.Models.Usuario;
 
 // @UniqueNombre   //для проверки по уникальности имени для create, для проверки уникальности Для update
 @Data

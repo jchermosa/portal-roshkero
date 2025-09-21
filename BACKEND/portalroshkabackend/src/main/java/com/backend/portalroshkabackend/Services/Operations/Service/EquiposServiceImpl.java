@@ -3,11 +3,8 @@ package com.backend.portalroshkabackend.Services.Operations.Service;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -15,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
@@ -123,7 +119,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 .toList();
         dto.setTecnologias(tecnologias);
 
-        // --- Пользователи с porcentaje_trabajo ---
+        // --- Users with porcentaje_trabajo ---
         List<AsignacionUsuario> asignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(id);
         List<UsuarioAsignacionDto> usuariosAsignacion = asignaciones.stream()
                 .map(asig -> new UsuarioAsignacionDto(
@@ -141,7 +137,7 @@ public class EquiposServiceImpl implements IEquiposService {
         return dto;
     }
 
-    // Метод для получения команд с сортировкой
+    // Method for show team with sort
     @Override
     public Page<EquiposResponseDto> getTeamsSorted(Pageable pageable, String sortBy) {
         Function<Pageable, Page<Equipos>> func = sortingMap.getOrDefault(sortBy, sortingMap.get("default"));
@@ -149,7 +145,7 @@ public class EquiposServiceImpl implements IEquiposService {
         return page.map(this::mapToDto);
     }
 
-    // Метод маппинга сущности в DTO
+    //Map in  DTO
     public EquiposResponseDto mapToDto(Equipos e) {
         EquiposResponseDto dto = new EquiposResponseDto();
         dto.setIdEquipo(e.getIdEquipo());
@@ -181,21 +177,21 @@ public class EquiposServiceImpl implements IEquiposService {
     @Override
     public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
 
-        // --- Проверка имени команды ---
+        // --- Check name Team ---
         List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
         if (!existentes.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
         }
 
-        // --- Проверка лидера ---
+        // --- Check Leader ---
         Usuario lider = usuarioisRepository.findById(requestDto.getIdLider())
                 .orElseThrow(() -> new RuntimeException("Lider not found"));
 
-        // --- Проверка клиента ---
+        // --- Check Clients ---
         Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
                 .orElseThrow(() -> new RuntimeException("Cliente not found"));
 
-        // --- Проверка пользователей ---
+        // --- Check Users ---
         if (requestDto.getUsuarios() != null) {
             for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
                 Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
@@ -212,7 +208,7 @@ public class EquiposServiceImpl implements IEquiposService {
             }
         }
 
-        // --- Создание команды ---
+        // --- Create team ---
         Equipos equipo = new Equipos();
         equipo.setNombre(requestDto.getNombre());
         equipo.setLider(lider);
@@ -224,7 +220,7 @@ public class EquiposServiceImpl implements IEquiposService {
 
         Equipos savedEquipo = equiposRepository.save(equipo);
 
-        // --- DTO лидера ---
+        // --- DTO lider ---
         UsuarioisResponseDto liderDto = new UsuarioisResponseDto(
                 lider.getIdUsuario(),
                 lider.getNombre(),
@@ -232,7 +228,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 lider.getCorreo(),
                 lider.getDisponibilidad());
 
-        // --- Технологии ---
+        // --- Tech ---
         List<Tecnologias> tecnologias = new ArrayList<>();
         if (requestDto.getIdTecnologias() != null) {
             for (Integer idTec : requestDto.getIdTecnologias()) {
@@ -247,17 +243,17 @@ public class EquiposServiceImpl implements IEquiposService {
             }
         }
 
-        // --- Привязка пользователей к команде ---
+        // --- Put users in team ---
         List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
         if (requestDto.getUsuarios() != null) {
             for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
                 Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario()).get();
 
-                // Уменьшаем disponibilidad у пользователя
+                // - disponibilidad from user
                 usuario.setDisponibilidad(usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue());
                 usuarioisRepository.save(usuario);
 
-                // Создаем запись в asignacion_usuario_equipo
+                // Save in asignacion_usuario_equipo
                 AsignacionUsuario asignacion = new AsignacionUsuario();
                 asignacion.setEquipo(savedEquipo);
                 asignacion.setUsuario(usuario);
@@ -267,7 +263,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 asignacion.setFechaCreacion(new Date(System.currentTimeMillis()));
                 asignacionUsuarioRepository.save(asignacion);
 
-                // DTO для ответа
+                // DTO for response
                 usuariosDto.add(new UsuarioAsignacionDto(
                         usuario.getIdUsuario(),
                         usuario.getNombre(),
@@ -279,7 +275,7 @@ public class EquiposServiceImpl implements IEquiposService {
             }
         }
 
-        // --- Формирование ответа ---
+        // --- Final answer for check if its work ---
         EquiposResponseDto responseDto = new EquiposResponseDto();
         responseDto.setIdEquipo(savedEquipo.getIdEquipo());
         responseDto.setNombre(savedEquipo.getNombre());
@@ -300,7 +296,7 @@ public class EquiposServiceImpl implements IEquiposService {
         Equipos equipo = equiposRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
-        // 1️⃣ Обновляем основные поля
+        // Update Main fields
         if (requestDto.getNombre() != null && !requestDto.getNombre().trim().isEmpty()
                 && !equipo.getNombre().equals(requestDto.getNombre().trim())) {
             if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
@@ -329,15 +325,15 @@ public class EquiposServiceImpl implements IEquiposService {
         if (requestDto.getEstado() != null)
             equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
 
-        // 2️⃣ Обновляем технологии
+        //  Update Main tech
         if (requestDto.getIdTecnologias() != null) {
             tecnologiaService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
         }
 
-        // 3️⃣ Сохраняем команду
+        // Save team
         Equipos savedEquipo = equiposRepository.save(equipo);
 
-        // 4️⃣ Обновляем пользователей и их asignaciones
+        // Update user asignaciones
         Map<Integer, AsignacionUsuario> actualesMap = asignacionUsuarioRepository
                 .findAllByEquipo_IdEquipo(id)
                 .stream()
@@ -378,7 +374,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 usuariosDto.add(uDto);
             }
 
-            // Удаляем пользователей, которых нет в запросе
+            // Delete users, if not put in field
             for (AsignacionUsuario asignacion : actualesMap.values()) {
                 if (requestDto.getUsuarios().stream()
                         .noneMatch(u -> u.getIdUsuario().equals(asignacion.getUsuario().getIdUsuario()))) {
@@ -391,7 +387,7 @@ public class EquiposServiceImpl implements IEquiposService {
             }
         }
 
-        // 5️⃣ Формируем DTO ответа
+        // Create responce for check if its work
         UsuarioisResponseDto liderDto = new UsuarioisResponseDto(
                 savedEquipo.getLider().getIdUsuario(),
                 savedEquipo.getLider().getNombre(),

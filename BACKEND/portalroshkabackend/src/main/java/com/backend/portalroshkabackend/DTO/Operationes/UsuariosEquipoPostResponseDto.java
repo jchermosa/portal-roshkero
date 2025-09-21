@@ -1,12 +1,9 @@
 package com.backend.portalroshkabackend.DTO.Operationes;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
-// import com.backend.portalroshkabackend.Models.Equipos;
-import com.backend.portalroshkabackend.Models.Usuario;
 import lombok.Data;
 
 @Data

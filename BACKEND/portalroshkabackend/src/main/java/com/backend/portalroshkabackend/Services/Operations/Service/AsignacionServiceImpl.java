@@ -6,25 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
-import com.backend.portalroshkabackend.Models.AsignacionUsuario;
-import com.backend.portalroshkabackend.Repositories.EquiposRepository;
-import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
 
 @Service("operationsAsignacionService")
 public class AsignacionServiceImpl implements IAsignacionService {
-    // private final EquiposRepository equiposRepository;
-    // private final TecnologiaRepository tecnologiaRepository;
-    // private final UserRepository userRepository;
-    private final AsignacionUsuarioRepository asignacionUsuarioRepository;
-
-    @Autowired
-    public AsignacionServiceImpl(
-            AsignacionUsuarioRepository asignacionUsuarioRepository) {
-        this.asignacionUsuarioRepository = asignacionUsuarioRepository;
-    }
+    @Autowired private AsignacionUsuarioRepository asignacionUsuarioRepository;
 
     @Override
     public Page<AsignacionResponseDto> getAllAsignacion(Pageable pageable) {
