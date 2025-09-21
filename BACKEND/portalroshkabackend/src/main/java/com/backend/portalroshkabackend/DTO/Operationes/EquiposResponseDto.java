@@ -25,6 +25,7 @@ public class EquiposResponseDto {
     private Date fechaCreacion;
     private EstadoActivoInactivo estado;
     private List<UsuarioisResponseDto> usuarios;
+    private List<UsuarioAsignacionDto> usuariosAsignacion;
 
     // getters & setters
     public UsuarioisResponseDto getLider() {

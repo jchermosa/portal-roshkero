@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuario;
 import com.backend.portalroshkabackend.Models.Clientes;
@@ -195,7 +196,7 @@ public class EquiposServiceImpl implements IEquiposService {
         Equipos savedEquipo = equiposRepository.save(equipo);
 
         Usuario liderEntity = savedEquipo.getLider();
-
+        // --- DTO лидера ---
         UsuarioisResponseDto liderDto = new UsuarioisResponseDto();
         liderDto.setIdUsuario(liderEntity.getIdUsuario());
         liderDto.setNombre(liderEntity.getNombre());
@@ -219,6 +220,47 @@ public class EquiposServiceImpl implements IEquiposService {
             tecnologias.add(tecnologia); // для ответа в DTO
         }
 
+
+        List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
+
+        if (requestDto.getUsuarios() != null) {
+            for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
+                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
+                        .orElseThrow(() -> new RuntimeException("Usuario not found: " + uDto.getIdUsuario()));
+
+                // Проверка доступности
+                if (usuario.getDisponibilidad() == null) {
+                    throw new RuntimeException("Usuario " + usuario.getIdUsuario() + " no tiene disponibilidad definida");
+                }
+                if (usuario.getDisponibilidad() < uDto.getPorcentajeTrabajo()) {
+                    throw new RuntimeException("Usuario " + usuario.getIdUsuario() + " no tiene suficiente disponibilidad");
+                }
+
+                // Уменьшаем disponibilidad у пользователя
+                usuario.setDisponibilidad(usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue());
+                usuarioisRepository.save(usuario);
+
+                // Создаем запись в asignacion_usuario_equipo
+                AsignacionUsuario asignacion = new AsignacionUsuario();
+                asignacion.setEquipo(savedEquipo);
+                asignacion.setUsuario(usuario);
+                asignacion.setFechaEntrada(uDto.getFechaEntrada());
+                asignacion.setFechaFin(uDto.getFechaFin());
+                asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
+                asignacion.setFechaCreacion(new Date(System.currentTimeMillis()));
+                asignacionUsuarioRepository.save(asignacion);
+
+                usuariosDto.add(new UsuarioAsignacionDto(
+                        usuario.getIdUsuario(),
+                        uDto.getPorcentajeTrabajo(),
+                        uDto.getFechaEntrada(),
+                        uDto.getFechaFin(),
+                        uDto.getEstado()
+                ));
+            }
+        }
+
+        
         // Теперь responseDto можно вернуть с полем tecnologias
         EquiposResponseDto responseDto = new EquiposResponseDto();
         responseDto.setIdEquipo(savedEquipo.getIdEquipo());
@@ -229,6 +271,7 @@ public class EquiposServiceImpl implements IEquiposService {
         responseDto.setFechaLimite(savedEquipo.getFechaLimite());
         responseDto.setEstado(savedEquipo.getEstado());
         responseDto.setTecnologias(tecnologias);
+        responseDto.setUsuariosAsignacion(usuariosDto);
         responseDto.setFechaCreacion(savedEquipo.getFechaCreacion());
 
         return responseDto;
@@ -343,6 +386,7 @@ public class EquiposServiceImpl implements IEquiposService {
         responseDto.setFechaLimite(savedEquipo.getFechaLimite());
         responseDto.setEstado(savedEquipo.getEstado());
         responseDto.setTecnologias(tecnologias);
+        responseDto.setFechaCreacion(savedEquipo.getFechaCreacion());
 
         return responseDto;
     }

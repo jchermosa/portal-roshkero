@@ -34,7 +34,7 @@ public class AsignacionUsuario {
     private Float porcentajeTrabajo;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
+    @JoinColumn(name = "id_usuario", updatable = false)
     private Usuario usuario;
 
     // @ManyToOne

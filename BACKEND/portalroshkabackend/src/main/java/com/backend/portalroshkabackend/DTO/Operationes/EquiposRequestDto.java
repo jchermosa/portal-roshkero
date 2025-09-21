@@ -47,5 +47,5 @@ public class EquiposRequestDto {
     @ValidEstado
     private String estado;
 
-
+    private List<UsuarioAsignacionDto> usuarios;
 }
