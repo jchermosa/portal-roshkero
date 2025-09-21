@@ -10,7 +10,7 @@ import com.backend.portalroshkabackend.tools.SaveManager;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
-import com.backend.portalroshkabackend.tools.validator.Validator;
+import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class ThSelfServiceImpl implements IThSelfService {
     private final UserRepository userRepository;
     private final SolicitudesTHRepository solicitudesTHRepository;
 
-    private final Validator validator;
+    private final EmployeeValidator employeeValidator;
 
     public ThSelfServiceImpl(BeneficiosRepository beneficiosRepository,
                              SolicitudTHTipoRepository solicitudTHTipoRepository,
@@ -35,7 +35,7 @@ public class ThSelfServiceImpl implements IThSelfService {
                              PermisosRepository permisosRepository,
                              UserRepository userRepository,
                              SolicitudesTHRepository solicitudesTHRepository,
-                             Validator validator
+                             EmployeeValidator employeeValidator
     ) {
         this.beneficiosRepository = beneficiosRepository;
         this.solicitudTHTipoRepository = solicitudTHTipoRepository;
@@ -44,7 +44,7 @@ public class ThSelfServiceImpl implements IThSelfService {
         this.solicitudesTHRepository = solicitudesTHRepository;
         this.userRepository = userRepository;
 
-        this.validator = validator;
+        this.employeeValidator = employeeValidator;
     }
 
     @Transactional
@@ -52,7 +52,7 @@ public class ThSelfServiceImpl implements IThSelfService {
     public EmailUpdatedDto updateEmail(int id, String newEmail) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        validator.validateUniqueEmail(newEmail, id); // Si el correo ya esta asginado a otro usuario, lanza excepcion
+        employeeValidator.validateUniqueEmail(newEmail, id); // Si el correo ya esta asginado a otro usuario, lanza excepcion
 
         user.setCorreo(newEmail);
 
@@ -66,7 +66,7 @@ public class ThSelfServiceImpl implements IThSelfService {
     public PhoneUpdatedDto updatePhone(int id, String newPhone) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        validator.validateUniquePhone(newPhone, id);
+        employeeValidator.validateUniquePhone(newPhone, id);
 
         user.setTelefono(newPhone);
 

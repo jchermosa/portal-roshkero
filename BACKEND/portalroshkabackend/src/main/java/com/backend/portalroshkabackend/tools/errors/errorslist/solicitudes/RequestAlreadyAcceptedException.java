@@ -5,7 +5,4 @@ public class RequestAlreadyAcceptedException extends RuntimeException{
         super("La solicitud con ID " + idSolicitud + " ya ha sido aceptada");
     }
 
-    public RequestAlreadyAcceptedException(String messageCustomized){
-        super(messageCustomized);
-    }
 }

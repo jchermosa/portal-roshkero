@@ -11,7 +11,8 @@ import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.Reque
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyRejectedException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
-import com.backend.portalroshkabackend.tools.validator.Validator;
+import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
+import com.backend.portalroshkabackend.tools.validator.RequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,31 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RequestServiceImpl implements IRequestService{
-    private final RequestRepository requestRepository;
     private final SolicitudesTHRepository solicitudesTHRepository;
-    private final BeneficiosRepository beneficiosRepository;
-    private final TipoDispositivoRepository tipoDispositivoRepository;
-    private final SolicitudTHTipoRepository solicitudTHTipoRepository;
-    private final PermisosRepository permisosRepository;
 
-    private final Validator validator;
+    private final RequestValidator requestValidator;
 
     @Autowired
-    public RequestServiceImpl (RequestRepository requestRepository,
-                              SolicitudesTHRepository solicitudesTHRepository,
-                              BeneficiosRepository beneficiosRepository,
-                              TipoDispositivoRepository tipoDispositivoRepository,
-                              SolicitudTHTipoRepository solicitudTHTipoRepository,
-                              PermisosRepository permisosRepository,
-                              Validator validator){
-        this.requestRepository = requestRepository;
-        this.solicitudesTHRepository = solicitudesTHRepository;
-        this.beneficiosRepository = beneficiosRepository;
-        this.tipoDispositivoRepository = tipoDispositivoRepository;
-        this.solicitudTHTipoRepository = solicitudTHTipoRepository;
-        this.permisosRepository = permisosRepository;
+    public RequestServiceImpl (SolicitudesTHRepository solicitudesTHRepository,
 
-        this.validator = validator;
+                              RequestValidator requestValidator){
+
+        this.solicitudesTHRepository = solicitudesTHRepository;
+
+        this.requestValidator = requestValidator;
     }
 
     @Transactional(readOnly = true)
@@ -67,8 +55,7 @@ public class RequestServiceImpl implements IRequestService{
     public RequestResponseDto acceptRequest(int idRequest) {
         SolicitudesTH request = solicitudesTHRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
 
-        if (request.getEstado() == EstadoSolicitudEnum.A) throw new RequestAlreadyAcceptedException(idRequest);
-        if (request.getEstado() == EstadoSolicitudEnum.R) throw new RequestAlreadyRejectedException("La solicitud con ID " + idRequest + " ya ha sido rechazada por otro administrador");
+        requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitudTH());
 
         request.setEstado(EstadoSolicitudEnum.A);
 
@@ -82,8 +69,7 @@ public class RequestServiceImpl implements IRequestService{
     public RequestResponseDto rejectRequest(int idRequest) {
         SolicitudesTH request = solicitudesTHRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
 
-        if (request.getEstado() == EstadoSolicitudEnum.R) throw new RequestAlreadyRejectedException(idRequest);
-        if (request.getEstado() == EstadoSolicitudEnum.A) throw new RequestAlreadyAcceptedException("La solicitud con ID " + idRequest + " ya ha sido aceptada por otro administrador.");
+        requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitudTH());
 
         request.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
 

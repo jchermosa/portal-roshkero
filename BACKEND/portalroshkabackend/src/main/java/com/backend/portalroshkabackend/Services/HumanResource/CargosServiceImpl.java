@@ -8,7 +8,7 @@ import com.backend.portalroshkabackend.Repositories.CargosRepository;
 import com.backend.portalroshkabackend.tools.SaveManager;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
-import com.backend.portalroshkabackend.tools.validator.Validator;
+import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class CargosServiceImpl implements ICargosService{
     private final CargosRepository cargosRepository;
 
-    private final Validator validator;
+    private final EmployeeValidator employeeValidator;
 
     @Autowired
     public CargosServiceImpl(CargosRepository cargosRepository,
-                               Validator validator) {
+                               EmployeeValidator employeeValidator) {
         this.cargosRepository = cargosRepository;
 
-        this.validator = validator;
+        this.employeeValidator = employeeValidator;
     }
 
     @Transactional(readOnly = true)

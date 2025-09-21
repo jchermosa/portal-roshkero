@@ -4,7 +4,7 @@ import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
 import com.backend.portalroshkabackend.Services.HumanResource.IThSelfService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.DatabaseOperationException;
-import com.backend.portalroshkabackend.tools.validator.Validator;
+import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,7 +24,7 @@ public class HumanResourceServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private Validator validator;
+    private EmployeeValidator employeeValidator;
 
     @InjectMocks
     private IThSelfService service;
@@ -40,7 +40,7 @@ public class HumanResourceServiceImplTest {
         fakeUser.setIdUsuario(1);
 
         when(userRepository.findById(1)).thenReturn(Optional.of(fakeUser));
-        doNothing().when(validator).validateUniqueEmail(any(), any());
+        doNothing().when(employeeValidator).validateUniqueEmail(any(), any());
         when(userRepository.save(any(Usuario.class)))
                 .thenThrow(new JpaSystemException(new RuntimeException("DB error")));
 

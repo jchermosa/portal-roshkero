@@ -8,10 +8,9 @@ import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.SaveManager;
-import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserAlreadyInactiveException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
-import com.backend.portalroshkabackend.tools.validator.Validator;
+import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeServiceImpl implements IEmployeeService {
     private final UserRepository userRepository;
 
-    private final Validator validator;
+    private final EmployeeValidator employeeValidator;
 
     @Autowired
     public EmployeeServiceImpl(UserRepository userRepository,
-                                    Validator validator) {
+                                    EmployeeValidator employeeValidator) {
         this.userRepository = userRepository;
 
-        this.validator = validator;
+        this.employeeValidator = employeeValidator;
     }
 
     @Transactional(readOnly = true)
@@ -84,10 +83,10 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public DefaultResponseDto addEmployee(UserInsertDto insertDto) {
 
-        validator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
-        validator.validateUniqueEmail(insertDto.getCorreo(), null);
-        validator.validateUniquePhone(insertDto.getTelefono(), null);
-        validator.validateRelatedEntities(insertDto.getRoles(), insertDto.getCargos());  // LLama al metodo que verifica si el rol/equipo o cargo asignado existen
+        employeeValidator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
+        employeeValidator.validateUniqueEmail(insertDto.getCorreo(), null);
+        employeeValidator.validateUniquePhone(insertDto.getTelefono(), null);
+        employeeValidator.validateRelatedEntities(insertDto.getRoles(), insertDto.getCargos());  // LLama al metodo que verifica si el rol/equipo o cargo asignado existen
 
         Usuario user = AutoMap.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
@@ -102,10 +101,10 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public DefaultResponseDto updateEmployee(UserUpdateDto updateDto, int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        validator.validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
-        validator.validateUniqueEmail(updateDto.getCorreo(), id);
-        validator.validateUniquePhone(updateDto.getTelefono(), id);
-        validator.validateRelatedEntities(updateDto.getRoles(), updateDto.getCargos());
+        employeeValidator.validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
+        employeeValidator.validateUniqueEmail(updateDto.getCorreo(), id);
+        employeeValidator.validateUniquePhone(updateDto.getTelefono(), id);
+        employeeValidator.validateRelatedEntities(updateDto.getRoles(), updateDto.getCargos());
 
         AutoMap.toUsuarioFromUpdateDto(user, updateDto);
 
@@ -120,9 +119,8 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public DefaultResponseDto deleteEmployee(int id) {
         Usuario user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
-        validator.validateUserDontHavePendientRequests(id, user.getNombre(), user.getApellido());
-
-        if (user.getEstado() == EstadoActivoInactivo.I) throw new UserAlreadyInactiveException(user.getNombre(), user.getApellido());
+        employeeValidator.validateEmployeeDontHavePendientRequests(id, user.getNombre(), user.getApellido());
+        employeeValidator.validateEmployeeIsActive(user.getEstado(), user.getNombre(), user.getApellido());
 
 
         user.setEstado(EstadoActivoInactivo.I); // Da de baja el empleado de la base de datos

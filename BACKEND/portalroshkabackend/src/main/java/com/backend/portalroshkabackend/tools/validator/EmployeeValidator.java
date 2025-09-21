@@ -1,29 +1,27 @@
 package com.backend.portalroshkabackend.tools.validator;
 
 import com.backend.portalroshkabackend.Models.Cargos;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Roles;
 import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.roles.RolesNotFoundException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.user.DuplicateCedulaException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.user.DuplicateEmailException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.user.DuplicateTelefonoException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserHavePendientRequestsException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.*;
 import org.springframework.stereotype.Component;
 
 @Component //Esta clase se debe inyectar por constructor en las clases que la quieren utilizar
-public class Validator {
+public class EmployeeValidator {
     private final UserRepository userRepository;
     private final RolesRepository rolesRepository;
     private final CargosRepository cargosRepository;
     private final SolicitudesTHRepository solicitudesTHRepository;
 
-    public Validator(UserRepository userRepository,
-                     RolesRepository rolesRepository,
-                     EquiposRepository equiposRepository,
-                     CargosRepository cargosRepository,
-                     SolicitudesTHRepository solicitudesTHRepository){
+    public EmployeeValidator(UserRepository userRepository,
+                             RolesRepository rolesRepository,
+                             EquiposRepository equiposRepository,
+                             CargosRepository cargosRepository,
+                             SolicitudesTHRepository solicitudesTHRepository){
         this.userRepository = userRepository;
         this.rolesRepository = rolesRepository;
         this.cargosRepository = cargosRepository;
@@ -60,7 +58,7 @@ public class Validator {
         }
     }
 
-    public void validateUserDontHavePendientRequests(Integer idUsuario, String nombre, String apellido){
+    public void validateEmployeeDontHavePendientRequests(Integer idUsuario, String nombre, String apellido){
         boolean havePendientRequests = solicitudesTHRepository.existsByUsuario_idUsuarioAndEstado(idUsuario, EstadoSolicitudEnum.P);
 
         if (havePendientRequests){
@@ -68,10 +66,12 @@ public class Validator {
         }
     }
 
+    public void validateEmployeeIsActive(EstadoActivoInactivo estado, String userName, String userLastName){
+        if (estado == EstadoActivoInactivo.I) throw new UserAlreadyInactiveException(userName, userLastName);
+    }
+
     public void validateRelatedEntities(Roles idRol, Cargos idCargo){
         if (!rolesRepository.existsById(idRol.getIdRol())) throw new RolesNotFoundException(idRol.getIdRol());
-
-        //if (!equiposRepository.existsById(idEquipo)) throw new EquipoNotFoundException(idEquipo);
 
         if (!cargosRepository.existsById(idCargo.getIdCargo())) throw new CargoNotFoundException(idCargo.getIdCargo());
     }
