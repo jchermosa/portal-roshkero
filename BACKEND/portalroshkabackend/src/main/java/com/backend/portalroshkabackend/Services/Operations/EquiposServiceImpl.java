@@ -102,6 +102,13 @@ public class EquiposServiceImpl implements IEquiposService {
         dto.setCliente(e.getCliente());
         dto.setFechaCreacion(e.getFechaCreacion());
         dto.setEstado(e.getEstado());
+
+        List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(e.getIdEquipo());
+        List<Tecnologias> tecnologias = tecs.stream()
+                .map(TecnologiasEquipos::getTecnologia)
+                .toList();
+
+        dto.setTecnologias(tecnologias);
         return dto;
     }
 
