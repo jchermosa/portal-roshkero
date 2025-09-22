@@ -124,13 +124,13 @@ export default function EquipoFromPage() {
       ...base,
       colors: {
         ...base.colors,
-        neutral0: isDark ? "#1f2937" : "#ffffff",   // fondo control y menú
+        neutral0: isDark ? "#1f2937" : "#ffffff",
         neutral5: isDark ? "#374151" : "#f3f4f6",
         neutral10: isDark ? "#374151" : "#e5e7eb",
-        neutral20: isDark ? "#374151" : "#d1d5db",  // borde
+        neutral20: isDark ? "#374151" : "#d1d5db",
         neutral30: isDark ? "#4b5563" : "#cbd5e1",
         neutral40: isDark ? "#9ca3af" : "#6b7280",
-        neutral80: isDark ? "#f3f4f6" : "#111827",  // texto
+        neutral80: isDark ? "#f3f4f6" : "#111827",
         primary: "#3b82f6",
         primary25: isDark ? "#374151" : "#e5e7eb",
         primary50: isDark ? "#1f2937" : "#dbeafe",
@@ -148,7 +148,8 @@ export default function EquipoFromPage() {
         ":hover": { borderColor: "#3b82f6" },
         minHeight: 40,
       }),
-      menu: (p: any) => ({ ...p, zIndex: 50 }),
+      menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
+      menu: (p: any) => ({ ...p, zIndex: 9999 }),
       input: (p: any) => ({ ...p, color: isDark ? "#f3f4f6" : "#111827" }),
       singleValue: (p: any) => ({ ...p, color: isDark ? "#f3f4f6" : "#111827" }),
       placeholder: (p: any) => ({ ...p, color: isDark ? "#9ca3af" : "#6b7280" }),
@@ -198,7 +199,7 @@ export default function EquipoFromPage() {
                 onChange={handleFormChange}
               />
 
-              {/* Select de Team Lead arriba de la tabla */}
+              {/* 1) Team Lead */}
               <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
                 <div className="flex-1 min-w-[260px]">
                   <Select
@@ -211,6 +212,7 @@ export default function EquipoFromPage() {
                     theme={selectTheme}
                     styles={selectStyles}
                     menuPortalTarget={document.body}
+                    menuPosition="fixed"
                   />
                 </div>
                 <button
@@ -237,16 +239,8 @@ export default function EquipoFromPage() {
 
               {isEditing && (
                 <>
-                  <DataTable
-                    data={miembros}
-                    columns={columns}
-                    rowKey={(s) => s.id}
-                    scrollable={false}
-                    enableSearch={false}
-                  />
-
-                  {/* Select para agregar miembro */}
-                  <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
+                  {/* 2) Miembros (agregar) */}
+                  <div className="mt-4 mb-4 flex flex-col gap-3 md:flex-row md:items-center">
                     <div className="flex-1 min-w-[240px]">
                       <Select
                         options={memberOptions}
@@ -258,6 +252,7 @@ export default function EquipoFromPage() {
                         theme={selectTheme}
                         styles={selectStyles}
                         menuPortalTarget={document.body}
+                        menuPosition="fixed"
                       />
                     </div>
                     <button
@@ -269,13 +264,24 @@ export default function EquipoFromPage() {
                       Agregar al equipo
                     </button>
                   </div>
+
+                  {/* 3) Tabla */}
+                  <DataTable
+                    data={miembros}
+                    columns={columns}
+                    rowKey={(s) => s.id}
+                    scrollable={false}
+                    enableSearch={false}
+                  />
                 </>
               )}
             </FormLayout>
           </div>
 
           <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 flex justify-end">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Última actualización del formulario visible aquí.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Última actualización del formulario visible aquí.
+            </p>
           </div>
         </div>
       </div>
