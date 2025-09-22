@@ -19,6 +19,9 @@ import SolicitudVacacionesPage from "../pages/SolicitudVacacionesPage";
 import BeneficioFormPage from "../pages/BenefitsFormPage.tsx";
 import RequestManagementPage from "../pages/RequestManagementPage.tsx";
 
+import OperationsPage from "../pages/Operations/OperationsPage";
+import EquipoFormPage from "../pages/Operations/EquipoFormPage.tsx";
+
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -47,6 +50,12 @@ export default function AppRoutes() {
               <Route path="/requests/:id" element={<RequestFormPage />} />
               <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
               <Route path="/gestion-solicitudes" element={<RequestManagementPage />} />
+              
+              {/* Operations routes */}
+              <Route path="/operations" element={<OperationsPage />} />
+              <Route path="/equipo/nuevo" element={<EquipoFormPage />} />
+              <Route path="/equipo/:id" element={<EquipoFormPage />} />
+              {/* <Route path="/operations/manage-teams" element={<ManageTeams />} /> */}
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
 
           < */}

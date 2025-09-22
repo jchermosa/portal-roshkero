@@ -8,6 +8,8 @@ export default function DashboardLayout() {
     user?.rol?.nombre === "TH" ||
     user?.rol?.nombre === "GTH" ||
     user?.rol?.nombre === "OPERACIONES";
+  
+  const isOperaciones = user?.rol?.nombre === 4;
 
   const isFuncionario = [
     "FUNCIONARIO_FABRICA",
@@ -24,11 +26,13 @@ export default function DashboardLayout() {
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
+    { id: "/operations", label: "Gestion de Equipos", icon: "👥", available: isOperaciones },
     { id: "/configuracion", label: "Configuration", icon: "⚙️", available: true },
   ].filter((o) => o.available);
 
   const initials =
     `${user?.nombre?.[0] ?? ""}${user?.apellido?.[0] ?? ""}`.trim() || "👤";
+
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">

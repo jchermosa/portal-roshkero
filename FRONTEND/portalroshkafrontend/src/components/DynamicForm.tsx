@@ -267,7 +267,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
               <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
             </div>
             <div className={`grid gap-4 ${section.className || "grid-cols-1 md:grid-cols-2"}`}>
-              {section.fields.map(renderField)}
+              {section.fields.map((field, fieldIndex) => (
+                <React.Fragment key={`${section.title}-${field.name}-${fieldIndex}`}>
+                  {renderField(field)}
+                </React.Fragment>
+              ))}
             </div>
           </div>
         ))}
