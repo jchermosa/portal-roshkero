@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 export interface FormField {
   name: string;
   label: string;
-  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom";
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom" | "slider";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
@@ -16,6 +16,11 @@ export interface FormField {
   render?: () => React.ReactNode;
   className?: string;
   fullWidth?: boolean;
+
+   // Props opcionales para slider
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
 export interface FormSection {
@@ -36,6 +41,7 @@ export interface DynamicFormProps {
   cancelLabel?: string;
   loading?: boolean;
   className?: string;
+  readonly?: boolean;
 }
 
 export interface FormMessage {
@@ -49,6 +55,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   onSubmit,
   onChange,
   loading = false,
+  readonly = false,
   className = "",
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>(initialData);
@@ -121,7 +128,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   const renderField = (field: FormField) => {
     const value = formData[field.name] ?? "";
     const error = errors[field.name];
-    const isFieldDisabled = field.disabled || loading;
+    const isFieldDisabled = field.disabled || loading || readonly;
 
     const baseProps = {
       name: field.name,
@@ -192,6 +199,46 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
           );
         }
         return null;
+
+        case "slider":
+  return (
+    <div
+      key={field.name}
+      className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}
+    >
+      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        {field.label}
+        {field.required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <input
+          type="range"
+          name={field.name}
+          min={field.min ?? 0}
+          max={field.max ?? 100}
+          step={field.step ?? 1}
+          value={formData[field.name] ?? field.min ?? 0}
+          onInput={(e) => {
+            const target = e.target as HTMLInputElement;
+            handleChange({
+              ...e,
+              target: {
+                ...target,
+                name: field.name,
+                value: target.value,
+                type: "number", // 👈 forzamos que lo trate como number
+              },
+            } as React.ChangeEvent<HTMLInputElement>);
+          }}
+          disabled={isFieldDisabled}
+          className="w-full accent-blue-600"
+        />
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {formData[field.name] ?? 0}%
+        </span>
+              {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
+            </div>
+          );
+
 
       // 🔒 Duplicado del case "custom" mantenido pero comentado para no romper el switch:
       /*

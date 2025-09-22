@@ -10,14 +10,13 @@ import {
 export function useUsuarioForm(
   token: string | null,
   id?: string,
-  cedulaParam?: string
+  cedulaParam?: number
 ) {
   const isEditing = !!id;
 
   // Estado inicial (creación)
   const [data, setData] = useState<Partial<UsuarioItem>>({
-    nroCedula: cedulaParam || "",
-    estado: true,
+    nroCedula: cedulaParam || undefined,
     requiereCambioContrasena: true,
     contrasena: "usuario123", // Contraseña por defecto
   });

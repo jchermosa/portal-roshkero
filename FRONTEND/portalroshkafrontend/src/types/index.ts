@@ -20,9 +20,10 @@ export interface UsuarioItem {
   diasVacacionesRestante?: number | null;
   requiereCambioContrasena: boolean;
   fechaCreacion?: string; // timestamp
-  estado: "ACTIVO" | "INACTIVO" | "VACACIONES"; // enum real
+  estado: "ACTIVO" | "INACTIVO"; // enum real
   urlPerfil?: string;
   disponibilidad?: number;
+  antiguedadPretty?: string; 
 }
 
 export type SolicitudEstado = "P" | "A" | "R";
@@ -93,4 +94,29 @@ export interface TipoBeneficioItem {
   descripcion: string;
   estado: "A" | "I";
   requiereAprobacionLider: boolean;
+}
+
+
+export interface DispositivoItem {
+  id_dispositivo: number;
+  id_tipo_dispositivo: number;
+  id_ubicacion: number;
+  nro_serie: string;
+  modelo: string;
+  detalles: string;
+  fecha_fabricacion: string; // YYYY-MM-DD
+  estado: string;
+  categoria: string;
+  encargado: string;
+  fecha_creacion: string; // YYYY-MM-DD
+}
+
+export interface DispositivoAsignadoItem {
+  id_dispositivo_asignado: number;
+  id_dispositivo: number;
+  id_solicitud: number;
+  fecha_entrega: string;
+  fecha_devolucion?: string | null;
+  estado_asignacion: string;
+  observaciones?: string | null;
 }

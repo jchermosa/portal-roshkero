@@ -63,23 +63,23 @@ async function getLideresApi(token: string): Promise<LiderItem[]> {
 // ================================
 // Mocks
 // ================================
-async function getEquiposMock(): Promise<EquipoItem[]> {
+async function getEquiposMock(_: string): Promise<EquipoItem[]> {
   return mockEquipos as EquipoItem[];
 }
 
-async function getRolesMock(): Promise<RolItem[]> {
+async function getRolesMock(_: string): Promise<RolItem[]> {
   return mockRoles as RolItem[];
 }
 
-async function getCargosMock(): Promise<CargoItem[]> {
+async function getCargosMock(_: string): Promise<CargoItem[]> {
   return mockCargos as CargoItem[];
 }
 
-async function getTiposPermisoMock(): Promise<TipoPermisoItem[]> {
+async function getTiposPermisoMock(_: string): Promise<TipoPermisoItem[]> {
   return mockTiposPermiso as TipoPermisoItem[];
 }
 
-async function getTiposBeneficioMock(): Promise<TipoBeneficioItem[]> {
+async function getTiposBeneficioMock(_: string): Promise<TipoBeneficioItem[]> {
   return mockTiposBeneficio as TipoBeneficioItem[];
 }
 async function getLideresMock(): Promise<LiderItem[]> {
