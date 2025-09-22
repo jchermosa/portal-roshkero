@@ -9,7 +9,7 @@ export default function DashboardLayout() {
     user?.rol?.nombre === "GTH" ||
     user?.rol?.nombre === "OPERACIONES";
   
-  const isOperaciones = user?.rol?.nombre === 4;
+  const isOperaciones = user?.rol?.nombre === "OP";
 
   const isFuncionario = [
     "FUNCIONARIO_FABRICA",
