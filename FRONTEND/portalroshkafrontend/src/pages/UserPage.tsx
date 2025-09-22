@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useUsuarios } from "../hooks/usuarios/useUsuarios";
-import { useCatalogos } from "../hooks/catalogos/useCatalogos";
+import { useCatalogosUsuarios } from "../hooks/catalogos/useCatalogosUsuarios";
 import { tieneRol } from "../utils/permisos";
 import { Roles } from "../types/roles";
 
@@ -12,7 +12,7 @@ import PaginationFooter from "../components/PaginationFooter";
 import SelectDropdown from "../components/SelectDropdown";
 import IconButton from "../components/IconButton";
 import PageLayout from "../layouts/PageLayout";
-import { usuariosColumns } from "../config/forms/usuariosTableConfig";
+import { usuariosColumns } from "../config/tables/usuariosTableConfig";
 
 
 export default function UsuariosPage() {
@@ -29,7 +29,7 @@ export default function UsuariosPage() {
   const puedeVerUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
 
   // Catálogos
-  const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogos(token);
+  const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogosUsuarios(token);
 
   // Usuarios (hook especializado)
   const {

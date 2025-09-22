@@ -1,7 +1,7 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DynamicForm from "../components/DynamicForm";
-import { useCatalogos } from "../hooks/catalogos/useCatalogos";
+import { useCatalogosUsuarios } from "../hooks/catalogos/useCatalogosUsuarios.ts";
 import { useUsuarioForm } from "../hooks/usuarios/useUsuarioForm.ts";
 import FormLayout from "../layouts/FormLayout";
 import { buildUsuarioSections } from "../config/forms/usuarioFormFields";
@@ -15,7 +15,7 @@ export default function UserFormPage() {
 
 
   // ✅ Catálogos
-  const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogos(token);
+  const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogosUsuarios(token);
 
   // ✅ Hook de formulario de usuario
   const {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSolicitudesTH, type SolicitudData } from "../hooks/solicitudes/useSolicitudesTH";
-import { useCatalogos } from "../hooks/catalogos/useCatalogos";
+import { useCatalogosSolicitudes } from "../hooks/catalogos/useCatalogosSolicitudes";
 import { tieneRol } from "../utils/permisos";
 import { Roles } from "../types/roles";
 
@@ -29,7 +29,7 @@ export default function SolicitudesTHPage() {
   const puedeVerSolicitudes = tieneRol(user, Roles.TH, Roles.GTH);
 
   // Catálogos
-  const { tiposPermiso, tiposBeneficio, loading: loadingCatalogos } = useCatalogos(token);
+  const { tiposPermiso, tiposBeneficio, loading: loadingCatalogos } = useCatalogosSolicitudes(token);
 
   // Opciones dinámicas según el tipo de solicitud
   const opcionesTipoEspecifico =
