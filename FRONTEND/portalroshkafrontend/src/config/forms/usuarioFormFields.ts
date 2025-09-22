@@ -18,7 +18,8 @@ export function buildUsuarioSections(
         { name: "telefono", label: "Teléfono", type: "text" },
         { name: "fechaIngreso", label: "Fecha de ingreso", type: "date" },
         { name: "fechaNacimiento", label: "Fecha de nacimiento", type: "date" },
-        { name: "urlPerfil", label: "URL perfil", type: "text" }, // 👈 campo nuevo
+        { name: "contraseña", label: "Contraseña", type: "password", required: true },
+        
       ],
     },
     {
@@ -54,7 +55,15 @@ export function buildUsuarioSections(
       fields: [
         { name: "estado", label: "Usuario activo", type: "checkbox" },
         { name: "requiereCambioContrasena", label: "Requiere cambio de contraseña", type: "checkbox" },
-        { name: "disponibilidad", label: "Disponibilidad", type: "number" }, // 👈 campo nuevo
+        {
+            name: "disponibilidad",
+            label: "Disponibilidad",
+            type: "slider",
+            min: 0,
+            max: 100,
+            step: 5,
+            required: true,
+        }
       ],
     },
   ];
