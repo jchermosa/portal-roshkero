@@ -25,7 +25,7 @@ public class EquiposResponseDto {
     private EstadoActivoInactivo estado;
     private List<UsuarioisResponseDto> usuarios;
     private List<UsuarioAsignacionDto> usuariosAsignacion;
-
+    private List<UsuarioisResponseDto> usuariosNoEnEquipo;
     // getters & setters
     public UsuarioisResponseDto getLider() {
         return lider;

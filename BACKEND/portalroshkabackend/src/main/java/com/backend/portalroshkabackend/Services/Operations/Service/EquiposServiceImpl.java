@@ -132,7 +132,20 @@ public class EquiposServiceImpl implements IEquiposService {
                         asig.getFechaFin()))
                 .toList();
 
+        // --- Users Not in This Team
         dto.setUsuariosAsignacion(usuariosAsignacion);
+
+        List<UsuarioisResponseDto> usuariosFueraEquipo = usuarioisRepository.findUsuariosNoEnEquipo(id)
+                .stream()
+                .map(u -> new UsuarioisResponseDto(
+                        u.getIdUsuario(),
+                        u.getNombre(),
+                        u.getApellido(),
+                        u.getCorreo(),
+                        u.getDisponibilidad()))
+                .toList();
+
+        dto.setUsuariosNoEnEquipo(usuariosFueraEquipo);
 
         return dto;
     }
@@ -145,7 +158,7 @@ public class EquiposServiceImpl implements IEquiposService {
         return page.map(this::mapToDto);
     }
 
-    //Map in  DTO
+    // Map in DTO
     public EquiposResponseDto mapToDto(Equipos e) {
         EquiposResponseDto dto = new EquiposResponseDto();
         dto.setIdEquipo(e.getIdEquipo());
@@ -325,7 +338,7 @@ public class EquiposServiceImpl implements IEquiposService {
         if (requestDto.getEstado() != null)
             equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
 
-        //  Update Main tech
+        // Update Main tech
         if (requestDto.getIdTecnologias() != null) {
             tecnologiaService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
         }
