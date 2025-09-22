@@ -95,3 +95,28 @@ export interface TipoBeneficioItem {
   estado: "A" | "I";
   requiereAprobacionLider: boolean;
 }
+
+
+export interface DispositivoItem {
+  id_dispositivo: number;
+  id_tipo_dispositivo: number;
+  id_ubicacion: number;
+  nro_serie: string;
+  modelo: string;
+  detalles: string;
+  fecha_fabricacion: string; // YYYY-MM-DD
+  estado: string;
+  categoria: string;
+  encargado: string;
+  fecha_creacion: string; // YYYY-MM-DD
+}
+
+export interface DispositivoAsignadoItem {
+  id_dispositivo_asignado: number;
+  id_dispositivo: number;
+  id_solicitud: number;
+  fecha_entrega: string;
+  fecha_devolucion?: string | null;
+  estado_asignacion: string;
+  observaciones?: string | null;
+}

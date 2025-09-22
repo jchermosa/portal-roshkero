@@ -20,6 +20,10 @@ import BeneficioFormPage from "../pages/BenefitsFormPage.tsx";
 import RequestManagementPage from "../pages/RequestManagementPage.tsx";
 import RequestSearchPage from "../pages/RequestSearchPage.tsx";
 import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
+import DevicePage from "../pages/DevicePage.tsx";
+import DeviceFormPage from "../pages/DeviceFormPage.tsx";
+import DeviceAssignmentsPage from "../pages/DeviceAssignmentsPage.tsx";
+import DeviceAssignmentsFormPage from "../pages/DeviceAssignmentFormPage.tsx";
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -56,6 +60,15 @@ export default function AppRoutes() {
           {/* Beneficios */}
           <Route path="/benefits" element={<BeneficiosPage />} />
           <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
+
+          {/* Dispositivos */}
+           <Route path="/dispositivos" element={<DevicePage />} />
+           <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
+
+           {/* Dispositivos Asignados */}
+           <Route path="/dispositivos-asignados" element={<DeviceAssignmentsPage />} />
+           <Route path="/dispositivos-asignados/nuevo" element={<DeviceAssignmentsFormPage />} />
+           
 
           {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />

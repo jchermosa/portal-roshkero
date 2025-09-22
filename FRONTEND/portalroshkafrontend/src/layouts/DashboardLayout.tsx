@@ -1,30 +1,30 @@
+// src/layouts/DashboardLayout.tsx
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { tieneRol } from "../utils/permisos";
+import { Roles } from "../types/roles";
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
 
-  const isThOrGth =
-    user?.rol?.nombre === "TH" ||
-    user?.rol?.nombre === "GTH" ||
-    user?.rol?.nombre === "OPERACIONES";
-
-  const isFuncionario = [
-    "FUNCIONARIO_FABRICA",
-    "FUNCIONARIO_TERCERIZADO",
-    "LIDER",
-    "DIRECTORIO",
-  ].includes(user?.rol?.nombre || "");
+  // Permisos usando tieneRol
+  const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+  const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+  const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN);
 
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
-    { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: isThOrGth },
-    { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: isThOrGth },
+    { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: puedeGestionarUsuarios },
+    { id: "/dispositivos-asignados", label: "Gestión de Dispositivos", icon: "💻", available: puedeGestionarDispositivos},
+    { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: puedeGestionarDispositivos},
+    { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: puedeGestionarSolicitudes },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
-    { id: "/configuracion", label: "Configuration", icon: "⚙️", available: true },
+    { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
+   
+
   ].filter((o) => o.available);
 
   const initials =
@@ -60,7 +60,7 @@ export default function DashboardLayout() {
               end={opt.end}
               className={({ isActive }) =>
                 [
-                  "block w-full text-left px-6 py-3 flex items-center space-x-3 transition-colors",
+                  "w-full text-left px-6 py-3 flex items-center space-x-3 transition-colors",
                   isActive
                     ? "bg-blue-50 dark:bg-blue-900/30 border-r-2 border-blue-600 text-blue-700 dark:text-blue-200"
                     : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",

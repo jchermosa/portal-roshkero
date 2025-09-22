@@ -18,6 +18,7 @@ export function buildUsuarioSections(
         { name: "telefono", label: "Teléfono", type: "text" },
         { name: "fechaIngreso", label: "Fecha de ingreso", type: "date" },
         { name: "fechaNacimiento", label: "Fecha de nacimiento", type: "date" },
+        { name: "contraseña", label: "Contraseña", type: "password", required: true },
         
       ],
     },
