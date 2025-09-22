@@ -17,6 +17,9 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
     @Query("SELECT u FROM Usuario u WHERE u.idRol.id = :rolId")
     List<Usuario> findAllByIdRolId(@Param("rolId") Integer rolId);// Por Vladimir
 
+    @Query("SELECT u FROM Usuario u WHERE u.idRol.id = 4")
+    List<Usuario> findAllUsuariosByRol4();// Por Vladimir
+
     Page<Usuario> findAllByEstadoTrue(Pageable pageable); // Busca todos los usuarios activos
 
     Page<Usuario> findAllByEstadoFalse(Pageable pageable); // Busca todos los usuarios inactivos

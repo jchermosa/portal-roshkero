@@ -69,7 +69,7 @@ public class MetaDatasServiceImpl implements IMetaDatasService {
 
         @Override
         public List<UsuarioisResponseDto> getAllUsers() {
-                List<Usuario> usuarios = userRepository.findAll();
+                List<Usuario> usuarios = userRepository.findAllUsuariosByRol4();
 
                 return usuarios.stream()
                                 .map(u -> new UsuarioisResponseDto(
