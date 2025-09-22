@@ -1,5 +1,8 @@
 package com.backend.portalroshkabackend.Models;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,29 +11,34 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "herramienta_usuario")
+
+
 @Data
 @NoArgsConstructor
-public class HerramientaUsuario {
-    
+@Entity
+@Table(name = "beneficio_asignado")
+public class BeneficiosAsignados {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_herramienta_usuario")
-    private Integer idHerramientaUsuario;
+    private Integer id;
+
+    @OneToOne
+    @JoinColumn(name = "id_solicitud")
+    private Solicitud solicitud;
 
     @ManyToOne
-    @JoinColumn(name = "id_herramienta")
-    private Herramientas idHerramienta;
+    @JoinColumn(name = "id_beneficio")
+    private TipoBeneficios beneficio;
 
-    @ManyToOne
-    @JoinColumn(name = "id_usuario")
-    private Usuario idUsuario;
+    @Column(name = "monto_aprobado", precision = 10, scale = 2)
+    private BigDecimal montoAprobado ;
 
     @Column(name = "fecha_asignacion")
-    private java.sql.Date fechaAsignacion;
+    private LocalDate fechaAsignacion;
 
 }
