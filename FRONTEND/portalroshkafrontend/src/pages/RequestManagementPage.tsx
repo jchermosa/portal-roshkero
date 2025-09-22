@@ -31,7 +31,6 @@ export default function SolicitudesTHPage() {
   // Catálogos
   const { tiposPermiso, tiposBeneficio, loading: loadingCatalogos } = useCatalogos(token);
 
-  // Opciones dinámicas según el tipo de solicitud
   const opcionesTipoEspecifico =
     tipoSolicitud === "PERMISO"
       ? tiposPermiso.map((t) => ({ value: t.id, label: t.nombre }))
@@ -64,14 +63,28 @@ export default function SolicitudesTHPage() {
     }},
   ];
 
-  const renderActions = (s: SolicitudData) => (
-    <button
-      onClick={() => navigate(`/solicitudes/${s.id}/evaluar`)}
-      className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-    >
-      Evaluar
-    </button>
-  );
+  const renderActions = (s: SolicitudData) => {
+    if (s.estado === "P") {
+      return (
+        <button
+          onClick={() => navigate(`/solicitudes/${s.id}/evaluar`)}
+          className="w-16 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition-colors duration-200"
+        >
+          Evaluar
+        </button>
+      );
+    } else {
+      return (
+        <button
+          onClick={() => navigate(`/solicitudes/${s.id}/ver`)}
+          className="w-16 px-3 py-1 bg-gray-400 text-white rounded-lg text-xs hover:bg-gray-500 transition-colors duration-200"
+        >
+          Ver
+        </button>
+      );
+    }
+  };
+
 
   if (!puedeVerSolicitudes) return <p>No tenés permisos para ver esta página.</p>;
   if (loading || loadingCatalogos) return <p>Cargando solicitudes...</p>;

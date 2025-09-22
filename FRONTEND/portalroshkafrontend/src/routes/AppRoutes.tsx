@@ -48,8 +48,8 @@ export default function AppRoutes() {
               <Route path="/requests/:id" element={<RequestFormPage />} />
               <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
               <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage/>} />
-              <Route path="/solicitudesTH/permisos" element={<RequestManagementPage tipoVista="permisos"/>} />
-              <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage tipoVista="beneficios"/>} />
+              <Route path="/solicitudesTH/permisos" element={<RequestManagementPage />} />
+              <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage/>} />
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
 
           < */}

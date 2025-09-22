@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getRoles, getCargos, getEquipos, getTiposPermiso, getTiposBeneficio,} from "../../services/CatalogService";
-import type { RolItem, CargoItem, EquipoItem, TipoBeneficioItem, TipoPermisoItem } from "../../types";
+import { getRoles, getCargos, getEquipos, getTiposPermiso, getTiposBeneficio, getLideres,} from "../../services/CatalogService";
+import type { RolItem, CargoItem, EquipoItem, TipoBeneficioItem, TipoPermisoItem, LiderItem } from "../../types";
 
 export function useCatalogos(token: string | null) {
   const [roles, setRoles] = useState<RolItem[]>([]);
@@ -8,6 +8,7 @@ export function useCatalogos(token: string | null) {
   const [equipos, setEquipos] = useState<EquipoItem[]>([]);
   const [tiposPermiso, setTiposPermiso] = useState<TipoPermisoItem[]>([]);
   const [tiposBeneficio, setTiposBeneficio] = useState<TipoBeneficioItem[]>([]);
+  const [lideres, setLideres] = useState<LiderItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,17 +16,18 @@ export function useCatalogos(token: string | null) {
     if (!token) return;
     setLoading(true);
 
-    Promise.all([getRoles(token), getCargos(token), getEquipos(token), getTiposPermiso(token),getTiposBeneficio(token),])
-      .then(([rolesRes, cargosRes, equiposRes, permisosRes, beneficiosRes]) => {
+    Promise.all([getRoles(token), getCargos(token), getEquipos(token), getTiposPermiso(token),getTiposBeneficio(token), getLideres(token)])
+      .then(([rolesRes, cargosRes, equiposRes, permisosRes, beneficiosRes, lideresRes]) => {
         setRoles(rolesRes);
         setCargos(cargosRes);
         setEquipos(equiposRes);
         setTiposPermiso(permisosRes);
         setTiposBeneficio(beneficiosRes);
+        setLideres(lideresRes);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [token]);
 
-  return { roles, cargos, equipos, tiposPermiso, tiposBeneficio, loading, error };
+  return { roles, cargos, equipos, tiposPermiso, tiposBeneficio, lideres, loading, error };
 }

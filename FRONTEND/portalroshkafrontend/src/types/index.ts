@@ -84,7 +84,7 @@ export interface CargoItem {
 export interface TipoPermisoItem {
   id: number;
   nombre: string;
-  cantidadDias: number | null; // null si es ajustable
+  cantidadDias: number | null; 
 }
 
 export interface TipoBeneficioItem {

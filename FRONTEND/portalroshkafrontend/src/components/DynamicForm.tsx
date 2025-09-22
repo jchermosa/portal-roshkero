@@ -60,12 +60,14 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     setFormData(initialData);
   }, [initialData]);
 
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, type, value } = e.target;
     let processedValue: any = value;
 
     if (type === "checkbox") processedValue = (e.target as HTMLInputElement).checked;
     else if (type === "number") processedValue = value === "" ? "" : Number(value);
+    else if (type === "select-one") processedValue = isNaN(Number(value)) ? value : Number(value);
 
     setFormData((prev) => {
       const next = { ...prev, [name]: processedValue };

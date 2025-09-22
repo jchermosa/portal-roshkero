@@ -1,9 +1,10 @@
-import type { EquipoItem, RolItem, CargoItem, TipoBeneficioItem, TipoPermisoItem } from "../types";
+import type { EquipoItem, RolItem, CargoItem, TipoBeneficioItem, TipoPermisoItem, LiderItem } from "../types";
 import mockEquipos from "../data/mockEquipos.json";
 import mockRoles from "../data/mockRoles.json";
 import mockCargos from "../data/mockCargos.json";
 import mockTiposPermiso from "../data/mockTiposPermiso.json";
 import mockTiposBeneficio from "../data/mockTiposBeneficio.json";
+import mockLideres from "../data/mockLideres.json"
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
@@ -49,6 +50,14 @@ async function getTiposBeneficioApi(token: string) {
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+async function getLideresApi(token: string): Promise<LiderItem[]> {
+  const res = await fetch(`/api/catalogos/lideres`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 
 
 // ================================
@@ -73,7 +82,9 @@ async function getTiposPermisoMock(): Promise<TipoPermisoItem[]> {
 async function getTiposBeneficioMock(): Promise<TipoBeneficioItem[]> {
   return mockTiposBeneficio as TipoBeneficioItem[];
 }
-
+async function getLideresMock(): Promise<LiderItem[]> {
+  return mockLideres as LiderItem[];
+}
 
 
 // ================================
@@ -84,3 +95,4 @@ export const getRoles = USE_MOCK ? getRolesMock : getRolesApi;
 export const getCargos = USE_MOCK ? getCargosMock : getCargosApi;
 export const getTiposPermiso = USE_MOCK ? getTiposPermisoMock : getTiposPermisoApi;
 export const getTiposBeneficio = USE_MOCK ? getTiposBeneficioMock : getTiposBeneficioApi;
+export const getLideres = USE_MOCK ? getLideresMock : getLideresApi;
