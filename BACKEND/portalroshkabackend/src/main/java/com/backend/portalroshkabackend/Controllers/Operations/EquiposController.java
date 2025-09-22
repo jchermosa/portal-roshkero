@@ -23,6 +23,8 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.MetaDatasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoRequestDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuariosAllDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoCombinedResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
@@ -67,6 +69,11 @@ public class EquiposController {
         return metaDatasService.getMetaDatas();
     }
 
+    @GetMapping("/users") // info for "form Create team"
+    public List<UsuarioisResponseDto> getAllUsers() {
+        return metaDatasService.getAllUsers();
+    }
+
     // ----------------- CREATE -----------------
     @PostMapping("/team")
     public EquiposResponseDto postNewTeam(@Valid @RequestBody EquiposRequestDto equipoRequest) {
@@ -90,24 +97,25 @@ public class EquiposController {
 
     // @PostMapping("teams/{idEquipo}/users")
     // public ResponseEntity<UsuariosEquipoResponseDto> addUsuarioEquipo(
-    //         @PathVariable Integer idEquipo,
-    //         @RequestBody @Valid UsuarioEquipoRequestDto dto) {
+    // @PathVariable Integer idEquipo,
+    // @RequestBody @Valid UsuarioEquipoRequestDto dto) {
 
-    //     return ResponseEntity.ok(usuariosEquipoService.addUsuarioToEquipo(idEquipo, dto));
+    // return ResponseEntity.ok(usuariosEquipoService.addUsuarioToEquipo(idEquipo,
+    // dto));
     // }
 
     // // Asignacion
     // @GetMapping("teams/{idEquipo}/users")
     // public ResponseEntity<UsuariosEquipoCombinedResponseDto> getUsuariosEquipo(
-    //         @PathVariable Integer idEquipo,
-    //         @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC) Pageable pageable) {
+    // @PathVariable Integer idEquipo,
+    // @PageableDefault(size = 10, sort = "idUsuario", direction =
+    // Sort.Direction.ASC) Pageable pageable) {
 
-    //     UsuariosEquipoCombinedResponseDto response = usuariosEquipoService.getUsuariosEnYFueraDeEquipo(idEquipo,
-    //             pageable);
-    //     return ResponseEntity.ok(response);
+    // UsuariosEquipoCombinedResponseDto response =
+    // usuariosEquipoService.getUsuariosEnYFueraDeEquipo(idEquipo,
+    // pageable);
+    // return ResponseEntity.ok(response);
     // }
-
-
 
     // @PutMapping("teams/{idEquipo}/users/{idAsignacionUsuario}")
     // public ResponseEntity<UsuarioisResponseDto> updateUsuarioEquipo(

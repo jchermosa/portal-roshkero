@@ -9,6 +9,8 @@ import com.backend.portalroshkabackend.DTO.Operationes.ClientesResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.MetaDatasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuariosAllDto;
+import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
@@ -63,5 +65,19 @@ public class MetaDatasServiceImpl implements IMetaDatasService {
                 metaDatas.setClientes(clientes);
                 metaDatas.setTeamLeaders(teamLeaders);
                 return metaDatas;
+        }
+
+        @Override
+        public List<UsuarioisResponseDto> getAllUsers() {
+                List<Usuario> usuarios = userRepository.findAll();
+
+                return usuarios.stream()
+                                .map(u -> new UsuarioisResponseDto(
+                                                u.getIdUsuario(),
+                                                u.getNombre(),
+                                                u.getApellido(),
+                                                u.getCorreo(),
+                                                u.getDisponibilidad()))
+                                .toList();
         }
 }
