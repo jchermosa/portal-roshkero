@@ -4,9 +4,9 @@ public enum FocoEnum {
     FABRICA,        // Fábrica
     GAMES,          // Games
     MANTENIMIENTO,  // Mantenimiento
-    NINGUNO,        // Ninguno
-    PRODUCTO,       // Producto
-    PROYECTO,       // Proyecto
-    STAFF,          // Staff
-    TERCERIZACION   // Tercerización
+    NINGUNO,       // Ninguno
+    PRODUCTO,      // Producto
+    PROYECTO,      // Proyecto
+    STAFF,         // Staff
+    TERCERIZACION  // Tercerización
 }

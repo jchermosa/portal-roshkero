@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.DTO.th.self;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 
-import com.backend.portalroshkabackend.Models.SolicitudThTipo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class UpdateSolicitudDto {
 
-    private SolicitudThTipo solicitudThTipo;
+    private SolicitudesEnum solicitudThTipo;
 
     private Integer cantidadDias;
 

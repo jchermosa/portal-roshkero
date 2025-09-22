@@ -19,7 +19,7 @@ public class UserDto {
 
     private String apellido;
 
-    private int nroCedula;
+    private String nroCedula;
 
     private String correo;
 
@@ -39,7 +39,7 @@ public class UserDto {
 
     private Cargos cargos;
 
-    private java.sql.Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private int diasVacacionesRestante;
 

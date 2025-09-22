@@ -15,17 +15,17 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
 
 
     Page<Usuario> findAllByEstado(EstadoActivoInactivo estado, Pageable pageable); //Busca todos los usuarios activos
-    Page<Usuario> findAllByOrderByRolesAsc(Pageable pageable); // Retona los usuarios ordenados por rol// Retona los usuarios ordenados por equipo
-    Page<Usuario> findAllByOrderByCargosAsc(Pageable pageable); // Retona los usuarios ordenados por cargo
+    Page<Usuario> findAllByOrderByRolAsc(Pageable pageable); // Retona los usuarios ordenados por rol// Retona los usuarios ordenados por equipo
+    Page<Usuario> findAllByOrderByCargoAsc(Pageable pageable); // Retona los usuarios ordenados por cargo
 
     boolean existsByCorreo(String correo);
-    boolean existsByNroCedula(int nroCedula);
+    boolean existsByNroCedula(String nroCedula);
     boolean existsByTelefono(String telefono);
     boolean existsByCorreoAndIdUsuarioNot(String correo, Integer idUsuario); // Si el correo / cedula ya existe excluyendo al propio usuario
-    boolean existsByNroCedulaAndIdUsuarioNot(Integer nroCedula, Integer idUsuario);
+    boolean existsByNroCedulaAndIdUsuarioNot(String nroCedula, Integer idUsuario);
     boolean existsByTelefonoAndIdUsuarioNot(String telefono, Integer idUsuario);
 
-    Optional<Usuario> findByNroCedula(Integer nroCedula);
+    Optional<Usuario> findByNroCedula(String nroCedula);
 
     Optional<Usuario> findByCorreo(String correo);
 }

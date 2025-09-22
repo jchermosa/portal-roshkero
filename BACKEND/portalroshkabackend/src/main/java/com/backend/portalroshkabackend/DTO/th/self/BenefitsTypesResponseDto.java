@@ -3,7 +3,7 @@ package com.backend.portalroshkabackend.DTO.th.self;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 @Data
 @NoArgsConstructor
@@ -15,9 +15,6 @@ public class BenefitsTypesResponseDto {
 
     private String descripcion;
 
-    private Date inicioVigencia;
+    private EstadoActivoInactivo vigencia;
 
-    private Date finVigencia;
-
-    private Date fechaCreacion;
 }

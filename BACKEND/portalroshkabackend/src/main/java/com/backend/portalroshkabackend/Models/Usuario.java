@@ -67,10 +67,10 @@ public class Usuario {
     @Column(name = "fecha_ingreso", nullable = false)
     private LocalDate fechaIngreso;
     
-    @Column(name = "antiguedad")
+    @Column(name = "antiguedad", insertable = false, updatable = false)
     private String antiguedad; // Se mapea como String para INTERVAL de PostgreSQL
     
-    @Column(name = "dias_vacaciones")
+    @Column(name = "dias_vacaciones", insertable = false, updatable = false)
     private Integer diasVacaciones = 0;
     
     @Column(name = "contrasena", nullable = false)
@@ -99,7 +99,7 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(name = "seniority", nullable = false, columnDefinition = "seniority_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private SeniorityEnum seniority = SeniorityEnum.STAFF;
+    private SeniorityEnum seniority = SeniorityEnum.JUNIOR;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "foco", nullable = false, columnDefinition = "foco_enum")

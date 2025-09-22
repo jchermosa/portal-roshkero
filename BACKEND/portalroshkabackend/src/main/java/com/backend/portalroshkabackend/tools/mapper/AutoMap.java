@@ -1,4 +1,3 @@
-/* 
 package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.*;
@@ -6,12 +5,12 @@ import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
+import com.backend.portalroshkabackend.DTO.th.request.RequestDto;
 import com.backend.portalroshkabackend.DTO.th.self.*;
 import com.backend.portalroshkabackend.Models.*;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class AutoMap {
     public static DefaultResponseDto toDefaultResponseDto(Integer idUsuario, String message){
@@ -45,23 +44,22 @@ public class AutoMap {
         dto.setTelefono(user.getTelefono());
         dto.setFechaIngreso(user.getFechaIngreso());
         dto.setFechaNacimiento(user.getFechaNacimiento());
-        dto.setRoles(user.getRoles());
-        dto.setCargos(user.getCargos());
+        dto.setRoles(user.getRol());
+        dto.setCargos(user.getCargo());
         dto.setEstado(user.getEstado());
 
         return dto;
     }
 
-    public static RequestDto toRequestDto(Solicitudes request){
+    public static RequestDto toRequestDto(Solicitud request){
         RequestDto requestDto = new RequestDto();
 
         requestDto.setIdSolicitud(request.getIdSolicitud());
         requestDto.setFechaInicio(request.getFechaInicio());
         requestDto.setFechaFin(request.getFechaFin());
         requestDto.setEstado(request.getEstado());
-        requestDto.setIdUsuario(request.getIdUsuario());
-        requestDto.setCantidadDias(request.getCantidadDias());
-        requestDto.setNumeroAprobaciones(request.getNumeroAprobaciones());
+        requestDto.setIdUsuario(request.getUsuario().getIdUsuario());
+        requestDto.setCantidadDias(request.getCantDias());
         requestDto.setComentario(request.getComentario());
 
         return requestDto;
@@ -76,14 +74,14 @@ public class AutoMap {
         return dto;
     }
 
-    public static SolicitudTHResponseDto toSolicitudTHResponseDto(SolicitudesTH solicitudesTH){
+    public static SolicitudTHResponseDto toSolicitudTHResponseDto(Solicitud solicitudesTH){
         SolicitudTHResponseDto dto = new SolicitudTHResponseDto();
 
-        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
+        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitud());
         dto.setFechaInicio(solicitudesTH.getFechaInicio());
         dto.setUsuario(solicitudesTH.getUsuario().getNombre() + " " + solicitudesTH.getUsuario().getApellido());
-        dto.setCantidadDias(solicitudesTH.getCantidadDias());
-        dto.setSolicitudThTipo(solicitudesTH.getSolicitudThTipo().getNombre());
+        dto.setCantidadDias(solicitudesTH.getCantDias());
+        dto.setSolicitudThTipo(solicitudesTH.getTipoSolicitud().name());
         dto.setEstado(solicitudesTH.getEstado());
         dto.setFechaCreacion(solicitudesTH.getFechaCreacion());
 
@@ -91,16 +89,13 @@ public class AutoMap {
 
     }
 
-    public static BenefitsTypesResponseDto toBenefitsResponseDto(Beneficios beneficios ){
+    public static BenefitsTypesResponseDto toBenefitsResponseDto(TipoBeneficios beneficios ){
         BenefitsTypesResponseDto dto = new BenefitsTypesResponseDto();
 
-        dto.setIdBeneficio(beneficios.getIdBeneficio());
+        dto.setIdBeneficio(beneficios.getIdTipoBeneficio());
         dto.setNombre(beneficios.getNombre());
         dto.setDescripcion(beneficios.getDescripcion());
-        dto.setInicioVigencia(beneficios.getInicioVigencia());
-        dto.setFinVigencia(beneficios.getFinVigencia());
-        dto.setFechaCreacion(beneficios.getFechaCreacion());
-
+        dto.setVigencia(beneficios.getVigencia());
         return dto;
 
     }
@@ -108,29 +103,27 @@ public class AutoMap {
     public static DevicesTypesResponseDto toDevicesTypesResponseDto(TipoDispositivo tipoDispositivo){
         DevicesTypesResponseDto dto = new DevicesTypesResponseDto();
 
-        dto.setIdInventario(tipoDispositivo.getIdInventario());
+        dto.setIdInventario(tipoDispositivo.getIdTipoDispositivo());
         dto.setNombre(tipoDispositivo.getNombre());
         dto.setDetalle(tipoDispositivo.getDetalle());
-        dto.setFechaCreacion(tipoDispositivo.getFechaCreacion());
 
         return dto;
 
     }
 
-    public static SolicitudTHTipoResponseDto toSolicitudTHTipoResponseDto(SolicitudThTipo solicitudThTipo){
+    public static SolicitudTHTipoResponseDto toSolicitudTHTipoResponseDto(Solicitud solicitud){
         SolicitudTHTipoResponseDto dto = new SolicitudTHTipoResponseDto();
 
-        dto.setIdSolicitudTHTipo(solicitudThTipo.getIdSolicitudTHTipo());
-        dto.setNombre(solicitudThTipo.getNombre());
-        dto.setFechaCreacion(solicitudThTipo.getFechaCreacion());
+        dto.setIdSolicitudTHTipo(solicitud.getIdSolicitud());
+        dto.setFechaCreacion(solicitud.getFechaCreacion());
 
         return dto;
     }
 
-    public static PermissionsTypesResponseDto toPermissionsTypesResponseDto(Permisos permisos){
+    public static PermissionsTypesResponseDto toPermissionsTypesResponseDto(TipoPermisos permisos){
         PermissionsTypesResponseDto dto = new PermissionsTypesResponseDto();
 
-        dto.setIdPermiso(permisos.getIdPermiso());
+        dto.setIdPermiso(permisos.getIdTipoPermiso());
         dto.setNombre(permisos.getNombre());
         dto.setCantDias(permisos.getCantDias());
 
@@ -170,15 +163,15 @@ public class AutoMap {
         user.setApellido(insertDto.getApellido());
         user.setNroCedula(insertDto.getNroCedula());
         user.setCorreo(insertDto.getCorreo());
-        user.setRoles(insertDto.getRoles());
+        user.setRol(insertDto.getRoles());
         user.setFechaIngreso(insertDto.getFechaIngreso());
         user.setEstado(insertDto.getEstado());
         user.setContrasena(insertDto.getContrasena());
         user.setTelefono(insertDto.getTelefono());
-        user.setCargos(insertDto.getCargos());
+        user.setCargo(insertDto.getCargos());
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
         user.setRequiereCambioContrasena(insertDto.isRequiereCambioContrasena());
-        user.setUrl(insertDto.getUrl_perfil());
+        user.setUrlPerfil(insertDto.getUrl_perfil());
         user.setDiasVacaciones(insertDto.getDisponibilidad());
         user.setDisponibilidad(insertDto.getDisponibilidad());
 
@@ -190,61 +183,56 @@ public class AutoMap {
         user.setApellido(updateDto.getApellido());
         user.setNroCedula(updateDto.getNroCedula());
         user.setCorreo(updateDto.getCorreo());
-        user.setRoles(updateDto.getRoles());
+        user.setRol(updateDto.getRoles());
         user.setFechaIngreso(updateDto.getFechaIngreso());
         user.setEstado(updateDto.getEstado());
         user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
-        user.setCargos(updateDto.getCargos());
+        user.setCargo(updateDto.getCargos());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
     }
 
-    public static void toSolicitudesThFromSendDto(SolicitudesTH solicitudesTH, SendSolicitudDto dto){
-        solicitudesTH.setFechaInicio(dto.getFechaInicio());
-        solicitudesTH.setUsuario(dto.getUsuario());
-        solicitudesTH.setCantidadDias(dto.getCantidadDias());
-        solicitudesTH.setAprobacionTH(false);
-        solicitudesTH.setComentario(dto.getComentario());
-        solicitudesTH.setSolicitudThTipo(dto.getSolicitudThTipo());
-        solicitudesTH.setEstado(EstadoSolicitudEnum.P);
-        solicitudesTH.setFechaCreacion(Date.valueOf(LocalDate.now()));
-        solicitudesTH.setPermisos(dto.getPermisos());
-        solicitudesTH.setBeneficios(dto.getBeneficios());
+    public static void toSolicitudesThFromSendDto(Solicitud solicitud, SendSolicitudDto dto){
+        solicitud.setFechaInicio(dto.getFechaInicio());
+        solicitud.setUsuario(dto.getUsuario());
+        solicitud.setCantDias(dto.getCantidadDias());
+        solicitud.setComentario(dto.getComentario());
+        solicitud.setTipoSolicitud(dto.getSolicitudThTipo());
+        solicitud.setEstado(EstadoSolicitudEnum.P);
+        solicitud.setFechaCreacion(LocalDateTime.now());
+        solicitud.setPermisoAsignado(dto.getPermisoAsignado());
+        solicitud.setBeneficioAsignado(dto.getBeneficioAsignado());
 
     }
 
-    public static void toSolicitudesThFromUpdateSolicitudDto(SolicitudesTH solicitudesTH, UpdateSolicitudDto dto){
-        solicitudesTH.setSolicitudThTipo(dto.getSolicitudThTipo());
-        solicitudesTH.setCantidadDias(dto.getCantidadDias());
-        solicitudesTH.setFechaInicio(dto.getFechaInicio());
-        solicitudesTH.setComentario(dto.getComentario());
+    public static void toSolicitudesThFromUpdateSolicitudDto(Solicitud solicitud, UpdateSolicitudDto dto){
+        solicitud.setTipoSolicitud(dto.getSolicitudThTipo());
+        solicitud.setCantDias(dto.getCantidadDias());
+        solicitud.setFechaInicio(dto.getFechaInicio());
+        solicitud.setComentario(dto.getComentario());
 
     }
 
-    public static MisSolicitudesResponseDto toMisSolicitudesResponseDto(SolicitudesTH solicitudesTH){
+    public static MisSolicitudesResponseDto toMisSolicitudesResponseDto(Solicitud solicitud){
         MisSolicitudesResponseDto dto = new MisSolicitudesResponseDto();
-
-        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
-        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
-        dto.setComentario(solicitudesTH.getComentario());
-        dto.setAprobacionTH(solicitudesTH.getAprobacionTH());
-        dto.setEstado(solicitudesTH.getEstado());
-        dto.setFechaCreacion(solicitudesTH.getFechaCreacion());
+        dto.setIdSolicitudTH(solicitud.getIdSolicitud());
+        dto.setComentario(solicitud.getComentario());
+        dto.setEstado(solicitud.getEstado());
+        dto.setFechaCreacion(solicitud.getFechaCreacion());
 
         return dto;
     }
 
-    public static SolicitudEspecificaResponseDto toSolicitudEspecificaResponseDto(SolicitudesTH solicitudesTH){
+    public static SolicitudEspecificaResponseDto toSolicitudEspecificaResponseDto(Solicitud solicitud){
         SolicitudEspecificaResponseDto dto = new SolicitudEspecificaResponseDto();
 
-        dto.setIdSolicitudTH(solicitudesTH.getIdSolicitudTH());
-        dto.setSolicitudThTipo(solicitudesTH.getSolicitudThTipo());
-        dto.setCantidadDias(solicitudesTH.getCantidadDias());
-        dto.setFechaInicio(solicitudesTH.getFechaInicio());
-        dto.setComentario(solicitudesTH.getComentario());
+        dto.setIdSolicitudTH(solicitud.getIdSolicitud());
+        dto.setSolicitudThTipo(solicitud.getTipoSolicitud());
+        dto.setCantidadDias(solicitud.getCantDias());
+        dto.setFechaInicio(solicitud.getFechaInicio());
+        dto.setComentario(solicitud.getComentario());
 
         return dto;
 
     }
 }
-*/

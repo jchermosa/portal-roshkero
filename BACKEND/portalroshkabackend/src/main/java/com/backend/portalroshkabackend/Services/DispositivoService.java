@@ -2,7 +2,7 @@ package com.backend.portalroshkabackend.Services;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +29,9 @@ public class DispositivoService {
 
         // creando un nuevo dispositivo
         TipoDispositivo newDispositivo = new TipoDispositivo();
-        TipoDispositivo newDispositivo = new TipoDispositivo();
         newDispositivo.setNombre(dispositivo.getNombre());
         newDispositivo.setDetalle(dispositivo.getDetalle());
-        newDispositivo.setFechaCreacion(new Date());
+        newDispositivo.setFechaCreacion(LocalDateTime.now());
 
         TipoDispositivo savedDispositivo = tipoDispositivoRepository.save(newDispositivo);
         
@@ -63,7 +62,6 @@ public class DispositivoService {
         tipoDispositivoRepository.deleteById(id);
     }
     
-    private DispositivoDto mapToDispositivoDto(TipoDispositivo dispositivo) {
     private DispositivoDto mapToDispositivoDto(TipoDispositivo dispositivo) {
         DispositivoDto dto = new DispositivoDto();
         dto.setIdTipoInventario(dispositivo.getIdTipoDispositivo());

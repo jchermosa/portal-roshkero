@@ -16,7 +16,7 @@ public class UserUpdateDto {
 
     private String apellido;
 
-    private int nroCedula;
+    private String nroCedula;
 
     private String correo;
 
@@ -32,7 +32,7 @@ public class UserUpdateDto {
 
     private Cargos cargos;
 
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private boolean requiereCambioContrasena;
 

@@ -123,7 +123,7 @@ public class UsuariosService {
     //dto.setIdCargo(usuario.getIdCargo() != null ? usuario.getIdCargo().getIdCargo() : null);
     dto.setFechaNacimiento(usuario.getFechaNacimiento());
     dto.setDiasVacacionesRestante(usuario.getDiasVacacionesRestante());
-    dto.setRequiereCambioContrasena(usuario.isRequiereCambioContrasena());
+    dto.setRequiereCambioContrasena(usuario.getRequiereCambioContrasena());
     return dto;
     }
 

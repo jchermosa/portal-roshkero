@@ -6,21 +6,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.portalroshkabackend.DTO.DispositivoAsignadoDto;
 import com.backend.portalroshkabackend.Models.DispositivoAsignado;
 import com.backend.portalroshkabackend.Repositories.InventarioAsignadoRepository;
-import com.backend.portalroshkabackend.Repositories.TipoDispositivoRepository;
+import java.time.LocalDate;
 
 @Service
 public class DispositivoAsignadoService {
 
     @Autowired
     private InventarioAsignadoRepository inventarioAsignadoRepository;
-    
-    @Autowired
-    private TipoDispositivoRepository tipoDispositivoRepository;
 
-    public InventarioAsignadoService(InventarioAsignadoRepository inventarioAsignadoRepository,
-                                   TipoDispositivoRepository tipoDispositivoRepository) {
+    public DispositivoAsignadoService(InventarioAsignadoRepository inventarioAsignadoRepository) {
         this.inventarioAsignadoRepository = inventarioAsignadoRepository;
-        this.tipoDispositivoRepository = tipoDispositivoRepository;
     }
 
     @Transactional
@@ -33,14 +28,14 @@ public class DispositivoAsignadoService {
         
         // Crear el objeto con todos los datos
         DispositivoAsignado inventarioAsignado = new DispositivoAsignado();
-        inventarioAsignado.setFechaAsignacion(inventarioAsignadoDto.getFechaAsignacion());
+        inventarioAsignado.setFechaEntrega(inventarioAsignadoDto.getFechaAsignacion());
         inventarioAsignado.setFechaDevolucion(inventarioAsignadoDto.getFechaDevolucion());
+        inventarioAsignado.setFechaCreacion(LocalDate.now());
         
-        // Buscar y asignar el tipo de dispositivo por ID
-        if (inventarioAsignadoDto.getIdInventario() != null) {
-            tipoDispositivoRepository.findById(inventarioAsignadoDto.getIdInventario())
-                .ifPresent(inventarioAsignado::setIdTipoDispositivo);
-        }
+        // No asignamos directamente un tipo de dispositivo sino que debemos
+        // primero tener un dispositivo en la base de datos
+        // Por ahora dejamos esto sin asignar, se debe implementar en otro método
+        // que obtenga un dispositivo disponible y lo asigne
         
         inventarioAsignado.setEstado(estadoEnum);
         
@@ -54,13 +49,14 @@ public class DispositivoAsignadoService {
     
     private DispositivoAsignadoDto mapToDto(DispositivoAsignado inventarioAsignado) {
         DispositivoAsignadoDto dto = new DispositivoAsignadoDto();
-        dto.setFechaAsignacion(inventarioAsignado.getFechaAsignacion());
+        dto.setFechaAsignacion(inventarioAsignado.getFechaCreacion());
         dto.setFechaDevolucion(inventarioAsignado.getFechaDevolucion());
-        dto.setIdInventario(inventarioAsignado.getIdTipoDispositivo() != null ? 
-            inventarioAsignado.getIdTipoDispositivo().getIdTipoDispositivo() : null);
+        dto.setIdInventario(inventarioAsignado.getDispositivo() != null && 
+            inventarioAsignado.getDispositivo().getIdDispositivo() != null ? 
+            inventarioAsignado.getDispositivo().getIdDispositivo() : null);
         dto.setEstado(inventarioAsignado.getEstado());
-        dto.setIdSolicitudDispositivos(inventarioAsignado.getIdSolicitudDispositivos() != null ? 
-            inventarioAsignado.getIdSolicitudDispositivos().getIdSolicitudDispositivo() : null);
+        dto.setIdSolicitudDispositivos(inventarioAsignado.getSolicitud() != null ? 
+            inventarioAsignado.getSolicitud().getIdSolicitud() : null);
         return dto;
     }
 }

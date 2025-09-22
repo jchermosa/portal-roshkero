@@ -38,7 +38,7 @@ public class EmployeeValidator {
         }
     }
 
-    public void validateUniqueCedula(Integer nroCedula, Integer excludeUserId){
+    public void validateUniqueCedula(String nroCedula, Integer excludeUserId){
         boolean exists = (excludeUserId == null)
                 ? userRepository.existsByNroCedula(nroCedula)
                 : userRepository.existsByNroCedulaAndIdUsuarioNot(nroCedula, excludeUserId);

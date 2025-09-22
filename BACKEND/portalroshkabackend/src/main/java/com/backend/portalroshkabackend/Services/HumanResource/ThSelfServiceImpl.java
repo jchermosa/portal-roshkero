@@ -3,7 +3,7 @@ package com.backend.portalroshkabackend.Services.HumanResource;
 import com.backend.portalroshkabackend.DTO.EmailUpdatedDto;
 import com.backend.portalroshkabackend.DTO.PhoneUpdatedDto;
 import com.backend.portalroshkabackend.DTO.th.self.*;
-import com.backend.portalroshkabackend.Models.SolicitudesTH;
+import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.SaveManager;
@@ -78,35 +78,35 @@ public class ThSelfServiceImpl implements IThSelfService {
     @Transactional
     @Override
     public RequestResponseDto sendRequest(int id, SendSolicitudDto sendSolicitudDto) {
-        SolicitudesTH solicitudesTH = new SolicitudesTH();
+        Solicitud solicitud = new Solicitud();
 
         System.out.println(sendSolicitudDto.getFechaInicio());
 
-        AutoMap.toSolicitudesThFromSendDto(solicitudesTH, sendSolicitudDto);
+        AutoMap.toSolicitudesThFromSendDto(solicitud, sendSolicitudDto);
 
-        System.out.println(solicitudesTH.getFechaInicio());
+        System.out.println(solicitud.getFechaInicio());
 
-        SaveManager.saveEntity(() -> solicitudesTHRepository.save(solicitudesTH), "Error al guardar la solicitud: ");
+        SaveManager.saveEntity(() -> solicitudesTHRepository.save(solicitud), "Error al guardar la solicitud: ");
 
         RequestResponseDto responseDto = new RequestResponseDto();
-        responseDto.setId(solicitudesTH.getIdSolicitudTH());
+        responseDto.setId(solicitud.getIdSolicitud());
         responseDto.setMessage("Solicitud enviada con exito");
 
-        System.out.println(solicitudesTH.getFechaInicio());
+        System.out.println(solicitud.getFechaInicio());
 
         return responseDto;
     }
 
     @Override
-    public RequestResponseDto updateRequest(int idSolicitudTh, UpdateSolicitudDto updateSolicitudDto) {
-        SolicitudesTH request  = solicitudesTHRepository.findById(idSolicitudTh).orElseThrow(() -> new RequestNotFoundException(idSolicitudTh));
+    public RequestResponseDto updateRequest(int idSolicitud, UpdateSolicitudDto updateSolicitudDto) {
+        Solicitud request  = solicitudesTHRepository.findById(idSolicitud).orElseThrow(() -> new RequestNotFoundException(idSolicitud));
 
         AutoMap.toSolicitudesThFromUpdateSolicitudDto(request, updateSolicitudDto);
 
         SaveManager.saveEntity(() -> solicitudesTHRepository.save(request), "Error al actualizar la solicitud: ");
 
         RequestResponseDto responseDto = new RequestResponseDto();
-        responseDto.setId(request.getIdSolicitudTH());
+        responseDto.setId(request.getIdSolicitud());
         responseDto.setMessage("Solicitud actualizada con exito");
 
         return responseDto;
@@ -143,10 +143,10 @@ public class ThSelfServiceImpl implements IThSelfService {
     }
 
     @Override
-    public SolicitudEspecificaResponseDto getRequestById(int idUsuario ,int idSolicitudTh) {
-        SolicitudesTH request = solicitudesTHRepository.findByUsuario_IdUsuarioAndIdSolicitudTH(idUsuario, idSolicitudTh);
+    public SolicitudEspecificaResponseDto getRequestById(int idUsuario ,int idSolicitud) {
+        Solicitud request = solicitudesTHRepository.findByUsuario_IdUsuarioAndIdSolicitud(idUsuario, idSolicitud);
 
-        if (request == null) throw new RequestNotFoundException(idSolicitudTh);
+        if (request == null) throw new RequestNotFoundException(idSolicitud);
 
         return AutoMap.toSolicitudEspecificaResponseDto(request);
     }

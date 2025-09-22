@@ -2,7 +2,8 @@ package com.backend.portalroshkabackend.DTO;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -10,7 +11,7 @@ public class DispositivoDto {
     private Integer idTipoInventario;
     private String nombre;
     private String detalle;
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
  
     public Integer getIdTipoInventario() {
         return idTipoInventario;
@@ -36,11 +37,11 @@ public class DispositivoDto {
         this.detalle = detalle;
     }
 
-    public Date getFechaCreacion() {
+    public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(Date fechaCreacion) {
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 }

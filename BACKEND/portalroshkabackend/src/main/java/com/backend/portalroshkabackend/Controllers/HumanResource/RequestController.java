@@ -1,4 +1,3 @@
-/*
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 
@@ -28,14 +27,14 @@ public class RequestController {
         this.requestService = requestService;
     }
 
-    @GetMapping("/th/users/requests/leader/approved")
-    public ResponseEntity<Page<SolicitudTHResponseDto>> getApprovedByLeader(
-            @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
-    ){
-        Page<SolicitudTHResponseDto> requests = requestService.getApprovedByLeader(pageable);
+    // @GetMapping("/th/users/requests/leader/approved")
+    // public ResponseEntity<Page<SolicitudTHResponseDto>> getApprovedByLeader(
+    //         @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
+    // ){
+    //     // Page<SolicitudTHResponseDto> requests = requestService.getApprovedByLeader(pageable);
 
-        return ResponseEntity.ok(requests);
-    }
+    //     return ResponseEntity.ok(requests);
+    // }
 
     @GetMapping("/th/users/requests/sortby")
     public ResponseEntity<Page<SolicitudTHResponseDto>> getRequestSortByEstado(
@@ -108,4 +107,3 @@ public class RequestController {
     // GET: Tipo de solicitudes
 
 }
-*/

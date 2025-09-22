@@ -1,15 +1,12 @@
 package com.backend.portalroshkabackend.DTO.th.self;
 
-import com.backend.portalroshkabackend.Models.Beneficios;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
-import com.backend.portalroshkabackend.Models.Permisos;
-import com.backend.portalroshkabackend.Models.SolicitudThTipo;
-import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +14,7 @@ public class MisSolicitudesResponseDto {
 
     private Integer idSolicitudTH;
 
-    private SolicitudThTipo solicitudThTipo;
+    private SolicitudesEnum solicitudThTipo;
 
     private String comentario;
 
@@ -25,6 +22,6 @@ public class MisSolicitudesResponseDto {
 
     private EstadoSolicitudEnum estado;
 
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
 }

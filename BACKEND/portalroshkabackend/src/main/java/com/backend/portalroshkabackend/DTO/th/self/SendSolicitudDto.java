@@ -1,15 +1,13 @@
 package com.backend.portalroshkabackend.DTO.th.self;
 
-import com.backend.portalroshkabackend.Models.Beneficios;
-
-import com.backend.portalroshkabackend.Models.Permisos;
-import com.backend.portalroshkabackend.Models.SolicitudThTipo;
+import com.backend.portalroshkabackend.Models.BeneficiosAsignados;
+import com.backend.portalroshkabackend.Models.PermisosAsignados;
 import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-import java.sql.Date;
 import java.time.LocalDate;
 
 @Data
@@ -24,9 +22,9 @@ public class SendSolicitudDto {
 
     private String comentario;
 
-    private SolicitudThTipo solicitudThTipo;
+    private SolicitudesEnum solicitudThTipo;
 
-    private Permisos permisos;
+    private PermisosAsignados permisoAsignado;
 
-    private Beneficios beneficios;
+    private BeneficiosAsignados beneficioAsignado;
 }

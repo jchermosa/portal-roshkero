@@ -22,7 +22,7 @@ public class UserInsertDto {
     private String apellido;
 
     @Positive(message = "El número de cédula debe ser positivo")
-    private int nroCedula;
+    private String nroCedula;
 
     @Email(message = "Correo inválido")
     @NotBlank(message = "El correo es obligatorio")
@@ -42,7 +42,7 @@ public class UserInsertDto {
     private Cargos Cargos;
 
     @Past(message = "La fecha de nacimiento debe ser en el pasado")
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private boolean requiereCambioContrasena;
 

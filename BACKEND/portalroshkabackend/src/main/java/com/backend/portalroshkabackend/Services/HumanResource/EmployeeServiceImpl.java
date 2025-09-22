@@ -57,7 +57,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Override
     public Page<UserResponseDto> getAllEmployeesByRol(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByRolesAsc(pageable);
+        Page<Usuario> users = userRepository.findAllByOrderByRolAsc(pageable);
 
         return users.map(AutoMap::toUserResponseDto);
     }
@@ -65,7 +65,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Override
     public Page<UserResponseDto> getAllEmployeesByPosition(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByCargosAsc(pageable);
+        Page<Usuario> users = userRepository.findAllByOrderByCargoAsc(pageable);
 
         return users.map(AutoMap::toUserResponseDto);
     }

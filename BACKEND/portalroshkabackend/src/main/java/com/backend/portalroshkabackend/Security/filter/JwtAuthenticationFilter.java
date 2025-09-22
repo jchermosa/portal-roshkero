@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             Usuario usuario = userService.getUserByCorreo(correo);
             
             // Obtener solo el ID del rol
-            Integer rolId = usuario.getRoles().getIdRol();
+            Integer rolId = usuario.getRol().getIdRol();
 
             String token = Jwts.builder()
                 .subject(correo)

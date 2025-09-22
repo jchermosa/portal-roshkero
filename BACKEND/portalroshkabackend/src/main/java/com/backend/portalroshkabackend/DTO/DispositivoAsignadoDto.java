@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.DTO;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoAsignacion;
 
@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class DispositivoAsignadoDto {
-    private Date fechaAsignacion;
-    private Date fechaDevolucion;
+    private LocalDate fechaAsignacion;
+    private LocalDate fechaDevolucion;
     private Integer idInventario;
     private EstadoAsignacion estado;
     private Integer idSolicitudDispositivos;

@@ -18,7 +18,7 @@ public class UserByIdResponseDto {
 
     private String apellido;
 
-    private int nroCedula;
+    private String nroCedula;
 
     private String correo;
 
@@ -26,7 +26,7 @@ public class UserByIdResponseDto {
 
     private LocalDate fechaIngreso;
 
-    private java.sql.Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private Roles roles;
 

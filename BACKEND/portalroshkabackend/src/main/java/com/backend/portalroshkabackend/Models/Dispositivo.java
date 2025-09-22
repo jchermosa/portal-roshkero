@@ -67,7 +67,7 @@ public class Dispositivo {
     private EstadoInventario estado = EstadoInventario.D;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", nullable = false, columnDefinition = "categoria_enum")
+    @Column(name = "categoria", nullable = false, columnDefinition = "categoria_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private CategoriaEnum categoria = CategoriaEnum.OFICINA;
 

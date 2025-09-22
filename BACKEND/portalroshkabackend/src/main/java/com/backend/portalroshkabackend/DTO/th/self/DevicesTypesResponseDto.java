@@ -12,6 +12,4 @@ public class DevicesTypesResponseDto {
     private String nombre;
 
     private String detalle;
-
-    private java.util.Date fechaCreacion;
 }
