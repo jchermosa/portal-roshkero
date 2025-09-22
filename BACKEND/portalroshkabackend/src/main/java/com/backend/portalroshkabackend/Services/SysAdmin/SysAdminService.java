@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services;
+package com.backend.portalroshkabackend.Services.SysAdmin;
 
 import java.util.List;
 
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.backend.portalroshkabackend.Models.SolicitudDispositivos;
 import com.backend.portalroshkabackend.Repositories.SysAdminRepository;
+import com.backend.portalroshkabackend.Services.DispositivoService;
 
 @Service
 public class SysAdminService {
@@ -25,8 +26,18 @@ public class SysAdminService {
 
 
     @Transactional(readOnly = true)
-    public List<SolicitudDispositivos> getAllAprovedRequest(){
-        return sysAdminRepository.findSolicitudesAprovadas();
+    public List<SolicitudDispositivos> getAllRejectedRequest(){
+        return sysAdminRepository.findSolicitudesRechazadas();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SolicitudDispositivos> getAllApprovedRequest(){
+        return sysAdminRepository.findSolicitudesAprobadas();
+    }
+
+    @Transactional (readOnly = true)
+    public List<SolicitudDispositivos> getAllPendingRequest(){
+        return sysAdminRepository.findSolicitudesPendientes();
     }
 
     @Transactional(readOnly = true)
@@ -34,12 +45,12 @@ public class SysAdminService {
         return sysAdminRepository.findAllSolicitudes();
     }
 
-
     @Transactional
     public void deleteDispositivo(Integer id){
 
         dispositivoService.deleteDeviceById(id);
     }
 
+    
 
 }

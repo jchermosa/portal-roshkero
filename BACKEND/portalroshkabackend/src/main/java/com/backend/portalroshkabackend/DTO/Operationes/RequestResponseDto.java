@@ -1,3 +1,4 @@
+/* 
 package com.backend.portalroshkabackend.DTO.Operationes;
 
 import java.sql.Date;
@@ -97,3 +98,4 @@ public class RequestResponseDto {
         this.fechaCreacion = fechaCreacion;
     }
 }
+*/

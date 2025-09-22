@@ -1,3 +1,4 @@
+/*
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 
@@ -107,3 +108,4 @@ public class RequestController {
     // GET: Tipo de solicitudes
 
 }
+*/

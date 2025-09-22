@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class InventarioAsignadoDto {
+public class DispositivoAsignadoDto {
     private Date fechaAsignacion;
     private Date fechaDevolucion;
     private Integer idInventario;

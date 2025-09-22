@@ -1,5 +1,5 @@
 package com.backend.portalroshkabackend.DTO;
-
+/* 
 import java.sql.Date;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 
@@ -95,3 +95,4 @@ public class RequestDto {
         this.fechaCreacion = fechaCreacion;
     }
 }
+*/
