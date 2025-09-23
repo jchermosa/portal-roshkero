@@ -1,6 +1,5 @@
 package com.backend.portalroshkabackend.DTO;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 import com.backend.portalroshkabackend.Models.Cargos;
@@ -25,8 +24,6 @@ public class UserUpdateDto {
     private LocalDate fechaIngreso;
 
     private EstadoActivoInactivo estado;
-
-    private String contrasena;
 
     private String telefono;
 

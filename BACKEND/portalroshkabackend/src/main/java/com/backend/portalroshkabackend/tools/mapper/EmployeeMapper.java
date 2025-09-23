@@ -9,6 +9,9 @@ import com.backend.portalroshkabackend.Models.Usuario;
 
 import java.time.LocalDateTime;
 
+// TODO Endopoint reestablecer contrasena (hashear la contrasena al guardar, requiereCambioContrasena en true)
+
+
 public class EmployeeMapper {
     public static DefaultResponseDto toDefaultResponseDto(Integer idUsuario, String message){
         DefaultResponseDto dto = new DefaultResponseDto();
@@ -84,7 +87,6 @@ public class EmployeeMapper {
         user.setRol(updateDto.getRoles());
         user.setFechaIngreso(updateDto.getFechaIngreso());
         user.setEstado(updateDto.getEstado());
-        user.setContrasena(updateDto.getContrasena());
         user.setTelefono(updateDto.getTelefono());
         user.setCargo(updateDto.getCargos());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
