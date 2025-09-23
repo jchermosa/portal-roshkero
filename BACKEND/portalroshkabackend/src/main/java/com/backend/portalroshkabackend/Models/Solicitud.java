@@ -43,7 +43,7 @@ public class Solicitud {
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = true)
+    @JoinColumn(name = "id_lider", nullable = true)
     private Usuario teamLeader;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -35,6 +35,6 @@ public class PermisosAsignados {
 
     @Column(name = "confirmacion_TH")
     private Boolean confirmacionTH = false;
-    
+
 
 }
