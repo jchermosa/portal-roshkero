@@ -1,7 +1,6 @@
 // src/pages/EquipoFormPage.tsx
 import { useState, useMemo, useEffect } from "react";
 import Select from "react-select";
-import FormLayout from "../../layouts/FormLayout";
 import { useNavigate } from "react-router-dom";
 import DynamicForm from "../../components/DynamicForm";
 import type { ICreateTeam } from "./interfaces/ICreateTeam";
@@ -70,7 +69,8 @@ export default function EquipoFromPage() {
     },
   ];
 
-  const handleFormChange = (updatedData: any) => setFormData((prev) => ({ ...prev, ...updatedData }));
+  const handleFormChange = (updatedData: any) =>
+    setFormData((prev) => ({ ...prev, ...updatedData }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +84,7 @@ export default function EquipoFromPage() {
       label: "Nombre",
       render: (s: IMiembrosEquipo) => (
         <div className="flex items-center gap-2">
-          <span>{s.nombre}</span>
+          <span className="text-gray-900 dark:text-gray-100">{s.nombre}</span>
           {leadId === s.id && (
             <span className="px-2 py-0.5 text-[10px] rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100">
               Lead
@@ -118,19 +118,14 @@ export default function EquipoFromPage() {
     setSelectedMember(null);
   };
 
-  // react-select: tema y estilos sensibles a dark
   const selectTheme = useMemo(
     () => (base: any) => ({
       ...base,
       colors: {
         ...base.colors,
-        neutral0: isDark ? "#1f2937" : "#ffffff",
-        neutral5: isDark ? "#374151" : "#f3f4f6",
-        neutral10: isDark ? "#374151" : "#e5e7eb",
-        neutral20: isDark ? "#374151" : "#d1d5db",
-        neutral30: isDark ? "#4b5563" : "#cbd5e1",
-        neutral40: isDark ? "#9ca3af" : "#6b7280",
-        neutral80: isDark ? "#f3f4f6" : "#111827",
+        neutral0: isDark ? "#111827" : "#ffffff",   // fondo dropdown/control
+        neutral20: isDark ? "#374151" : "#d1d5db",  // borde
+        neutral80: isDark ? "#f9fafb" : "#111827",  // texto
         primary: "#3b82f6",
         primary25: isDark ? "#374151" : "#e5e7eb",
         primary50: isDark ? "#1f2937" : "#dbeafe",
@@ -143,15 +138,16 @@ export default function EquipoFromPage() {
     () => ({
       control: (p: any, s: any) => ({
         ...p,
-        borderColor: s.isFocused ? "#3b82f6" : (isDark ? "#374151" : "#d1d5db"),
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+        borderColor: s.isFocused ? "#3b82f6" : isDark ? "#374151" : "#d1d5db",
         boxShadow: s.isFocused ? "0 0 0 2px rgba(59,130,246,.2)" : "none",
         ":hover": { borderColor: "#3b82f6" },
         minHeight: 40,
       }),
       menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-      menu: (p: any) => ({ ...p, zIndex: 9999 }),
-      input: (p: any) => ({ ...p, color: isDark ? "#f3f4f6" : "#111827" }),
-      singleValue: (p: any) => ({ ...p, color: isDark ? "#f3f4f6" : "#111827" }),
+      menu: (p: any) => ({ ...p, zIndex: 9999, backgroundColor: isDark ? "#111827" : "#ffffff" }),
+      input: (p: any) => ({ ...p, color: isDark ? "#f9fafb" : "#111827" }),
+      singleValue: (p: any) => ({ ...p, color: isDark ? "#f9fafb" : "#111827" }),
       placeholder: (p: any) => ({ ...p, color: isDark ? "#9ca3af" : "#6b7280" }),
       option: (p: any, s: any) => ({
         ...p,
@@ -160,7 +156,7 @@ export default function EquipoFromPage() {
           : s.isFocused
           ? (isDark ? "#374151" : "#e5e7eb")
           : "transparent",
-        color: isDark ? "#f3f4f6" : "#111827",
+        color: isDark ? "#f9fafb" : "#111827",
       }),
     }),
     [isDark]
@@ -180,108 +176,135 @@ export default function EquipoFromPage() {
         <div className="absolute inset-0 bg-brand-blue/40" />
       </div>
 
-      <div className="relative z-10 flex flex-col h-full p-4">
-        <div className="bg-white/45 dark:bg-gray-900/70 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col h-full overflow-hidden">
-          <div className="flex-1 overflow-auto p-6">
-            <FormLayout
-              title={isEditing ? "Crear Equipo" : "Editar Equipo"}
-              subtitle={isEditing ? "Modifica los campos necesarios" : "Completá la información de la nueva solicitud"}
-              icon={isEditing ? "✏️" : "🧑‍💻"}
-              onCancel={() => navigate("/operations")}
-              onSubmitLabel={isEditing ? "Guardar cambios" : "Enviar solicitud"}
-            >
-              <DynamicForm
-                key="create-team-form"
-                id="equipo-form"
-                sections={getSections()}
-                initialData={formData}
-                onSubmit={handleSubmit}
-                onChange={handleFormChange}
-              />
-
-              {/* 1) Team Lead */}
-              <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
-                <div className="flex-1 min-w-[260px]">
-                  <Select
-                    options={memberOptions}
-                    value={leadOption}
-                    onChange={(opt) => setLeadOption(opt as any)}
-                    isClearable
-                    isSearchable
-                    placeholder="Elegir Team Lead…"
-                    theme={selectTheme}
-                    styles={selectStyles}
-                    menuPortalTarget={document.body}
-                    menuPosition="fixed"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!leadOption) return;
-                    if (!miembros.some((m) => m.id === leadOption.value)) {
-                      const found = memberOptions.find((o) => o.value === leadOption.value);
-                      if (found) {
-                        setMiembros((ms) => [
-                          ...ms,
-                          { id: found.value, nombre: found.label, idCargo: (found as any).idCargo },
-                        ]);
-                      }
-                    }
-                    setLeadId(leadOption.value);
-                  }}
-                  disabled={!leadOption}
-                  className="px-4 py-2 rounded bg-green-600 text-white text-sm disabled:opacity-60"
-                >
-                  Cambiar
-                </button>
-              </div>
-
-              {isEditing && (
-                <>
-                  {/* 2) Miembros (agregar) */}
-                  <div className="mt-4 mb-4 flex flex-col gap-3 md:flex-row md:items-center">
-                    <div className="flex-1 min-w-[240px]">
-                      <Select
-                        options={memberOptions}
-                        value={selectedMember}
-                        onChange={(opt) => setSelectedMember(opt as any)}
-                        isClearable
-                        isSearchable
-                        placeholder="Buscar miembro para agregar…"
-                        theme={selectTheme}
-                        styles={selectStyles}
-                        menuPortalTarget={document.body}
-                        menuPosition="fixed"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleAddMember}
-                      disabled={!selectedMember}
-                      className="px-4 py-2 rounded bg-blue-600 text-white text-sm disabled:opacity-60"
-                    >
-                      Agregar al equipo
-                    </button>
-                  </div>
-
-                  {/* 3) Tabla */}
-                  <DataTable
-                    data={miembros}
-                    columns={columns}
-                    rowKey={(s) => s.id}
-                    scrollable={false}
-                    enableSearch={false}
-                  />
-                </>
-              )}
-            </FormLayout>
+      <div className="relative z-10 h-full p-4">
+        <div className="mx-auto w-full max-w-4xl bg-white/45 dark:bg-gray-900/80 backdrop-blur-sm
+                        rounded-2xl shadow-lg flex flex-col 
+                        max-h-[calc(100vh-2rem)] text-gray-900 dark:text-gray-100">
+          
+          {/* Header fijo */}
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              {isEditing ? "Crear Equipo" : "Editar Equipo"}
+            </h2>
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              {isEditing
+                ? "Modifica los campos necesarios"
+                : "Completá la información de la nueva solicitud"}
+            </p>
           </div>
 
-          <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 flex justify-end">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          {/* Body scrolleable */}
+          <div className="flex-1 min-h-0 overflow-auto p-6">
+            <DynamicForm
+              key="create-team-form"
+              id="equipo-form"
+              sections={getSections()}
+              initialData={formData}
+              onSubmit={handleSubmit}
+              onChange={handleFormChange}
+            />
+
+            {/* 1) Team Lead */}
+            <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
+              <div className="flex-1 min-w-[260px]">
+                <Select
+                  options={memberOptions}
+                  value={leadOption}
+                  onChange={(opt) => setLeadOption(opt as any)}
+                  isClearable
+                  isSearchable
+                  placeholder="Elegir Team Lead…"
+                  theme={selectTheme}
+                  styles={selectStyles}
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!leadOption) return;
+                  if (!miembros.some((m) => m.id === leadOption.value)) {
+                    const found = memberOptions.find(
+                      (o) => o.value === leadOption.value
+                    );
+                    if (found) {
+                      setMiembros((ms) => [
+                        ...ms,
+                        {
+                          id: found.value,
+                          nombre: found.label,
+                          idCargo: (found as any).idCargo,
+                        },
+                      ]);
+                    }
+                  }
+                  setLeadId(leadOption.value);
+                }}
+                disabled={!leadOption}
+                className="px-4 py-2 rounded bg-green-600 text-white text-sm disabled:opacity-60"
+              >
+                Cambiar
+              </button>
+            </div>
+
+            {/* 2) Miembros */}
+            <div className="mt-4 mb-4 flex flex-col gap-3 md:flex-row md:items-center">
+              <div className="flex-1 min-w-[240px]">
+                <Select
+                  options={memberOptions}
+                  value={selectedMember}
+                  onChange={(opt) => setSelectedMember(opt as any)}
+                  isClearable
+                  isSearchable
+                  placeholder="Buscar miembro para agregar…"
+                  theme={selectTheme}
+                  styles={selectStyles}
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleAddMember}
+                disabled={!selectedMember}
+                className="px-4 py-2 rounded bg-blue-600 text-white text-sm disabled:opacity-60"
+              >
+                Agregar al equipo
+              </button>
+            </div>
+
+            {/* 3) Tabla */}
+            <DataTable
+              data={miembros}
+              columns={columns}
+              rowKey={(s) => s.id}
+              scrollable={false}
+              enableSearch={false}
+            />
+          </div>
+
+          {/* Footer fijo con acciones */}
+          <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 flex items-center justify-between">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
               Última actualización del formulario visible aquí.
             </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate("/operations")}
+                className="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                form="equipo-form"
+                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
+              >
+                Guardar
+              </button>
+            </div>
           </div>
         </div>
       </div>
