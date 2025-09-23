@@ -1,20 +1,27 @@
-package com.backend.portalroshkabackend.DTO.Operationes;
+package com.backend.portalroshkabackend.DTO.Operationes.Metadatas;
 
 import java.time.LocalDate;
 
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
+import com.backend.portalroshkabackend.Models.Usuario;
 import lombok.Data;
 
 @Data
-public class UsuariosEquipoPostResponseDto {
+public class UsuariosEquipoResponseDto {
     private Integer idAsignacionUsuarioEquipo;
-    private Integer idUsuario; // просто id пользователя
-    private Tecnologias idTecnologia;
-    private Equipos equipos;
 
     private LocalDate fechaEntrada;
+
     private LocalDate fechaFin;
-    private Double porcentajeTrabajo;
+
+    private Integer porcentajeTrabajo;
+
+    private Usuario idUsuario;
+
+    private Tecnologias idTecnologia;
+
+    private Equipos equipos;
+
     private LocalDate fechaCreacion;
 }

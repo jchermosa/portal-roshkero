@@ -42,14 +42,14 @@ public class TecnologiaServiceImpl implements ITecnologiaService {
                 .collect(Collectors.toSet());
         Set<Integer> nuevasIds = new HashSet<>(nuevasTecnologiasIds);
 
-        // Удаляем лишние
+        // delete not needed
         for (TecnologiasEquipos te : actuales) {
             if (!nuevasIds.contains(te.getTecnologia().getIdTecnologia())) {
                 tecnologiasEquiposRepository.delete(te);
             }
         }
 
-        // Добавляем новые
+        // add new
         for (Integer idTec : nuevasTecnologiasIds) {
             if (!actualesIds.contains(idTec)) {
                 Tecnologias tecnologia = getTecnologiaById(idTec);

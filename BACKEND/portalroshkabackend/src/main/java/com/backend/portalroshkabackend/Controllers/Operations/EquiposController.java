@@ -25,15 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.MetaDatasDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuarioEquipoRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuariosAllDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoCombinedResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuariosEquipoResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.MetaDatasDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IMetaDatasService;
-import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioisEquipoService;
+
 
 import jakarta.validation.Valid;
 
@@ -46,7 +42,6 @@ public class EquiposController {
 
     @Autowired
     public EquiposController(IEquiposService equiposService,
-            IUsuarioisEquipoService usuariosEquipoService,
             IMetaDatasService metaDatasService) {
         this.equiposService = equiposService;
         this.metaDatasService = metaDatasService;

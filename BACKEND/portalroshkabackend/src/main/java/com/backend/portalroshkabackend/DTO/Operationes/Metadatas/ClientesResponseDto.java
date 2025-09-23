@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO.Operationes;
+package com.backend.portalroshkabackend.DTO.Operationes.Metadatas;
 
 import lombok.Data;
 import lombok.AllArgsConstructor;

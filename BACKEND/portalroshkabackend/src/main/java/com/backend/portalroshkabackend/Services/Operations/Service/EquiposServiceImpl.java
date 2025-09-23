@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.Services.Operations.Service;
 
-import java.sql.Date;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,12 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.backend.portalroshkabackend.DTO.Operationes.ClientesResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Equipos;
@@ -72,7 +72,6 @@ public class EquiposServiceImpl implements IEquiposService {
         this.usuarioService = usuarioService;
         this.tecnologiaService = tecnologiaService;
 
-        // sortingMap = new java.util.concurrent.ConcurrentHashMap<>();
         sortingMap = new HashMap<>();
 
         // nombre
@@ -198,7 +197,7 @@ public class EquiposServiceImpl implements IEquiposService {
         dto.setFechaCreacion(e.getFechaCreacion());
         dto.setEstado(e.getEstado());
 
-        // Лидер
+        // Lider
         if (e.getLider() != null) {
             Usuario u = e.getLider();
             dto.setLider(new UsuarioisResponseDto(
@@ -209,14 +208,14 @@ public class EquiposServiceImpl implements IEquiposService {
                     u.getDisponibilidad()));
         }
 
-        // Клиент
+        // Client
         if (e.getCliente() != null) {
             dto.setCliente(new ClientesResponseDto(
                     e.getCliente().getIdCliente(),
                     e.getCliente().getNombre()));
         }
 
-        // Технологии
+        // Tecnologias
         List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(e.getIdEquipo());
         List<TecnologiasDto> tecnologias = tecs.stream()
                 .map(te -> {

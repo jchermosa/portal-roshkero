@@ -5,12 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.backend.portalroshkabackend.DTO.Operationes.ClientesResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.MetaDatasDto;
-import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuariosAllDto;
-import com.backend.portalroshkabackend.Models.Clientes;
+import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.MetaDatasDto;
+import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;

@@ -1,6 +1,5 @@
 package com.backend.portalroshkabackend.DTO.Operationes;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;

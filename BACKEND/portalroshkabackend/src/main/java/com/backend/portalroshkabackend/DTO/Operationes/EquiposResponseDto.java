@@ -1,6 +1,5 @@
 package com.backend.portalroshkabackend.DTO.Operationes;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,6 +7,8 @@ import java.util.List;
 import jakarta.validation.constraints.NotNull; // Для POST обязательных полей
 import lombok.Data;
 
+import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
+import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 @Data

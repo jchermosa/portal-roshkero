@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.UsuariosEquipoResponseDto;
 import com.backend.portalroshkabackend.Models.Tecnologias;
 
 public class UsuariosEquipoCombinedResponseDto {

@@ -1,6 +1,9 @@
-package com.backend.portalroshkabackend.DTO.Operationes;
+package com.backend.portalroshkabackend.DTO.Operationes.Metadatas;
 
 import java.util.List;
+
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+
 import lombok.Data;
 @Data
 public class MetaDatasDto {
