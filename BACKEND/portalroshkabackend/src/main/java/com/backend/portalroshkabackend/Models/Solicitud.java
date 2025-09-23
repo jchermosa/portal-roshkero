@@ -44,7 +44,7 @@ public class Solicitud {
 
     @ManyToOne
     @JoinColumn(name = "id_lider", nullable = true)
-    private Usuario teamLeader;
+    private Usuario lider;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_documento_adjunto")
