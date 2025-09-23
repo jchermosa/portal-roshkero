@@ -47,9 +47,7 @@ public class Usuario {
     private Integer idUsuario;
     
 
-    @OneToMany
-    @JoinColumn(name = "id_lider")
-    private List<Solicitud>  listaSolicitudes = new ArrayList<>();
+
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
@@ -137,6 +135,9 @@ public class Usuario {
     @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
     private List<Equipos> equiposLiderados = new ArrayList<>();
 
+    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
+    private List<Solicitud>  listaSolicitudes = new ArrayList<>();
+    
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "tecnologias_usuario",
