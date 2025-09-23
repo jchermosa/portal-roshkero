@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class SolicitudTHResponseDto {
+public class SolicitudResponseDto {
 
-    private Integer idSolicitudTH;
+    private Integer idSolicitud;
 
     private String usuario;
 
-    private String solicitudThTipo;
+    private String tipoSolicitud;
 
     private LocalDate fechaInicio;
 

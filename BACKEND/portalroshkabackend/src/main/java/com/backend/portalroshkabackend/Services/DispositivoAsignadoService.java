@@ -30,7 +30,7 @@ public class DispositivoAsignadoService {
         DispositivoAsignado inventarioAsignado = new DispositivoAsignado();
         inventarioAsignado.setFechaEntrega(inventarioAsignadoDto.getFechaAsignacion());
         inventarioAsignado.setFechaDevolucion(inventarioAsignadoDto.getFechaDevolucion());
-        inventarioAsignado.setFechaCreacion(LocalDate.now());
+        //inventarioAsignado.setFechaCreacion(LocalDate.now());
         
         // No asignamos directamente un tipo de dispositivo sino que debemos
         // primero tener un dispositivo en la base de datos
@@ -49,7 +49,7 @@ public class DispositivoAsignadoService {
     
     private DispositivoAsignadoDto mapToDto(DispositivoAsignado inventarioAsignado) {
         DispositivoAsignadoDto dto = new DispositivoAsignadoDto();
-        dto.setFechaAsignacion(inventarioAsignado.getFechaCreacion());
+        //dto.setFechaAsignacion(inventarioAsignado.getFechaCreacion());
         dto.setFechaDevolucion(inventarioAsignado.getFechaDevolucion());
         dto.setIdInventario(inventarioAsignado.getDispositivo() != null && 
             inventarioAsignado.getDispositivo().getIdDispositivo() != null ? 

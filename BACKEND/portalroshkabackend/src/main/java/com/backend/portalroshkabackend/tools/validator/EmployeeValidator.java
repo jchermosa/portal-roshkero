@@ -15,17 +15,17 @@ public class EmployeeValidator {
     private final UserRepository userRepository;
     private final RolesRepository rolesRepository;
     private final CargosRepository cargosRepository;
-    private final SolicitudesTHRepository solicitudesTHRepository;
+    private final SolicitudRepository solicitudRepository;
 
     public EmployeeValidator(UserRepository userRepository,
                              RolesRepository rolesRepository,
                              EquiposRepository equiposRepository,
                              CargosRepository cargosRepository,
-                             SolicitudesTHRepository solicitudesTHRepository){
+                             SolicitudRepository solicitudRepository){
         this.userRepository = userRepository;
         this.rolesRepository = rolesRepository;
         this.cargosRepository = cargosRepository;
-        this.solicitudesTHRepository = solicitudesTHRepository;
+        this.solicitudRepository = solicitudRepository;
     }
 
     public void validateUniqueEmail(String correo, Integer excludeUserId){
@@ -59,7 +59,7 @@ public class EmployeeValidator {
     }
 
     public void validateEmployeeDontHavePendientRequests(Integer idUsuario, String nombre, String apellido){
-        boolean havePendientRequests = solicitudesTHRepository.existsByUsuario_idUsuarioAndEstado(idUsuario, EstadoSolicitudEnum.P);
+        boolean havePendientRequests = solicitudRepository.existsByUsuario_idUsuarioAndEstado(idUsuario, EstadoSolicitudEnum.P);
 
         if (havePendientRequests){
             throw new UserHavePendientRequestsException(nombre, apellido);

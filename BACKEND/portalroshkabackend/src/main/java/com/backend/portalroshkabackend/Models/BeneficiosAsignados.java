@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 public class BeneficiosAsignados {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_beneficio_asignado")
     private Integer id;
 
     @OneToOne
@@ -32,7 +33,7 @@ public class BeneficiosAsignados {
     private Solicitud solicitud;
 
     @ManyToOne
-    @JoinColumn(name = "id_beneficio")
+    @JoinColumn(name = "id_tipo_beneficio")
     private TipoBeneficios beneficio;
 
     @Column(name = "monto_aprobado", precision = 10, scale = 2)

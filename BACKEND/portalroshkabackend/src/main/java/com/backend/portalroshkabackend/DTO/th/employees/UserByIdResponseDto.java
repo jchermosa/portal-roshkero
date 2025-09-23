@@ -22,15 +22,17 @@ public class UserByIdResponseDto {
 
     private String correo;
 
-    private String telefono;
+    private Integer rolId;
+    private String rolNombre;
+
+    private Integer cargoId;
+    private String cargoNombre;
 
     private LocalDate fechaIngreso;
 
+    private String telefono;
+
     private LocalDate fechaNacimiento;
-
-    private Roles roles;
-
-    private Cargos cargos;
 
     private EstadoActivoInactivo estado;
 

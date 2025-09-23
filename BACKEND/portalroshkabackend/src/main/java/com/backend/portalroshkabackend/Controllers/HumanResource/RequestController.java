@@ -14,7 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -37,7 +36,7 @@ public class RequestController {
     // }
 
     @GetMapping("/th/users/requests/sortby")
-    public ResponseEntity<Page<SolicitudTHResponseDto>> getRequestSortByEstado(
+    public ResponseEntity<Page<SolicitudResponseDto>> getRequestSortByEstado(
             @RequestParam(value = "estado", required = true) String estado,
             @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request
@@ -53,7 +52,7 @@ public class RequestController {
         if (estado.isBlank()) throw new IllegalArgumentException("El argumento del parametro no debe estar vacio");
 
 
-        Page<SolicitudTHResponseDto> requests;
+        Page<SolicitudResponseDto> requests;
 
         switch (estado) {
             case "A" -> requests = requestService.getByEstado(EstadoSolicitudEnum.A, pageable);

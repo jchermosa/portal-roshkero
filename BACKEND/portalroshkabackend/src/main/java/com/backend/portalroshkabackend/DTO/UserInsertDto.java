@@ -5,6 +5,7 @@ import com.backend.portalroshkabackend.Models.Roles;
 import jakarta.validation.constraints.*;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
@@ -28,7 +29,7 @@ public class UserInsertDto {
     @NotBlank(message = "El correo es obligatorio")
     private String correo;
 
-    private Roles roles;
+    private Roles rol;
 
     @NotBlank(message = "La contraseña es obligatoria")
     private String contrasena;
@@ -39,7 +40,7 @@ public class UserInsertDto {
     @Pattern(regexp = "^[0-9]{9,15}$", message = "Teléfono inválido")
     private String telefono;
 
-    private Cargos Cargos;
+    private Cargos cargo;
 
     @Past(message = "La fecha de nacimiento debe ser en el pasado")
     private LocalDate fechaNacimiento;

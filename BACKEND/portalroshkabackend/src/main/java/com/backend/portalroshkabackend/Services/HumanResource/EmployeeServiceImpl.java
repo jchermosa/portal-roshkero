@@ -10,6 +10,7 @@ import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.SaveManager;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
+import com.backend.portalroshkabackend.tools.mapper.EmployeeMapper;
 import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,7 +37,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public Page<UserResponseDto> getAllEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAll(pageable);
 
-        return users.map(AutoMap::toUserResponseDto);
+        return users.map(EmployeeMapper::toUserResponseDto);
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +45,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public Page<UserResponseDto> getAllActiveEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.A, pageable);
 
-        return users.map(AutoMap::toUserResponseDto); // Retorna una lista de empleados activos (DTOs)
+        return users.map(EmployeeMapper::toUserResponseDto); // Retorna una lista de empleados activos (DTOs)
     }
 
     @Transactional(readOnly = true)
@@ -52,14 +53,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public Page<UserResponseDto> getAllInactiveEmployees(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.I, pageable);
 
-        return users.map(AutoMap::toUserResponseDto); // Retorna la lista de empleados inactivos
+        return users.map(EmployeeMapper::toUserResponseDto); // Retorna la lista de empleados inactivos
     }
 
     @Override
     public Page<UserResponseDto> getAllEmployeesByRol(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByRolAsc(pageable);
 
-        return users.map(AutoMap::toUserResponseDto);
+        return users.map(EmployeeMapper::toUserResponseDto);
     }
 
 
@@ -67,7 +68,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public Page<UserResponseDto> getAllEmployeesByPosition(Pageable pageable) {
         Page<Usuario> users = userRepository.findAllByOrderByCargoAsc(pageable);
 
-        return users.map(AutoMap::toUserResponseDto);
+        return users.map(EmployeeMapper::toUserResponseDto);
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +76,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public UserByIdResponseDto getEmployeeById(int id) {
         var user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)); //Lanza una excepcion personalizada
 
-        return AutoMap.toUserByIdDto(user);
+        return EmployeeMapper.toUserByIdDto(user);
 
     }
 
@@ -86,13 +87,13 @@ public class EmployeeServiceImpl implements IEmployeeService {
         employeeValidator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
         employeeValidator.validateUniqueEmail(insertDto.getCorreo(), null);
         employeeValidator.validateUniquePhone(insertDto.getTelefono(), null);
-        employeeValidator.validateRelatedEntities(insertDto.getRoles(), insertDto.getCargos());  // LLama al metodo que verifica si el rol/equipo o cargo asignado existen
+        employeeValidator.validateRelatedEntities(insertDto.getRol(), insertDto.getCargo());  // LLama al metodo que verifica si el rol/equipo o cargo asignado existen
 
-        Usuario user = AutoMap.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
+        Usuario user = EmployeeMapper.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
         Usuario savedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al guardar el usuario: ");
 
-        return AutoMap.toDefaultResponseDto(savedUser.getIdUsuario(), "Usuario creado con exito.");
+        return EmployeeMapper.toDefaultResponseDto(savedUser.getIdUsuario(), "Usuario creado con exito.");
 
     }
 
@@ -106,11 +107,11 @@ public class EmployeeServiceImpl implements IEmployeeService {
         employeeValidator.validateUniquePhone(updateDto.getTelefono(), id);
         employeeValidator.validateRelatedEntities(updateDto.getRoles(), updateDto.getCargos());
 
-        AutoMap.toUsuarioFromUpdateDto(user, updateDto);
+        EmployeeMapper.toUsuarioFromUpdateDto(user, updateDto);
 
         Usuario updatedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al actualizar el usuario: ");
 
-        return AutoMap.toDefaultResponseDto(updatedUser.getIdUsuario(), "Usuario actualizado con exito.");
+        return EmployeeMapper.toDefaultResponseDto(updatedUser.getIdUsuario(), "Usuario actualizado con exito.");
 
     }
 
@@ -127,7 +128,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         Usuario deletedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al eliminar el usuario: ");
 
-        return AutoMap.toDefaultResponseDto(deletedUser.getIdUsuario(), "Usuario eliminado con exito.");
+        return EmployeeMapper.toDefaultResponseDto(deletedUser.getIdUsuario(), "Usuario eliminado con exito.");
 
     }
 }

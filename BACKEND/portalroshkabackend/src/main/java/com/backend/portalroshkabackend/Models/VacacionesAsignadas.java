@@ -29,7 +29,7 @@ public class VacacionesAsignadas {
     @Column(name = "dias_utilizados", nullable = false)
     private Integer diasUtilizados;
 
-    @Column(name = "confirmacion_TH")
+    @Column(name = "confirmacion_th")
     private Boolean confirmacionTH = false;
 
     @Column(name = "fecha_creacion")

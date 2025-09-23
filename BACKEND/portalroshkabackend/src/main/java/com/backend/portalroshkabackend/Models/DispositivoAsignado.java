@@ -36,9 +36,6 @@ public class DispositivoAsignado {
     @Column(name = "fecha_devolucion")
     private LocalDate fechaDevolucion;
 
-    @Column(name = "fecha_creacion")
-    private LocalDate fechaCreacion;
-
     // Para enums PostgreSQL se debe especificar así y asegurar que los valores coinciden exactamente
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_asignacion", columnDefinition = "estado_asignacion_enum")

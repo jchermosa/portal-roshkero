@@ -25,7 +25,7 @@ public class ThSelfServiceImpl implements IThSelfService {
     private final TipoDispositivoRepository tipoDispositivoRepository;
     private final PermisosRepository permisosRepository;
     private final UserRepository userRepository;
-    private final SolicitudesTHRepository solicitudesTHRepository;
+    private final SolicitudRepository solicitudRepository;
 
     private final EmployeeValidator employeeValidator;
 
@@ -34,14 +34,14 @@ public class ThSelfServiceImpl implements IThSelfService {
                              TipoDispositivoRepository tipoDispositivoRepository,
                              PermisosRepository permisosRepository,
                              UserRepository userRepository,
-                             SolicitudesTHRepository solicitudesTHRepository,
+                             SolicitudRepository solicitudRepository,
                              EmployeeValidator employeeValidator
     ) {
         this.beneficiosRepository = beneficiosRepository;
         this.solicitudTHTipoRepository = solicitudTHTipoRepository;
         this.tipoDispositivoRepository = tipoDispositivoRepository;
         this.permisosRepository = permisosRepository;
-        this.solicitudesTHRepository = solicitudesTHRepository;
+        this.solicitudRepository = solicitudRepository;
         this.userRepository = userRepository;
 
         this.employeeValidator = employeeValidator;
@@ -86,7 +86,7 @@ public class ThSelfServiceImpl implements IThSelfService {
 
         System.out.println(solicitud.getFechaInicio());
 
-        SaveManager.saveEntity(() -> solicitudesTHRepository.save(solicitud), "Error al guardar la solicitud: ");
+        SaveManager.saveEntity(() -> solicitudRepository.save(solicitud), "Error al guardar la solicitud: ");
 
         RequestResponseDto responseDto = new RequestResponseDto();
         responseDto.setId(solicitud.getIdSolicitud());
@@ -99,11 +99,11 @@ public class ThSelfServiceImpl implements IThSelfService {
 
     @Override
     public RequestResponseDto updateRequest(int idSolicitud, UpdateSolicitudDto updateSolicitudDto) {
-        Solicitud request  = solicitudesTHRepository.findById(idSolicitud).orElseThrow(() -> new RequestNotFoundException(idSolicitud));
+        Solicitud request  = solicitudRepository.findById(idSolicitud).orElseThrow(() -> new RequestNotFoundException(idSolicitud));
 
         AutoMap.toSolicitudesThFromUpdateSolicitudDto(request, updateSolicitudDto);
 
-        SaveManager.saveEntity(() -> solicitudesTHRepository.save(request), "Error al actualizar la solicitud: ");
+        SaveManager.saveEntity(() -> solicitudRepository.save(request), "Error al actualizar la solicitud: ");
 
         RequestResponseDto responseDto = new RequestResponseDto();
         responseDto.setId(request.getIdSolicitud());
@@ -139,12 +139,12 @@ public class ThSelfServiceImpl implements IThSelfService {
     @Transactional(readOnly = true)
     @Override
     public Page<MisSolicitudesResponseDto> getAllSelfRequests(int idUsuario, Pageable pageable) {
-        return solicitudesTHRepository.findAllByUsuario_idUsuario(idUsuario, pageable).map(AutoMap::toMisSolicitudesResponseDto);
+        return solicitudRepository.findAllByUsuario_idUsuario(idUsuario, pageable).map(AutoMap::toMisSolicitudesResponseDto);
     }
 
     @Override
     public SolicitudEspecificaResponseDto getRequestById(int idUsuario ,int idSolicitud) {
-        Solicitud request = solicitudesTHRepository.findByUsuario_IdUsuarioAndIdSolicitud(idUsuario, idSolicitud);
+        Solicitud request = solicitudRepository.findByUsuario_IdUsuarioAndIdSolicitud(idUsuario, idSolicitud);
 
         if (request == null) throw new RequestNotFoundException(idSolicitud);
 

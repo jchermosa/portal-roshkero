@@ -8,6 +8,7 @@ import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.SaveManager;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
+import com.backend.portalroshkabackend.tools.mapper.RequestMapper;
 import com.backend.portalroshkabackend.tools.validator.RequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,16 +18,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RequestServiceImpl implements IRequestService{
-    private final SolicitudesTHRepository solicitudesTHRepository;
+    private final SolicitudRepository solicitudRepository;
 
     private final RequestValidator requestValidator;
 
     @Autowired
-    public RequestServiceImpl (SolicitudesTHRepository solicitudesTHRepository,
+    public RequestServiceImpl (SolicitudRepository solicitudRepository,
 
-                              RequestValidator requestValidator){
+                               RequestValidator requestValidator){
 
-        this.solicitudesTHRepository = solicitudesTHRepository;
+        this.solicitudRepository = solicitudRepository;
 
         this.requestValidator = requestValidator;
     }
@@ -40,38 +41,38 @@ public class RequestServiceImpl implements IRequestService{
 
     @Transactional(readOnly = true)
     @Override
-    public Page<SolicitudTHResponseDto> getByEstado(EstadoSolicitudEnum estado, Pageable pageable) {
-        Page<Solicitud> requestSorted = solicitudesTHRepository.findAllByEstado(estado, pageable);
+    public Page<SolicitudResponseDto> getByEstado(EstadoSolicitudEnum estado, Pageable pageable) {
+        Page<Solicitud> requestSorted = solicitudRepository.findAllByEstado(estado, pageable);
 
-        return requestSorted.map(AutoMap::toSolicitudTHResponseDto);
+        return requestSorted.map(RequestMapper::toSolicitudTHResponseDto);
     }
 
     @Transactional
     @Override
     public RequestResponseDto acceptRequest(int idRequest) {
-        Solicitud request = solicitudesTHRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
+        Solicitud request = solicitudRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
 
         requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitud());
 
         request.setEstado(EstadoSolicitudEnum.A);
 
-        Solicitud acceptedRequest = SaveManager.saveEntity( () -> solicitudesTHRepository.save(request), "Error al aceptar la solicitud: ");
+        Solicitud acceptedRequest = SaveManager.saveEntity( () -> solicitudRepository.save(request), "Error al aceptar la solicitud: ");
 
-        return AutoMap.toRequestResponseDto(acceptedRequest.getIdSolicitud(), "Solicitud aceptada.");
+        return RequestMapper.toRequestResponseDto(acceptedRequest.getIdSolicitud(), "Solicitud aceptada.");
     }
 
     @Transactional
     @Override
     public RequestResponseDto rejectRequest(int idRequest) {
-        Solicitud request = solicitudesTHRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
+        Solicitud request = solicitudRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
 
         requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitud());
 
         request.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
 
-        Solicitud rejectedRequest =  SaveManager.saveEntity( () -> solicitudesTHRepository.save(request), "Error al rechazar la solicitud: ");
+        Solicitud rejectedRequest =  SaveManager.saveEntity( () -> solicitudRepository.save(request), "Error al rechazar la solicitud: ");
 
-        return AutoMap.toRequestResponseDto(rejectedRequest.getIdSolicitud(), "Solicitud rechazada");
+        return RequestMapper.toRequestResponseDto(rejectedRequest.getIdSolicitud(), "Solicitud rechazada");
 
     }
 
