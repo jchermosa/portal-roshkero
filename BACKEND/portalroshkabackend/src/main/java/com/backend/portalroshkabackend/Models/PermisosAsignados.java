@@ -33,4 +33,8 @@ public class PermisosAsignados {
     @JoinColumn(name = "id_solicitud", nullable = false)
     private Solicitud solicitud;
 
+    @Column(name = "confirmacion_TH")
+    private Boolean confirmacionTH = false;
+    
+
 }

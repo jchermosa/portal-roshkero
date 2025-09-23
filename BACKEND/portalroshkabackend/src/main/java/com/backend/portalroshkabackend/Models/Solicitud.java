@@ -42,6 +42,10 @@ public class Solicitud {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", nullable = true)
+    private Usuario teamLeader;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_documento_adjunto")
     private DocumentoAdjunto documentoAdjunto;

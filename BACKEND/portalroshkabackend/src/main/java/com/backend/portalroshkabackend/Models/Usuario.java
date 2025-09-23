@@ -46,6 +46,11 @@ public class Usuario {
     @Column(name = "id_usuario")
     private Integer idUsuario;
     
+
+    @OneToMany
+    @JoinColumn(name = "id_lider")
+    private List<Solicitud>  listaSolicitudes = new ArrayList<>();
+
     @Column(name = "nombre", nullable = false)
     private String nombre;
     
