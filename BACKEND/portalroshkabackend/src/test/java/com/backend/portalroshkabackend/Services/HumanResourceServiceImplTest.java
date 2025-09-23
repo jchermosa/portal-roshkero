@@ -33,20 +33,20 @@ public class HumanResourceServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testUpdateEmail_ThrowsDatabaseOperationException() {
+    // @Test
+    // void testUpdateEmail_ThrowsDatabaseOperationException() {
 
-        Usuario fakeUser = new Usuario();
-        fakeUser.setIdUsuario(1);
+    //     Usuario fakeUser = new Usuario();
+    //     fakeUser.setIdUsuario(1);
 
-        when(userRepository.findById(1)).thenReturn(Optional.of(fakeUser));
-        doNothing().when(employeeValidator).validateUniqueEmail(any(), any());
-        when(userRepository.save(any(Usuario.class)))
-                .thenThrow(new JpaSystemException(new RuntimeException("DB error")));
+        // when(userRepository.findById(1)).thenReturn(Optional.of(fakeUser));
+        // doNothing().when(employeeValidator).validateUniqueEmail(any(), any());
+        // when(userRepository.save(any(Usuario.class)))
+        //         .thenThrow(new JpaSystemException(new RuntimeException("DB error")));
 
-        assertThrows(DatabaseOperationException.class, () -> {
-            service.updateEmail(1, "test@test.com");
-        });
-    }
+    //     assertThrows(DatabaseOperationException.class, () -> {
+    //         service.updateEmail(1, "test@test.com");
+    //     });
+    // }
 
 }

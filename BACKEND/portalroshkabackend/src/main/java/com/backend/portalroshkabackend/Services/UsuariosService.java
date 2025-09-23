@@ -1,6 +1,5 @@
 package com.backend.portalroshkabackend.Services;
 
-
 import com.backend.portalroshkabackend.DTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Models.Usuario;
@@ -18,35 +17,35 @@ public class UsuariosService {
     @Autowired
     UserRepository UsuarioRepository;
 
-    public List<Usuario> getUsuario(){
+    public List<Usuario> getUsuario() {
         return (List<Usuario>) UsuarioRepository.findAll();
     }
 
-    public Optional<Usuario> getUsuario(Integer id){
+    public Optional<Usuario> getUsuario(Integer id) {
         return UsuarioRepository.findById(id);
     }
 
-    public void saveUsuario(Usuario Usuario){
+    public void saveUsuario(Usuario Usuario) {
         UsuarioRepository.save(Usuario);
     }
 
-    public void delete(Integer id){
+    public void delete(Integer id) {
         UsuarioRepository.deleteById(id);
     }
-    
+
     public Usuario getUserByCorreo(String correo) {
         Optional<Usuario> usuario = UsuarioRepository.findByCorreo(correo);
         return usuario.orElse(null);
     }
 
-
-
     public UserDto getUsuarioActual() {
-        // Obtener el correo del usuario autenticado del 
+        // Obtener el correo del usuario autenticado del
         /*
-         * Spring Security identifica al usuario logueado mediante el contexto de seguridad. 
-         * Cuando un usuario inicia sesión correctamente (por ejemplo, usando JWT o sesión),
-         * Spring Security almacena la información del usuario autenticado en el objeto 
+         * Spring Security identifica al usuario logueado mediante el contexto de
+         * seguridad.
+         * Cuando un usuario inicia sesión correctamente (por ejemplo, usando JWT o
+         * sesión),
+         * Spring Security almacena la información del usuario autenticado en el objeto
          * SecurityContextHolder
          */
         System.out.println(" Se ejecuto la funcion getUsuarioActual()");
@@ -73,9 +72,11 @@ public class UsuariosService {
     public UserDto updateUsuarioActual(UserUpdateDto updateDto) {
         // Obtener el correo del usuario autenticado
         /*
-         * Spring Security identifica al usuario logueado mediante el contexto de seguridad. 
-         * Cuando un usuario inicia sesión correctamente (por ejemplo, usando JWT o sesión),
-         * Spring Security almacena la información del usuario autenticado en el objeto 
+         * Spring Security identifica al usuario logueado mediante el contexto de
+         * seguridad.
+         * Cuando un usuario inicia sesión correctamente (por ejemplo, usando JWT o
+         * sesión),
+         * Spring Security almacena la información del usuario autenticado en el objeto
          * SecurityContextHolder
          */
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -92,17 +93,20 @@ public class UsuariosService {
         }
 
         // Actualizar solo los campos permitidos para edición de un usuario
-        if (updateDto.getNombre() != null) usuario.setNombre(updateDto.getNombre());
-        if (updateDto.getApellido() != null) usuario.setApellido(updateDto.getApellido());
-        if (updateDto.getTelefono() != null) usuario.setTelefono(updateDto.getTelefono());
-        if (updateDto.getFechaNacimiento() != null) usuario.setFechaNacimiento(updateDto.getFechaNacimiento());
+        if (updateDto.getNombre() != null)
+            usuario.setNombre(updateDto.getNombre());
+        if (updateDto.getApellido() != null)
+            usuario.setApellido(updateDto.getApellido());
+        if (updateDto.getTelefono() != null)
+            usuario.setTelefono(updateDto.getTelefono());
+        if (updateDto.getFechaNacimiento() != null)
+            usuario.setFechaNacimiento(updateDto.getFechaNacimiento());
         // Agrega aquí otros campos segun futuros requerimientos
 
         UsuarioRepository.save(usuario);
 
         return mapUsuarioToDto(usuario);
     }
-
 
     private UserDto mapUsuarioToDto(Usuario usuario) {
     if (usuario == null) return null;
@@ -126,6 +130,5 @@ public class UsuariosService {
     dto.setRequiereCambioContrasena(usuario.getRequiereCambioContrasena());
     return dto;
     }
-
 
 }

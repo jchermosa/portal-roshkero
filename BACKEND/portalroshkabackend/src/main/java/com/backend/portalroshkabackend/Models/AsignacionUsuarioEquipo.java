@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Data
-@Table(name = "asignacion_usuario")
+@Table(name = "asignacion_usuario_equipo")
 public class AsignacionUsuarioEquipo {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_asignacion")
-    private Integer idAsignacionUsuario;
+    @Column(name = "id_asignacion_usuario_equipo")
+    private Integer idAsignacionUsuarioEquipo;
 
     @Column(name = "fecha_entrada")
     private LocalDate fechaEntrada;
