@@ -8,8 +8,6 @@ import java.util.List;
 import jakarta.validation.constraints.NotNull; // Для POST обязательных полей
 import lombok.Data;
 
-import com.backend.portalroshkabackend.Models.Clientes;
-import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 @Data
@@ -17,15 +15,12 @@ public class EquiposResponseDto {
 
     private Integer idEquipo;
     private UsuarioisResponseDto lider;
-    // private List<Tecnologias> tecnologias;
     private List<TecnologiasDto> tecnologias;
-    // private List<TecnologiasDto> tecnologias;
 
     private String nombre;
     private LocalDate fechaInicio;
     private LocalDate fechaLimite;
-    private Clientes cliente;
-    // private ClienteDTO cliente;
+    private ClientesResponseDto cliente;
     private LocalDateTime fechaCreacion;
     private EstadoActivoInactivo estado;
     private List<UsuarioisResponseDto> usuarios;

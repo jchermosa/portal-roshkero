@@ -12,12 +12,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.backend.portalroshkabackend.DTO.Operationes.ClientesResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
@@ -99,7 +101,13 @@ public class EquiposServiceImpl implements IEquiposService {
 
         EquiposResponseDto dto = new EquiposResponseDto();
         dto.setIdEquipo(e.getIdEquipo());
+        dto.setNombre(e.getNombre());
+        dto.setFechaInicio(e.getFechaInicio());
+        dto.setFechaLimite(e.getFechaLimite());
+        dto.setFechaCreacion(e.getFechaCreacion());
+        dto.setEstado(e.getEstado());
 
+        // --- Lider ---
         if (e.getLider() != null) {
             Usuario u = e.getLider();
             dto.setLider(new UsuarioisResponseDto(
@@ -110,23 +118,25 @@ public class EquiposServiceImpl implements IEquiposService {
                     u.getDisponibilidad()));
         }
 
-        dto.setNombre(e.getNombre());
-        dto.setFechaInicio(e.getFechaInicio());
-        dto.setFechaLimite(e.getFechaLimite());
-        dto.setCliente(e.getCliente());
-        dto.setFechaCreacion(e.getFechaCreacion());
-        dto.setEstado(e.getEstado());
+        // --- Cliente ---
+        if (e.getCliente() != null) {
+            dto.setCliente(new ClientesResponseDto(
+                    e.getCliente().getIdCliente(),
+                    e.getCliente().getNombre()));
+        }
 
+        // --- Tecnologias ---
         List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(e.getIdEquipo());
         List<TecnologiasDto> tecnologias = tecs.stream()
                 .map(te -> {
                     Tecnologias t = te.getTecnologia();
-                    return new TecnologiasDto(t.getIdTecnologia(), t.getNombre(), t.getDescripcion());
+                    return new TecnologiasDto(
+                            t.getIdTecnologia(),
+                            t.getNombre(),
+                            t.getDescripcion());
                 })
-        .toList();
-
+                .toList();
         dto.setTecnologias(tecnologias);
-
 
         // --- Users with porcentaje_trabajo ---
         List<AsignacionUsuarioEquipo> asignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(id);
@@ -140,10 +150,9 @@ public class EquiposServiceImpl implements IEquiposService {
                         asig.getFechaEntrada(),
                         asig.getFechaFin()))
                 .toList();
-
-        // --- Users Not in This Team
         dto.setUsuariosAsignacion(usuariosAsignacion);
 
+        // --- Users Not in This Team ---
         List<UsuarioisResponseDto> usuariosFueraEquipo = usuarioisRepository.findUsuariosNoEnEquipo(id)
                 .stream()
                 .map(u -> new UsuarioisResponseDto(
@@ -153,7 +162,6 @@ public class EquiposServiceImpl implements IEquiposService {
                         u.getCorreo(),
                         u.getDisponibilidad()))
                 .toList();
-
         dto.setUsuariosNoEnEquipo(usuariosFueraEquipo);
 
         return dto;
@@ -163,15 +171,34 @@ public class EquiposServiceImpl implements IEquiposService {
     // SE AGREGO EL SINCHRONIZED
     @Override
     public Page<EquiposResponseDto> getTeamsSorted(Pageable pageable, String sortBy) {
+        // Получаем Page<Equipos> с нужной сортировкой
         Function<Pageable, Page<Equipos>> func = sortingMap.getOrDefault(sortBy, sortingMap.get("default"));
         Page<Equipos> page = func.apply(pageable);
-        return page.map(this::mapToDto);
+
+        // Маппим контент в DTO
+        List<EquiposResponseDto> contentDto = page.getContent()
+                .stream()
+                .map(this::mapToDto)
+                .toList();
+
+        // Создаём новый PageImpl с DTO
+        return new PageImpl<>(
+                contentDto,
+                page.getPageable(),
+                page.getTotalElements());
     }
 
     // Map in DTO
     public EquiposResponseDto mapToDto(Equipos e) {
         EquiposResponseDto dto = new EquiposResponseDto();
         dto.setIdEquipo(e.getIdEquipo());
+        dto.setNombre(e.getNombre());
+        dto.setFechaInicio(e.getFechaInicio());
+        dto.setFechaLimite(e.getFechaLimite());
+        dto.setFechaCreacion(e.getFechaCreacion());
+        dto.setEstado(e.getEstado());
+
+        // Лидер
         if (e.getLider() != null) {
             Usuario u = e.getLider();
             dto.setLider(new UsuarioisResponseDto(
@@ -181,69 +208,26 @@ public class EquiposServiceImpl implements IEquiposService {
                     u.getCorreo(),
                     u.getDisponibilidad()));
         }
-        dto.setNombre(e.getNombre());
-        dto.setFechaInicio(e.getFechaInicio());
-        dto.setFechaLimite(e.getFechaLimite());
-        dto.setCliente(e.getCliente());
-        dto.setFechaCreacion(e.getFechaCreacion());
-        dto.setEstado(e.getEstado());
 
+        // Клиент
+        if (e.getCliente() != null) {
+            dto.setCliente(new ClientesResponseDto(
+                    e.getCliente().getIdCliente(),
+                    e.getCliente().getNombre()));
+        }
+
+        // Технологии
         List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(e.getIdEquipo());
         List<TecnologiasDto> tecnologias = tecs.stream()
                 .map(te -> {
                     Tecnologias t = te.getTecnologia();
                     return new TecnologiasDto(t.getIdTecnologia(), t.getNombre(), t.getDescripcion());
                 })
-        .toList();
-
+                .toList();
         dto.setTecnologias(tecnologias);
+
         return dto;
     }
-
-
-    //     public EquiposResponseDto mapToDto(Equipos e) {
-    //         EquiposResponseDto dto = new EquiposResponseDto();
-    //         dto.setIdEquipo(e.getIdEquipo());
-
-    //         if (e.getLider() != null) {
-    //             Usuario u = e.getLider();
-    //             dto.setLider(new UsuarioisResponseDto(
-    //                     u.getIdUsuario(),
-    //                     u.getNombre(),
-    //                     u.getApellido(),
-    //                     u.getCorreo(),
-    //                     u.getDisponibilidad()));
-    //         }
-
-    //         dto.setNombre(e.getNombre());
-    //         dto.setFechaInicio(e.getFechaInicio());
-    //         dto.setFechaLimite(e.getFechaLimite());
-
-    //         // ✅ convertir Cliente entity -> ClienteDto
-    //         if (e.getCliente() != null) {
-    //             dto.setCliente(new ClienteDTO(
-    //                 e.getCliente().getIdCliente(),
-    //                 e.getCliente().getNombre()
-    //             ));
-    //         }
-
-    //         dto.setFechaCreacion(e.getFechaCreacion());
-    //         dto.setEstado(e.getEstado());
-
-    //         // ✅ convertir Tecnologias entity -> TecnologiaDto
-    //         List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(e.getIdEquipo());
-    //         List<TecnologiasDto> tecnologias = tecs.stream()
-    //                 .map(te -> new TecnologiasDto(
-    //                     te.getTecnologia().getIdTecnologia(),
-    //                     te.getTecnologia().getNombre()
-    //                 ))
-    //                 .toList();
-
-    //         dto.setTecnologias(tecnologias);
-
-    //         return dto;
-    // }
-
 
     @Override
     public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
@@ -309,7 +293,8 @@ public class EquiposServiceImpl implements IEquiposService {
                 tecEquipo.setEquipo(savedEquipo);
                 tecEquipo.setTecnologia(tecnologia);
                 tecnologiasEquiposRepository.save(tecEquipo);
-                tecnologias.add(new TecnologiasDto(tecnologia.getIdTecnologia(), tecnologia.getNombre(), tecnologia.getDescripcion()));
+                tecnologias.add(new TecnologiasDto(tecnologia.getIdTecnologia(), tecnologia.getNombre(),
+                        tecnologia.getDescripcion()));
             }
         }
 
@@ -349,7 +334,11 @@ public class EquiposServiceImpl implements IEquiposService {
         EquiposResponseDto responseDto = new EquiposResponseDto();
         responseDto.setIdEquipo(savedEquipo.getIdEquipo());
         responseDto.setNombre(savedEquipo.getNombre());
-        responseDto.setCliente(savedEquipo.getCliente());
+        if (savedEquipo.getCliente() != null) {
+            responseDto.setCliente(new ClientesResponseDto(
+                    savedEquipo.getCliente().getIdCliente(),
+                    savedEquipo.getCliente().getNombre()));
+        }
         responseDto.setLider(liderDto);
         responseDto.setFechaInicio(savedEquipo.getFechaInicio());
         responseDto.setFechaLimite(savedEquipo.getFechaLimite());
@@ -465,7 +454,8 @@ public class EquiposServiceImpl implements IEquiposService {
                 savedEquipo.getLider().getCorreo(),
                 savedEquipo.getLider().getDisponibilidad());
 
-        List<TecnologiasDto> tecnologias = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(savedEquipo.getIdEquipo())
+        List<TecnologiasDto> tecnologias = tecnologiasEquiposRepository
+                .findAllByEquipo_IdEquipo(savedEquipo.getIdEquipo())
                 .stream().map(te -> {
                     Tecnologias t = te.getTecnologia();
                     return new TecnologiasDto(t.getIdTecnologia(), t.getNombre(), t.getDescripcion());
@@ -475,7 +465,11 @@ public class EquiposServiceImpl implements IEquiposService {
         EquiposResponseDto responseDto = new EquiposResponseDto();
         responseDto.setIdEquipo(savedEquipo.getIdEquipo());
         responseDto.setNombre(savedEquipo.getNombre());
-        responseDto.setCliente(savedEquipo.getCliente());
+        if (savedEquipo.getCliente() != null) {
+            responseDto.setCliente(new ClientesResponseDto(
+                    savedEquipo.getCliente().getIdCliente(),
+                    savedEquipo.getCliente().getNombre()));
+        }
         responseDto.setLider(liderDto);
         responseDto.setFechaInicio(savedEquipo.getFechaInicio());
         responseDto.setFechaLimite(savedEquipo.getFechaLimite());

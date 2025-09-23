@@ -1,12 +1,16 @@
 package com.backend.portalroshkabackend.Controllers.Operations;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,23 +43,30 @@ public class EquiposController {
 
     private final IMetaDatasService metaDatasService;
     private final IEquiposService equiposService;
-    private final IUsuarioisEquipoService usuariosEquipoService;
 
     @Autowired
-    public EquiposController(IEquiposService equiposService, IUsuarioisEquipoService usuariosEquipoService,
+    public EquiposController(IEquiposService equiposService,
+            IUsuarioisEquipoService usuariosEquipoService,
             IMetaDatasService metaDatasService) {
         this.equiposService = equiposService;
-        this.usuariosEquipoService = usuariosEquipoService;
         this.metaDatasService = metaDatasService;
     }
 
     @GetMapping("/teams")
-    public ResponseEntity<Page<EquiposResponseDto>> getAllTeams(
+    public ResponseEntity<Map<String, Object>> getAllTeams(
             @PageableDefault(size = 10, sort = "idEquipo", direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam(required = false, defaultValue = "default") String sortBy) {
 
-        Page<EquiposResponseDto> teams = equiposService.getTeamsSorted(pageable, sortBy);
-        return ResponseEntity.ok(teams);
+        Page<EquiposResponseDto> page = equiposService.getTeamsSorted(pageable, sortBy);
+
+        // Better json for front
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", page.getContent());
+        response.put("currentPage", page.getNumber());
+        response.put("totalItems", page.getTotalElements());
+        response.put("totalPages", page.getTotalPages());
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/team/{id}")
