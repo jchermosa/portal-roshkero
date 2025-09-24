@@ -1,92 +1,110 @@
-// package com.backend.portalroshkabackend.Services.SysAdmin;
+package com.backend.portalroshkabackend.Services.SysAdmin;
 
-// import java.util.Optional;
+import java.util.List;
+import java.util.Optional;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-// import com.backend.portalroshkabackend.DTO.DeviceRequestDto;
-// import com.backend.portalroshkabackend.Models.SolicitudDispositivos;
-// import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
-// import com.backend.portalroshkabackend.Repositories.DeviceRequestRepository;
+import com.backend.portalroshkabackend.DTO.DeviceRequestDto;
+import com.backend.portalroshkabackend.DTO.DispositivoDto;
+import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceTypeDTO;
+import com.backend.portalroshkabackend.Models.Dispositivo;
+import com.backend.portalroshkabackend.Models.Solicitud;
+import com.backend.portalroshkabackend.Models.TipoDispositivo;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.Repositories.DeviceRequestRepository;
+import com.backend.portalroshkabackend.Repositories.DeviceTypesRepository;
 
-// import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
-// @Service
-// public class DeviceRequest {
+@Service
+public class DeviceRequest {
 
-//     @Autowired
-//     private DeviceRequestRepository deviceRequestRepository;
+    @Autowired
+    private DeviceRequestRepository deviceRequestRepository;
 
-//     DeviceRequest(DeviceRequestRepository deviceRequestRepository) {
-//         this.deviceRequestRepository = deviceRequestRepository;
-//     }
+    @Autowired
+    private DeviceTypesRepository deviceTypesRepository;
+
+    @Autowired
+    private final DispositivoService dispositivoService;
+
+    DeviceRequest(DeviceRequestRepository deviceRequestRepository, DeviceTypesRepository deviceTypesRepository, DispositivoService dispositivoService) {
+        this.deviceRequestRepository = deviceRequestRepository;
+        this.deviceTypesRepository = deviceTypesRepository;
+        this.dispositivoService = dispositivoService;
+    }
 
 
-//     @Transactional
-//     public DeviceRequestDto acceptRequest(Integer idRequest){
-//         Optional<SolicitudDispositivos> solicitudOp = deviceRequestRepository.findById(idRequest);
-//         if (solicitudOp.isEmpty()) {
-//             throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
-//         }
+    @Transactional
+    public DeviceRequestDto acceptRequest(Integer idRequest){
+        Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
+        if (solicitudOp.isEmpty()) {
+            throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
+        }
 
-//         SolicitudDispositivos solicitud = solicitudOp.get();
+        Solicitud solicitud = solicitudOp.get();
 
-//         if(solicitud.getAprobacionAdmin()) {
-//             throw new RuntimeException("La solicitud ya ha sido aprobada.");
-//         }
+        if(solicitud.getEstado() != EstadoSolicitudEnum.P) {
+            throw new RuntimeException("La solicitud ya fue procesada.");
+        }
 
-//         if(solicitud.getEstado() != EstadoSolicitudEnum.P) {
-//             throw new RuntimeException("La solicitud ya fue procesada.");
-//         }
-//         solicitud.setAprobacionAdmin(true);
-//         solicitud.setEstado(EstadoSolicitudEnum.A);
-//         deviceRequestRepository.save(solicitud);
-//         return convertToDto(solicitud);
-//     }
+        solicitud.setEstado(EstadoSolicitudEnum.A);
+        deviceRequestRepository.save(solicitud);
+        return convertToDto(solicitud);
+    }
 
-//     @Transactional
-//     public DeviceRequestDto rejectRequest(Integer idRequest) {
-//         Optional<SolicitudDispositivos> solicitudOp = deviceRequestRepository.findById(idRequest);
-//         if (solicitudOp.isEmpty()) {
-//             throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
-//         }
+    @Transactional
+    public DeviceRequestDto rejectRequest(Integer idRequest) {
+        Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
+        if (solicitudOp.isEmpty()) {
+            throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
+        }
 
-//         SolicitudDispositivos solicitud = solicitudOp.get();
+        Solicitud solicitud = solicitudOp.get();
 
-//         if(solicitud.getAprobacionAdmin()) {
-//             throw new RuntimeException("La solicitud ya ha sido aprobada.");
-//         }
 
-//         if(solicitud.getEstado() != EstadoSolicitudEnum.P) {
-//             throw new RuntimeException("La solicitud ya fue procesada.");
-//         }
-//         solicitud.setAprobacionAdmin(false);
-//         solicitud.setEstado(EstadoSolicitudEnum.R);
-//         deviceRequestRepository.save(solicitud);
-//         return convertToDto(solicitud);
-//     }
+        if(solicitud.getEstado() != EstadoSolicitudEnum.P) {
+            throw new RuntimeException("La solicitud ya fue procesada.");
+        }
 
-//     /*
-//     @Transactional
-//     public DeviceRequestDto rejectRequest(int idRequest, @RequestBody DeviceRequestDto deviceRequestDto) {
-//         SolicitudDispositivos solicitud = deviceRequestRepository.findById(idRequest).orElse(null);
-//         solicitud.setAprobacionAdmin(deviceRequestDto.isAprobacionAdmin());
-//         solicitud.setEstado(deviceRequestDto.getEstado());
-//         deviceRequestRepository.save(solicitud);
-//         return deviceRequestDto;
-//     }
+        solicitud.setEstado(EstadoSolicitudEnum.R);
+        deviceRequestRepository.save(solicitud);
+        return convertToDto(solicitud);
+    }
 
-//     */
-//     private DeviceRequestDto convertToDto(SolicitudDispositivos solicitud) {
-//         DeviceRequestDto dto = new DeviceRequestDto();
-//         dto.setFechaInicio(solicitud.getFechaInicio());
-//         dto.setCantDias(solicitud.getCantidadDias());
-//         dto.setAprobacionAdmin(solicitud.getAprobacionAdmin());
-//         dto.setEstado(solicitud.getEstado());
-//         dto.setComentario(solicitud.getComentario());
-//         dto.setIdUsuario(solicitud.getUsuario().getIdUsuario());
-//         dto.setIdTipoDispositivo(solicitud.getTipoDispositivo().getIdTipoDispositivo());
-//         return dto;
-//     }
-// }
+    //  ====> DISPOSITIVOS <=====
+
+
+    /*
+    @Transactional
+    public DeviceRequestDto rejectRequest(int idRequest, @RequestBody DeviceRequestDto deviceRequestDto) {
+        SolicitudDispositivos solicitud = deviceRequestRepository.findById(idRequest).orElse(null);
+        solicitud.setAprobacionAdmin(deviceRequestDto.isAprobacionAdmin());
+        solicitud.setEstado(deviceRequestDto.getEstado());
+        deviceRequestRepository.save(solicitud);
+        return deviceRequestDto;
+    }
+
+    */
+    private DeviceRequestDto convertToDto(Solicitud solicitud) {
+        DeviceRequestDto dto = new DeviceRequestDto();
+        dto.setFechaInicio(solicitud.getFechaInicio());
+        dto.setCantDias(solicitud.getCantDias());
+        dto.setEstado(solicitud.getEstado());
+        dto.setComentario(solicitud.getComentario());
+        dto.setIdUsuario(solicitud.getUsuario().getIdUsuario());
+        dto.setIdTipoDispositivo(solicitud.getIdSolicitud());
+        return dto;
+    }
+
+
+    private DeviceTypeDTO convertToDto(TipoDispositivo tipoDispositivo) {
+        DeviceTypeDTO dto = new DeviceTypeDTO();
+        dto.setIdTipoDispositivo(tipoDispositivo.getIdTipoDispositivo());
+        dto.setNombre(tipoDispositivo.getNombre());
+        dto.setDetalle(tipoDispositivo.getDetalle());
+        return dto;
+    }
+}

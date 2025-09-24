@@ -1,10 +1,12 @@
 package com.backend.portalroshkabackend.Repositories;
 
-import com.backend.portalroshkabackend.Models.Solicitud;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface DeviceRequestRepository extends JpaRepository<Solicitud, Integer> {
+import com.backend.portalroshkabackend.Models.Dispositivo;
 
-}
+@Repository
+public interface DeviceRepository extends JpaRepository<Dispositivo, Integer> {
+
+    
+} 

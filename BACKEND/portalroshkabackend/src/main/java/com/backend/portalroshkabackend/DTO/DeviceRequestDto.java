@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.DTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.sql.Date;
+import java.time.LocalDate;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 
@@ -15,7 +16,7 @@ import jakarta.validation.constraints.Positive;
 public class DeviceRequestDto {
     @NotNull ( message = "La fecha de inicio es Obligatoria")
     @FutureOrPresent (message = "La fecha de inicio no puede ser en el pasado")
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     @NotNull ( message = "Se debe indicar la cantidad de dias solicitados")
     private int cantDias;
