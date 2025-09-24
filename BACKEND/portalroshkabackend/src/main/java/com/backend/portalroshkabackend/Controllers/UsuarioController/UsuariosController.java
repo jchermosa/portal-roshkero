@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
+// import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Services.UsuarioServicio.UserService;
 
@@ -42,11 +43,17 @@ public class UsuariosController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/solicitudes")
+    @GetMapping("/solicitudes") // Endpoint para obtener las solicitudes del usuario actual 
     public ResponseEntity<List<SolicitudUserDto>> getSolicitudesUsuarioActual() {
         List<SolicitudUserDto> solicitudes = userService.getSolicitudesUsuarioActual();
         return ResponseEntity.ok(solicitudes);
     }
+
+    // @PostMapping("/crear_permiso") // Endpoint para crear una nueva solicitud para el usuario actual
+    // public ResponseEntity<String> crearPermisoUsuarioActual(@RequestBody UserSolPermisoDto solPermisoDto) {
+    //     userService.crearPermisoUsuarioActual(solPermisoDto);
+    //     return ResponseEntity.status(201).body("Solicitud creada con éxito");
+    // }
 
     // Endpoints comentados para futuras implementaciones
     // @GetMapping("/vacaciones")

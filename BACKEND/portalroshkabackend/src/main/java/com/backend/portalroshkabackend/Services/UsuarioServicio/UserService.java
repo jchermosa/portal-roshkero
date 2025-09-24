@@ -3,11 +3,13 @@ package com.backend.portalroshkabackend.Services.UsuarioServicio;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
+// import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.AsigUsuarioEquipoRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.SolicitudesTHRepository;
@@ -152,6 +154,41 @@ public class UserService {
                 .map(this::mapSolicitudToDto)
                 .collect(Collectors.toList());
     }
+
+    // public void crearPermisoUsuarioActual(UserSolPermisoDto solPermisoDto) {
+    //     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    //     String correo;
+    //     if (principal instanceof UserDetails) {
+    //         correo = ((UserDetails) principal).getUsername();
+    //     } else {
+    //         correo = principal.toString();
+    //     }
+
+    //     Usuario usuario = getUserByCorreo(correo);
+    //     if (usuario == null) {
+    //         throw new RuntimeException("Usuario no encontrado");
+    //     }
+
+    //     Usuario lider = getUserByCorreo(correo);
+
+        
+    //     // Obtener la lista de equipos a los que esta asignado el usuario
+    //     List<AsignacionUsuarioEquipo> asignaciones = asignacionUsuarioRepository.findByUsuario(usuario);
+
+
+    //     Solicitud nuevaSolicitud = new Solicitud();
+    //     nuevaSolicitud.setUsuario(usuario);
+    //     nuevaSolicitud.setTipoSolicitud(SolicitudesEnum.PERMISO); // Asigna el tipo de solicitud correspondiente
+    //     nuevaSolicitud.setLider(lider);
+
+    //     nuevaSolicitud.setFechaInicio(solPermisoDto.getFecha_inicio());
+    //     nuevaSolicitud.setCantDias(solPermisoDto.getCant_dias());
+    //     nuevaSolicitud.setComentario(solPermisoDto.getComentario());
+    //     // Aquí puedes agregar más campos según lo que necesites
+
+    //     solicitudesTHRepository.save(nuevaSolicitud);
+
+    // }
 
     // Mapeo de Solicitud a SolicitudUserDto según el nuevo modelo
     private SolicitudUserDto mapSolicitudToDto(Solicitud solicitud) {
