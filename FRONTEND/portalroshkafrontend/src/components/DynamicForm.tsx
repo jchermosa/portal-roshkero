@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 export interface FormField {
   name: string;
   label: string;
-  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom" | "slider";
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom" | "slider" | "file";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
@@ -21,6 +21,10 @@ export interface FormField {
   min?: number;
   max?: number;
   step?: number;
+
+  // Props opcionales para file
+  accept?: string;
+  multiple?: boolean;
 }
 
 export interface FormSection {
@@ -239,19 +243,43 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             </div>
           );
 
-
-      // 🔒 Duplicado del case "custom" mantenido pero comentado para no romper el switch:
-      /*
-      case "custom":
-        if (field.render) {
-          return (
-            <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
-              {field.render()}
-            </div>
-          );
-        }
-        return null;
-      */
+         case "file":
+  return (
+    <div key={field.name} className="space-y-2">
+      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        {field.label}
+        {field.required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <input
+        type="file"
+        name={field.name}
+        accept={field.accept}
+        multiple={field.multiple}
+        disabled={isFieldDisabled}
+        onChange={(e) => {
+          const files = e.target.files;
+          let value: File | File[] | null = null;
+          if (files) {
+            value = field.multiple ? Array.from(files) : files[0];
+          }
+          setFormData((prev) => {
+            const next = { ...prev, [field.name]: value };
+            if (onChange) onChange(next);
+            return next;
+          });
+        }}
+        className={`w-full text-sm text-gray-700 dark:text-gray-200
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100
+                    ${isFieldDisabled ? "cursor-not-allowed opacity-60" : ""}`}
+      />
+      {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
+    </div>
+  );
+ 
 
       default:
         return (

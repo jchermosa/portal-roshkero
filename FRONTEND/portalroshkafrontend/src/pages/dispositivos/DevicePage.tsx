@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { tieneRol } from "../utils/permisos";
-import { Roles } from "../types/roles";
+import { useAuth } from "../../context/AuthContext";
+import { tieneRol } from "../../utils/permisos";
+import { Roles } from "../../types/roles";
 
-import type { DispositivoItem } from "../types";
-import { useDispositivos } from "../hooks/dispositivos/useDispositivos";
-import DataTable from "../components/DataTable";
-import PaginationFooter from "../components/PaginationFooter";
-import SelectDropdown from "../components/SelectDropdown";
-import IconButton from "../components/IconButton";
-import PageLayout from "../layouts/PageLayout";
-import { dispositivosColumns } from "../config/tables/dispositivoTableConfig";
+import type { DispositivoItem } from "../../types";
+import { useDispositivos } from "../../hooks/dispositivos/useDispositivos";
+import DataTable from "../../components/DataTable";
+import PaginationFooter from "../../components/PaginationFooter";
+import SelectDropdown from "../../components/SelectDropdown";
+import IconButton from "../../components/IconButton";
+import PageLayout from "../../layouts/PageLayout";
+import { dispositivosColumns } from "../../config/tables/dispositivoTableConfig";
 
 export default function DevicePage() {
   const { token, user } = useAuth();

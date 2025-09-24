@@ -1,0 +1,50 @@
+[
+  {
+    "id_solicitud": 1,
+    "id_usuario": 5,
+    "id_documento_adjunto": null,
+    "tipo_solicitud": "Dispositivo",
+    "comentario": "Solicitud de notebook para teletrabajo",
+    "estado": "Pendiente",
+    "fecha_inicio": "2025-09-01",
+    "cant_dias": null,
+    "fecha_fin": null,
+    "fecha_creacion": "2025-09-01T08:30:00Z"
+  },
+  {
+    "id_solicitud": 2,
+    "id_usuario": 7,
+    "id_documento_adjunto": null,
+    "tipo_solicitud": "Dispositivo",
+    "comentario": "Solicitud de celular corporativo",
+    "estado": "Aprobada",
+    "fecha_inicio": "2025-08-15",
+    "cant_dias": null,
+    "fecha_fin": null,
+    "fecha_creacion": "2025-08-15T09:00:00Z"
+  },
+  {
+    "id_solicitud": 3,
+    "id_usuario": 12,
+    "id_documento_adjunto": null,
+    "tipo_solicitud": "Dispositivo",
+    "comentario": "Solicitud de tablet para área comercial",
+    "estado": "Rechazada",
+    "fecha_inicio": "2025-07-20",
+    "cant_dias": null,
+    "fecha_fin": null,
+    "fecha_creacion": "2025-07-20T10:15:00Z"
+  },
+  {
+    "id_solicitud": 4,
+    "id_usuario": 20,
+    "id_documento_adjunto": null,
+    "tipo_solicitud": "Dispositivo",
+    "comentario": "Solicitud de PC de escritorio para oficina",
+    "estado": "Pendiente",
+    "fecha_inicio": "2025-09-10",
+    "cant_dias": null,
+    "fecha_fin": null,
+    "fecha_creacion": "2025-09-10T14:00:00Z"
+  }
+]
