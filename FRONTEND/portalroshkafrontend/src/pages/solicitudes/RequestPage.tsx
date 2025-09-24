@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import SelectDropdown from "../components/SelectDropdown";
-import DataTable from "../components/DataTable";
-import PaginationFooter from "../components/PaginationFooter";
-import IconButton from "../components/IconButton";
-import rawSolicitudes from "../data/mockSolicitudes.json";
-import type { SolicitudItem } from "../types";
+import SelectDropdown from "../../components/SelectDropdown";
+import DataTable from "../../components/DataTable";
+import PaginationFooter from "../../components/PaginationFooter";
+import IconButton from "../../components/IconButton";
+import rawSolicitudes from "../../data/mockSolicitudes.json";
+import type { SolicitudItem } from "../../types";
 
 
 
@@ -90,18 +90,6 @@ export default function RequestPage() {
   {
     key: "comentario",
     label: "Comentario",
-  },
-  {
-    key: "numero_aprobaciones",
-    label: "Aprobaciones",
-    render: (s: SolicitudItem) => {
-      const total = s.lideres.length;
-      return(
-      <span className="font-medium text-sm">
-        {s.numero_aprobaciones}/{total}
-      </span>
-      )
-    },
   },
   {
     key: "estado",
