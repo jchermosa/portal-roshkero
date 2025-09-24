@@ -8,22 +8,24 @@ import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
 import BeneficiosPage from "../pages/BenefitsPage";
-import UsuariosPage from "../pages/UserPage.tsx";
+import UsuariosPage from "../pages/user/UserPage.tsx";
 import VacacionesPage from "../pages/VacacionesPage";
 import RequestPage from "../pages/RequestPage";
 import Configuration from "../pages/Configuration.tsx";
-import UserFormPage from "../pages/UserFormPage";
+import UserFormPage from "../pages/user/UserFormPage.tsx";
 import UserSearchPage from "../pages/UserSearchPage.tsx";
 import RequestFormPage from "../pages/RequestFormPage";
 import SolicitudVacacionesPage from "../pages/SolicitudVacacionesPage";
 import BeneficioFormPage from "../pages/BenefitsFormPage.tsx";
-import RequestManagementPage from "../pages/RequestManagementPage.tsx";
-import RequestSearchPage from "../pages/RequestSearchPage.tsx";
+import RequestManagementPage from "../pages/solicitudes/RequestManagementPage.tsx";
+import RequestSearchPage from "../pages/solicitudes/RequestSearchPage.tsx";
 import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
 import DevicePage from "../pages/DevicePage.tsx";
 import DeviceFormPage from "../pages/DeviceFormPage.tsx";
-import DeviceAssignmentsPage from "../pages/DeviceAssignmentsPage.tsx";
+import DeviceAssignmentsPage from "../pages/dispositivos/DeviceAssignmentsPage.tsx";
 import DeviceAssignmentsFormPage from "../pages/DeviceAssignmentFormPage.tsx";
+import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
+import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -69,6 +71,9 @@ export default function AppRoutes() {
            <Route path="/dispositivos-asignados" element={<DeviceAssignmentsPage />} />
            <Route path="/dispositivos-asignados/nuevo" element={<DeviceAssignmentsFormPage />} />
            
+           {/* Solicitud Dispositivos */}
+           <Route path="/solicitud-dispositivo" element={<SolicitudDispositivoPage />} />
+           <Route path="/solicitud-dispositivo/nuevo" element={<SolicitudDispositivoFormPage />} />
 
           {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />

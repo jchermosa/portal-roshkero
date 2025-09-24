@@ -1,10 +1,10 @@
 // src/pages/DeviceAssignmentFormPage.tsx
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import DynamicForm from "../components/DynamicForm";
-import { useDispositivoAsignadoForm } from "../hooks/dispositivosAsignados/useDispositivoAsignadoForm";
-import FormLayout from "../layouts/FormLayout";
-import { buildDispositivoAsignadoSections } from "../config/forms/dispositivoAsignadoFormField";
+import { useAuth } from "../../context/AuthContext";
+import DynamicForm from "../../components/DynamicForm";
+import { useDispositivoAsignadoForm } from "../../hooks/dispositivosAsignados/useDispositivoAsignadoForm";
+import FormLayout from "../../layouts/FormLayout";
+import { buildDispositivoAsignadoSections } from "../../config/forms/dispositivoAsignadoFormField";
 
 export default function DeviceAssignmentFormPage() {
   const { token } = useAuth();

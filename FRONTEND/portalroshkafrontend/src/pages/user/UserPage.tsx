@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useUsuarios } from "../hooks/usuarios/useUsuarios";
-import { useCatalogosUsuarios } from "../hooks/catalogos/useCatalogosUsuarios";
-import { tieneRol } from "../utils/permisos";
-import { Roles } from "../types/roles";
+import { useAuth } from "../../context/AuthContext";
+import { useUsuarios } from "../../hooks/usuarios/useUsuarios";
+import { useCatalogosUsuarios } from "../../hooks/catalogos/useCatalogosUsuarios";
+import { tieneRol } from "../../utils/permisos";
+import { Roles } from "../../types/roles";
 
-import type { UsuarioItem } from "../types"; 
-import DataTable from "../components/DataTable";
-import PaginationFooter from "../components/PaginationFooter";
-import SelectDropdown from "../components/SelectDropdown";
-import IconButton from "../components/IconButton";
-import PageLayout from "../layouts/PageLayout";
-import { usuariosColumns } from "../config/tables/usuariosTableConfig";
+import type { UsuarioItem } from "../../types"; 
+import DataTable from "../../components/DataTable";
+import PaginationFooter from "../../components/PaginationFooter";
+import SelectDropdown from "../../components/SelectDropdown";
+import IconButton from "../../components/IconButton";
+import PageLayout from "../../layouts/PageLayout";
+import { usuariosColumns } from "../../config/tables/usuariosTableConfig";
 
 
 export default function UsuariosPage() {

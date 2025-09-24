@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import DynamicForm, { type FormSection } from "../components/DynamicForm";
-import FormLayout from "../layouts/FormLayout";
+import { useAuth } from "../../context/AuthContext";
+import DynamicForm, { type FormSection } from "../../components/DynamicForm";
+import FormLayout from "../../layouts/FormLayout";
 
 const DIAS_TOTALES = 30;
 

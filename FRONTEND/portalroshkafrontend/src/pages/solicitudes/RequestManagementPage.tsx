@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useSolicitudesTH, type SolicitudData } from "../hooks/solicitudes/useSolicitudesTH";
-import { useCatalogosSolicitudes } from "../hooks/catalogos/useCatalogosSolicitudes";
-import { tieneRol } from "../utils/permisos";
-import { Roles } from "../types/roles";
+import { useAuth } from "../../context/AuthContext";
+import { useSolicitudesTH, type SolicitudData } from "../../hooks/solicitudes/useSolicitudesTH";
+import { useCatalogosSolicitudes } from "../../hooks/catalogos/useCatalogosSolicitudes";
+import { tieneRol } from "../../utils/permisos";
+import { Roles } from "../../types/roles";
 
-import DataTable from "../components/DataTable";
-import PaginationFooter from "../components/PaginationFooter";
-import SelectDropdown from "../components/SelectDropdown";
-import IconButton from "../components/IconButton";
-import PageLayout from "../layouts/PageLayout";
+import DataTable from "../../components/DataTable";
+import PaginationFooter from "../../components/PaginationFooter";
+import SelectDropdown from "../../components/SelectDropdown";
+import IconButton from "../../components/IconButton";
+import PageLayout from "../../layouts/PageLayout";
 
 export default function SolicitudesTHPage() {
   const { token, user } = useAuth();
