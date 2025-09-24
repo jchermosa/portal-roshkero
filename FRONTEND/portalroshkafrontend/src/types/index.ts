@@ -120,3 +120,24 @@ export interface DispositivoAsignadoItem {
   estado_asignacion: string;
   observaciones?: string | null;
 }
+
+export interface SolicitudDispositivoItem {
+  id_solicitud: number;
+  id_usuario: number;
+  id_documento_adjunto?: number | null;
+  tipo_solicitud: "Dispositivo"; // restringido
+  comentario?: string;
+  estado: string; // enum estado_solicitud_enum
+  fecha_inicio: string;
+  cant_dias?: number | null;
+  fecha_fin?: string | null;
+  fecha_creacion: string;
+}
+
+
+export interface TipoDispositivoItem {
+  id_tipo_dispositivo: number;
+  nombre: string;
+  detalle: string;
+  fecha_creacion: string;
+}
