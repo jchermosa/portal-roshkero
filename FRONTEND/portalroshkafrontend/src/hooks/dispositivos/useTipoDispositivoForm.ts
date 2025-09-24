@@ -8,8 +8,9 @@ import {
   deleteTipoDispositivo,
 } from "../../services/TipoDispositivoService";
 
-export function useTipoDispositivoForm(token: string | null, id?: number) {
-  const isEditing = !!id;
+export function useTipoDispositivoForm(token: string | null, id?: number | string) {
+  const numericId = typeof id === "string" ? Number(id) : id;
+  const isEditing = !!numericId;
 
   const [data, setData] = useState<Partial<TipoDispositivoItem>>({
     nombre: "",
@@ -20,20 +21,22 @@ export function useTipoDispositivoForm(token: string | null, id?: number) {
 
   // cargar si es edición
   useEffect(() => {
-    if (!token || !isEditing || !id) return;
+    if (!token || !isEditing || !numericId) return;
+
     setLoading(true);
-    getTipoDispositivoById(token, id)
+    getTipoDispositivoById(token, numericId)
       .then(setData)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [token, id, isEditing]);
+  }, [token, numericId, isEditing]);
 
   // crear o actualizar
   const handleSubmit = async (formData: Partial<TipoDispositivoItem>) => {
     if (!token) return;
+
     try {
-      if (isEditing && id) {
-        await updateTipoDispositivo(token, id, formData);
+      if (isEditing && numericId) {
+        await updateTipoDispositivo(token, numericId, formData);
       } else {
         await createTipoDispositivo(token, formData);
       }
@@ -45,9 +48,10 @@ export function useTipoDispositivoForm(token: string | null, id?: number) {
 
   // eliminar
   const handleDelete = async () => {
-    if (!token || !id) return;
+    if (!token || !numericId) return;
+
     try {
-      await deleteTipoDispositivo(token, id);
+      await deleteTipoDispositivo(token, numericId);
     } catch (err: any) {
       setError(err.message || "Error al eliminar tipo de dispositivo");
       throw err;
