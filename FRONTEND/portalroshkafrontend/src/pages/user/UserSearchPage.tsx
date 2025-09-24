@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { getUsuarioByCedula } from "../services/UserService";
-import heroBg from "../assets/ilustracion-herov3.svg";
+import { useAuth } from "../../context/AuthContext";
+import { getUsuarioByCedula } from "../../services/UserService";
+import heroBg from "../../assets/ilustracion-herov3.svg";
 
 export default function UserSearchPage() {
   const { token } = useAuth();
