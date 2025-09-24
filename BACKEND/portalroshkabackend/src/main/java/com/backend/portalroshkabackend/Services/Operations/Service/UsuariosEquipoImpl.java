@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,7 +135,7 @@ public class UsuariosEquipoImpl implements IUsuarioisEquipoService {
                 asignacion.setFechaEntrada(requestDto.getFechaEntrada());
                 asignacion.setFechaFin(requestDto.getFechaFin());
                 asignacion.setPorcentajeTrabajo(porcentajeAsignado);
-                asignacion.setFechaCreacion(LocalDate.now());
+                asignacion.setFechaCreacion(LocalDateTime.now());
 
                 asignacionUsuarioRepository.save(asignacion);
 

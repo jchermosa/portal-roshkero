@@ -230,125 +230,112 @@ public class EquiposServiceImpl implements IEquiposService {
 
     @Override
     public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
-
-        // --- Check name Team ---
-        List<Equipos> existentes = equiposRepository.findAllByNombre(requestDto.getNombre().trim());
-        if (!existentes.isEmpty()) {
+        // --- Check name ---
+        if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
         }
 
         // --- Check Leader ---
         Usuario lider = null;
         if (requestDto.getIdLider() != null) {
-            lider = usuarioisRepository.findById(requestDto.getIdLider())
-                    .orElse(null);
+            lider = usuarioisRepository.findById(requestDto.getIdLider()).orElse(null);
         }
 
-        // --- Check Clients ---
+        // --- Check Client ---
         Clientes cliente = Optional.ofNullable(requestDto.getIdCliente())
                 .flatMap(clientesRepository::findById)
                 .orElse(null);
 
-        // --- Check Users ---
+        // --- Check Users (validate before creating team) ---
+        Map<Integer, Usuario> usuariosValidados = new HashMap<>();
         if (requestDto.getUsuarios() != null) {
             for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
                 Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
                         .orElseThrow(() -> new RuntimeException("Usuario not found: " + uDto.getIdUsuario()));
 
                 if (uDto.getPorcentajeTrabajo() == null) {
-                    throw new RuntimeException("PorcentajeTrabajo obligatorio para usuario " + usuario.getIdUsuario());
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "PorcentajeTrabajo obligatorio para usuario " + usuario.getIdUsuario());
+                }
+
+                if (uDto.getFechaEntrada() == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "FechaEntrada obligatoria para usuario " + usuario.getIdUsuario());
                 }
 
                 if (usuario.getDisponibilidad() == null || usuario.getDisponibilidad() < uDto.getPorcentajeTrabajo()) {
-                    throw new RuntimeException(
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Usuario " + usuario.getIdUsuario() + " no tiene suficiente disponibilidad");
                 }
+
+                usuariosValidados.put(usuario.getIdUsuario(), usuario);
             }
         }
 
         // --- Create team ---
         Equipos equipo = new Equipos();
-        equipo.setNombre(requestDto.getNombre());
+        equipo.setNombre(requestDto.getNombre().trim());
         equipo.setLider(lider);
-        equipo.setFechaInicio(requestDto.getFechaInicio());
-        if (requestDto.getFechaLimite() != null) {
-            equipo.setFechaLimite(requestDto.getFechaLimite());
-        } else {
-            equipo.setFechaLimite(null);
-        }
         equipo.setCliente(cliente);
+        equipo.setFechaInicio(requestDto.getFechaInicio());
+        equipo.setFechaLimite(requestDto.getFechaLimite()); // может быть null
         equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
         equipo.setFechaCreacion(LocalDateTime.now());
 
         Equipos savedEquipo = equiposRepository.save(equipo);
 
-        // --- DTO lider ---
-        UsuarioisResponseDto liderDto = null;
-        if (lider != null) {
-            liderDto = new UsuarioisResponseDto(
-                    lider.getIdUsuario(),
-                    lider.getNombre(),
-                    lider.getApellido(),
-                    lider.getCorreo(),
-                    lider.getDisponibilidad());
-        }
+        // --- DTO Lider ---
+        UsuarioisResponseDto liderDto = Optional.ofNullable(lider)
+                .map(l -> new UsuarioisResponseDto(l.getIdUsuario(), l.getNombre(), l.getApellido(),
+                        l.getCorreo(), l.getDisponibilidad()))
+                .orElse(null);
 
         // --- Tech ---
         List<TecnologiasDto> tecnologias = new ArrayList<>();
         if (requestDto.getIdTecnologias() != null) {
             for (Integer idTec : requestDto.getIdTecnologias()) {
                 Tecnologias tecnologia = tecnologiasRepository.findByIdTecnologia(idTec);
-
                 TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
                 tecEquipo.setEquipo(savedEquipo);
                 tecEquipo.setTecnologia(tecnologia);
                 tecnologiasEquiposRepository.save(tecEquipo);
-                tecnologias.add(new TecnologiasDto(tecnologia.getIdTecnologia(), tecnologia.getNombre(),
-                        tecnologia.getDescripcion()));
+                tecnologias.add(new TecnologiasDto(tecnologia.getIdTecnologia(),
+                        tecnologia.getNombre(), tecnologia.getDescripcion()));
             }
         }
 
-        // --- Put users in team ---
+        // --- Assign Users ---
         List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
         if (requestDto.getUsuarios() != null) {
             for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
-                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario()).get();
+                Usuario usuario = usuariosValidados.get(uDto.getIdUsuario());
 
-                // - disponibilidad from user
                 usuario.setDisponibilidad(usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue());
                 usuarioisRepository.save(usuario);
 
-                // Save in asignacion_usuario_equipo
                 AsignacionUsuarioEquipo asignacion = new AsignacionUsuarioEquipo();
                 asignacion.setEquipo(savedEquipo);
                 asignacion.setUsuario(usuario);
+                asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
                 asignacion.setFechaEntrada(uDto.getFechaEntrada());
                 asignacion.setFechaFin(uDto.getFechaFin());
-                asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
-                asignacion.setFechaCreacion(LocalDate.now());
+                asignacion.setFechaCreacion(LocalDateTime.now());
                 asignacionUsuarioRepository.save(asignacion);
 
-                // DTO for response
                 usuariosDto.add(new UsuarioAsignacionDto(
-                        usuario.getIdUsuario(),
-                        usuario.getNombre(),
-                        usuario.getApellido(),
-                        usuario.getCorreo(),
-                        uDto.getPorcentajeTrabajo(),
-                        uDto.getFechaEntrada(),
-                        uDto.getFechaFin()));
+                        usuario.getIdUsuario(), usuario.getNombre(), usuario.getApellido(),
+                        usuario.getCorreo(), uDto.getPorcentajeTrabajo(),
+                        uDto.getFechaEntrada(), uDto.getFechaFin()));
             }
         }
 
-        // --- Final answer for check if its work ---
+        // --- Final DTO ---
         EquiposResponseDto responseDto = new EquiposResponseDto();
         responseDto.setIdEquipo(savedEquipo.getIdEquipo());
         responseDto.setNombre(savedEquipo.getNombre());
-        if (savedEquipo.getCliente() != null) {
-            responseDto.setCliente(new ClientesResponseDto(
-                    savedEquipo.getCliente().getIdCliente(),
-                    savedEquipo.getCliente().getNombre()));
-        }
+        responseDto.setCliente(Optional.ofNullable(savedEquipo.getCliente())
+                .map(c -> new ClientesResponseDto(c.getIdCliente(), c.getNombre()))
+                .orElse(null));
         responseDto.setLider(liderDto);
         responseDto.setFechaInicio(savedEquipo.getFechaInicio());
         responseDto.setFechaLimite(savedEquipo.getFechaLimite());
@@ -366,7 +353,7 @@ public class EquiposServiceImpl implements IEquiposService {
         Equipos equipo = equiposRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
-        // --- updates fields ---
+        // --- update nombre ---
         if (requestDto.getNombre() != null && !requestDto.getNombre().trim().isEmpty() &&
                 !equipo.getNombre().equals(requestDto.getNombre().trim())) {
             if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
@@ -375,7 +362,7 @@ public class EquiposServiceImpl implements IEquiposService {
             equipo.setNombre(requestDto.getNombre().trim());
         }
 
-        // --- Update lider ---
+        // --- update lider ---
         if (requestDto.getIdLider() != null) {
             Usuario nuevoLider = usuarioService.getUsuarioById(requestDto.getIdLider());
             equipo.setLider(nuevoLider);
@@ -383,7 +370,7 @@ public class EquiposServiceImpl implements IEquiposService {
             equipo.setLider(null);
         }
 
-        // --- Update client ---
+        // --- update cliente ---
         if (requestDto.getIdCliente() != null) {
             Clientes nuevoCliente = clientesRepository.findById(requestDto.getIdCliente())
                     .orElseThrow(() -> new RuntimeException("Cliente not found"));
@@ -392,25 +379,21 @@ public class EquiposServiceImpl implements IEquiposService {
             equipo.setCliente(null);
         }
 
-        // --- Update status and dates ---
+        // --- update estado y fechas ---
         Optional.ofNullable(requestDto.getFechaInicio()).ifPresent(equipo::setFechaInicio);
-        // --- Update fecha limite ---
-        if (requestDto.getFechaLimite() != null) {
-            equipo.setFechaLimite(requestDto.getFechaLimite());
-        } else {
-            equipo.setFechaLimite(null);
-        }
-        Optional.ofNullable(requestDto.getEstado()).ifPresent(e -> equipo.setEstado(EstadoActivoInactivo.valueOf(e)));
+        equipo.setFechaLimite(requestDto.getFechaLimite()); // puede ser null
+        Optional.ofNullable(requestDto.getEstado())
+                .ifPresent(e -> equipo.setEstado(EstadoActivoInactivo.valueOf(e)));
 
-        // --- Updates tec ---
+        // --- update tecnologias ---
         if (requestDto.getIdTecnologias() != null) {
             tecnologiaService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
         }
 
-        // ---save chanches in team ---
+        // --- save cambios básicos ---
         equiposRepository.save(equipo);
 
-        // --- Update membrers ---
+        // --- update usuarios asignados ---
         Map<Integer, AsignacionUsuarioEquipo> actualesMap = asignacionUsuarioRepository
                 .findAllByEquipo_IdEquipo(id)
                 .stream()
@@ -420,7 +403,19 @@ public class EquiposServiceImpl implements IEquiposService {
         if (requestDto.getUsuarios() != null) {
             for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
                 Usuario usuario = usuarioService.getUsuarioById(uDto.getIdUsuario());
-                float viejoPorcentaje = actualesMap.getOrDefault(usuario.getIdUsuario(), new AsignacionUsuarioEquipo())
+
+                // --- validaciones obligatorias ---
+                if (uDto.getPorcentajeTrabajo() == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "PorcentajeTrabajo obligatorio para usuario " + usuario.getIdUsuario());
+                }
+                if (uDto.getFechaEntrada() == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "FechaEntrada obligatoria para usuario " + usuario.getIdUsuario());
+                }
+
+                float viejoPorcentaje = actualesMap
+                        .getOrDefault(usuario.getIdUsuario(), new AsignacionUsuarioEquipo())
                         .getPorcentajeTrabajo();
                 float delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
                 usuarioService.ajustarDisponibilidadConDelta(usuario, delta);
@@ -438,13 +433,13 @@ public class EquiposServiceImpl implements IEquiposService {
                     nueva.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
                     nueva.setFechaEntrada(uDto.getFechaEntrada());
                     nueva.setFechaFin(uDto.getFechaFin());
-                    nueva.setFechaCreacion(LocalDate.now());
+                    nueva.setFechaCreacion(LocalDateTime.now());
                     asignacionUsuarioRepository.save(nueva);
                 }
                 usuariosDto.add(uDto);
             }
 
-            // Delete users, which dont work
+            // --- eliminar usuarios que ya no están asignados ---
             for (AsignacionUsuarioEquipo asignacion : actualesMap.values()) {
                 if (requestDto.getUsuarios().stream()
                         .noneMatch(u -> u.getIdUsuario().equals(asignacion.getUsuario().getIdUsuario()))) {
@@ -456,10 +451,10 @@ public class EquiposServiceImpl implements IEquiposService {
             }
         }
 
-        // --- Form dto for send ---
+        // --- form response dto ---
         UsuarioisResponseDto liderDto = Optional.ofNullable(equipo.getLider())
-                .map(l -> new UsuarioisResponseDto(l.getIdUsuario(), l.getNombre(), l.getApellido(), l.getCorreo(),
-                        l.getDisponibilidad()))
+                .map(l -> new UsuarioisResponseDto(l.getIdUsuario(), l.getNombre(), l.getApellido(),
+                        l.getCorreo(), l.getDisponibilidad()))
                 .orElse(null);
 
         List<TecnologiasDto> tecnologias = tecnologiasEquiposRepository

@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.DTO.Operationes.Metadatas;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
@@ -23,5 +24,5 @@ public class UsuariosEquipoResponseDto {
 
     private Equipos equipos;
 
-    private LocalDate fechaCreacion;
+    private LocalDateTime fechaCreacion;
 }

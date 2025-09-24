@@ -3,6 +3,8 @@ package com.backend.portalroshkabackend.DTO.Operationes;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.Usuario;
@@ -16,7 +18,7 @@ public class AsignacionResponseDto {
     private Usuario idUsuario; 
     private Tecnologias idTecnologia;
     private Equipos equipo;
-    private LocalDate fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     public AsignacionResponseDto(){
         
