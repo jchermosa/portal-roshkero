@@ -31,9 +31,6 @@ public class UserInsertDto {
 
     private Roles rol;
 
-    @NotBlank(message = "La contraseña es obligatoria")
-    private String contrasena;
-
     @PastOrPresent(message = "La fecha de ingreso no puede ser futura")
     private LocalDate fechaIngreso;
 

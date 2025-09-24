@@ -32,6 +32,16 @@ public class EmployeeController {
      }
 
     // ----------------- Users -----------------
+    @PostMapping("/th/users/{id}/resetpassword")
+    public ResponseEntity<DefaultResponseDto> resetUserPassword(
+            @PathVariable int id
+    ){
+        DefaultResponseDto response = employeeService.resetUserPassword(id);
+
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping("/th/users")
     public ResponseEntity<?> getAllEmployees(
             @RequestParam(value = "sortBy", required = false) String sortBy,

@@ -15,6 +15,7 @@ import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,20 @@ public class EmployeeServiceImpl implements IEmployeeService {
         this.userRepository = userRepository;
 
         this.employeeValidator = employeeValidator;
+    }
+
+    @Override
+    public DefaultResponseDto resetUserPassword(int id) {
+        Usuario user = userRepository.findById(id).orElseThrow( () -> new UserNotFoundException(id));
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        user.setContrasena(encoder.encode(user.getNroCedula()));
+        user.setRequiereCambioContrasena(true);
+
+        Usuario savedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al restablecer la contraseña.");
+
+        return EmployeeMapper.toDefaultResponseDto(savedUser.getIdUsuario(), "Contraseña restablecida.");
     }
 
     @Transactional(readOnly = true)

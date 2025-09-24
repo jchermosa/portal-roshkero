@@ -6,13 +6,14 @@ import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
 import com.backend.portalroshkabackend.Models.Usuario;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 
-// TODO Endopoint reestablecer contrasena (hashear la contrasena al guardar, requiereCambioContrasena en true)
-
-
 public class EmployeeMapper {
+
+    // ------ ENTITY TO DTO ------
+
     public static DefaultResponseDto toDefaultResponseDto(Integer idUsuario, String message){
         DefaultResponseDto dto = new DefaultResponseDto();
 
@@ -59,6 +60,9 @@ public class EmployeeMapper {
 
     public static Usuario toUsuarioFromInsertDto(UserInsertDto insertDto){
         Usuario user = new Usuario();
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
         user.setNombre(insertDto.getNombre());
         user.setApellido(insertDto.getApellido());
         user.setNroCedula(insertDto.getNroCedula());
@@ -66,7 +70,7 @@ public class EmployeeMapper {
         user.setRol(insertDto.getRol());
         user.setFechaIngreso(insertDto.getFechaIngreso());
         user.setEstado(insertDto.getEstado());
-        user.setContrasena(insertDto.getContrasena());
+        user.setContrasena(encoder.encode(insertDto.getNroCedula()));
         user.setTelefono(insertDto.getTelefono());
         user.setCargo(insertDto.getCargo());
         user.setFechaNacimiento(insertDto.getFechaNacimiento());

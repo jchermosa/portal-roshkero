@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface IEmployeeService {
+    DefaultResponseDto resetUserPassword(int id);
     Page<UserResponseDto> getAllEmployees(Pageable pageable);
     Page<UserResponseDto> getAllActiveEmployees(Pageable pageable);
     Page<UserResponseDto> getAllInactiveEmployees(Pageable pageable);
