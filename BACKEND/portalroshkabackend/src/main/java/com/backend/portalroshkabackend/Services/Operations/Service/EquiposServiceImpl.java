@@ -245,8 +245,9 @@ public class EquiposServiceImpl implements IEquiposService {
         }
 
         // --- Check Clients ---
-        Clientes cliente = clientesRepository.findById(requestDto.getIdCliente())
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+        Clientes cliente = Optional.ofNullable(requestDto.getIdCliente())
+                .flatMap(clientesRepository::findById)
+                .orElse(null);
 
         // --- Check Users ---
         if (requestDto.getUsuarios() != null) {
@@ -270,7 +271,11 @@ public class EquiposServiceImpl implements IEquiposService {
         equipo.setNombre(requestDto.getNombre());
         equipo.setLider(lider);
         equipo.setFechaInicio(requestDto.getFechaInicio());
-        equipo.setFechaLimite(requestDto.getFechaLimite());
+        if (requestDto.getFechaLimite() != null) {
+            equipo.setFechaLimite(requestDto.getFechaLimite());
+        } else {
+            equipo.setFechaLimite(null);
+        }
         equipo.setCliente(cliente);
         equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
         equipo.setFechaCreacion(LocalDateTime.now());
@@ -378,18 +383,23 @@ public class EquiposServiceImpl implements IEquiposService {
             equipo.setLider(null);
         }
 
-        // --- Update clients ---
-        if (requestDto.getIdCliente() != null &&
-                (equipo.getCliente() == null
-                        || !equipo.getCliente().getIdCliente().equals(requestDto.getIdCliente()))) {
+        // --- Update client ---
+        if (requestDto.getIdCliente() != null) {
             Clientes nuevoCliente = clientesRepository.findById(requestDto.getIdCliente())
                     .orElseThrow(() -> new RuntimeException("Cliente not found"));
             equipo.setCliente(nuevoCliente);
+        } else {
+            equipo.setCliente(null);
         }
 
         // --- Update status and dates ---
         Optional.ofNullable(requestDto.getFechaInicio()).ifPresent(equipo::setFechaInicio);
-        Optional.ofNullable(requestDto.getFechaLimite()).ifPresent(equipo::setFechaLimite);
+        // --- Update fecha limite ---
+        if (requestDto.getFechaLimite() != null) {
+            equipo.setFechaLimite(requestDto.getFechaLimite());
+        } else {
+            equipo.setFechaLimite(null);
+        }
         Optional.ofNullable(requestDto.getEstado()).ifPresent(e -> equipo.setEstado(EstadoActivoInactivo.valueOf(e)));
 
         // --- Updates tec ---
@@ -477,7 +487,7 @@ public class EquiposServiceImpl implements IEquiposService {
 
         return responseDto;
     }
-    
+
     @Override
     public void deleteTeam(int id_equipo) {
         Equipos equipo = equiposRepository.findById(id_equipo)
