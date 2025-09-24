@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.MetaDatasDto;
-import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.TecnologiasResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.Tecnologias.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
@@ -47,7 +47,7 @@ public class MetaDatasServiceImpl implements IMetaDatasService {
                                 .map(t -> new TecnologiasResponseDto(
                                                 t.getIdTecnologia(),
                                                 t.getNombre(),
-                                                t.getDescripcion()))
+                                                t.getDescripcion(), null))
                                 .toList();
 
                 List<UsuarioisResponseDto> teamLeaders = userRepository.findAllByIdRolId(idTeamLeader)

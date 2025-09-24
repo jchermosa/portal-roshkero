@@ -20,7 +20,6 @@ public class EquiposRequestDto {
 
     private Integer idEquipo;
 
-    @NotNull
     private Integer idLider;
 
     @NotBlank(message = "El nombre no puede estar vacio")
