@@ -40,18 +40,18 @@ export interface SolicitudBase {
   id_usuario: number;
   nombre: string;
   apellido: string;
-  id_solicitud_tipo: number;
-  tipo: { id: number; nombre: string };
+  tipo_solicitud: "PERMISO" | "BENEFICIO";
+  subtipo: { id: number; nombre: string };
   comentario?: string;
   estado: "P" | "A" | "R"; // Pendiente, Aprobada, Rechazada
 }
 
 // Solicitud de permisos
 export interface SolicitudPermiso extends SolicitudBase {
+  lider: { id: number; nombre: string; apellido: string };
   cantidad_dias: number;
   fecha_inicio: string;
   fecha_fin: string;
-  numero_aprobaciones: number;
 }
 
 // Solicitud de beneficios (solo tiene lo de base, sin extras)

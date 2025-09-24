@@ -1,0 +1,32 @@
+[
+  {
+    "id": 201,
+    "id_usuario": 1,
+    "nombre": "Pedro",
+    "apellido": "Martínez",
+    "tipo_solicitud": "BENEFICIO",
+    "subtipo": { "id": 1, "nombre": "Gimnasio" },
+    "comentario": "Quiero acceder al gimnasio corporativo",
+    "estado": "P"
+  },
+  {
+    "id": 202,
+    "id_usuario": 4,
+    "nombre": "Carla",
+    "apellido": "Domínguez",
+    "tipo_solicitud": "BENEFICIO",
+    "subtipo": { "id": 2, "nombre": "Nutricionista" },
+    "comentario": "Solicito sesiones de nutricionista",
+    "estado": "A"
+  },
+  {
+    "id": 203,
+    "id_usuario": 5,
+    "nombre": "Jorge",
+    "apellido": "Cáceres",
+    "tipo_solicitud": "BENEFICIO",
+    "subtipo": { "id": 3, "nombre": "Transporte" },
+    "comentario": "Apoyo en gastos de transporte",
+    "estado": "R"
+  }
+]

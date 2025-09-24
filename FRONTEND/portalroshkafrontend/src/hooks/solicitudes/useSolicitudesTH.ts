@@ -1,10 +1,10 @@
 // src/hooks/solicitudes/useSolicitudesTH.ts
 import { useState, useEffect } from "react";
-import { getSolicitudesTH } from "../../services/RequestTHService";
+import { getSolicitudesTH } from "../../services/RequestService";
 
-// Importar los mocks directamente
-import mockSolicitudes from "../../data/mockSolicitudes.json";
-import mockBeneficios from "../../data/mockBeneficios.json";
+// Importar los mocks actualizados
+import mockPermisos from "../../data/mockSolicitudPermiso.json";
+import mockBeneficios from "../../data/mockSolicitudBeneficios.json";
 
 // Tipo normalizado que usará la tabla
 export interface SolicitudData {
@@ -14,8 +14,7 @@ export interface SolicitudData {
   tipoNombre: string;
   cantidad_dias?: number | null;
   fecha_inicio?: string | null;
-  lideres?: any[];
-  numero_aprobaciones?: number;
+  fecha_fin?: string | null;
   estado: "P" | "A" | "R";
   comentario?: string;
 }
@@ -31,7 +30,7 @@ export function useSolicitudesTH(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Modo desarrollo
+  // Cambiar a false en producción
   const modoDesarrollo = true;
 
   useEffect(() => {
@@ -45,42 +44,35 @@ export function useSolicitudesTH(
     setError(null);
 
     if (modoDesarrollo) {
-      // Simular delay
       setTimeout(() => {
         try {
           let rawData: any[] = [];
 
-          // Combinar ambos mocks o filtrar por tipo
+          // Seleccionar dataset según filtro
           if (filtros.tipoSolicitud === "PERMISO") {
-            rawData = [...mockSolicitudes];
+            rawData = [...(mockPermisos as any[])];
           } else if (filtros.tipoSolicitud === "BENEFICIO") {
-            rawData = [...mockBeneficios];
+            rawData = [...(mockBeneficios as any[])];
           } else {
-            rawData = [...mockSolicitudes, ...mockBeneficios];
+            rawData = [
+              ...(mockPermisos as any[]),
+              ...(mockBeneficios as any[]),
+            ];
           }
 
-          console.log("Raw data:", rawData); // Debug
-
-          // Aplicar filtros
+          // Filtros adicionales
           if (filtros.tipoId) {
-            rawData = rawData.filter((s) => {
-              // Para permisos: comparar con id_solicitud_tipo
-              if (filtros.tipoSolicitud === "PERMISO") {
-                return s.id_solicitud_tipo === Number(filtros.tipoId);
-              }
-              // Para beneficios: comparar con tipo.id
-              if (filtros.tipoSolicitud === "BENEFICIO") {
-                return s.tipo?.id === Number(filtros.tipoId);
-              }
-              return false;
-            });
+            rawData = rawData.filter(
+              (s) => s.subtipo?.id === Number(filtros.tipoId)
+            );
           }
 
           if (filtros.usuarioNombre) {
             const searchText = filtros.usuarioNombre.toLowerCase();
-            rawData = rawData.filter((s) =>
-              s.nombre?.toLowerCase().includes(searchText) ||
-              s.apellido?.toLowerCase().includes(searchText)
+            rawData = rawData.filter(
+              (s) =>
+                s.nombre?.toLowerCase().includes(searchText) ||
+                s.apellido?.toLowerCase().includes(searchText)
             );
           }
 
@@ -88,38 +80,33 @@ export function useSolicitudesTH(
             rawData = rawData.filter((s) => s.estado === filtros.estado);
           }
 
-          console.log("Filtered data:", rawData); // Debug
-
           // Paginación
           const totalElements = rawData.length;
           const start = page * size;
           const paginatedData = rawData.slice(start, start + size);
 
-          // Normalizar datos para la tabla
+          // Normalizar al formato de tabla
           const normalizedData: SolicitudData[] = paginatedData.map((s) => ({
             id: s.id,
-            nombre: s.nombre || "",
-            apellido: s.apellido || "",
-            tipoNombre: s.tipo?.nombre || s.tipo || "",
+            nombre: s.nombre,
+            apellido: s.apellido,
+            tipoNombre: s.subtipo?.nombre ?? s.tipo_solicitud,
             cantidad_dias: s.cantidad_dias ?? null,
             fecha_inicio: s.fecha_inicio ?? null,
-            lideres: s.lideres ?? [],
-            numero_aprobaciones: s.numero_aprobaciones ?? 0,
+            fecha_fin: s.fecha_fin ?? null,
             estado: s.estado,
-            comentario: s.comentario || "",
+            comentario: s.comentario ?? "",
           }));
-
-          console.log("Normalized data:", normalizedData); // Debug
 
           setData(normalizedData);
           setTotalPages(Math.ceil(totalElements / size));
-          setLoading(false);
         } catch (err) {
-          console.error("Error processing mock data:", err);
+          console.error("Error procesando mock:", err);
           setError("Error al procesar datos mock");
+        } finally {
           setLoading(false);
         }
-      }, 300); // Reducido el delay
+      }, 300);
 
       return;
     }
@@ -134,19 +121,17 @@ export function useSolicitudesTH(
         };
 
         const response = await getSolicitudesTH(token, params);
-        
-        // Normalizar datos del backend
+
         const normalizedData: SolicitudData[] = response.content.map((s: any) => ({
           id: s.id,
-          nombre: s.nombre || "",
-          apellido: s.apellido || "",
-          tipoNombre: s.tipo?.nombre || "",
+          nombre: s.nombre,
+          apellido: s.apellido,
+          tipoNombre: s.subtipo?.nombre ?? s.tipo_solicitud,
           cantidad_dias: s.cantidad_dias ?? null,
           fecha_inicio: s.fecha_inicio ?? null,
-          lideres: s.lideres ?? [],
-          numero_aprobaciones: s.numero_aprobaciones ?? 0,
+          fecha_fin: s.fecha_fin ?? null,
           estado: s.estado,
-          comentario: s.comentario || "",
+          comentario: s.comentario ?? "",
         }));
 
         setData(normalizedData);

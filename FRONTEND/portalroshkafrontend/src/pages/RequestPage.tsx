@@ -5,10 +5,9 @@ import SelectDropdown from "../components/SelectDropdown";
 import DataTable from "../components/DataTable";
 import PaginationFooter from "../components/PaginationFooter";
 import IconButton from "../components/IconButton";
-import rawSolicitudes from "../data/mockSolicitudes.json";
+import rawPermisos from "../data/mockSolicitudPermiso.json";
+import rawBeneficios from "../data/mockSolicitudBeneficios.json";
 import type { SolicitudItem } from "../types";
-
-
 
 export default function RequestPage() {
   const { token, user } = useAuth();
@@ -20,56 +19,55 @@ export default function RequestPage() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const modoDesarrollo = true;
-  const mockSolicitudes: SolicitudItem[] = rawSolicitudes.map((s) => ({
-    ...s,
-    estado: s.estado as "P" | "A" | "R",
-    lideres: [
-    { id: 1, nombre: "Ana", aprobado: true },
-    { id: 2, nombre: "Carlos", aprobado: false },],
-  }));
 
+  const modoDesarrollo = true;
+
+  // Combinar mock de permisos y beneficios
+  const mockSolicitudes: SolicitudItem[] = [
+    ...(rawPermisos as SolicitudItem[]),
+    ...(rawBeneficios as SolicitudItem[]),
+  ];
 
   useEffect(() => {
-  if (modoDesarrollo) {
-    const solicitudesFiltradas = mockSolicitudes.filter(
-      (s) => !tipo || s.tipo?.nombre === tipo
-    );
+    if (modoDesarrollo) {
+      const solicitudesFiltradas = mockSolicitudes.filter(
+        (s) => !tipo || s.subtipo.nombre === tipo
+      );
 
-    setSolicitudes(solicitudesFiltradas);
-    setTotalPages(1);
-    setLoading(false);
-    return;
-  }
+      setSolicitudes(solicitudesFiltradas);
+      setTotalPages(1);
+      setLoading(false);
+      return;
+    }
 
-  if (!token || !user?.id) return;
+    if (!token || !user?.id) return;
 
-  setLoading(true);
-  setSolicitudes([]);
+    setLoading(true);
+    setSolicitudes([]);
 
-  const params = new URLSearchParams();
-  params.append("usuarioId", user.id.toString());
-  if (tipo) params.append("tipo", tipo);
-  params.append("page", page.toString());
-  params.append("size", "10");
+    const params = new URLSearchParams();
+    params.append("usuarioId", user.id.toString());
+    if (tipo) params.append("tipo", tipo);
+    params.append("page", page.toString());
+    params.append("size", "10");
 
-  fetch(`/api/solicitudes?${params.toString()}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then(async (res) => {
-      if (!res.ok) throw new Error(await res.text());
-      return res.json();
+    fetch(`/api/solicitudes?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .then((data) => {
-      setSolicitudes(data.content);
-      setTotalPages(data.totalPages);
-    })
-    .catch((err) => {
-      setError("Error al cargar solicitudes: " + err.message);
-    })
-    .finally(() => setLoading(false));
+      .then(async (res) => {
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+      })
+      .then((data) => {
+        setSolicitudes(data.content);
+        setTotalPages(data.totalPages);
+      })
+      .catch((err) => {
+        setError("Error al cargar solicitudes: " + err.message);
+      })
+      .finally(() => setLoading(false));
   }, [token, user?.id, tipo, page]);
 
   const limpiarFiltros = () => {
@@ -78,80 +76,63 @@ export default function RequestPage() {
   };
 
   const columns = [
-  {
-    key: "id",
-    label: "ID",
-  },
-  {
-    key: "tipo",
-    label: "Tipo",
-    render: (s: SolicitudItem) => s.tipo?.nombre ?? "—",
-  },
-  {
-    key: "comentario",
-    label: "Comentario",
-  },
-  {
-    key: "numero_aprobaciones",
-    label: "Aprobaciones",
-    render: (s: SolicitudItem) => {
-      const total = s.lideres.length;
-      return(
-      <span className="font-medium text-sm">
-        {s.numero_aprobaciones}/{total}
-      </span>
-      )
+    { key: "id", label: "ID" },
+    { key: "tipo_solicitud", label: "Categoría" },
+    {
+      key: "subtipo",
+      label: "Subtipo",
+      render: (s: SolicitudItem) => s.subtipo?.nombre ?? "—",
     },
-  },
-  {
-    key: "estado",
-    label: "Estado",
-    render: (s: SolicitudItem) => {
-      const estados = { P: "Pendiente", A: "Aprobado", R: "Rechazado" };
-      const colores = {
-        P: "bg-yellow-100 text-yellow-700",
-        A: "bg-green-100 text-green-700",
-        R: "bg-red-100 text-red-700",
-      };
-      return (
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${colores[s.estado]}`}
+    { key: "comentario", label: "Comentario" },
+    {
+      key: "estado",
+      label: "Estado",
+      render: (s: SolicitudItem) => {
+        const estados = { P: "Pendiente", A: "Aprobado", R: "Rechazado" };
+        const colores = {
+          P: "bg-yellow-100 text-yellow-700",
+          A: "bg-green-100 text-green-700",
+          R: "bg-red-100 text-red-700",
+        };
+        return (
+          <span
+            className={`px-2 py-1 text-xs font-medium rounded-full ${colores[s.estado]}`}
+          >
+            {estados[s.estado]}
+          </span>
+        );
+      },
+    },
+    {
+      key: "acciones",
+      label: "Acciones",
+      render: (s: SolicitudItem) => (
+        <button
+          onClick={() => navigate(`/requests/${s.id}`)}
+          className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
         >
-          {estados[s.estado]}
-        </span>
-      );
+          Ver / Editar
+        </button>
+      ),
     },
-  },
-  {
-    key: "acciones",
-    label: "Acciones",
-    render: (s: SolicitudItem) => (
-      <button
-        onClick={() => navigate(`/requests/${s.id}`)}
-        className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
-      >
-        Editar
-      </button>
-    ),
-  },
-];
+  ];
 
   if (loading) return <p>Cargando solicitudes...</p>;
   if (error) return <p>{error}</p>;
 
   const tiposUnicos: { value: string; label: string }[] =
-  solicitudes.length > 0
-    ? Array.from(
-        new Set(
-          solicitudes
-            .map((s) => s.tipo?.nombre)
-            .filter((nombre): nombre is string => typeof nombre === "string")
-        )
-      ).map((nombre) => ({
-        value: nombre,
-        label: nombre,
-      }))
-    : [];
+    solicitudes.length > 0
+      ? Array.from(
+          new Set(
+            solicitudes
+              .map((s) => s.subtipo?.nombre)
+              .filter((nombre): nombre is string => typeof nombre === "string")
+          )
+        ).map((nombre) => ({
+          value: nombre,
+          label: nombre,
+        }))
+      : [];
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -185,12 +166,12 @@ export default function RequestPage() {
 
             <div className="flex items-center gap-4">
               <SelectDropdown
-                label="Tipo"
+                label="Subtipo"
                 name="tipo"
                 value={tipo}
                 onChange={(e) => setTipo(e.target.value)}
                 options={tiposUnicos}
-                placeholder="Filtrar por tipo"
+                placeholder="Filtrar por subtipo"
               />
 
               <div className="mb-4">

@@ -1,0 +1,44 @@
+[
+  {
+    "id": 101,
+    "id_usuario": 1,
+    "nombre": "Pedro",
+    "apellido": "Martínez",
+    "tipo_solicitud": "PERMISO",
+    "subtipo": { "id": 1, "nombre": "Luto 1er grado" },
+    "comentario": "Fallecimiento de un familiar directo",
+    "estado": "P",
+    "lider": { "id": 2, "nombre": "Carlos", "apellido": "Méndez" },
+    "cantidad_dias": 5,
+    "fecha_inicio": "2025-09-25",
+    "fecha_fin": "2025-09-30"
+  },
+  {
+    "id": 102,
+    "id_usuario": 2,
+    "nombre": "Laura",
+    "apellido": "González",
+    "tipo_solicitud": "PERMISO",
+    "subtipo": { "id": 3, "nombre": "Reposo médico" },
+    "comentario": "Reposo recomendado por el médico",
+    "estado": "A",
+    "lider": { "id": 5, "nombre": "María", "apellido": "López" },
+    "cantidad_dias": 7,
+    "fecha_inicio": "2025-09-10",
+    "fecha_fin": "2025-09-17"
+  },
+  {
+    "id": 103,
+    "id_usuario": 3,
+    "nombre": "Andrés",
+    "apellido": "Ramírez",
+    "tipo_solicitud": "PERMISO",
+    "subtipo": { "id": 6, "nombre": "Paternidad" },
+    "comentario": "Nacimiento de mi hijo",
+    "estado": "R",
+    "lider": { "id": 8, "nombre": "Diego", "apellido": "Benítez" },
+    "cantidad_dias": 14,
+    "fecha_inicio": "2025-08-01",
+    "fecha_fin": "2025-08-15"
+  }
+]
