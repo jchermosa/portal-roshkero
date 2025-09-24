@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useDispositivosAsignados } from "../hooks/dispositivosAsignados/useDispositivosAsignados";
-import { tieneRol } from "../utils/permisos";
-import { Roles } from "../types/roles";
+import { useAuth } from "../../context/AuthContext";
+import { useDispositivosAsignados } from "../../hooks/dispositivosAsignados/useDispositivosAsignados";
+import { tieneRol } from "../../utils/permisos";
+import { Roles } from "../../types/roles";
 
-import type { DispositivoAsignadoItem } from "../types";
-import DataTable from "../components/DataTable";
-import PaginationFooter from "../components/PaginationFooter";
-import IconButton from "../components/IconButton";
-import PageLayout from "../layouts/PageLayout";
-import { dispositivosAsignadosColumns } from "../config/tables/dispositivosAsignadosTableConfig";
+import type { DispositivoAsignadoItem } from "../../types";
+import DataTable from "../../components/DataTable";
+import PaginationFooter from "../../components/PaginationFooter";
+import IconButton from "../../components/IconButton";
+import PageLayout from "../../layouts/PageLayout";
+import { dispositivosAsignadosColumns } from "../../config/tables/dispositivosAsignadosTableConfig";
 
 export default function DeviceAssignmentsPage() {
   const { token, user } = useAuth();

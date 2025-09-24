@@ -1,10 +1,10 @@
 // src/pages/DeviceFormPage.tsx
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import DynamicForm from "../components/DynamicForm";
-import FormLayout from "../layouts/FormLayout";
-import { buildDispositivoSections } from "../config/forms/dispositivoFormFields";
-import { useDispositivoForm } from "../hooks/dispositivos/useDispositivoForm";
+import { useAuth } from "../../context/AuthContext";
+import DynamicForm from "../../components/DynamicForm";
+import FormLayout from "../../layouts/FormLayout";
+import { buildDispositivoSections } from "../../config/forms/dispositivoFormFields";
+import { useDispositivoForm } from "../../hooks/dispositivos/useDispositivoForm";
 
 export default function DeviceFormPage() {
   const { token } = useAuth();

@@ -1,10 +1,10 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import DynamicForm from "../components/DynamicForm";
-import { useCatalogosUsuarios } from "../hooks/catalogos/useCatalogosUsuarios.ts";
-import { useUsuarioForm } from "../hooks/usuarios/useUsuarioForm.ts";
-import FormLayout from "../layouts/FormLayout";
-import { buildUsuarioSections } from "../config/forms/usuarioFormFields";
+import { useAuth } from "../../context/AuthContext.tsx";
+import DynamicForm from "../../components/DynamicForm.tsx";
+import { useCatalogosUsuarios } from "../../hooks/catalogos/useCatalogosUsuarios.ts";
+import { useUsuarioForm } from "../../hooks/usuarios/useUsuarioForm.ts";
+import FormLayout from "../../layouts/FormLayout.tsx";
+import { buildUsuarioSections } from "../../config/forms/usuarioFormFields.ts";
 export default function UserFormPage() {
   const { token } = useAuth();
   const { id } = useParams();
