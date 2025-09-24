@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import heroBg from "../assets/ilustracion-herov3.svg";
+import heroBg from "../../assets/ilustracion-herov3.svg";
 
 export default function RequestSearchPage() {
   const navigate = useNavigate();

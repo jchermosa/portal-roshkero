@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import SelectDropdown from "../components/SelectDropdown";
 import DataTable from "../components/DataTable";
 import PaginationFooter from "../components/PaginationFooter";
@@ -8,6 +9,14 @@ import IconButton from "../components/IconButton";
 import rawPermisos from "../data/mockSolicitudPermiso.json";
 import rawBeneficios from "../data/mockSolicitudBeneficios.json";
 import type { SolicitudItem } from "../types";
+=======
+import SelectDropdown from "../../components/SelectDropdown";
+import DataTable from "../../components/DataTable";
+import PaginationFooter from "../../components/PaginationFooter";
+import IconButton from "../../components/IconButton";
+import rawSolicitudes from "../../data/mockSolicitudes.json";
+import type { SolicitudItem } from "../../types";
+>>>>>>> f55da6450365035892de2d564de124cb6bd6a42c
 
 export default function RequestPage() {
   const { token, user } = useAuth();
@@ -76,6 +85,7 @@ export default function RequestPage() {
   };
 
   const columns = [
+<<<<<<< HEAD
     { key: "id", label: "ID" },
     { key: "tipo_solicitud", label: "Categoría" },
     {
@@ -110,6 +120,34 @@ export default function RequestPage() {
         <button
           onClick={() => navigate(`/requests/${s.id}`)}
           className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+=======
+  {
+    key: "id",
+    label: "ID",
+  },
+  {
+    key: "tipo",
+    label: "Tipo",
+    render: (s: SolicitudItem) => s.tipo?.nombre ?? "—",
+  },
+  {
+    key: "comentario",
+    label: "Comentario",
+  },
+  {
+    key: "estado",
+    label: "Estado",
+    render: (s: SolicitudItem) => {
+      const estados = { P: "Pendiente", A: "Aprobado", R: "Rechazado" };
+      const colores = {
+        P: "bg-yellow-100 text-yellow-700",
+        A: "bg-green-100 text-green-700",
+        R: "bg-red-100 text-red-700",
+      };
+      return (
+        <span
+          className={`px-2 py-1 text-xs font-medium rounded-full ${colores[s.estado]}`}
+>>>>>>> f55da6450365035892de2d564de124cb6bd6a42c
         >
           Ver / Editar
         </button>
