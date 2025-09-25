@@ -10,7 +10,6 @@ import com.backend.portalroshkabackend.Repositories.TH.CargosRepository;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.CargosMapper;
 import com.backend.portalroshkabackend.tools.validator.CargoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,8 @@ import java.util.List;
 
 import static com.backend.portalroshkabackend.tools.MessagesConst.*;
 
-@Service
-public class CargosService implements ICargosService{
+@Service("cargosService") // Para hacer keyed dependency injection :D
+public class CargosServiceImpl implements ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto> {
     private final CargosRepository cargosRepository;
     private final UserRepository userRepository;
     private final CargoValidator cargoValidator;
@@ -32,10 +31,10 @@ public class CargosService implements ICargosService{
 
 
     @Autowired
-    public CargosService(CargosRepository cargosRepository,
-                         UserRepository userRepository,
-                         CargoValidator cargoValidator,
-                         RepositoryService repositoryService){
+    public CargosServiceImpl(CargosRepository cargosRepository,
+                             UserRepository userRepository,
+                             CargoValidator cargoValidator,
+                             RepositoryService repositoryService){
         this.cargosRepository = cargosRepository;
         this.userRepository = userRepository;
         this.cargoValidator = cargoValidator;
@@ -44,7 +43,7 @@ public class CargosService implements ICargosService{
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CargosResponseDto> getAllCargos(Pageable pageable){
+    public Page<CargosResponseDto> getAll(Pageable pageable){
         Page<Cargos> cargos = cargosRepository.findAll(pageable);
 
         return cargos.map(CargosMapper::toCargosResponseDto);
@@ -52,7 +51,7 @@ public class CargosService implements ICargosService{
 
     @Transactional(readOnly = true)
     @Override
-    public CargoByIdResponseDto getCargoById(int idCargo) {
+    public CargoByIdResponseDto getById(int idCargo) {
         Cargos cargo = repositoryService.findByIdOrThrow(
                 cargosRepository,
                 idCargo,
@@ -66,7 +65,7 @@ public class CargosService implements ICargosService{
 
     @Transactional
     @Override
-    public CargosDefaultResponseDto addCargo(CargoInsertDto insertDto) {
+    public CargosDefaultResponseDto add(CargoInsertDto insertDto) {
         Cargos cargo = new Cargos();
 
         cargoValidator.validateCargoUniqueName(insertDto.getNombre(), null);
@@ -84,7 +83,7 @@ public class CargosService implements ICargosService{
 
     @Transactional
     @Override
-    public CargosDefaultResponseDto updateCargo(int idCargo, CargoInsertDto updateDto) {
+    public CargosDefaultResponseDto update(int idCargo, CargoInsertDto updateDto) {
         Cargos cargo = repositoryService.findByIdOrThrow(
                 cargosRepository,
                 idCargo,
@@ -106,7 +105,7 @@ public class CargosService implements ICargosService{
 
     @Transactional
     @Override
-    public CargosDefaultResponseDto deleteCargo(int idCargo) {
+    public CargosDefaultResponseDto delete(int idCargo) {
         Cargos cargo = repositoryService.findByIdOrThrow(
                 cargosRepository,
                 idCargo,

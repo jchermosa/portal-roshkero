@@ -5,8 +5,9 @@ import com.backend.portalroshkabackend.DTO.th.cargos.CargoByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.cargos.CargoInsertDto;
 import com.backend.portalroshkabackend.DTO.th.cargos.CargosDefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.cargos.CargosResponseDto;
-import com.backend.portalroshkabackend.Services.HumanResource.ICargosService;
+import com.backend.portalroshkabackend.Services.HumanResource.ICommonRolesCargosService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,16 +15,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
-
 @RestController()
 @RequestMapping("/api/v1/admin")
 public class CargosController {
-    private final ICargosService cargosService;
+    private final ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto> cargosService;
 
     @Autowired
-    public CargosController(ICargosService cargosService){
+    public CargosController(@Qualifier("cargosService") ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto> cargosService){
         this.cargosService = cargosService;
     }
 
@@ -32,7 +30,7 @@ public class CargosController {
             @PageableDefault(size = 10, direction = Sort.Direction.ASC)Pageable pageable
 
     ){
-        Page<CargosResponseDto> cargosDto = cargosService.getAllCargos(pageable);
+        Page<CargosResponseDto> cargosDto = cargosService.getAll(pageable);
 
         return ResponseEntity.ok(cargosDto);
 
@@ -42,7 +40,7 @@ public class CargosController {
     public ResponseEntity<?> getCargoById(
             @PathVariable int idCargo
     ){
-        CargoByIdResponseDto response = cargosService.getCargoById(idCargo);
+        CargoByIdResponseDto response = cargosService.getById(idCargo);
 
         return ResponseEntity.ok(response);
     }
@@ -51,7 +49,7 @@ public class CargosController {
     public ResponseEntity<CargosDefaultResponseDto> addCargo(
             @RequestBody CargoInsertDto insertDto
     ){
-        CargosDefaultResponseDto cargoDto = cargosService.addCargo(insertDto);
+        CargosDefaultResponseDto cargoDto = cargosService.add(insertDto);
 
         return ResponseEntity.ok(cargoDto);
 
@@ -62,7 +60,7 @@ public class CargosController {
             @PathVariable int idCargo,
             @RequestBody CargoInsertDto updateDto
     ){
-        CargosDefaultResponseDto cargoDto = cargosService.updateCargo(idCargo, updateDto);
+        CargosDefaultResponseDto cargoDto = cargosService.update(idCargo, updateDto);
 
         return ResponseEntity.ok(cargoDto);
     }
@@ -71,7 +69,7 @@ public class CargosController {
     public ResponseEntity<CargosDefaultResponseDto> deleteCargo(
             @PathVariable int idCargo
     ){
-        CargosDefaultResponseDto cargoDto = cargosService.deleteCargo(idCargo);
+        CargosDefaultResponseDto cargoDto = cargosService.delete(idCargo);
 
         return ResponseEntity.ok(cargoDto);
     }

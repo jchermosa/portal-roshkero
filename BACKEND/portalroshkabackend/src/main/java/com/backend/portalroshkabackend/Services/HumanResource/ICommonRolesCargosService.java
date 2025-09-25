@@ -7,12 +7,10 @@ import com.backend.portalroshkabackend.DTO.th.cargos.CargosResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
-public interface ICargosService {
-    Page<CargosResponseDto> getAllCargos(Pageable pageable);
-    CargoByIdResponseDto getCargoById(int idCargo);
-    CargosDefaultResponseDto addCargo(CargoInsertDto insertDto);
-    CargosDefaultResponseDto updateCargo(int idCargo, CargoInsertDto updateDto);
-    CargosDefaultResponseDto deleteCargo(int idCargo);
+public interface ICommonRolesCargosService<T, TById, TDefault> { // T: ResponseDto, TById: ByIdResponseDto, TDefault: DefaultResponseDto
+    Page<T> getAll(Pageable pageable);
+    TById getById(int idCargo);
+    TDefault add(CargoInsertDto insertDto);
+    TDefault update(int idCargo, CargoInsertDto updateDto);
+    TDefault delete(int idCargo);
 }
