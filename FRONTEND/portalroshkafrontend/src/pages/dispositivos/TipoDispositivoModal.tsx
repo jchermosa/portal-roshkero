@@ -22,7 +22,9 @@ export default function TipoDispositivoModal({ token, id, onClose, onSaved }: Pr
           {isEditing ? "Editar tipo de dispositivo" : "Nuevo tipo de dispositivo"}
         </h2>
 
+        {/* ✅ DynamicForm con ID para poder usar el submit */}
         <DynamicForm
+          id="tipo-dispositivo-form"
           sections={sections}
           initialData={data}
           onSubmit={async (formData) => {
@@ -31,8 +33,6 @@ export default function TipoDispositivoModal({ token, id, onClose, onSaved }: Pr
             onClose();
           }}
           onChange={setData}
-          submitLabel={isEditing ? "Guardar cambios" : "Crear"}
-          cancelLabel="Cancelar"
           loading={loading}
         />
 
@@ -51,12 +51,22 @@ export default function TipoDispositivoModal({ token, id, onClose, onSaved }: Pr
               Eliminar
             </button>
           )}
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 ml-auto"
-          >
-            Cerrar
-          </button>
+          <div className="flex gap-2 ml-auto">
+            <button
+              form="tipo-dispositivo-form"
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isEditing ? "Guardar cambios" : "Crear"}
+            </button>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cerrar
+            </button>
+          </div>
         </div>
       </div>
     </div>
