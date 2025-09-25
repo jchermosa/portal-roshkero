@@ -8,9 +8,14 @@ import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
+<<<<<<< Updated upstream
 import com.backend.portalroshkabackend.Repositories.TH.*;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.SaveManager;
+=======
+import com.backend.portalroshkabackend.Repositories.*;
+import com.backend.portalroshkabackend.tools.RepositoryService;
+>>>>>>> Stashed changes
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.EmployeeMapper;
 import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
@@ -44,7 +49,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
         user.setContrasena(encoder.encode(user.getNroCedula()));
         user.setRequiereCambioContrasena(true);
 
-        Usuario savedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al restablecer la contraseña.");
+        Usuario savedUser = RepositoryService.saveEntity( () -> userRepository.save(user), "Error al restablecer la contraseña.");
 
         return EmployeeMapper.toDefaultResponseDto(savedUser.getIdUsuario(), "Contraseña restablecida.");
     }
@@ -108,7 +113,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         Usuario user = EmployeeMapper.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
-        Usuario savedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al guardar el usuario: ");
+        Usuario savedUser = RepositoryService.saveEntity( () -> userRepository.save(user), "Error al guardar el usuario: ");
 
         return EmployeeMapper.toDefaultResponseDto(savedUser.getIdUsuario(), "Usuario creado con exito.");
 
@@ -126,7 +131,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         EmployeeMapper.toUsuarioFromUpdateDto(user, updateDto);
 
-        Usuario updatedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al actualizar el usuario: ");
+        Usuario updatedUser = RepositoryService.saveEntity( () -> userRepository.save(user), "Error al actualizar el usuario: ");
 
         return EmployeeMapper.toDefaultResponseDto(updatedUser.getIdUsuario(), "Usuario actualizado con exito.");
 
@@ -143,7 +148,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         user.setEstado(EstadoActivoInactivo.I); // Da de baja el empleado de la base de datos
 
-        Usuario deletedUser = SaveManager.saveEntity( () -> userRepository.save(user), "Error al eliminar el usuario: ");
+        Usuario deletedUser = RepositoryService.saveEntity( () -> userRepository.save(user), "Error al eliminar el usuario: ");
 
         return EmployeeMapper.toDefaultResponseDto(deletedUser.getIdUsuario(), "Usuario eliminado con exito.");
 

@@ -4,11 +4,15 @@ import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Solicitud;
+<<<<<<< Updated upstream
 import com.backend.portalroshkabackend.Repositories.TH.*;
 import com.backend.portalroshkabackend.Repositories.TH.SolicitudRepository;
 import com.backend.portalroshkabackend.tools.SaveManager;
+=======
+import com.backend.portalroshkabackend.Repositories.*;
+import com.backend.portalroshkabackend.tools.RepositoryService;
+>>>>>>> Stashed changes
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
-import com.backend.portalroshkabackend.tools.mapper.AutoMap;
 import com.backend.portalroshkabackend.tools.mapper.RequestMapper;
 import com.backend.portalroshkabackend.tools.validator.RequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +61,7 @@ public class RequestServiceImpl implements IRequestService{
 
         request.setEstado(EstadoSolicitudEnum.A);
 
-        Solicitud acceptedRequest = SaveManager.saveEntity( () -> solicitudRepository.save(request), "Error al aceptar la solicitud: ");
+        Solicitud acceptedRequest = RepositoryService.saveEntity( () -> solicitudRepository.save(request), "Error al aceptar la solicitud: ");
 
         return RequestMapper.toRequestResponseDto(acceptedRequest.getIdSolicitud(), "Solicitud aceptada.");
     }
@@ -71,7 +75,7 @@ public class RequestServiceImpl implements IRequestService{
 
         request.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
 
-        Solicitud rejectedRequest =  SaveManager.saveEntity( () -> solicitudRepository.save(request), "Error al rechazar la solicitud: ");
+        Solicitud rejectedRequest =  RepositoryService.saveEntity( () -> solicitudRepository.save(request), "Error al rechazar la solicitud: ");
 
         return RequestMapper.toRequestResponseDto(rejectedRequest.getIdSolicitud(), "Solicitud rechazada");
 

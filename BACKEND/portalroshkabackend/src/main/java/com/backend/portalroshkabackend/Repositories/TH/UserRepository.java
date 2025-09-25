@@ -32,10 +32,12 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
     boolean existsByCorreoAndIdUsuarioNot(String correo, Integer idUsuario); // Si el correo / cedula ya existe excluyendo al propio usuario
     boolean existsByNroCedulaAndIdUsuarioNot(String nroCedula, Integer idUsuario);
     boolean existsByTelefonoAndIdUsuarioNot(String telefono, Integer idUsuario);
+    boolean existsByCargo_IdCargo(int idCargo);
 
     Optional<Usuario> findByNroCedula(String nroCedula);
 
     Optional<Usuario> findByCorreo(String correo);
 
     List<Usuario> findByIdUsuarioNotIn(List<Integer> list);//
+    List<Usuario> findAllByCargo_IdCargo(int idCargo);
 }

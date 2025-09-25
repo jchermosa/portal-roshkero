@@ -73,6 +73,8 @@ public class EmployeeController {
         return ResponseEntity.ok(users);
     }
 
+    //TODO: Obtener todos los datos de un usuario (y su foto de perfil y tecnologias), tambien el historial de equipos en los que estuvo.
+
     @GetMapping("/th/users/{id}")
     public ResponseEntity<UserByIdResponseDto> getEmployeeById(@PathVariable int id){
         UserByIdResponseDto user = employeeService.getEmployeeById(id);
