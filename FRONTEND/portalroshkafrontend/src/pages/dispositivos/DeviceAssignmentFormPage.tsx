@@ -1,4 +1,3 @@
-// src/pages/DeviceAssignmentFormPage.tsx
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import DynamicForm from "../../components/DynamicForm";
@@ -12,14 +11,13 @@ export default function DeviceAssignmentFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ Hook de formulario de dispositivo asignado
-  const {
-    data,
-    loading,
-    error,
-    handleSubmit,
-    isEditing,
-  } = useDispositivoAsignadoForm(token, id);
+  // ✅ Extraer solicitudId del query param (cuando se aprueba una solicitud)
+  const solicitudIdStr = new URLSearchParams(location.search).get("solicitudId");
+  const solicitudId = solicitudIdStr ? Number(solicitudIdStr) : undefined;
+
+  // ✅ Hook de formulario de dispositivo asignado (ahora soporta solicitudPreasignada)
+  const { data, setData, loading, error, handleSubmit, isEditing } =
+    useDispositivoAsignadoForm(token, id, solicitudId);
 
   // ✅ Configuración de secciones (puede recibir catálogos en el futuro)
   const sections = buildDispositivoAsignadoSections();
@@ -44,7 +42,7 @@ export default function DeviceAssignmentFormPage() {
           : "Completá los datos para asignar un dispositivo"
       }
       icon={isEditing ? (readonly ? "👀" : "✏️") : "📦"}
-      onCancel={() => navigate("/dispositivos-asignados")}
+      onCancel={() => navigate("/gestion-dispositivos?tab=asignaciones")}
       onSubmitLabel={
         readonly
           ? undefined
@@ -58,10 +56,11 @@ export default function DeviceAssignmentFormPage() {
         id="device-assignment-form"
         sections={sections}
         initialData={data}
+        onChange={setData}
         onSubmit={async (formData) => {
           if (!readonly) {
             await handleSubmit(formData);
-            navigate("/dispositivos-asignados");
+            navigate("/gestion-dispositivos?tab=asignaciones");
           }
         }}
         loading={loading}

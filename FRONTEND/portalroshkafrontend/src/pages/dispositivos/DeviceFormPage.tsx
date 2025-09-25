@@ -1,4 +1,3 @@
-// src/pages/DeviceFormPage.tsx
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import DynamicForm from "../../components/DynamicForm";
