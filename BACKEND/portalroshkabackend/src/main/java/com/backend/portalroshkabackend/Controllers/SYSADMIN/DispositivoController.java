@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceDTO;
@@ -47,10 +48,19 @@ public class DispositivoController {
     }  
 
     // Listar los dispositivos sin duenho
+    // Listar los dispositivos sin dueño
     @GetMapping("/allDevicesWithoutOwner")
-    public List<DeviceDTO> getAllDevicesWithoutOwner() {
-        return dispositivoService.getAllDevicesWithoutOwner();
+    public List<DeviceDTO> getAllDevicesWithoutOwner(
+        @RequestParam(required = false, defaultValue = "default") String sortBy,
+        @RequestParam(required = false) String filterValue
+    ) {
+        return dispositivoService.getAllDevicesWithoutOwner(sortBy, filterValue);
     }
+
+
+
+    // Listar dispositivos dependiendo del tipo 
+
 
     // CRUD 
 

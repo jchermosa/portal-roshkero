@@ -1,7 +1,10 @@
 package com.backend.portalroshkabackend.Services.SysAdmin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
@@ -42,12 +45,22 @@ public class DispositivoService {
     @Autowired
     private final DeviceRepository deviceRepository;
 
+    private final Map<String, Function<String, List<Dispositivo>>> sortingMap;
+
+
     public DispositivoService(DeviceTypesRepository deviceTypesRepository,
                              DeviceRepository deviceRepository,
                              UbicacionService ubicacionService) {
         this.deviceTypesRepository = deviceTypesRepository;
         this.deviceRepository = deviceRepository;
         this.ubicacionService = ubicacionService;
+
+
+        sortingMap = new HashMap<>();
+
+        sortingMap.put("tipoDispositivo", idStr -> 
+            deviceRepository.findAllByTipoDispositivo_IdTipoDispositivo(Integer.parseInt(idStr))
+        );
     }
 
 
@@ -79,12 +92,29 @@ public class DispositivoService {
 
 
     // Listar los dispositivos que no tienen duenho 
-    public List<DeviceDTO> getAllDevicesWithoutOwner() {
-        List<Dispositivo> dispositivos = deviceRepository.findAllWithoutOwner();
-        return dispositivos.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    } 
+    public List<DeviceDTO> getAllDevicesWithoutOwner(String sortBy, String filterValue) {
+
+    List<Dispositivo> dispositivos;
+
+    // Caso default: sin filtro
+    if (sortBy == null || sortBy.isBlank() || !sortingMap.containsKey(sortBy)) {
+        dispositivos = deviceRepository.findAllWithoutOwner();
+    } else {
+        // Aplico el filtro que está en el mapa (ej: tipoDispositivo)
+        dispositivos = sortingMap.get(sortBy).apply(filterValue);
+
+        // Filtrar solo los que no tienen dueño
+        dispositivos = dispositivos.stream()
+                .filter(d -> d.getEncargado() == null)
+                .toList();
+    }
+
+    return dispositivos.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+}
+
+
     
 
     // CRUD DEVICES
