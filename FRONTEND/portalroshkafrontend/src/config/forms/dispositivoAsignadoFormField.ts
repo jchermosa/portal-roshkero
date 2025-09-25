@@ -1,7 +1,11 @@
 // src/config/forms/dispositivoAsignadoFormFields.ts
 import type { FormSection } from "../../components/DynamicForm";
 
-export function buildDispositivoAsignadoSections(): FormSection[] {
+export function buildDispositivoAsignadoSections(
+  dispositivos: { value: number; label: string }[] = [],
+  solicitudes: { value: number; label: string }[] = [],
+  solicitudPreasignada?: number
+): FormSection[] {
   return [
     {
       title: "Asignación de dispositivo",
@@ -12,15 +16,15 @@ export function buildDispositivoAsignadoSections(): FormSection[] {
           label: "Dispositivo",
           type: "select",
           required: true,
-          // ⚡ Los options se pueden inyectar dinámicamente desde el hook
-          options: [],
+          options: dispositivos,
         },
         {
           name: "id_solicitud",
           label: "Solicitud",
           type: "select",
           required: true,
-          options: [],
+          options: solicitudes,
+          disabled: !!solicitudPreasignada, // ⚡ si viene de aprobación, no se puede cambiar
         },
         {
           name: "fecha_entrega",
@@ -45,9 +49,9 @@ export function buildDispositivoAsignadoSections(): FormSection[] {
           type: "select",
           required: true,
           options: [
-            { value: "ASIGNADO", label: "Asignado" },
-            { value: "DEVUELTO", label: "Devuelto" },
-            { value: "EN_REPARACION", label: "En reparación" },
+            { value: "Activo", label: "Activo" },
+            { value: "Devuelto", label: "Devuelto" },
+            { value: "EnReparacion", label: "En reparación" },
           ],
         },
         {

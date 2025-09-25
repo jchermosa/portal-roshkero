@@ -13,7 +13,7 @@ export const solicitudDispositivoColumns: TableColumn<SolicitudDispositivoItem>[
   {
     key: "id_usuario",
     label: "Usuario",
-    render: (s: SolicitudDispositivoItem) => `#${s.id_usuario}`,
+    render: (s: SolicitudDispositivoItem) => `${s.id_usuario}`,
   },
   {
     key: "comentario",
@@ -59,11 +59,5 @@ export const solicitudDispositivoColumns: TableColumn<SolicitudDispositivoItem>[
     label: "Fecha Fin",
     render: (s: SolicitudDispositivoItem) =>
       s.fecha_fin ? new Date(s.fecha_fin).toLocaleDateString() : "-",
-  },
-  {
-    key: "fecha_creacion",
-    label: "Creada",
-    render: (s: SolicitudDispositivoItem) =>
-      new Date(s.fecha_creacion).toLocaleString(),
   },
 ];
