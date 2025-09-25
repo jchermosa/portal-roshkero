@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.backend.portalroshkabackend.Models.BeneficiosAsignados;
 
 @Repository
-public interface BeneficiosAsignadosRepository extends JpaRepository<BeneficiosAsignados, Integer> {
+public interface UserBeneficiosAsignadosRepository extends JpaRepository<BeneficiosAsignados, Integer> {
     
 }

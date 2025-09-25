@@ -13,9 +13,11 @@ import com.backend.portalroshkabackend.Models.Solicitud;
 // import com.backend.portalroshkabackend.Models.TipoBeneficios;
 import com.backend.portalroshkabackend.Models.TipoPermisos;
 import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.AsigUsuarioEquipoRepository;
-import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.BeneficiosAsignadosRepository;
+import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.UserBeneficiosAsignadosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.SolicitudesTHRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoBeneficiosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoPermisosRepository;
@@ -51,7 +53,7 @@ public class UserService {
     private SolicitudesTHRepository solicitudesTHRepository;
 
     @Autowired
-    private BeneficiosAsignadosRepository beneficiosAsignadosRepository;
+    private UserBeneficiosAsignadosRepository beneficiosAsignadosRepository;
 
     public List<Usuario> getUsuario() {
         return usuarioRepository.findAll();
