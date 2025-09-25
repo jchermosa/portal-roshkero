@@ -2,7 +2,7 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 
 import com.backend.portalroshkabackend.DTO.th.*;
-import com.backend.portalroshkabackend.DTO.th.self.RequestResponseDto;
+import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Services.HumanResource.IRequestService;
 import jakarta.servlet.http.HttpServletRequest;

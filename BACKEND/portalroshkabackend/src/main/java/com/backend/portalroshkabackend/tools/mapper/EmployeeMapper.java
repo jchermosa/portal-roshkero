@@ -1,7 +1,7 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
-import com.backend.portalroshkabackend.DTO.UserInsertDto;
-import com.backend.portalroshkabackend.DTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.common.UserInsertDto;
+import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
 import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;

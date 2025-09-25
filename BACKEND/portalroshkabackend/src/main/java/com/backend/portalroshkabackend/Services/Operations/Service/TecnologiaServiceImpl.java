@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
-import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
-import com.backend.portalroshkabackend.Repositories.TecnologiasEquiposRepository;
+import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
+import com.backend.portalroshkabackend.Repositories.OP.TecnologiasEquiposRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
 
 @Service

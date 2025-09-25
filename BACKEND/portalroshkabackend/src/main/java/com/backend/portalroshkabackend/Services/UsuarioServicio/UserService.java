@@ -8,7 +8,7 @@ import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.AsigUsuarioEquipoRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.SolicitudesTHRepository;
 

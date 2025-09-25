@@ -1,6 +1,12 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.time.LocalDate;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +17,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
+
 
 @Entity
 @NoArgsConstructor
@@ -42,4 +53,10 @@ public class AsignacionUsuarioEquipo {
 
     @Column(name = "fecha_creacion")
     private LocalDate fechaCreacion;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", columnDefinition = "estado_ac_enum")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private EstadoActivoInactivo estado = EstadoActivoInactivo.A;
+
 }

@@ -1,15 +1,17 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.DTO.common.UserInsertDto;
+import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
-import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.*;
+import com.backend.portalroshkabackend.Repositories.TH.*;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.SaveManager;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
-import com.backend.portalroshkabackend.tools.mapper.AutoMap;
 import com.backend.portalroshkabackend.tools.mapper.EmployeeMapper;
 import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
 import org.springframework.beans.factory.annotation.Autowired;

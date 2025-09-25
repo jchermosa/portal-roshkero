@@ -32,15 +32,15 @@ import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
-import com.backend.portalroshkabackend.Repositories.EquiposRepository;
-import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
-import com.backend.portalroshkabackend.Repositories.TecnologiasEquiposRepository;
-import com.backend.portalroshkabackend.Repositories.UsuarioisRepository;
+import com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository;
+import com.backend.portalroshkabackend.Repositories.OP.ClientesRepository;
+import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
+import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
+import com.backend.portalroshkabackend.Repositories.OP.TecnologiasEquiposRepository;
+import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
-import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
-import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 
 @Service("operationsEquiposService")
 @Validated

@@ -4,7 +4,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.backend.portalroshkabackend.Repositories.ClientesRepository;
+import com.backend.portalroshkabackend.Repositories.OP.ClientesRepository;
 
 public class ClienteExistsValidator implements ConstraintValidator<ClienteExists, Integer> {
 

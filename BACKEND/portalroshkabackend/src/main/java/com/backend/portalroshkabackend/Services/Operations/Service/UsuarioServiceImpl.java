@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.UsuarioisRepository;
+import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
 
 @Service

@@ -10,9 +10,9 @@ import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesRespons
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.MetaDatasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.ClientesRepository;
-import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.OP.ClientesRepository;
+import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IMetaDatasService;
 
 @Service

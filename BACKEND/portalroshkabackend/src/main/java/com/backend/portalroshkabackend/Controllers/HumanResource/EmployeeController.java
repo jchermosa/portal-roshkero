@@ -1,11 +1,12 @@
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.DTO.common.UserInsertDto;
+import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
-import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
-import com.backend.portalroshkabackend.Services.HumanResource.IThSelfService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,8 +27,7 @@ public class EmployeeController {
     private final IEmployeeService employeeService;
 
      @Autowired
-    public EmployeeController(IEmployeeService employeeService,
-                              IThSelfService thService){
+    public EmployeeController(IEmployeeService employeeService){
          this.employeeService = employeeService;
      }
 

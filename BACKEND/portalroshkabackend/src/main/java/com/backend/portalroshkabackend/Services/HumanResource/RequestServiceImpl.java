@@ -1,10 +1,11 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
-import com.backend.portalroshkabackend.DTO.th.*;
-import com.backend.portalroshkabackend.DTO.th.self.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.DTO.th.*;
+import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Solicitud;
-import com.backend.portalroshkabackend.Repositories.*;
+import com.backend.portalroshkabackend.Repositories.TH.*;
+import com.backend.portalroshkabackend.Repositories.TH.SolicitudRepository;
 import com.backend.portalroshkabackend.tools.SaveManager;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.AutoMap;
