@@ -20,7 +20,7 @@ import com.backend.portalroshkabackend.Services.SysAdmin.DispositivoService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/sysadmin/devices")
+@RequestMapping("/api/v1/admin/sysadmin/devices")
 public class DispositivoController {
 
 

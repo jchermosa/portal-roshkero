@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
-@RequestMapping("/api/v1/sysadmin/deviceAssignments")
+@RequestMapping("/api/v1/admin/sysadmin/deviceAssignments")
 public class AsignacionDispositivoController {
 
     @Autowired

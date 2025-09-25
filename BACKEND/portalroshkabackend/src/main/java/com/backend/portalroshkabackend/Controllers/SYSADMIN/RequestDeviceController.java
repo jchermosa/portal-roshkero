@@ -17,7 +17,7 @@ import com.backend.portalroshkabackend.Services.SysAdmin.DeviceRequest;
 import com.backend.portalroshkabackend.Services.SysAdmin.SysAdminService;
 
 @RestController
-@RequestMapping("/api/v1/sysadmin")
+@RequestMapping("/api/v1/admin/sysadmin")
 public class RequestDeviceController {
 
 

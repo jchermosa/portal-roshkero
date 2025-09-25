@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
-@RequestMapping("/api/v1/sysadmin/ubicaciones")
+@RequestMapping("/api/v1/admin/sysadmin/ubicaciones")
 public class UbicacionesController {
 
     @Autowired
