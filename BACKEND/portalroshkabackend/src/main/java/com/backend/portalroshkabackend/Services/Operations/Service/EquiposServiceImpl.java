@@ -19,14 +19,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.backend.portalroshkabackend.DTO.Operationes.DiaLaboralDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquipoDiaUbicacionResponceDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Clientes;
+import com.backend.portalroshkabackend.Models.EquipoDiaUbicacion;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
@@ -41,6 +45,7 @@ import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologia
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
 import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
+import com.backend.portalroshkabackend.Repositories.EquipoDiaUbicacionRepository;
 
 @Service("operationsEquiposService")
 @Validated
@@ -52,6 +57,7 @@ public class EquiposServiceImpl implements IEquiposService {
     private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
     private final UsuarioisRepository usuarioisRepository;
     private final AsignacionUsuarioRepository asignacionUsuarioRepository;
+    private final EquipoDiaUbicacionRepository equipoDiaUbicacionRepository;
     private final IUsuarioService usuarioService;
     private final ITecnologiaService tecnologiaService;
 
@@ -61,6 +67,7 @@ public class EquiposServiceImpl implements IEquiposService {
     public EquiposServiceImpl(EquiposRepository equiposRepository, ClientesRepository clientesRepository,
             TecnologiaRepository tecnologiasRepository, TecnologiasEquiposRepository tecnologiasEquiposRepository,
             UsuarioisRepository usuarioisRepository, AsignacionUsuarioRepository asignacionUsuarioRepository,
+            EquipoDiaUbicacionRepository equipoDiaUbicacionRepository,
             IUsuarioService usuarioService,
             ITecnologiaService tecnologiaService) {
         this.equiposRepository = equiposRepository;
@@ -69,6 +76,7 @@ public class EquiposServiceImpl implements IEquiposService {
         this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
         this.usuarioisRepository = usuarioisRepository;
         this.asignacionUsuarioRepository = asignacionUsuarioRepository;
+        this.equipoDiaUbicacionRepository = equipoDiaUbicacionRepository;
         this.usuarioService = usuarioService;
         this.tecnologiaService = tecnologiaService;
 
@@ -101,6 +109,22 @@ public class EquiposServiceImpl implements IEquiposService {
         EquiposResponseDto dto = new EquiposResponseDto();
         dto.setIdEquipo(e.getIdEquipo());
         dto.setNombre(e.getNombre());
+
+        List<EquipoDiaUbicacion> asignacionesDU = equipoDiaUbicacionRepository
+                .findAllByEquipo_IdEquipo(e.getIdEquipo());
+
+        List<EquipoDiaUbicacionResponceDto> dtoList = asignacionesDU.stream()
+                .map(edu -> new EquipoDiaUbicacionResponceDto(
+                        new DiaLaboralDto(
+                                edu.getDiaLaboral().getIdDiaLaboral(),
+                                edu.getDiaLaboral().getNombreDia()),
+                        new UbicacionDto(
+                                edu.getUbicacion().getIdUbicacion(),
+                                edu.getUbicacion().getNombre())))
+                .toList();
+
+        dto.setEquipoDiaUbicacion(dtoList);
+
         dto.setFechaInicio(e.getFechaInicio());
         dto.setFechaLimite(e.getFechaLimite());
         dto.setFechaCreacion(e.getFechaCreacion());
@@ -192,6 +216,22 @@ public class EquiposServiceImpl implements IEquiposService {
         EquiposResponseDto dto = new EquiposResponseDto();
         dto.setIdEquipo(e.getIdEquipo());
         dto.setNombre(e.getNombre());
+
+        List<EquipoDiaUbicacion> asignaciones = equipoDiaUbicacionRepository
+                .findAllByEquipo_IdEquipo(e.getIdEquipo());
+
+        List<EquipoDiaUbicacionResponceDto> dtoList = asignaciones.stream()
+                .map(edu -> new EquipoDiaUbicacionResponceDto(
+                        new DiaLaboralDto(
+                                edu.getDiaLaboral().getIdDiaLaboral(),
+                                edu.getDiaLaboral().getNombreDia()),
+                        new UbicacionDto(
+                                edu.getUbicacion().getIdUbicacion(),
+                                edu.getUbicacion().getNombre())))
+                .toList();
+
+        dto.setEquipoDiaUbicacion(dtoList);
+
         dto.setFechaInicio(e.getFechaInicio());
         dto.setFechaLimite(e.getFechaLimite());
         dto.setFechaCreacion(e.getFechaCreacion());
