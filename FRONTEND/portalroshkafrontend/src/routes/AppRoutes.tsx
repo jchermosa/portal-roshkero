@@ -1,3 +1,4 @@
+// src/routes/AppRoutes.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -20,12 +21,15 @@ import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage.tsx";
 import RequestManagementPage from "../pages/solicitudes/RequestManagementPage.tsx";
 import RequestSearchPage from "../pages/solicitudes/RequestSearchPage.tsx";
 import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
+
+// Dispositivos
 import DevicePage from "../pages/dispositivos/DevicePage.tsx";
 import DeviceFormPage from "../pages/dispositivos/DeviceFormPage.tsx";
-import DeviceAssignmentsPage from "../pages/dispositivos/DeviceAssignmentsPage.tsx";
-import DeviceAssignmentsFormPage from "../pages/dispositivos/DeviceAssignmentFormPage.tsx";
+import DeviceAssignmentFormPage from "../pages/dispositivos/DeviceAssignmentFormPage.tsx";
 import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
 import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
+import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage.tsx";
+import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage.tsx";
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -41,13 +45,19 @@ export default function AppRoutes() {
         <Route element={<DashboardLayout />}>
           <Route index element={<HomePage />} />
 
-          {/* Solicitudes */}
+          {/* Solicitudes generales */}
           <Route path="/requests" element={<RequestPage />} />
           <Route path="/requests/nuevo" element={<RequestFormPage />} />
           <Route path="/requests/:id" element={<RequestFormPage />} />
           <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage />} />
-          <Route path="/solicitudesTH/permisos" element={<RequestManagementPage tipoVista="permisos" />} />
-          <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage tipoVista="beneficios" />} />
+          <Route
+            path="/solicitudesTH/permisos"
+            element={<RequestManagementPage tipoVista="permisos" />}
+          />
+          <Route
+            path="/solicitudesTH/beneficios"
+            element={<RequestManagementPage tipoVista="beneficios" />}
+          />
 
           {/* Usuarios */}
           <Route path="/usuarios" element={<UsuariosPage />} />
@@ -64,16 +74,23 @@ export default function AppRoutes() {
           <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
 
           {/* Dispositivos */}
-           <Route path="/dispositivos" element={<DevicePage />} />
-           <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
+          <Route path="/dispositivos" element={<DevicePage />} />
+          <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
 
-           {/* Dispositivos Asignados */}
-           <Route path="/dispositivos-asignados" element={<DeviceAssignmentsPage />} />
-           <Route path="/dispositivos-asignados/nuevo" element={<DeviceAssignmentsFormPage />} />
-           
-           {/* Solicitud Dispositivos */}
-           <Route path="/solicitud-dispositivo" element={<SolicitudDispositivoPage />} />
-           <Route path="/solicitud-dispositivo/nuevo" element={<SolicitudDispositivoFormPage />} />
+          {/* Solicitud de Dispositivos (usuarios normales) */}
+          <Route path="/solicitud-dispositivo" element={<SolicitudDispositivoPage />} />
+          <Route path="/solicitud-dispositivo/nuevo" element={<SolicitudDispositivoFormPage />} />
+          <Route path="/solicitud-dispositivo/:id" element={<SolicitudDispositivoFormPage />} />
+
+          {/* Gestión de Dispositivos (SYSADMIN → Tabs: Solicitudes + Asignaciones) */}
+          <Route path="/gestion-dispositivos" element={<GestionDispositivosPage />} />
+
+          {/* Asignaciones (formularios) */}
+          <Route path="/dispositivos-asignados/nuevo" element={<DeviceAssignmentFormPage />} />
+          <Route path="/dispositivos-asignados/:id" element={<DeviceAssignmentFormPage />} />
+
+          {/* Tipos de dispositivo */}
+          <Route path="/tipo-dispositivo" element={<TipoDispositivoPage />} />
 
           {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />
@@ -85,7 +102,10 @@ export default function AppRoutes() {
       </Route>
 
       {/* Fallback */}
-      <Route path="*" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route
+        path="*"
+        element={user ? <Navigate to="/" replace /> : <LoginPage />}
+      />
     </Routes>
   );
 }

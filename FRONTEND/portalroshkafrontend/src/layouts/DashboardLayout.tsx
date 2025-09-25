@@ -16,8 +16,9 @@ export default function DashboardLayout() {
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
     { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: puedeGestionarUsuarios },
-    { id: "/dispositivos-asignados", label: "Gestión de Dispositivos", icon: "💻", available: puedeGestionarDispositivos},
+    { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: puedeGestionarDispositivos },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: puedeGestionarDispositivos},
+    { id: "/tipo-dispositivo", label: "Tipos Dispositivos", icon: "🛠️", available: puedeGestionarDispositivos },
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: puedeGestionarSolicitudes },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
@@ -25,7 +26,6 @@ export default function DashboardLayout() {
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
     { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
    
-
   ].filter((o) => o.available);
 
   const initials =
@@ -52,8 +52,48 @@ export default function DashboardLayout() {
           </div>
         </div>
 
-        {/* Menú */}
-        <nav className="flex-1 overflow-y-auto mt-6">
+        {/* Menú con scroll personalizado */}
+        <nav className="flex-1 overflow-y-auto mt-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
+          <style jsx>{`
+            /* Estilos personalizados para el scrollbar */
+            nav::-webkit-scrollbar {
+              width: 6px;
+            }
+            
+            nav::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            
+            nav::-webkit-scrollbar-thumb {
+              background-color: rgb(209 213 219); /* gray-300 */
+              border-radius: 3px;
+              transition: background-color 0.2s ease;
+            }
+            
+            nav::-webkit-scrollbar-thumb:hover {
+              background-color: rgb(156 163 175); /* gray-400 */
+            }
+            
+            /* Estilos para modo oscuro */
+            .dark nav::-webkit-scrollbar-thumb {
+              background-color: rgb(75 85 99); /* gray-600 */
+            }
+            
+            .dark nav::-webkit-scrollbar-thumb:hover {
+              background-color: rgb(107 114 128); /* gray-500 */
+            }
+            
+            /* Para Firefox */
+            nav {
+              scrollbar-width: thin;
+              scrollbar-color: rgb(209 213 219) transparent;
+            }
+            
+            .dark nav {
+              scrollbar-color: rgb(75 85 99) transparent;
+            }
+          `}</style>
+          
           {menuOptions.map((opt) => (
             <NavLink
               key={opt.id}
