@@ -6,7 +6,8 @@ import { Roles } from "../types/roles";
 import "../styles/scrollbar.css";
 
 export default function DashboardLayout() {
-  const { user, logout } = useAuth();
+  const { user, refreshUser, logout } = useAuth();
+
 
   // Permisos usando tieneRol
   const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
@@ -29,8 +30,10 @@ export default function DashboardLayout() {
    
   ].filter((o) => o.available);
 
+
+
   const initials =
-    `${user?.nombre?.[0] ?? ""}${user?.apellido?.[0] ?? ""}`.trim() || "👤";
+    "👤";
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">
@@ -39,9 +42,20 @@ export default function DashboardLayout() {
         {/* Perfil compacto */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white font-bold text-lg">
-              {initials}
+            <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
+              {user?.fotoBase64 ? (
+                <img
+                  src={`data:image/png;base64,${user.fotoBase64}`}
+                  alt={user?.nombre}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center text-white font-bold text-lg">
+                  👤
+                </div>
+              )}
             </div>
+
             <div>
               <p className="font-semibold text-gray-800 dark:text-gray-100 line-clamp-1">
                 {user?.nombre}
