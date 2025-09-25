@@ -107,8 +107,10 @@ public class AutoMap {
         solicitud.setTipoSolicitud(dto.getSolicitudThTipo());
         solicitud.setEstado(EstadoSolicitudEnum.P);
         solicitud.setFechaCreacion(LocalDateTime.now());
+        /* 
         solicitud.setPermisoAsignado(dto.getPermisoAsignado());
         solicitud.setBeneficioAsignado(dto.getBeneficioAsignado());
+        */
 
     }
 
