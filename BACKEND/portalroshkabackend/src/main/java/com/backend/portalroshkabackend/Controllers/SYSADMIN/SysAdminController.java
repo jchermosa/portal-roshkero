@@ -8,17 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceRequestDto;
-import com.backend.portalroshkabackend.DTO.SYSADMIN.DispositivoAsignadoDto;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.RequestDTO;
 import com.backend.portalroshkabackend.Services.SysAdmin.DeviceRequest;
 import com.backend.portalroshkabackend.Services.SysAdmin.SysAdminService;
-import com.backend.portalroshkabackend.Services.DispositivoAsignadoService;
-
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
@@ -35,13 +29,9 @@ public class SysAdminController {
     @Autowired
     private final DeviceRequest deviceRequest;
 
-    @Autowired 
-    private final DispositivoAsignadoService dispositivoAsignadoService;
 
-
-    SysAdminController(SysAdminService sysAdminService, DispositivoAsignadoService dispositivoAsignadoService, DeviceRequest deviceRequest) {
+    SysAdminController(SysAdminService sysAdminService, DeviceRequest deviceRequest) {
         this.sysAdminService = sysAdminService;
-        this.dispositivoAsignadoService = dispositivoAsignadoService;
         this.deviceRequest = deviceRequest;
     }
 
@@ -66,16 +56,6 @@ public class SysAdminController {
         return sysAdminService.getAllPendingRequest();
     }
 
-
-    
-
-
-    // Crear una asignacion 
-
-    @PostMapping("createAssignment")
-    public DispositivoAsignadoDto createAssignment(@Valid @RequestBody DispositivoAsignadoDto inventarioAsignadoDto) {
-        return dispositivoAsignadoService.crearInventarioAsignado(inventarioAsignadoDto);
-    }
 
     // ======> SOLICITUDES DE DISPOSITIVOS <========
 

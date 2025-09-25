@@ -29,8 +29,8 @@ public class Cargos {
     @Column(name = "nombre")
     private String nombre;
 
-    @OneToMany (mappedBy = "cargo", fetch = FetchType.LAZY)
-    private Set<Usuario> usuarios = new HashSet<>();
+    // @OneToMany (mappedBy = "cargo", fetch = FetchType.LAZY)
+    // private Set<Usuario> usuarios = new HashSet<>();
 
     @Column(name = "fecha_creacion")
     private LocalDate fechaCreacion;

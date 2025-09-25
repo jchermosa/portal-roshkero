@@ -37,25 +37,6 @@ public class UbicacionService {
                     dto.setNombre(ubicacion.getNombre());
                     dto.setEstado(ubicacion.getEstado());
                     
-                    dto.setDispositivos(ubicacion.getDispositivos().stream()
-                            .map(device -> {
-                                DeviceDTO deviceDto = new DeviceDTO();
-                                deviceDto.setTipoDispositivo(device.getTipoDispositivo().getIdTipoDispositivo());
-                                deviceDto.setNroSerie(device.getNroSerie());
-                                deviceDto.setModelo(device.getModelo());
-                                deviceDto.setDetalle(device.getDetalles());
-                                deviceDto.setFechaFabricacion(device.getFechaFabricacion());
-                                deviceDto.setEstado(device.getEstado()); 
-                                deviceDto.setCategoria(device.getCategoria());
-                                if (device.getEncargado() != null) {
-                                    deviceDto.setEncargado(device.getEncargado().getIdUsuario());
-                                } else {
-                                    deviceDto.setEncargado(3);
-                                }
-                                return deviceDto;
-                            })
-                            .toList()
-                    );
                     
                     return dto;
                 });
@@ -73,25 +54,6 @@ public class UbicacionService {
                     dto.setNombre(ubicacion.getNombre());
                     dto.setEstado(ubicacion.getEstado());
                     
-                    dto.setDispositivos(ubicacion.getDispositivos().stream()
-                            .map(device -> {
-                                DeviceDTO deviceDto = new DeviceDTO();
-                                deviceDto.setTipoDispositivo(device.getTipoDispositivo().getIdTipoDispositivo());
-                                deviceDto.setNroSerie(device.getNroSerie());
-                                deviceDto.setModelo(device.getModelo());
-                                deviceDto.setDetalle(device.getDetalles());
-                                deviceDto.setFechaFabricacion(device.getFechaFabricacion());
-                                deviceDto.setEstado(device.getEstado()); 
-                                deviceDto.setCategoria(device.getCategoria());
-                                 if (device.getEncargado() != null) {
-                                    deviceDto.setEncargado(device.getEncargado().getIdUsuario());
-                                } else {
-                                    deviceDto.setEncargado(3);
-                                }
-                                return deviceDto;
-                            })
-                            .toList()
-                    );
                     
                     return dto;
                 })

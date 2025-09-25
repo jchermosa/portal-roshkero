@@ -123,20 +123,20 @@ public class Usuario {
     private Integer disponibilidad = 100;
     
     // Relaciones
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Solicitud> solicitudes = new ArrayList<>();
+    // @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<Solicitud> solicitudes = new ArrayList<>();
     
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private List<AsignacionUsuarioEquipo> asignacionesEquipo = new ArrayList<>();
+    // @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    // private List<AsignacionUsuarioEquipo> asignacionesEquipo = new ArrayList<>();
     
-    @OneToMany(mappedBy = "encargado", fetch = FetchType.LAZY)
-    private List<Dispositivo> dispositivosACargo = new ArrayList<>();
+    // @OneToMany(mappedBy = "encargado", fetch = FetchType.LAZY)
+    // private List<Dispositivo> dispositivosACargo = new ArrayList<>();
 
-    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
-    private List<Equipos> equiposLiderados = new ArrayList<>();
+    // @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
+    // private List<Equipos> equiposLiderados = new ArrayList<>();
 
-    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
-    private List<Solicitud>  listaSolicitudes = new ArrayList<>();
+    // @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
+    // private List<Solicitud>  listaSolicitudes = new ArrayList<>();
     
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
