@@ -1,4 +1,3 @@
-// src/hooks/dispositivosAsignados/useDispositivoAsignadoForm.ts
 import { useEffect, useState } from "react";
 import type { DispositivoAsignadoItem } from "../../types";
 import {
@@ -9,14 +8,16 @@ import {
 
 export function useDispositivoAsignadoForm(
   token: string | null,
-  id?: string
+  id?: string,
+  solicitudPreasignada?: number // ⚡ nueva prop
 ) {
   const isEditing = !!id;
 
   // Estado inicial
   const [data, setData] = useState<Partial<DispositivoAsignadoItem>>({
-    estado_asignacion: "Pendiente",
+    estado_asignacion: "Activo", // por defecto
     fecha_entrega: new Date().toISOString().split("T")[0], // fecha actual
+    ...(solicitudPreasignada ? { id_solicitud: solicitudPreasignada } : {}), // ⚡ si viene de aprobación, se guarda
   });
 
   const [loading, setLoading] = useState(false);
@@ -41,7 +42,10 @@ export function useDispositivoAsignadoForm(
       if (isEditing && id) {
         await updateDispositivoAsignado(token, id, formData);
       } else {
-        await createDispositivoAsignado(token, formData);
+        await createDispositivoAsignado(token, {
+          ...formData,
+          ...(solicitudPreasignada ? { id_solicitud: solicitudPreasignada } : {}),
+        });
       }
     } catch (err: any) {
       setError(err.message || "Error al guardar el dispositivo asignado");

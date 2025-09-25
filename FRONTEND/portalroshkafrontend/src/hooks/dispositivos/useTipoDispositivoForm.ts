@@ -1,4 +1,3 @@
-// src/hooks/dispositivos/useTipoDispositivoForm.ts
 import { useEffect, useState } from "react";
 import type { TipoDispositivoItem } from "../../types";
 import {
