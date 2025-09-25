@@ -4,14 +4,10 @@ import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Solicitud;
-<<<<<<< Updated upstream
 import com.backend.portalroshkabackend.Repositories.TH.*;
 import com.backend.portalroshkabackend.Repositories.TH.SolicitudRepository;
-import com.backend.portalroshkabackend.tools.SaveManager;
-=======
 import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.tools.RepositoryService;
->>>>>>> Stashed changes
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.RequestMapper;
 import com.backend.portalroshkabackend.tools.validator.RequestValidator;
@@ -21,28 +17,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.backend.portalroshkabackend.tools.MessagesConst.*;
+
 @Service("humanRequestService")
 public class RequestServiceImpl implements IRequestService{
     private final SolicitudRepository solicitudRepository;
-
     private final RequestValidator requestValidator;
+    private final RepositoryService repositoryService;
 
     @Autowired
     public RequestServiceImpl (SolicitudRepository solicitudRepository,
-
-                               RequestValidator requestValidator){
-
+                               RequestValidator requestValidator,
+                               RepositoryService repositoryService
+    ){
         this.solicitudRepository = solicitudRepository;
-
         this.requestValidator = requestValidator;
+        this.repositoryService = repositoryService;
     }
-
-    // @Transactional(readOnly = true)
-    // @Override
-    // public Page<SolicitudTHResponseDto> getApprovedByLeader(Pageable pageable) {
-    //     Page<Solicitud> requests = solicitudesTHRepository.findAllByEstadoLiderAndEstado(EstadoSolicitudEnum.P, EstadoSolicitudEnum.P, pageable);
-    //     return requests.map(AutoMap::toSolicitudTHResponseDto);
-    // }
 
     @Transactional(readOnly = true)
     @Override
@@ -55,31 +46,46 @@ public class RequestServiceImpl implements IRequestService{
     @Transactional
     @Override
     public RequestResponseDto acceptRequest(int idRequest) {
-        Solicitud request = solicitudRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
+        Solicitud request = repositoryService.findByIdOrThrow(
+                solicitudRepository,
+                idRequest,
+                () -> new RequestNotFoundException(idRequest)
+        );
 
         requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitud());
 
         request.setEstado(EstadoSolicitudEnum.A);
 
-        Solicitud acceptedRequest = RepositoryService.saveEntity( () -> solicitudRepository.save(request), "Error al aceptar la solicitud: ");
+        Solicitud acceptedRequest = repositoryService.save(
+                solicitudRepository,
+                request,
+                DATABASE_DEFAULT_ERROR
+        );
 
-        return RequestMapper.toRequestResponseDto(acceptedRequest.getIdSolicitud(), "Solicitud aceptada.");
+        return RequestMapper.toRequestResponseDto(acceptedRequest.getIdSolicitud(), REQUEST_ACCEPTED_MESSAGE);
     }
 
     @Transactional
     @Override
     public RequestResponseDto rejectRequest(int idRequest) {
-        Solicitud request = solicitudRepository.findById(idRequest).orElseThrow(() -> new RequestNotFoundException(idRequest));
+        Solicitud request = repositoryService.findByIdOrThrow(
+                solicitudRepository,
+                idRequest,
+                () -> new RequestNotFoundException(idRequest)
+        );
 
         requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitud());
 
         request.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
 
-        Solicitud rejectedRequest =  RepositoryService.saveEntity( () -> solicitudRepository.save(request), "Error al rechazar la solicitud: ");
+        Solicitud rejectedRequest =  repositoryService.save(
+                solicitudRepository,
+                request,
+                DATABASE_DEFAULT_ERROR
+        );
 
-        return RequestMapper.toRequestResponseDto(rejectedRequest.getIdSolicitud(), "Solicitud rechazada");
+        return RequestMapper.toRequestResponseDto(rejectedRequest.getIdSolicitud(), REQUEST_REJECTED_MESSAGE);
 
     }
 
-    
 }

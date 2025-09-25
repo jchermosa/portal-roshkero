@@ -6,11 +6,11 @@ import com.backend.portalroshkabackend.DTO.th.cargos.CargosDefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.cargos.CargosResponseDto;
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.CargosRepository;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.TH.CargosRepository;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.RepositoryService;
-import com.backend.portalroshkabackend.tools.errors.errorslist.DatabaseOperationException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.CargosMapper;
 import com.backend.portalroshkabackend.tools.validator.CargoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.backend.portalroshkabackend.tools.MessagesConst.*;
+
 @Service
 public class CargosService implements ICargosService{
     private final CargosRepository cargosRepository;
@@ -28,8 +30,6 @@ public class CargosService implements ICargosService{
     private final CargoValidator cargoValidator;
     private final RepositoryService repositoryService;
 
-    private final String DATABASE_DEFAULT_ERROR = "Ocurrio un error en la operacion. ";
-    private final String OPERATION_DEFAULT_MESSAGE = "Operacion exitosa.";
 
     @Autowired
     public CargosService(CargosRepository cargosRepository,
@@ -53,7 +53,12 @@ public class CargosService implements ICargosService{
     @Transactional(readOnly = true)
     @Override
     public CargoByIdResponseDto getCargoById(int idCargo) {
-        Cargos cargo = cargosRepository.findById(idCargo).orElseThrow( () -> new CargoNotFoundException(idCargo));
+        Cargos cargo = repositoryService.findByIdOrThrow(
+                cargosRepository,
+                idCargo,
+                () -> new CargoNotFoundException(idCargo)
+        );
+
         List<Usuario> usersWithProvidedCargo = userRepository.findAllByCargo_IdCargo(idCargo);
 
         return CargosMapper.toCargoByIdResponseDto(cargo, usersWithProvidedCargo);
@@ -74,13 +79,17 @@ public class CargosService implements ICargosService{
                 DATABASE_DEFAULT_ERROR
         );
 
-        return CargosMapper.toCargosDefaultResponseDto(addedCargo.getIdCargo(), OPERATION_DEFAULT_MESSAGE);
+        return CargosMapper.toCargosDefaultResponseDto(addedCargo.getIdCargo(), CARGO_CREATED_MESSAGE);
     }
 
     @Transactional
     @Override
     public CargosDefaultResponseDto updateCargo(int idCargo, CargoInsertDto updateDto) {
-        Cargos cargo = cargosRepository.findById(idCargo).orElseThrow( () -> new CargoNotFoundException(idCargo));
+        Cargos cargo = repositoryService.findByIdOrThrow(
+                cargosRepository,
+                idCargo,
+                () -> new CargoNotFoundException(idCargo)
+        );
 
         cargoValidator.validateCargoUniqueName(updateDto.getNombre(), idCargo);
 
@@ -92,13 +101,17 @@ public class CargosService implements ICargosService{
                 DATABASE_DEFAULT_ERROR
         );
 
-        return CargosMapper.toCargosDefaultResponseDto(cargoUpdated.getIdCargo(), OPERATION_DEFAULT_MESSAGE);
+        return CargosMapper.toCargosDefaultResponseDto(cargoUpdated.getIdCargo(), CARGO_UPDATED_MESSAGE);
     }
 
     @Transactional
     @Override
     public CargosDefaultResponseDto deleteCargo(int idCargo) {
-        Cargos cargo = cargosRepository.findById(idCargo).orElseThrow( () -> new CargoNotFoundException(idCargo));
+        Cargos cargo = repositoryService.findByIdOrThrow(
+                cargosRepository,
+                idCargo,
+                () -> new CargoNotFoundException(idCargo)
+        );
 
         cargoValidator.validateCargoDontHaveUsersAssigned(idCargo, cargo.getNombre());
 
@@ -108,7 +121,7 @@ public class CargosService implements ICargosService{
                 DATABASE_DEFAULT_ERROR
         );
 
-        return CargosMapper.toCargosDefaultResponseDto(idCargo, OPERATION_DEFAULT_MESSAGE); // Eliminar registro
+        return CargosMapper.toCargosDefaultResponseDto(idCargo, CARGO_DELETED_MESSAGE); // Eliminar registro
 
     }
 }

@@ -1,7 +1,7 @@
 package com.backend.portalroshkabackend.tools.validator;
 
-import com.backend.portalroshkabackend.Repositories.CargosRepository;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.TH.CargosRepository;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoAssignedToUsers;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoDuplicateNameException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -11,12 +11,8 @@ import java.util.function.Supplier;
 @Service
 public class RepositoryService {
 
-    public static <T> T saveEntity(Supplier<T> saveOperation, String errorMessage){
-        try{
-            return saveOperation.get();
-        } catch (JpaSystemException ex){
-            throw new DatabaseOperationException(errorMessage, ex);
-        }
+    public <T> T findByIdOrThrow(JpaRepository<T, Integer> repository, Integer id, Supplier<RuntimeException> exception){
+        return repository.findById(id).orElseThrow(exception);
     }
 
     public <T> T save(JpaRepository<T, ?> repository, T entity, String errorMessage){
