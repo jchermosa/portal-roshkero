@@ -21,13 +21,13 @@ import RequestManagementPage from "../pages/RequestManagementPage.tsx";
 
 import OperationsPage from "../pages/Operations/OperationsPage";
 import EquipoFormPage from "../pages/Operations/EquipoFormPage.tsx";
-
+import EditarEquipoPage from "../pages/Operations/EditarEquipoPage.tsx";
 
 export default function AppRoutes() {
   const { user } = useAuth();
 
   return (
-    <Routes>
+    <Routes>  
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginPage />} />
 
@@ -54,7 +54,7 @@ export default function AppRoutes() {
               {/* Operations routes */}
               <Route path="/operations" element={<OperationsPage />} />
               <Route path="/equipo/nuevo" element={<EquipoFormPage />} />
-              <Route path="/equipo/:id" element={<EquipoFormPage />} />
+              <Route path="/equipo/:id/edit" element={<EditarEquipoPage />} />
               {/* <Route path="/operations/manage-teams" element={<ManageTeams />} /> */}
           {/*<Route path="/usuarios" element={<UsuariosPage />} />
 

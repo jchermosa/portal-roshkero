@@ -6,21 +6,26 @@ type Cargo = { id?: number; nombre: string };
 type Equipo = { id?: number; nombre: string };
 
 export type User = {
-  id?: number;
+  idUsuario: number;
   nombre: string;
   apellido: string;
+  nroCedula: string;
   correo: string;
-  rol: Rol;
-  cargo?: Cargo;
-  equipo?: Equipo;
-  dias_vacaciones?: number;
-  dias_vacaciones_restante?: number;
-  // nuevos opcionales para ProfilePage
-  telefono?: string;
-  fecha_ingreso?: string;
-  nro_cedula?: string;
-  estado?: boolean;
+  roles: Roles; // definir Roles como enum o type aparte
+  fechaIngreso: string; // LocalDate → string (ej: "2025-09-25")
+  antiguedad: string;
+  diasVacaciones: number;
+  estado: "ACTIVO" | "INACTIVO"; // si usas enum EstadoActivoInactivo mejor tiparlo
+  contrasena: string;
+  telefono: string;
+  cargos: Cargos; // idem, definirlo aparte
+  fechaNacimiento: string; // LocalDate → string
+  diasVacacionesRestante: number;
+  requiereCambioContrasena: boolean;
+  url: string;
+  disponibilidad: number | null;
 };
+
 
 type AuthContextType = {
   user: User | null;

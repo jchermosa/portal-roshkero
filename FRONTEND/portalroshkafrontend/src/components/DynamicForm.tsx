@@ -1,16 +1,16 @@
+// src/components/DynamicForm.tsx
 import React, { useEffect, useState } from "react";
 
 export interface FormField {
   name: string;
   label: string;
-  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom";
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea" | "custom";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
   helperText?: string;
   disabled?: boolean;
   validation?: (value: any) => string | null;
-  //Para campo de request
   value?: any;
   onChange?: (e: React.ChangeEvent<any>) => void;
   render?: () => React.ReactNode;
@@ -44,6 +44,7 @@ export interface FormMessage {
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
+  id = "dynamic-form",              // <<--- usa el id recibido
   sections,
   initialData = {},
   onSubmit,
@@ -107,7 +108,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     }
     setSubmitting(true);
     try {
-      await onSubmit(formData);
+      await onSubmit(formData); // <<--- envía data, no el evento
       setMessage({ type: "success", text: "Datos guardados correctamente" });
     } catch (error: any) {
       setMessage({ type: "error", text: error.message || "Error al guardar los datos" });
@@ -184,60 +185,38 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       case "custom":
         if (field.render) {
           return (
-            <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
-              {field.render()}
-            </div>
-          );
-        }
-        return null;
-
-      // 🔒 Duplicado del case "custom" mantenido pero comentado para no romper el switch:
-      /*
-      case "custom":
-        if (field.render) {
-          return (
             <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
               {field.render()}
             </div>
           );
         }
         return null;
-      */
 
       default:
         return (
-          <>
-            {/*
-              Línea duplicada tras el merge; la comento para evitar un <div> sin cerrar:
-              <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
-            */}
-            <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {field.label}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
-              </label>
-              <input
-                type={field.type}
-                {...baseProps}
-                className={`w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                            bg-white text-gray-800 border
-                            border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
-                            ${error ? "border-red-500 focus:ring-red-500" : ""}
-                            ${isFieldDisabled ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" : ""}`}
-              />
-              {field.helperText && (
-                <p className="text-gray-500 dark:text-gray-400 text-xs">{field.helperText}</p>
-              )}
-              {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
-            </div>
-          </>
+          <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {field.label}
+              {field.required && <span className="text-red-500 ml-1">*</span>}
+            </label>
+            <input
+              type={field.type}
+              {...baseProps}
+              className={`w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                          bg-white text-gray-800 border
+                          border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
+                          ${error ? "border-red-500 focus:ring-red-500" : ""}
+                          ${isFieldDisabled ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" : ""}`}
+            />
+            {field.helperText && <p className="text-gray-500 dark:text-gray-400 text-xs">{field.helperText}</p>}
+            {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
+          </div>
         );
     }
   };
 
   return (
-    <form id="dynamic-form" onSubmit={handleSubmit} className={`flex flex-col h-full ${className}`}>
-      {/* Mensajes */}
+    <form id={id} onSubmit={handleSubmit} className={`flex flex-col h-full ${className}`}>
       {message && (
         <div
           className={`p-4 rounded-lg text-sm border ${
@@ -246,14 +225,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
               : "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700"
           }`}
         >
-          <div className="flex items-center gap-2">
-            {message.type === "error" ? "❌" : "✅"}
-            <span>{message.text}</span>
-          </div>
+          <div className="flex items-center gap-2">{message.type === "error" ? "❌" : "✅"}<span>{message.text}</span></div>
         </div>
       )}
 
-      {/* Body */}
       <div className="flex-1 overflow-y-auto p-6 space-y-10">
         {sections.map((section, idx) => (
           <div key={idx} className="space-y-4">
@@ -261,9 +236,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
               <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
                 {section.icon}
               </div>
-              <h2 className="text-gray-800 dark:text-gray-100 font-semibold text-lg">
-                {section.title}
-              </h2>
+              <h2 className="text-gray-800 dark:text-gray-100 font-semibold text-lg">{section.title}</h2>
               <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
             </div>
             <div className={`grid gap-4 ${section.className || "grid-cols-1 md:grid-cols-2"}`}>

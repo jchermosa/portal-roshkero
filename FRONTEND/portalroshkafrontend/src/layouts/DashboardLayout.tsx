@@ -26,7 +26,7 @@ export default function DashboardLayout() {
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
-    { id: "/operations", label: "Gestion de Equipos", icon: "👥", available: isOperaciones },
+    { id: "/operations", label: "Gestion de Equipos", icon: "👥", available: true },
     { id: "/configuracion", label: "Configuration", icon: "⚙️", available: true },
   ].filter((o) => o.available);
 
