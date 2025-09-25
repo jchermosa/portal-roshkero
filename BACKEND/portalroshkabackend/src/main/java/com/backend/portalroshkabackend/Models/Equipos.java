@@ -40,14 +40,14 @@ public class Equipos {
     @Column(name = "id_equipo")
     private Integer idEquipo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_lider")
     private Usuario lider;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente")
     private Clientes cliente;
 
@@ -60,14 +60,6 @@ public class Equipos {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "tecnologias_equipos",
-        joinColumns = @JoinColumn(name = "id_equipo"),
-        inverseJoinColumns = @JoinColumn(name = "id_tecnologia")
-    )
-    private Set<Tecnologias> tecnologias = new HashSet<>();
-
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "estado_ac_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
@@ -75,4 +67,5 @@ public class Equipos {
 
     @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
     private List<AsignacionUsuarioEquipo> asignacionesUsuario = new ArrayList<>();
+
 }

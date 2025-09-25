@@ -45,9 +45,6 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
     private Integer idUsuario;
-    
-
-
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
@@ -121,29 +118,4 @@ public class Usuario {
     @Max(100)
     @Column(name = "disponibilidad", nullable = false)
     private Integer disponibilidad = 100;
-    
-    // Relaciones
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Solicitud> solicitudes = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private List<AsignacionUsuarioEquipo> asignacionesEquipo = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "encargado", fetch = FetchType.LAZY)
-    private List<Dispositivo> dispositivosACargo = new ArrayList<>();
-
-    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
-    private List<Equipos> equiposLiderados = new ArrayList<>();
-
-    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
-    private List<Solicitud>  listaSolicitudes = new ArrayList<>();
-    
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "tecnologias_usuario",
-        joinColumns = @JoinColumn(name = "id_usuario"),
-        inverseJoinColumns = @JoinColumn(name = "id_tecnologia")
-    )
-    private Set<Tecnologias> tecnologias = new HashSet<>();
-    
 }

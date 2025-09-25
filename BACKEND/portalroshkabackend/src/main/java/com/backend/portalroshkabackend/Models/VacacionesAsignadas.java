@@ -1,13 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +16,7 @@ public class VacacionesAsignadas {
     @Column(name = "id_vacaciones_asignadas")
     private Integer idVacacionesAsignadas;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_solicitud", nullable = false, unique = true)
     private Solicitud solicitud;
 
