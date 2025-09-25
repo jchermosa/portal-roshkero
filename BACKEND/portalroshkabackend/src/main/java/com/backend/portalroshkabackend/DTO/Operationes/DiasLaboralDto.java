@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiaLaboralDto {
+public class DiasLaboralDto {
     private Integer idDiaLaboral;
     private String nombreDia;
 }

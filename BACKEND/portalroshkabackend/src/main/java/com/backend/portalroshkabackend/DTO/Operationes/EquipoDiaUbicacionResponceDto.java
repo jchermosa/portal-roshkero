@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EquipoDiaUbicacionResponceDto {
-    private DiaLaboralDto diaLaboral;
+    private DiasLaboralDto diaLaboral;
     private UbicacionDto ubicacion;
 }

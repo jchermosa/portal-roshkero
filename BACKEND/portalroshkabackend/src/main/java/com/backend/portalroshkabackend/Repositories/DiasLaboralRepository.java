@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.backend.portalroshkabackend.Models.DiaLaboral;
 
 @Repository
-public interface DiaLaboralRepository extends JpaRepository<DiaLaboral, Integer> {
+public interface DiasLaboralRepository extends JpaRepository<DiaLaboral, Integer> {
 
 }
