@@ -53,8 +53,8 @@ public class Dispositivo {
     @Column(name = "fecha_fabricacion", nullable = false)
     private LocalDate fechaFabricacion;
     
-    @OneToMany(mappedBy = "dispositivo")
-    private List<DispositivoAsignado> dispositivosAsignados = new ArrayList<>();
+//    @OneToMany(mappedBy = "dispositivo")
+//    private List<DispositivoAsignado> dispositivosAsignados = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "id_ubicacion")

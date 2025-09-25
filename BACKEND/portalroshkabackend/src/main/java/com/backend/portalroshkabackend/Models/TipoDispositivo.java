@@ -36,7 +36,7 @@ public class TipoDispositivo {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
-    @OneToMany(mappedBy = "tipoDispositivo", fetch = FetchType.LAZY)
-    private List<Dispositivo> dispositivos = new ArrayList<>();
+//    @OneToMany(mappedBy = "tipoDispositivo", fetch = FetchType.LAZY)
+//    private List<Dispositivo> dispositivos = new ArrayList<>();
 
 }

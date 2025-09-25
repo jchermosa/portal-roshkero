@@ -33,8 +33,8 @@ public class Ubicacion {
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @OneToMany(mappedBy = "ubicacion", fetch = FetchType.LAZY)
-    private List<Dispositivo> dispositivos = new ArrayList<>();
+//    @OneToMany(mappedBy = "ubicacion", fetch = FetchType.LAZY)
+//    private List<Dispositivo> dispositivos = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, columnDefinition = "estado_ac_enum")

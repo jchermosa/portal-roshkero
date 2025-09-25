@@ -35,7 +35,7 @@ public class DocumentoAdjunto {
     @Column(name = "fecha_subida")
     private LocalDateTime fechaSubida;
 
-    @OneToMany(mappedBy = "documentoAdjunto", fetch = FetchType.LAZY)
-    private List<Solicitud> solicitudes = new ArrayList<>();
+//    @OneToMany(mappedBy = "documentoAdjunto", fetch = FetchType.LAZY)
+//    private List<Solicitud> solicitudes = new ArrayList<>();
 
 }

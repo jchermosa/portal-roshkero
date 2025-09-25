@@ -60,19 +60,19 @@ public class Equipos {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "tecnologias_equipos",
-        joinColumns = @JoinColumn(name = "id_equipo"),
-        inverseJoinColumns = @JoinColumn(name = "id_tecnologia")
-    )
-    private Set<Tecnologias> tecnologias = new HashSet<>();
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//        name = "tecnologias_equipos",
+//        joinColumns = @JoinColumn(name = "id_equipo"),
+//        inverseJoinColumns = @JoinColumn(name = "id_tecnologia")
+//    )
+//    private Set<Tecnologias> tecnologias = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "estado_ac_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private EstadoActivoInactivo estado = EstadoActivoInactivo.A;
 
-    @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
-    private List<AsignacionUsuarioEquipo> asignacionesUsuario = new ArrayList<>();
+//    @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
+//    private List<AsignacionUsuarioEquipo> asignacionesUsuario = new ArrayList<>();
 }

@@ -62,18 +62,18 @@ public class Solicitud {
     @Column(name = "estado", nullable = false, columnDefinition = "estado_solicitud_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private EstadoSolicitudEnum estado = EstadoSolicitudEnum.P;
-
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-    private PermisosAsignados permisoAsignado;
-
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-    private VacacionesAsignadas vacacionesAsignadas;
-
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-    private BeneficiosAsignados beneficioAsignado;
-
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-    private DispositivoAsignado dispositivoAsignado;
+//
+//    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
+//    private PermisosAsignados permisoAsignado;
+//
+//    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
+//    private VacacionesAsignadas vacacionesAsignadas;
+//
+//    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
+//    private BeneficiosAsignados beneficioAsignado;
+//
+//    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
+//    private DispositivoAsignado dispositivoAsignado;
 
     @Column(name = "fecha_inicio", nullable = false)
     private LocalDate fechaInicio;

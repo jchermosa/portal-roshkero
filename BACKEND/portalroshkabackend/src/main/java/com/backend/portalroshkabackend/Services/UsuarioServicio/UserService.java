@@ -166,10 +166,10 @@ public class UserService {
         dto.setTipoSolicitud(solicitud.getTipoSolicitud());
         dto.setEstado(solicitud.getEstado());
         dto.setFechaCreacion(solicitud.getFechaCreacion());
-        dto.setPermisoAsignado(solicitud.getPermisoAsignado());
-        dto.setVacacionesAsignadas(solicitud.getVacacionesAsignadas());
-        dto.setBeneficioAsignado(solicitud.getBeneficioAsignado());
-        dto.setDispositivoAsignado(solicitud.getDispositivoAsignado());
+//        dto.setPermisoAsignado(solicitud.getPermisoAsignado());
+//        dto.setVacacionesAsignadas(solicitud.getVacacionesAsignadas());
+//        dto.setBeneficioAsignado(solicitud.getBeneficioAsignado());
+//        dto.setDispositivoAsignado(solicitud.getDispositivoAsignado());
         // Puedes agregar más campos según lo que necesites exponer en el DTO
         return dto;
     }

@@ -46,7 +46,7 @@ public class TipoBeneficios {
     @Column(name = "monto_maximo", nullable = false, precision = 10, scale = 2)
     private BigDecimal montoMaximo;
 
-    @OneToMany(mappedBy = "beneficio", fetch = FetchType.LAZY)
-    private List<BeneficiosAsignados> beneficiosAsignados = new ArrayList<>();
+//    @OneToMany(mappedBy = "beneficio", fetch = FetchType.LAZY)
+//    private List<BeneficiosAsignados> beneficiosAsignados = new ArrayList<>();
 
 }

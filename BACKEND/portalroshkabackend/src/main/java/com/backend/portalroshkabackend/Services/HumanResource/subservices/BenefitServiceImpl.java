@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
@@ -41,8 +42,10 @@ public class BenefitServiceImpl implements IAcceptRequestService{
 
         String comentario = request.getComentario();
         Integer idTipoBeneficio = extraerIdTipoBeneficio(comentario);
+        BigDecimal monto = extraerMonto(comentario);
 
         if (idTipoBeneficio == null) throw new IllegalArgumentException("No se pudo extraer el tipo de beneficio del comentario.");
+        if (monto == null) throw new IllegalArgumentException("No se pudo extraer el monto del comentario.");
 
         TipoBeneficios tipoBeneficios = repositoryService.findByIdOrThrow(
                 beneficiosRepository,
@@ -52,14 +55,16 @@ public class BenefitServiceImpl implements IAcceptRequestService{
 
         beneficiosAsignados.setBeneficio(tipoBeneficios);
         beneficiosAsignados.setSolicitud(request);
-        beneficiosAsignados.setMontoAprobado(request.getBeneficioAsignado().getMontoAprobado());
         beneficiosAsignados.setFechaAsignacion(LocalDate.now());
+        beneficiosAsignados.setMontoAprobado(monto);
+
 
         repositoryService.save(
                 beneficiosAsignadosRepository,
                 beneficiosAsignados,
                 DATABASE_DEFAULT_ERROR
         );
+
 
     }
 
@@ -72,4 +77,19 @@ public class BenefitServiceImpl implements IAcceptRequestService{
         }
         return null;
     }
+
+    private BigDecimal extraerMonto(String comentario) {
+        if (comentario == null) return null;
+
+        // Expresión regular para capturar números (enteros o decimales) dentro de {}
+        Pattern pattern = Pattern.compile("\\{(\\d+(?:\\.\\d+)?)}");
+        Matcher matcher = pattern.matcher(comentario);
+
+        if (matcher.find()) {
+            return new BigDecimal(matcher.group(1));
+        }
+        return null;
+    }
+
+
 }
