@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.common;
 
 import java.time.LocalDate;
 

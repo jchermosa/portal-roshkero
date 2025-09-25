@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.common;
 
 public class ErrorResponseDto {
     private int status;

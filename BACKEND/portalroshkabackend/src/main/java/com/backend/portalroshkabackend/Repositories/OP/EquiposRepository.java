@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Repositories;
+package com.backend.portalroshkabackend.Repositories.OP;
 
 import com.backend.portalroshkabackend.Models.Equipos;
 import org.springframework.data.domain.Page;

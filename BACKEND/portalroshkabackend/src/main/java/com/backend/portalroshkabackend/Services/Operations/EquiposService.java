@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services;
+package com.backend.portalroshkabackend.Services.Operations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.backend.portalroshkabackend.Models.Equipos;
-import com.backend.portalroshkabackend.Repositories.EquiposRepository;
+import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 
 @Service

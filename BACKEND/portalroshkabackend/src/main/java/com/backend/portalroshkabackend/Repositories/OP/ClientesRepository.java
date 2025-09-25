@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Repositories;
+package com.backend.portalroshkabackend.Repositories.OP;
 
 import com.backend.portalroshkabackend.Models.Clientes;
 import org.springframework.data.jpa.repository.JpaRepository;

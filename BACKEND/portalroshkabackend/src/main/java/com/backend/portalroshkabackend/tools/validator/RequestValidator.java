@@ -1,7 +1,7 @@
 package com.backend.portalroshkabackend.tools.validator;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
-import com.backend.portalroshkabackend.Repositories.SolicitudRepository;
+import com.backend.portalroshkabackend.Repositories.TH.SolicitudRepository;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyAcceptedException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyRejectedException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.backend.portalroshkabackend.tools.errors.handler;
 
-import com.backend.portalroshkabackend.DTO.ErrorResponseDto;
+import com.backend.portalroshkabackend.DTO.common.ErrorResponseDto;
 import com.backend.portalroshkabackend.tools.errors.errorslist.equipos.EquipoNotFoundException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

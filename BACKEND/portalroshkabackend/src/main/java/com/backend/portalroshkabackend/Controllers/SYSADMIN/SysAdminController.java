@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.portalroshkabackend.DTO.DeviceRequestDto;
+import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceRequestDto;
+import com.backend.portalroshkabackend.DTO.SYSADMIN.DispositivoAsignadoDto;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.RequestDTO;
-import com.backend.portalroshkabackend.DTO.DispositivoAsignadoDto;
 import com.backend.portalroshkabackend.Services.SysAdmin.DeviceRequest;
 import com.backend.portalroshkabackend.Services.SysAdmin.SysAdminService;
 import com.backend.portalroshkabackend.Services.DispositivoAsignadoService;

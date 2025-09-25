@@ -46,6 +46,11 @@ public class DispositivoController {
         return dispositivoService.getAllDevices();
     }  
 
+    // Listar los dispositivos sin duenho
+    @GetMapping("/allDevicesWithoutOwner")
+    public List<DeviceDTO> getAllDevicesWithoutOwner() {
+        return dispositivoService.getAllDevicesWithoutOwner();
+    }
 
     // CRUD 
 

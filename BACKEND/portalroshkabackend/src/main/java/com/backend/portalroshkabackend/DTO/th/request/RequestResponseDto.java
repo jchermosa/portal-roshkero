@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class RequestResponseDto {
-    private Integer idSolicitud;
-    private String meesage;
+    private Integer id;
+    private String message;
 }

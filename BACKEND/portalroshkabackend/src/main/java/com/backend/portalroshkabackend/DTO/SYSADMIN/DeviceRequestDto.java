@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.SYSADMIN;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

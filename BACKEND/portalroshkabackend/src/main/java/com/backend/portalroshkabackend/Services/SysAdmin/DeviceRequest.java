@@ -6,13 +6,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.backend.portalroshkabackend.DTO.DeviceRequestDto;
+import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceRequestDto;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceTypeDTO;
 import com.backend.portalroshkabackend.Models.Dispositivo;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.TipoDispositivo;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
-import com.backend.portalroshkabackend.Repositories.DeviceRequestRepository;
+import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceRequestRepository;
 import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceTypesRepository;
 
 import jakarta.transaction.Transactional;

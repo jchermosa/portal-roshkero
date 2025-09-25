@@ -1,7 +1,7 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.th.SolicitudResponseDto;
-import com.backend.portalroshkabackend.DTO.th.self.RequestResponseDto;
+import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Solicitud;
 
 public class RequestMapper {

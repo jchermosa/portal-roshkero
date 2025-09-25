@@ -17,9 +17,9 @@ import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
-import com.backend.portalroshkabackend.Repositories.EquiposRepository;
-import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
+import com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository;
+import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
+import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioisEquipoService;
 

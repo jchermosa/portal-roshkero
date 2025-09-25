@@ -3,9 +3,11 @@ package com.backend.portalroshkabackend.Services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.backend.portalroshkabackend.DTO.DispositivoAsignadoDto;
+
+import com.backend.portalroshkabackend.DTO.SYSADMIN.DispositivoAsignadoDto;
 import com.backend.portalroshkabackend.Models.DispositivoAsignado;
-import com.backend.portalroshkabackend.Repositories.InventarioAsignadoRepository;
+import com.backend.portalroshkabackend.Repositories.SYSADMIN.InventarioAsignadoRepository;
+
 import java.time.LocalDate;
 
 @Service

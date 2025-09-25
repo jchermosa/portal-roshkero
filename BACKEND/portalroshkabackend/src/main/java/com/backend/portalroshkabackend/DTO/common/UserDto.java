@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.DTO;
+package com.backend.portalroshkabackend.DTO.common;
 
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
