@@ -102,7 +102,7 @@ public class SysAdminService {
             dto.setComentario(solicitud.getComentario());
             
             if (solicitud.getEstado() != null) {
-                dto.setEstado(solicitud.getEstado().name());
+                dto.setEstado(solicitud.getEstado());
             }
             
             dto.setFechaInicio(solicitud.getFechaInicio());

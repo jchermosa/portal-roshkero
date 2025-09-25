@@ -6,22 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceRequestDto;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.RequestDTO;
 import com.backend.portalroshkabackend.Services.SysAdmin.DeviceRequest;
 import com.backend.portalroshkabackend.Services.SysAdmin.SysAdminService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
-
-
-
 
 @RestController
 @RequestMapping("/api/v1/sysadmin")
-public class SysAdminController {
+public class RequestDeviceController {
+
 
     @Autowired
     private final SysAdminService sysAdminService;
@@ -29,31 +27,9 @@ public class SysAdminController {
     @Autowired
     private final DeviceRequest deviceRequest;
 
-
-    SysAdminController(SysAdminService sysAdminService, DeviceRequest deviceRequest) {
+    RequestDeviceController(SysAdminService sysAdminService, DeviceRequest deviceRequest) {
         this.sysAdminService = sysAdminService;
         this.deviceRequest = deviceRequest;
-    }
-
-
-
-
-    // Obtener todos las solicitudes aprobadas
-   @GetMapping("/getAllApprovedRequests")
-   public List<RequestDTO> getAllApprovedRequest() {
-        return sysAdminService.getAllApprovedRequest();
-   }
-
-    // Obtener todas las solicitudes rechazadas
-    @GetMapping("/getAllRejectedRequests")
-    public List<RequestDTO> getAllRejectedRequest() {
-        return sysAdminService.getAllRejectedRequest();
-    }
-
-    // Obtener todas las solicitudes pendientes
-    @GetMapping("/getAllPendingRequests")
-    public List<RequestDTO> getAllPendingRequest() {
-        return sysAdminService.getAllPendingRequest();
     }
 
 
@@ -65,8 +41,8 @@ public class SysAdminController {
        return sysAdminService.findAllSolicitudes();
    }
 
-
-    @PostMapping("deviceRequest/{id}/accept")
+    //Aceptar
+    @PostMapping("deviceRequest/{idRequest}/accept")
     public ResponseEntity<?> acceptRequest(@PathVariable Integer idRequest) {
 
         DeviceRequestDto updatedRequest = deviceRequest.acceptRequest(idRequest);
@@ -77,7 +53,9 @@ public class SysAdminController {
         return ResponseEntity.ok(updatedRequest);
     }
 
-    @PostMapping("deviceRequest/{id}/reject")
+
+    // Rechazar
+    @PostMapping("deviceRequest/{idRequest}/reject")
     public ResponseEntity<?> rejectRequest(@PathVariable Integer idRequest) {
 
         DeviceRequestDto updatedRequest = deviceRequest.rejectRequest(idRequest);
@@ -89,4 +67,5 @@ public class SysAdminController {
     }
 
 
+    
 }

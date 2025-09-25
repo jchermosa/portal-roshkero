@@ -2,6 +2,8 @@ package com.backend.portalroshkabackend.DTO.SYSADMIN;
 
 import java.time.LocalDate;
 
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +19,7 @@ public class RequestDTO {
     private Integer idLider;
     private String tipoSolicitud;
     private String comentario;
-    private String estado;
+    private EstadoSolicitudEnum estado;
     private LocalDate fechaInicio;
     private int cantDias;
     private LocalDate fechaFin;
