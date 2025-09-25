@@ -5,6 +5,7 @@ import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Roles;
 import com.backend.portalroshkabackend.Repositories.*;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.roles.RolesNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.*;

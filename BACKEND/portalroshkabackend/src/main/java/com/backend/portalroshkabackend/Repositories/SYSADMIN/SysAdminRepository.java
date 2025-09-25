@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Repositories;
+package com.backend.portalroshkabackend.Repositories.SYSADMIN;
 
 import java.util.List;
 

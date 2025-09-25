@@ -7,14 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.DeviceRequestDto;
-import com.backend.portalroshkabackend.DTO.DispositivoDto;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceTypeDTO;
 import com.backend.portalroshkabackend.Models.Dispositivo;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.TipoDispositivo;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Repositories.DeviceRequestRepository;
-import com.backend.portalroshkabackend.Repositories.DeviceTypesRepository;
+import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceTypesRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -24,16 +23,9 @@ public class DeviceRequest {
     @Autowired
     private DeviceRequestRepository deviceRequestRepository;
 
-    @Autowired
-    private DeviceTypesRepository deviceTypesRepository;
 
-    @Autowired
-    private final DispositivoService dispositivoService;
-
-    DeviceRequest(DeviceRequestRepository deviceRequestRepository, DeviceTypesRepository deviceTypesRepository, DispositivoService dispositivoService) {
+    DeviceRequest(DeviceRequestRepository deviceRequestRepository) {
         this.deviceRequestRepository = deviceRequestRepository;
-        this.deviceTypesRepository = deviceTypesRepository;
-        this.dispositivoService = dispositivoService;
     }
 
 
@@ -58,6 +50,7 @@ public class DeviceRequest {
     @Transactional
     public DeviceRequestDto rejectRequest(Integer idRequest) {
         Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
+
         if (solicitudOp.isEmpty()) {
             throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
         }
@@ -74,20 +67,7 @@ public class DeviceRequest {
         return convertToDto(solicitud);
     }
 
-    //  ====> DISPOSITIVOS <=====
 
-
-    /*
-    @Transactional
-    public DeviceRequestDto rejectRequest(int idRequest, @RequestBody DeviceRequestDto deviceRequestDto) {
-        SolicitudDispositivos solicitud = deviceRequestRepository.findById(idRequest).orElse(null);
-        solicitud.setAprobacionAdmin(deviceRequestDto.isAprobacionAdmin());
-        solicitud.setEstado(deviceRequestDto.getEstado());
-        deviceRequestRepository.save(solicitud);
-        return deviceRequestDto;
-    }
-
-    */
     private DeviceRequestDto convertToDto(Solicitud solicitud) {
         DeviceRequestDto dto = new DeviceRequestDto();
         dto.setFechaInicio(solicitud.getFechaInicio());
@@ -98,7 +78,6 @@ public class DeviceRequest {
         dto.setIdTipoDispositivo(solicitud.getIdSolicitud());
         return dto;
     }
-
 
     private DeviceTypeDTO convertToDto(TipoDispositivo tipoDispositivo) {
         DeviceTypeDTO dto = new DeviceTypeDTO();

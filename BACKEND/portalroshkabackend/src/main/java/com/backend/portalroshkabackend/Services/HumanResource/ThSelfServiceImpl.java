@@ -6,6 +6,8 @@ import com.backend.portalroshkabackend.DTO.th.self.*;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.*;
+import com.backend.portalroshkabackend.Repositories.TH.TipoDispositivoRepository;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.SaveManager;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;

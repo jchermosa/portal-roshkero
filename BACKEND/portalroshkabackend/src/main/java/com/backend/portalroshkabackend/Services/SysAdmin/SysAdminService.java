@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.portalroshkabackend.DTO.SYSADMIN.RequestDTO;
 import com.backend.portalroshkabackend.Models.Solicitud;
-import com.backend.portalroshkabackend.Repositories.SysAdminRepository;
+import com.backend.portalroshkabackend.Repositories.SYSADMIN.SysAdminRepository;
 
 @Service
 public class SysAdminService {
@@ -70,10 +70,6 @@ public class SysAdminService {
         }
     }
 
-    @Transactional
-    public void deleteDispositivo(Integer id){
-        dispositivoService.deleteDeviceById(id);
-    }
 
     private List<RequestDTO> convertToDto(List<Solicitud> solicitudes) {
         return solicitudes.stream()

@@ -10,7 +10,7 @@ import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceDTO;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.UbicacionDto;
 import com.backend.portalroshkabackend.Models.Ubicacion;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
-import com.backend.portalroshkabackend.Repositories.UbicacionRepository;
+import com.backend.portalroshkabackend.Repositories.SYSADMIN.UbicacionRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -40,14 +40,13 @@ public class UbicacionService {
                     dto.setDispositivos(ubicacion.getDispositivos().stream()
                             .map(device -> {
                                 DeviceDTO deviceDto = new DeviceDTO();
-                                deviceDto.setIdDispositivo(device.getIdDispositivo());
                                 deviceDto.setTipoDispositivo(device.getTipoDispositivo().getIdTipoDispositivo());
                                 deviceDto.setNroSerie(device.getNroSerie());
                                 deviceDto.setModelo(device.getModelo());
                                 deviceDto.setDetalle(device.getDetalles());
                                 deviceDto.setFechaFabricacion(device.getFechaFabricacion());
                                 deviceDto.setEstado(device.getEstado()); 
-                                deviceDto.setCategoria(device.getCategoria().name());
+                                deviceDto.setCategoria(device.getCategoria());
                                 if (device.getEncargado() != null) {
                                     deviceDto.setEncargado(device.getEncargado().getIdUsuario());
                                 } else {
@@ -77,14 +76,13 @@ public class UbicacionService {
                     dto.setDispositivos(ubicacion.getDispositivos().stream()
                             .map(device -> {
                                 DeviceDTO deviceDto = new DeviceDTO();
-                                deviceDto.setIdDispositivo(device.getIdDispositivo());
                                 deviceDto.setTipoDispositivo(device.getTipoDispositivo().getIdTipoDispositivo());
                                 deviceDto.setNroSerie(device.getNroSerie());
                                 deviceDto.setModelo(device.getModelo());
                                 deviceDto.setDetalle(device.getDetalles());
                                 deviceDto.setFechaFabricacion(device.getFechaFabricacion());
                                 deviceDto.setEstado(device.getEstado()); 
-                                deviceDto.setCategoria(device.getCategoria().name());
+                                deviceDto.setCategoria(device.getCategoria());
                                  if (device.getEncargado() != null) {
                                     deviceDto.setEncargado(device.getEncargado().getIdUsuario());
                                 } else {

@@ -3,7 +3,8 @@ package com.backend.portalroshkabackend.Services;
 import com.backend.portalroshkabackend.DTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

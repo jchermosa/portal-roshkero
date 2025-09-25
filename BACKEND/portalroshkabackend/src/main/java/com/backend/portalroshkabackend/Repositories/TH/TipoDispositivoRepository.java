@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Repositories;
+package com.backend.portalroshkabackend.Repositories.TH;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

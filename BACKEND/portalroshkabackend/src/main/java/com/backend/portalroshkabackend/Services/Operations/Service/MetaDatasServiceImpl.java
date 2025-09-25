@@ -12,7 +12,7 @@ import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.TecnologiasResp
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IMetaDatasService;
 
 @Service
