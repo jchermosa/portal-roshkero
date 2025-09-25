@@ -8,7 +8,9 @@ import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
 import com.backend.portalroshkabackend.Models.Usuario;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 public class EmployeeMapper {
 
@@ -74,10 +76,21 @@ public class EmployeeMapper {
         user.setTelefono(insertDto.getTelefono());
         user.setCargo(insertDto.getCargo());
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
+
+        Period period = Period.between(insertDto.getFechaIngreso(), LocalDate.now());
+
+        if (period.getYears() >= 1 && period.getYears() <= 5){
+            user.setDiasVacaciones(12);
+        } else if (period.getYears() >= 5 && period.getYears() <= 10 ){
+            user.setDiasVacaciones(15);
+        } else if (period.getYears() >= 10 ){
+            user.setDiasVacaciones(21);
+        }
+
+        user.setDiasVacacionesRestante(user.getDiasVacaciones());
         user.setRequiereCambioContrasena(insertDto.isRequiereCambioContrasena());
         user.setFechaCreacion(LocalDateTime.now());
         user.setUrlPerfil(insertDto.getUrl_perfil());
-        user.setDiasVacaciones(insertDto.getDisponibilidad());
         user.setDisponibilidad(insertDto.getDisponibilidad());
 
         return user;
@@ -94,6 +107,7 @@ public class EmployeeMapper {
         user.setTelefono(updateDto.getTelefono());
         user.setCargo(updateDto.getCargos());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
+        user.setDisponibilidad(updateDto.getDisponibilidad());
     }
 
 }

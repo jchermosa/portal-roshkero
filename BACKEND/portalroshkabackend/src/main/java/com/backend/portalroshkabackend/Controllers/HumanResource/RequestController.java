@@ -55,6 +55,7 @@ public class RequestController {
         return ResponseEntity.ok(requests);
     }
 
+    // TODO: getyByIdSolicitud?
 
     @PostMapping("/th/users/requests/{idRequest}/accept")
     public ResponseEntity<RequestResponseDto> acceptRequest(@PathVariable int idRequest){

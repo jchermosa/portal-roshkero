@@ -73,7 +73,7 @@ public class Usuario {
     @Column(name = "antiguedad", insertable = false, updatable = false)
     private String antiguedad; // Se mapea como String para INTERVAL de PostgreSQL
     
-    @Column(name = "dias_vacaciones", insertable = false, updatable = false)
+    @Column(name = "dias_vacaciones")
     private Integer diasVacaciones = 0;
     
     @Column(name = "contrasena", nullable = false)

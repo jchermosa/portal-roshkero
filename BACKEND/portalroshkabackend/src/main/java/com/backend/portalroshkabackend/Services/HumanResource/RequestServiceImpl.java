@@ -3,15 +3,18 @@ package com.backend.portalroshkabackend.Services.HumanResource;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Repositories.TH.*;
 import com.backend.portalroshkabackend.Repositories.TH.SolicitudRepository;
 import com.backend.portalroshkabackend.Repositories.*;
+import com.backend.portalroshkabackend.Services.HumanResource.subservices.IAcceptRequestService;
 import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.RequestMapper;
 import com.backend.portalroshkabackend.tools.validator.RequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,15 +27,24 @@ public class RequestServiceImpl implements IRequestService{
     private final SolicitudRepository solicitudRepository;
     private final RequestValidator requestValidator;
     private final RepositoryService repositoryService;
+    private final IAcceptRequestService acceptVacationsService;
+    private final IAcceptRequestService acceptBenefitService;
+    private final IAcceptRequestService acceptPermissionsService;
 
     @Autowired
     public RequestServiceImpl (SolicitudRepository solicitudRepository,
                                RequestValidator requestValidator,
-                               RepositoryService repositoryService
+                               RepositoryService repositoryService,
+                               @Qualifier("acceptVacationsService") IAcceptRequestService acceptVacationsService,
+                               @Qualifier("acceptBenefitService") IAcceptRequestService acceptBenefitService,
+                               @Qualifier("acceptPermissionsService") IAcceptRequestService acceptPermissionsService
     ){
         this.solicitudRepository = solicitudRepository;
         this.requestValidator = requestValidator;
         this.repositoryService = repositoryService;
+        this.acceptVacationsService = acceptVacationsService;
+        this.acceptBenefitService = acceptBenefitService;
+        this.acceptPermissionsService = acceptPermissionsService;
     }
 
     @Transactional(readOnly = true)
@@ -53,6 +65,12 @@ public class RequestServiceImpl implements IRequestService{
         );
 
         requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitud());
+
+        switch (request.getTipoSolicitud()){
+            case SolicitudesEnum.VACACIONES -> acceptVacationsService.acceptRequest(request);
+            case SolicitudesEnum.BENEFICIO -> acceptBenefitService.acceptRequest(request);
+            case SolicitudesEnum.PERMISO -> acceptPermissionsService.acceptRequest(request);
+        }
 
         request.setEstado(EstadoSolicitudEnum.A);
 

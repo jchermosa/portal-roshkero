@@ -33,6 +33,6 @@ public class UserUpdateDto {
 
     private boolean requiereCambioContrasena;
 
-
+    private Integer disponibilidad;
 
 }
