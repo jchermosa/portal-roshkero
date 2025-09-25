@@ -13,7 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+// import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
@@ -24,9 +24,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+// import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+// import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -123,20 +123,20 @@ public class Usuario {
     private Integer disponibilidad = 100;
     
     // Relaciones
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Solicitud> solicitudes = new ArrayList<>();
+    // @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<Solicitud> solicitudes = new ArrayList<>();
     
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private List<AsignacionUsuarioEquipo> asignacionesEquipo = new ArrayList<>();
+    // @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    // private List<AsignacionUsuarioEquipo> asignacionesEquipo = new ArrayList<>();
     
-    @OneToMany(mappedBy = "encargado", fetch = FetchType.LAZY)
-    private List<Dispositivo> dispositivosACargo = new ArrayList<>();
+    // @OneToMany(mappedBy = "encargado", fetch = FetchType.LAZY)
+    // private List<Dispositivo> dispositivosACargo = new ArrayList<>();
 
-    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
-    private List<Equipos> equiposLiderados = new ArrayList<>();
+    // @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
+    // private List<Equipos> equiposLiderados = new ArrayList<>();
 
-    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
-    private List<Solicitud>  listaSolicitudes = new ArrayList<>();
+    // @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
+    // private List<Solicitud>  listaSolicitudes = new ArrayList<>();
     
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

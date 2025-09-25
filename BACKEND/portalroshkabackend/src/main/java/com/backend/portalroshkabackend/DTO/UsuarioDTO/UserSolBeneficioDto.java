@@ -7,13 +7,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UserSolPermisoDto {
-    
-    // private Integer id_usuario;
-    private Integer id_tipo_permiso;
+public class UserSolBeneficioDto {
+
+    private Integer id_tipo_beneficio;
     private LocalDate fecha_inicio;
     private Integer cant_dias;
     private String comentario;
+    private Integer monto;
 
-    
 }

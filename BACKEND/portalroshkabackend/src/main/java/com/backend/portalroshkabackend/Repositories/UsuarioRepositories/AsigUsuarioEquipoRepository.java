@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AsigUsuarioEquipoRepository extends JpaRepository<AsignacionUsuarioEquipo, Integer> {
     List<AsignacionUsuarioEquipo> findByUsuario(Usuario usuario);
+    // List<AsignacionUsuarioEquipo> findByUsuario_IdUsuario(Integer idUsuario);
 }
 
 //Repositorio de las Asignaciones de los usuarios a los equipos

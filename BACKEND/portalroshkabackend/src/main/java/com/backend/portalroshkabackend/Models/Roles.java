@@ -1,17 +1,17 @@
 package com.backend.portalroshkabackend.Models;
 
 
-import java.util.Set;
+// import java.util.Set;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+// import java.util.HashSet;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.FetchType;
+// import jakarta.persistence.OneToMany;
+// import jakarta.persistence.FetchType;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -32,8 +32,8 @@ public class Roles {
     @Column(name = "nombre", unique = true)
     private String nombre;
 
-    @OneToMany (mappedBy = "rol", fetch = FetchType.LAZY)
-    private Set<Usuario> usuarios = new HashSet<>();
+    // @OneToMany (mappedBy = "rol", fetch = FetchType.LAZY)
+    // private Set<Usuario> usuarios = new HashSet<>();
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;

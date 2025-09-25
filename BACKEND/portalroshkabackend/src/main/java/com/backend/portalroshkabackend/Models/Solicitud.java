@@ -20,9 +20,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.CascadeType;
+// import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
+// import jakarta.persistence.OneToOne;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,11 +38,11 @@ public class Solicitud {
     @Column(name = "id_solicitud")
     private Integer idSolicitud;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_lider", nullable = true)
     private Usuario lider;
 
@@ -63,17 +63,17 @@ public class Solicitud {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private EstadoSolicitudEnum estado = EstadoSolicitudEnum.P;
 
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-    private PermisosAsignados permisoAsignado;
+    // @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private PermisosAsignados permisoAsignado;
 
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-    private VacacionesAsignadas vacacionesAsignadas;
+    // @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private VacacionesAsignadas vacacionesAsignadas;
 
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-    private BeneficiosAsignados beneficioAsignado;
+    // @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private BeneficiosAsignados beneficioAsignado;
 
-    @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL)
-    private DispositivoAsignado dispositivoAsignado;
+    // @OneToOne(mappedBy = "solicitud", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private DispositivoAsignado dispositivoAsignado;
 
     @Column(name = "fecha_inicio", nullable = false)
     private LocalDate fechaInicio;

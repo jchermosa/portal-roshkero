@@ -3,9 +3,9 @@ package com.backend.portalroshkabackend.Models;
 import com.backend.portalroshkabackend.Models.Enum.CategoriaEnum;
 import com.backend.portalroshkabackend.Models.Enum.EstadoInventario;
 import java.time.LocalDate;
-import java.util.List;
+// import java.util.List;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+// import java.util.ArrayList;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -20,7 +20,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+// import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import lombok.Data;
@@ -53,8 +53,8 @@ public class Dispositivo {
     @Column(name = "fecha_fabricacion", nullable = false)
     private LocalDate fechaFabricacion;
     
-    @OneToMany(mappedBy = "dispositivo")
-    private List<DispositivoAsignado> dispositivosAsignados = new ArrayList<>();
+    // @OneToMany(mappedBy = "dispositivo")
+    // private List<DispositivoAsignado> dispositivosAsignados = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "id_ubicacion")
