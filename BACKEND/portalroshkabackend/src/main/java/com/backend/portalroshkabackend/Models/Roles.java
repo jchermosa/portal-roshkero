@@ -32,8 +32,8 @@ public class Roles {
     @Column(name = "nombre", unique = true)
     private String nombre;
 
-    // @OneToMany (mappedBy = "rol", fetch = FetchType.LAZY)
-    // private Set<Usuario> usuarios = new HashSet<>();
+//    @OneToMany (mappedBy = "rol", fetch = FetchType.LAZY)
+//    private Set<Usuario> usuarios = new HashSet<>();
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;

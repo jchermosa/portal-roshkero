@@ -2,6 +2,7 @@ package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.common.ErrorResponseDto;
 import com.backend.portalroshkabackend.tools.errors.errorslist.permisos.PermissionTypeInUseException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.permisos.PermissionTypeNotFoundException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,11 @@ public class PermissionExceptionHandler extends BaseExceptionHandler{
     @ExceptionHandler(PermissionTypeInUseException.class)
     public ResponseEntity<ErrorResponseDto> handlerPermissionTypeInUse(PermissionTypeInUseException ex){
         return buildError(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(PermissionTypeNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handlePermissionTypeNotFound(PermissionTypeNotFoundException ex){
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
 }

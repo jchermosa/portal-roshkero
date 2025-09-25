@@ -32,6 +32,16 @@ public class EmployeeController {
      }
 
     // ----------------- Users -----------------
+    @PostMapping("/th/users/{id}/resetpassword")
+    public ResponseEntity<DefaultResponseDto> resetUserPassword(
+            @PathVariable int id
+    ){
+        DefaultResponseDto response = employeeService.resetUserPassword(id);
+
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping("/th/users")
     public ResponseEntity<?> getAllEmployees(
             @RequestParam(value = "sortBy", required = false) String sortBy,
@@ -62,6 +72,8 @@ public class EmployeeController {
 
         return ResponseEntity.ok(users);
     }
+
+    //TODO: Obtener todos los datos de un usuario (y su foto de perfil y tecnologias), tambien el historial de equipos en los que estuvo.
 
     @GetMapping("/th/users/{id}")
     public ResponseEntity<UserByIdResponseDto> getEmployeeById(@PathVariable int id){

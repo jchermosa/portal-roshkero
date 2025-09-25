@@ -38,7 +38,7 @@ public class TipoPermisos {
     @Column(name = "fuerza_menor", nullable = false)
     private Boolean fuerzaMenor = false;
 
-    // @OneToMany(mappedBy = "tipoPermiso", fetch = FetchType.LAZY)
-    // private List<PermisosAsignados> permisosAsignados = new ArrayList<>();
+//    @OneToMany(mappedBy = "tipoPermiso", fetch = FetchType.LAZY)
+//    private List<PermisosAsignados> permisosAsignados = new ArrayList<>();
 
 }

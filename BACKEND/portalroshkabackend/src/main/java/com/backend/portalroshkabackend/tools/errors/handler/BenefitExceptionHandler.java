@@ -2,6 +2,7 @@ package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.common.ErrorResponseDto;
 import com.backend.portalroshkabackend.tools.errors.errorslist.beneficios.BenefitTypeInUseException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.beneficios.BenefitTypeNotFoundException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class BenefitExceptionHandler extends BaseExceptionHandler{
 
     @ExceptionHandler(BenefitTypeInUseException.class)
-    public ResponseEntity<ErrorResponseDto> handlerBenefitTypeInUse(BenefitTypeInUseException ex){
+    public ResponseEntity<ErrorResponseDto> handleBenefitTypeInUse(BenefitTypeInUseException ex){
         return buildError(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(BenefitTypeNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleBenefitTypeNotFound(BenefitTypeNotFoundException ex){
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
 }

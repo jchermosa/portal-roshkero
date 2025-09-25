@@ -73,7 +73,7 @@ public class Usuario {
     @Column(name = "antiguedad", insertable = false, updatable = false)
     private String antiguedad; // Se mapea como String para INTERVAL de PostgreSQL
     
-    @Column(name = "dias_vacaciones", insertable = false, updatable = false)
+    @Column(name = "dias_vacaciones")
     private Integer diasVacaciones = 0;
     
     @Column(name = "contrasena", nullable = false)
@@ -123,27 +123,27 @@ public class Usuario {
     private Integer disponibilidad = 100;
     
     // Relaciones
-    // @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<Solicitud> solicitudes = new ArrayList<>();
+   // @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    //private List<Solicitud> solicitudes = new ArrayList<>();
     
-    // @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    // private List<AsignacionUsuarioEquipo> asignacionesEquipo = new ArrayList<>();
-    
-    // @OneToMany(mappedBy = "encargado", fetch = FetchType.LAZY)
-    // private List<Dispositivo> dispositivosACargo = new ArrayList<>();
-
-    // @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
-    // private List<Equipos> equiposLiderados = new ArrayList<>();
-
-    // @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
-    // private List<Solicitud>  listaSolicitudes = new ArrayList<>();
-    
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "tecnologias_usuario",
-        joinColumns = @JoinColumn(name = "id_usuario"),
-        inverseJoinColumns = @JoinColumn(name = "id_tecnologia")
-    )
-    private Set<Tecnologias> tecnologias = new HashSet<>();
+   // @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+//   // private List<AsignacionUsuarioEquipo> asignacionesEquipo = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "encargado", fetch = FetchType.LAZY)
+//    private List<Dispositivo> dispositivosACargo = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
+//    private List<Equipos> equiposLiderados = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "lider", fetch = FetchType.LAZY)
+//    private List<Solicitud>  listaSolicitudes = new ArrayList<>();
+////
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//        name = "tecnologias_usuario",
+//        joinColumns = @JoinColumn(name = "id_usuario"),
+//        inverseJoinColumns = @JoinColumn(name = "id_tecnologia")
+//    )
+//    private Set<Tecnologias> tecnologias = new HashSet<>();
     
 }

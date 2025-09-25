@@ -35,8 +35,8 @@ public class Clientes {
     @Column(name = "ruc")
     private String ruc;
 
-    // @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
-    // private Set<Equipos> equipos = new HashSet<>();
+//    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
+//    private Set<Equipos> equipos = new HashSet<>();
 
     @Column(name = "fecha_creacion")
     private LocalDate fechaCreacion;

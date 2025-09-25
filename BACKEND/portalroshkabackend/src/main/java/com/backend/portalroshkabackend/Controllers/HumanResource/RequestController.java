@@ -26,15 +26,6 @@ public class RequestController {
         this.requestService = requestService;
     }
 
-    // @GetMapping("/th/users/requests/leader/approved")
-    // public ResponseEntity<Page<SolicitudTHResponseDto>> getApprovedByLeader(
-    //         @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
-    // ){
-    //     // Page<SolicitudTHResponseDto> requests = requestService.getApprovedByLeader(pageable);
-
-    //     return ResponseEntity.ok(requests);
-    // }
-
     @GetMapping("/th/users/requests/sortby")
     public ResponseEntity<Page<SolicitudResponseDto>> getRequestSortByEstado(
             @RequestParam(value = "estado", required = true) String estado,
@@ -64,6 +55,7 @@ public class RequestController {
         return ResponseEntity.ok(requests);
     }
 
+    // TODO: getyByIdSolicitud?
 
     @PostMapping("/th/users/requests/{idRequest}/accept")
     public ResponseEntity<RequestResponseDto> acceptRequest(@PathVariable int idRequest){

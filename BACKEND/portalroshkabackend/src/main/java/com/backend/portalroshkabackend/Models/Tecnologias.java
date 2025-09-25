@@ -36,10 +36,10 @@ public class Tecnologias {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
-    // @ManyToMany(mappedBy = "tecnologias", fetch = FetchType.LAZY)
-    // private Set<Usuario> usuarios = new HashSet<>();
-
-    // @ManyToMany(mappedBy = "tecnologias", fetch = FetchType.LAZY)
-    // private Set<Equipos> equipos = new HashSet<>();
+//    @ManyToMany(mappedBy = "tecnologias", fetch = FetchType.LAZY)
+//    private Set<Usuario> usuarios = new HashSet<>();
+//
+//    @ManyToMany(mappedBy = "tecnologias", fetch = FetchType.LAZY)
+//    private Set<Equipos> equipos = new HashSet<>();
 
 }
