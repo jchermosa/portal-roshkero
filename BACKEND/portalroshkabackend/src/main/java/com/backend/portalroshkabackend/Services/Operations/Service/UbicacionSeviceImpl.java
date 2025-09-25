@@ -31,4 +31,6 @@ public class UbicacionSeviceImpl implements IUbicacionSevice {
 
         return allUbicacion;
     }
+
+        
 }
