@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController()
 @RequestMapping("/api/v1/admin")
 public class CargosController {
-    private final ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto> cargosService;
+    private final ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoInsertDto> cargosService;
 
     @Autowired
-    public CargosController(@Qualifier("cargosService") ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto> cargosService){
+    public CargosController(@Qualifier("cargosService") ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoInsertDto> cargosService){
         this.cargosService = cargosService;
     }
 

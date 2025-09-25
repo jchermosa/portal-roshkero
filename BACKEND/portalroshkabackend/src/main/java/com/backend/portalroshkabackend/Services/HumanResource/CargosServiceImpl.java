@@ -23,7 +23,7 @@ import java.util.List;
 import static com.backend.portalroshkabackend.tools.MessagesConst.*;
 
 @Service("cargosService") // Para hacer keyed dependency injection :D
-public class CargosServiceImpl implements ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto> {
+public class CargosServiceImpl implements ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoInsertDto> {
     private final CargosRepository cargosRepository;
     private final UserRepository userRepository;
     private final CargoValidator cargoValidator;

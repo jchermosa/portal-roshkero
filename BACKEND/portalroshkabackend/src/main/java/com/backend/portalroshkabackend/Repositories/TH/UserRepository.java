@@ -33,6 +33,7 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
     boolean existsByNroCedulaAndIdUsuarioNot(String nroCedula, Integer idUsuario);
     boolean existsByTelefonoAndIdUsuarioNot(String telefono, Integer idUsuario);
     boolean existsByCargo_IdCargo(int idCargo);
+    boolean existsByRol_IdRol(int idRol);
 
     Optional<Usuario> findByNroCedula(String nroCedula);
 
@@ -40,4 +41,5 @@ public interface UserRepository extends JpaRepository<Usuario, Integer> {
 
     List<Usuario> findByIdUsuarioNotIn(List<Integer> list);//
     List<Usuario> findAllByCargo_IdCargo(int idCargo);
+    List<Usuario> findAllByRol_IdRol(int idRol);
 }

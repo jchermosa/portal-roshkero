@@ -2,6 +2,7 @@ package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.common.ErrorResponseDto;
 import com.backend.portalroshkabackend.tools.errors.errorslist.roles.RoleAssignedToUsersException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.roles.RoleDuplicateNameException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.roles.RolesNotFoundException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,11 @@ public class RolesExceptionHandler extends BaseExceptionHandler{
 
     @ExceptionHandler(RoleAssignedToUsersException.class)
     public ResponseEntity<ErrorResponseDto> handleRoleAssignedToUsers(RoleAssignedToUsersException ex){
+        return buildError(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(RoleDuplicateNameException.class)
+    public ResponseEntity<ErrorResponseDto> handleRolDuplicateNameException(RoleDuplicateNameException ex){
         return buildError(HttpStatus.CONFLICT, ex.getMessage());
     }
 

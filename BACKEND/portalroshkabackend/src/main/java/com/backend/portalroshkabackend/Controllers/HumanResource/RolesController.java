@@ -6,6 +6,7 @@ import com.backend.portalroshkabackend.DTO.th.cargos.CargosDefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.cargos.CargosResponseDto;
 import com.backend.portalroshkabackend.DTO.th.roles.RolByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.roles.RolDefaultResponseDto;
+import com.backend.portalroshkabackend.DTO.th.roles.RolInsertDto;
 import com.backend.portalroshkabackend.DTO.th.roles.RolesResponseDto;
 import com.backend.portalroshkabackend.Services.HumanResource.ICommonRolesCargosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/admin")
 public class RolesController {
-    private final ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto> rolesService;
+    private final ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto, RolInsertDto, RolInsertDto> rolesService;
 
     @Autowired
-    public RolesController(@Qualifier("rolesService") ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto> rolesService){
+    public RolesController(@Qualifier("rolesService") ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto, RolInsertDto, RolInsertDto> rolesService){
         this.rolesService = rolesService;
     }
 
@@ -40,16 +41,16 @@ public class RolesController {
 
     @GetMapping("/th/roles/{idRol}")
     public ResponseEntity<?> getCargoById(
-            @PathVariable int idCargo
+                @PathVariable int idRol
     ){
-        RolByIdResponseDto response = rolesService.getById(idCargo);
+        RolByIdResponseDto response = rolesService.getById(idRol);
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/th/roles")
     public ResponseEntity<RolDefaultResponseDto> addCargo(
-            @RequestBody CargoInsertDto insertDto
+            @RequestBody RolInsertDto insertDto
     ){
         RolDefaultResponseDto rolDto = rolesService.add(insertDto);
 
@@ -59,19 +60,19 @@ public class RolesController {
 
     @PutMapping("/th/roles/{idRol}")
     public ResponseEntity<RolDefaultResponseDto> updateCargo(
-            @PathVariable int idCargo,
-            @RequestBody CargoInsertDto updateDto
+            @PathVariable int idRol,
+            @RequestBody RolInsertDto updateDto
     ){
-        RolDefaultResponseDto rolDto = rolesService.update(idCargo, updateDto);
+        RolDefaultResponseDto rolDto = rolesService.update(idRol, updateDto);
 
         return ResponseEntity.ok(rolDto);
     }
 
     @DeleteMapping("/th/roles/{idRol}")
     public ResponseEntity<RolDefaultResponseDto> deleteCargo(
-            @PathVariable int idCargo
+            @PathVariable int idRol
     ){
-        RolDefaultResponseDto rolDto = rolesService.delete(idCargo);
+        RolDefaultResponseDto rolDto = rolesService.delete(idRol);
 
         return ResponseEntity.ok(rolDto);
     }
