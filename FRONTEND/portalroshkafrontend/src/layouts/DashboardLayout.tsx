@@ -3,6 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { tieneRol } from "../utils/permisos";
 import { Roles } from "../types/roles";
+import "../styles/scrollbar.css";
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
@@ -53,46 +54,13 @@ export default function DashboardLayout() {
         </div>
 
         {/* Menú con scroll personalizado */}
-        <nav className="flex-1 overflow-y-auto mt-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
-          <style jsx>{`
-            /* Estilos personalizados para el scrollbar */
-            nav::-webkit-scrollbar {
-              width: 6px;
-            }
-            
-            nav::-webkit-scrollbar-track {
-              background: transparent;
-            }
-            
-            nav::-webkit-scrollbar-thumb {
-              background-color: rgb(209 213 219); /* gray-300 */
-              border-radius: 3px;
-              transition: background-color 0.2s ease;
-            }
-            
-            nav::-webkit-scrollbar-thumb:hover {
-              background-color: rgb(156 163 175); /* gray-400 */
-            }
-            
-            /* Estilos para modo oscuro */
-            .dark nav::-webkit-scrollbar-thumb {
-              background-color: rgb(75 85 99); /* gray-600 */
-            }
-            
-            .dark nav::-webkit-scrollbar-thumb:hover {
-              background-color: rgb(107 114 128); /* gray-500 */
-            }
-            
-            /* Para Firefox */
-            nav {
-              scrollbar-width: thin;
-              scrollbar-color: rgb(209 213 219) transparent;
-            }
-            
-            .dark nav {
-              scrollbar-color: rgb(75 85 99) transparent;
-            }
-          `}</style>
+        <nav 
+          className="flex-1 overflow-y-auto mt-6 custom-scrollbar"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgb(209 213 219) transparent'
+          }}
+        >
           
           {menuOptions.map((opt) => (
             <NavLink
