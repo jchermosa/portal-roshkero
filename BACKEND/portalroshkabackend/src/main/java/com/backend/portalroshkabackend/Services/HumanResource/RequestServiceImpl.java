@@ -49,8 +49,8 @@ public class RequestServiceImpl implements IRequestService{
 
     @Transactional(readOnly = true)
     @Override
-    public Page<SolicitudResponseDto> getByEstado(EstadoSolicitudEnum estado, Pageable pageable) {
-        Page<Solicitud> requestSorted = solicitudRepository.findAllByEstado(estado, pageable);
+    public Page<SolicitudResponseDto> getByTipoSolicitud(SolicitudesEnum tipoSolicitud, Pageable pageable) {
+        Page<Solicitud> requestSorted = solicitudRepository.findAllByTipoSolicitud(tipoSolicitud, pageable);
 
         return requestSorted.map(RequestMapper::toSolicitudTHResponseDto);
     }
