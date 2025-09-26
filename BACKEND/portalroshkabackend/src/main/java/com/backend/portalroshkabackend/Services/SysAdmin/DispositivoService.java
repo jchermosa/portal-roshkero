@@ -209,7 +209,7 @@ public class DispositivoService {
         ubicacion.setEstado(ubicacionDto.getEstado());
         ubicacion.setIdUbicacion(ubicacionDto.getIdUbicacion());
 
-        existingDispositivo.setUbicacion(ubicacion);
+        existingDispositivo.setUbicacion(ubicacion); 
 
         existingDispositivo.setModelo(dispositivoDto.getModelo());
         existingDispositivo.setFechaFabricacion(dispositivoDto.getFechaFabricacion());
