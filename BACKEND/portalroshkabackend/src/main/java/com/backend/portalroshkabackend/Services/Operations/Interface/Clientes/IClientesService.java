@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services.Operations.Interface;
+package com.backend.portalroshkabackend.Services.Operations.Interface.Clientes;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -4,7 +4,7 @@ import com.backend.portalroshkabackend.DTO.Operationes.Clientes.ClientesRequestD
 import com.backend.portalroshkabackend.DTO.Operationes.Clientes.ClientesResponseDto;
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Repositories.ClientesRepository;
-import com.backend.portalroshkabackend.Services.Operations.Interface.IClientesService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.Clientes.IClientesService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
