@@ -30,6 +30,7 @@ import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivo
 import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
 import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage.tsx";
 import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage.tsx";
+import UbicacionPage from "../pages/varios/UbicacionPage.tsx";
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -91,6 +92,9 @@ export default function AppRoutes() {
 
           {/* Tipos de dispositivo */}
           <Route path="/tipo-dispositivo" element={<TipoDispositivoPage />} />
+
+          {/* Ubicación */}
+          <Route path="/ubicacion" element={<UbicacionPage />} />
 
           {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />
