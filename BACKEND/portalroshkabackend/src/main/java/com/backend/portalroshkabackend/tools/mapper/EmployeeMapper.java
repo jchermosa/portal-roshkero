@@ -1,5 +1,6 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.common.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
 import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
@@ -56,6 +57,32 @@ public class EmployeeMapper {
         return dto;
     }
 
+    public static UserDto toUserDto(Usuario user){
+        UserDto dto = new UserDto();
+
+        dto.setIdUsuario(user.getIdUsuario());
+        dto.setNombre(user.getNombre());
+        dto.setApellido(user.getApellido());
+        dto.setNroCedula(user.getNroCedula());
+        dto.setCorreo(user.getCorreo());
+        dto.setIdRol(user.getRol().getIdRol());
+        dto.setNombreRol(user.getRol().getNombre());
+        dto.setFechaIngreso(user.getFechaIngreso());
+        dto.setAntiguedad(user.getAntiguedad());
+        dto.setDiasVacaciones(user.getDiasVacaciones());
+        dto.setEstado(user.getEstado());
+        dto.setTelefono(user.getTelefono());
+        dto.setIdCargo(user.getCargo().getIdCargo());
+        dto.setFechaNacimiento(user.getFechaNacimiento());
+        dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
+        dto.setRequiereCambioContrasena(user.getRequiereCambioContrasena());
+        dto.setSeniority(user.getSeniority());
+        dto.setFoco(user.getFoco());
+        dto.setUrlPerfil(user.getUrlPerfil());
+        dto.setDisponibilidad(user.getDisponibilidad());
+
+        return dto;
+    }
 
     // ------ DTO TO ENTITY ------
 

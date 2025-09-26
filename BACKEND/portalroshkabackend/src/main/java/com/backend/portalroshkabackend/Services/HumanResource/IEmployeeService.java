@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
+
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.common.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
 import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
@@ -17,6 +19,7 @@ public interface IEmployeeService {
     Page<UserResponseDto> getAllEmployeesByRol(Pageable pageable);
     Page<UserResponseDto> getAllEmployeesByPosition(Pageable pageable);
     UserByIdResponseDto getEmployeeById(int id);
+    UserDto getEmployeeByCedula(String cedula);
     DefaultResponseDto addEmployee(UserInsertDto insertDto);
     DefaultResponseDto updateEmployee(UserUpdateDto updateDto, int id);
     DefaultResponseDto deleteEmployee(int id);

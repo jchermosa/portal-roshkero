@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.common.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
 import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
@@ -112,6 +113,13 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
         return EmployeeMapper.toUserByIdDto(user);
 
+    }
+
+    @Override
+    public UserDto getEmployeeByCedula(String cedula) {
+        Usuario user = userRepository.findByNroCedula(cedula).orElseThrow( () -> new UserNotFoundException(cedula));
+
+        return EmployeeMapper.toUserDto(user);
     }
 
     @Transactional

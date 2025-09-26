@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 import com.backend.portalroshkabackend.DTO.*;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.common.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
 import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
@@ -80,6 +81,13 @@ public class EmployeeController {
         UserByIdResponseDto user = employeeService.getEmployeeById(id);
 
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/th/users/cedula/{cedula}")
+    public ResponseEntity<UserDto> getEmployeeByCedula(@PathVariable String cedula){
+        UserDto userDto = employeeService.getEmployeeByCedula(cedula);
+
+        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("/th/users")
