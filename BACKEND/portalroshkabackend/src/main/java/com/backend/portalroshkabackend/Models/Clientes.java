@@ -1,8 +1,9 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.time.LocalDate;
-// import java.util.Set;
-// import java.util.HashSet;
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.HashSet;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.FetchType;
@@ -39,5 +40,5 @@ public class Clientes {
 //    private Set<Equipos> equipos = new HashSet<>();
 
     @Column(name = "fecha_creacion")
-    private LocalDate fechaCreacion;
+    private LocalDateTime fechaCreacion;
 }

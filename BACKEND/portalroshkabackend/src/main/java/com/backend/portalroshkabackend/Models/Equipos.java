@@ -1,9 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 // import java.util.List;
-import java.util.Set;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -18,8 +16,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 // import jakarta.persistence.OneToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -40,14 +36,14 @@ public class Equipos {
     @Column(name = "id_equipo")
     private Integer idEquipo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_lider")
     private Usuario lider;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente")
     private Clientes cliente;
 
@@ -73,6 +69,6 @@ public class Equipos {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private EstadoActivoInactivo estado = EstadoActivoInactivo.A;
 
-//    @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
-//    private List<AsignacionUsuarioEquipo> asignacionesUsuario = new ArrayList<>();
+    // @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
+    // private List<AsignacionUsuarioEquipo> asignacionesUsuario = new ArrayList<>();
 }

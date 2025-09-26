@@ -45,9 +45,6 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
     private Integer idUsuario;
-    
-
-
 
     @Column(name = "nombre", nullable = false)
     private String nombre;

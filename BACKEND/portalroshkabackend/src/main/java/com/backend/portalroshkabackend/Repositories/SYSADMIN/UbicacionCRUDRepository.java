@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.backend.portalroshkabackend.Models.Ubicacion;
 
 @Repository
-public interface UbicacionRepository extends JpaRepository<Ubicacion, Integer> {
+public interface UbicacionCRUDRepository extends JpaRepository<Ubicacion, Integer> {
 
     Optional<Ubicacion> findByIdUbicacion(Integer idUbicacion);
 }

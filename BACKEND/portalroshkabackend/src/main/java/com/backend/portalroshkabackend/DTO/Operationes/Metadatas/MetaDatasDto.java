@@ -3,6 +3,7 @@ package com.backend.portalroshkabackend.DTO.Operationes.Metadatas;
 import java.util.List;
 
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.Tecnologias.TecnologiasResponseDto;
 
 import lombok.Data;
 @Data

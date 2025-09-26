@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 import com.backend.portalroshkabackend.Security.filter.JwtAuthenticationFilter;
 import com.backend.portalroshkabackend.Security.filter.JwtValidationFilter;
 import com.backend.portalroshkabackend.Services.UsuariosService;
@@ -40,9 +41,9 @@ public class SpringSecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
         config.setAllowedOrigins(java.util.List.of("http://localhost:5173")); // Origen del frontend
-        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowCredentials(true);
-        config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type"));
+        config.setAllowedHeaders(java.util.List.of("Authorization","Content-Type","Accept","Origin","X-Requested-With"));
         
         org.springframework.web.cors.UrlBasedCorsConfigurationSource source = 
             new org.springframework.web.cors.UrlBasedCorsConfigurationSource();

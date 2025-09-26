@@ -16,13 +16,13 @@ import com.backend.portalroshkabackend.Repositories.OP.TecnologiasEquiposReposit
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
 
 @Service
-public class TecnologiaServiceImpl implements ITecnologiaService {
+public class TecnologiasEquiposServiceImpl implements ITecnologiaService {
 
     private final TecnologiaRepository tecnologiaRepository;
     private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
 
     @Autowired
-    public TecnologiaServiceImpl(TecnologiaRepository tecnologiaRepository,
+    public TecnologiasEquiposServiceImpl(TecnologiaRepository tecnologiaRepository,
                                  TecnologiasEquiposRepository tecnologiasEquiposRepository) {
         this.tecnologiaRepository = tecnologiaRepository;
         this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;

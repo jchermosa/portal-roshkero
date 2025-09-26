@@ -1,26 +1,16 @@
 import type { UsuarioItem } from "../types";
-import mockUsuariosData from "../data/mockUsuarios.json";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
-
-// Hacemos una copia mutable del mock
-let mockUsuarios: UsuarioItem[] = [...(mockUsuariosData as UsuarioItem[])];
-
-// ================================
-// Respuesta pageable estándar
-// ================================
 export interface PaginatedResponse<T> {
   content: T[];
   totalPages: number;
   totalElements: number;
   size: number;
-  number: number; // página actual
+  number: number;
 }
 
-// ================================
-// Métodos reales
-// ================================
-async function getUsuariosApi(
+const BASE_URL = "/api/v1/admin/th/users";
+
+export async function getUsuarios(
   token: string,
   params: Record<string, string | number | undefined> = {}
 ): Promise<PaginatedResponse<UsuarioItem>> {
@@ -29,33 +19,33 @@ async function getUsuariosApi(
     if (v !== undefined && v !== "") query.append(k, String(v));
   });
 
-  const res = await fetch(`/api/usuarios?${query.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-async function getUsuarioByIdApi(token: string, id: string): Promise<UsuarioItem> {
-  const res = await fetch(`/api/usuarios/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await fetch(`${BASE_URL}?${query.toString()}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-async function getUsuarioByCedulaApi(token: string, cedula: string): Promise<UsuarioItem | null> {
-  const res = await fetch(`/api/usuarios/cedula/${cedula}`, {
-    headers: { Authorization: `Bearer ${token}` },
+export async function getUsuarioById(
+  token: string,
+  id: string
+): Promise<UsuarioItem> {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
-  if (res.status === 404) return null;
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-async function createUsuarioApi(token: string, data: Partial<UsuarioItem>) {
-  const res = await fetch(`/api/usuarios`, {
+export async function createUsuario(
+  token: string,
+  data: Partial<UsuarioItem>
+) {
+  const res = await fetch(BASE_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -67,8 +57,12 @@ async function createUsuarioApi(token: string, data: Partial<UsuarioItem>) {
   return res.json();
 }
 
-async function updateUsuarioApi(token: string, id: string, data: Partial<UsuarioItem>) {
-  const res = await fetch(`/api/usuarios/${id}`, {
+export async function updateUsuario(
+  token: string,
+  id: string,
+  data: Partial<UsuarioItem>
+) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -80,50 +74,30 @@ async function updateUsuarioApi(token: string, id: string, data: Partial<Usuario
   return res.json();
 }
 
-// ================================
-// Mocks
-// ================================
-async function getUsuariosMock(): Promise<PaginatedResponse<UsuarioItem>> {
-  return {
-    content: mockUsuarios,
-    totalPages: 1,
-    totalElements: mockUsuarios.length,
-    size: mockUsuarios.length,
-    number: 0,
-  };
+export async function deleteUsuario(
+  token: string,
+  id: string
+) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
-async function getUsuarioByIdMock(_token: string, id: string): Promise<UsuarioItem> {
-  const user = mockUsuarios.find((u) => u.id === Number(id));
-  if (!user) throw new Error("Usuario no encontrado");
-  return user;
+export async function resetUsuarioPassword(
+  token: string,
+  id: string
+) {
+  const res = await fetch(`${BASE_URL}/${id}/resetpassword`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
-
-async function getUsuarioByCedulaMock(_token: string, cedula: string): Promise<UsuarioItem | null> {
-  return mockUsuarios.find((u) => u.nroCedula === Number(cedula)) || null;
-}
-
-async function createUsuarioMock(_token: string, data: Partial<UsuarioItem>) {
-  const newUser: UsuarioItem = {
-    ...(data as UsuarioItem),
-    id: mockUsuarios.length + 1,
-  };
-  mockUsuarios.push(newUser);
-  return newUser;
-}
-
-async function updateUsuarioMock(_token: string, id: string, data: Partial<UsuarioItem>) {
-  const index = mockUsuarios.findIndex((u) => u.id === Number(id));
-  if (index === -1) throw new Error("Usuario no encontrado");
-  mockUsuarios[index] = { ...mockUsuarios[index], ...(data as UsuarioItem) };
-  return mockUsuarios[index];
-}
-
-// ================================
-// Export condicional
-// ================================
-export const getUsuarios = USE_MOCK ? getUsuariosMock : getUsuariosApi;
-export const getUsuarioById = USE_MOCK ? getUsuarioByIdMock : getUsuarioByIdApi;
-export const getUsuarioByCedula = USE_MOCK ? getUsuarioByCedulaMock : getUsuarioByCedulaApi;
-export const createUsuario = USE_MOCK ? createUsuarioMock : createUsuarioApi;
-export const updateUsuario = USE_MOCK ? updateUsuarioMock : updateUsuarioApi;
