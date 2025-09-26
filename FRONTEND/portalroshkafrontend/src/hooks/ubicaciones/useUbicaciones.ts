@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
-import { getTiposDispositivo } from "../../services/TipoDispositivoService";
-import type { TipoDispositivoItem } from "../../types";
+import { getUbicaciones } from "../../services/UbicacionService";
+import type { UbicacionItem } from "../../types";
 
-export function useTiposDispositivo(
+export function useUbicaciones(
   token: string | null,
   page: number = 0,
   pageSize: number = 10
 ) {
-  const [data, setData] = useState<TipoDispositivoItem[]>([]);
+  const [data, setData] = useState<UbicacionItem[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,13 +16,13 @@ export function useTiposDispositivo(
     if (!token) return;
     setLoading(true);
     try {
-      const all = await getTiposDispositivo(token);
+      const all = await getUbicaciones(token);
       const start = page * pageSize;
       const end = start + pageSize;
       setData(all.slice(start, end));
       setTotalPages(Math.ceil(all.length / pageSize));
     } catch (err: any) {
-      setError(err.message || "Error al cargar tipos de dispositivo");
+      setError(err.message || "Error al cargar ubicaciones");
     } finally {
       setLoading(false);
     }
@@ -37,6 +37,6 @@ export function useTiposDispositivo(
     totalPages,
     loading,
     error,
-    refresh: fetchData, // 👈 ahora sí disponible
+    refresh: fetchData, // 👈 disponible para refrescar
   };
 }
