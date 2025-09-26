@@ -20,7 +20,6 @@ public class EquiposRequestDto {
 
     private Integer idEquipo;
 
-    @NotNull
     private Integer idLider;
 
     @NotBlank(message = "El nombre no puede estar vacio")
@@ -29,11 +28,8 @@ public class EquiposRequestDto {
     @NotNull(message = "La fecha de inicio es obligatoria")
     private LocalDate fechaInicio;
 
-    @NotNull(message = "La fecha límite es obligatoria")
     private LocalDate fechaLimite;
 
-    @NotNull(message = "El ID del cliente es obligatorio")
-    @ClienteExists
     private Integer idCliente;
 
     private List<Integer> idTecnologias;

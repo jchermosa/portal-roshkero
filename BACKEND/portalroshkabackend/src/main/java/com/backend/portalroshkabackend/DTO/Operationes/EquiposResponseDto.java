@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull; // Для POST обязатель
 import lombok.Data;
 
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
-import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 @Data
@@ -22,6 +21,7 @@ public class EquiposResponseDto {
     private LocalDate fechaInicio;
     private LocalDate fechaLimite;
     private ClientesResponseDto cliente;
+    private List<EquipoDiaUbicacionResponceDto> equipoDiaUbicacion;
     private LocalDateTime fechaCreacion;
     private EstadoActivoInactivo estado;
     private List<UsuarioisResponseDto> usuarios;

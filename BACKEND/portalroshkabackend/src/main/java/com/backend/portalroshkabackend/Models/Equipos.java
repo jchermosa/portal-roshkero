@@ -69,6 +69,6 @@ public class Equipos {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private EstadoActivoInactivo estado = EstadoActivoInactivo.A;
 
-//    @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
-//    private List<AsignacionUsuarioEquipo> asignacionesUsuario = new ArrayList<>();
+    // @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
+    // private List<AsignacionUsuarioEquipo> asignacionesUsuario = new ArrayList<>();
 }
