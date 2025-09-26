@@ -36,8 +36,8 @@ public class AsignacionController {
         return ResponseEntity.ok(asignaciones);
     }
 
-    @GetMapping("/libres/")
-    public List<UbicacionConDiasDto> getUbicacionesConDiasLibres() {
+    @GetMapping("/libres")
+    public List<UbicacionConDiasDto> getUbicacionesLibres() {
         return asignacionService.getUbicacionesConDiasLibres();
     }
 }

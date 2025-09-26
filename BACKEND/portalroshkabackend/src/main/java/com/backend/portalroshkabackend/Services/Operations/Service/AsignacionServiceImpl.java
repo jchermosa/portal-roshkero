@@ -14,6 +14,7 @@ import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.DiasLaboralDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionConDiasDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 import com.backend.portalroshkabackend.Repositories.AsignacionUbicacionDiaRepository;
@@ -63,20 +64,17 @@ public class AsignacionServiceImpl implements IAsignacionService {
 
     @Override
     public List<UbicacionConDiasDto> getUbicacionesConDiasLibres() {
-        List<Object[]> results = asignacionUbicacionDiaRepository.findUbicacionesDiasLibresForEquipos();
+
+        List<UbicacionDto> results = asignacionUbicacionDiaRepository.findUbicacionesDiasLibresForEquipos();
 
         Map<Integer, UbicacionConDiasDto> grouped = new HashMap<>();
 
-        for (Object[] row : results) {
-            Integer idUbicacion = ((Number) row[0]).intValue();
-            String ubicacion = (String) row[1];
-            Integer idDiaLaboral = ((Number) row[2]).intValue();
-            String dia = (String) row[3];
-
-            grouped.computeIfAbsent(idUbicacion,
-                    k -> new UbicacionConDiasDto(idUbicacion, ubicacion, new ArrayList<>()))
+        for (UbicacionDto row : results) {
+            grouped.computeIfAbsent(
+                    row.getIdUbicacion(),
+                    k -> new UbicacionConDiasDto(row.getIdUbicacion(), row.getNombre(), new ArrayList<>()))
                     .getDiasLibres()
-                    .add(new DiasLaboralDto(idDiaLaboral, dia));
+                    .add(new DiasLaboralDto(row.getIdDiaLaboral(), row.getDia()));
         }
 
         return new ArrayList<>(grouped.values());
