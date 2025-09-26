@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionConDiasDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 
 @RestController("asignacionController")
@@ -36,8 +36,8 @@ public class AsignacionController {
         return ResponseEntity.ok(asignaciones);
     }
 
-    @GetMapping("/libres/{idEquipo}")
-    public List<UbicacionDiaDto> getUbicacionesLibres(@PathVariable Integer idEquipo) {
-        return asignacionService.getUbicacionesDiasLibresForEquipo(idEquipo);
+    @GetMapping("/libres/")
+    public List<UbicacionConDiasDto> getUbicacionesConDiasLibres() {
+        return asignacionService.getUbicacionesConDiasLibres();
     }
 }

@@ -1,6 +1,9 @@
 package com.backend.portalroshkabackend.Services.Operations.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,10 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.DiasLaboralDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionConDiasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.Tecnologias.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 import com.backend.portalroshkabackend.Repositories.AsignacionUbicacionDiaRepository;
 
@@ -59,15 +62,23 @@ public class AsignacionServiceImpl implements IAsignacionService {
     }
 
     @Override
-    public List<UbicacionDiaDto> getUbicacionesDiasLibresForEquipo(Integer idEquipo) {
-        return asignacionUbicacionDiaRepository.findUbicacionesDiasLibresForEquipo(idEquipo)
-                .stream()
-                .map(row -> new UbicacionDiaDto(
-                        (Integer) row[0],
-                        (String) row[1],
-                        (Integer) row[2],
-                        (String) row[3]))
-                .toList();
-    }
+    public List<UbicacionConDiasDto> getUbicacionesConDiasLibres() {
+        List<Object[]> results = asignacionUbicacionDiaRepository.findUbicacionesDiasLibresForEquipos();
 
+        Map<Integer, UbicacionConDiasDto> grouped = new HashMap<>();
+
+        for (Object[] row : results) {
+            Integer idUbicacion = ((Number) row[0]).intValue();
+            String ubicacion = (String) row[1];
+            Integer idDiaLaboral = ((Number) row[2]).intValue();
+            String dia = (String) row[3];
+
+            grouped.computeIfAbsent(idUbicacion,
+                    k -> new UbicacionConDiasDto(idUbicacion, ubicacion, new ArrayList<>()))
+                    .getDiasLibres()
+                    .add(new DiasLaboralDto(idDiaLaboral, dia));
+        }
+
+        return new ArrayList<>(grouped.values());
+    }
 }

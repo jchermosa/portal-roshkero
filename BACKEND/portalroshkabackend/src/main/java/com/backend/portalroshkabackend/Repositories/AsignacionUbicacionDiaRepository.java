@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.backend.portalroshkabackend.Models.AsignacionEquipoDiaUbicacion;
 
 public interface AsignacionUbicacionDiaRepository extends JpaRepository<AsignacionEquipoDiaUbicacion, Integer> {
+
     @Query(value = """
             SELECT u.id_ubicacion, u.nombre AS ubicacion,
                    d.id_dia_laboral, d.nombre_dia AS dia
@@ -21,5 +21,6 @@ public interface AsignacionUbicacionDiaRepository extends JpaRepository<Asignaci
                   AND a.id_dia_laboral = d.id_dia_laboral
             )
             """, nativeQuery = true)
-    List<Object[]> findUbicacionesDiasLibresForEquipo(@Param("idEquipo") Integer idEquipo);
+    List<Object[]> findUbicacionesDiasLibresForEquipos();
 }
+

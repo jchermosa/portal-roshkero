@@ -24,7 +24,7 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquipoDiaUbicacionResponc
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
@@ -120,7 +120,7 @@ public class EquiposServiceImpl implements IEquiposService {
                                                 new DiasLaboralDto(
                                                                 edu.getDiaLaboral().getIdDiaLaboral(),
                                                                 edu.getDiaLaboral().getNombreDia()),
-                                                new UbicacionDto(
+                                                new UbicacionDiaDto(
                                                                 edu.getUbicacion().getIdUbicacion(),
                                                                 edu.getUbicacion().getNombre())))
                                 .toList();
@@ -227,7 +227,7 @@ public class EquiposServiceImpl implements IEquiposService {
                                                 new DiasLaboralDto(
                                                                 edu.getDiaLaboral().getIdDiaLaboral(),
                                                                 edu.getDiaLaboral().getNombreDia()),
-                                                new UbicacionDto(
+                                                new UbicacionDiaDto(
                                                                 edu.getUbicacion().getIdUbicacion(),
                                                                 edu.getUbicacion().getNombre())))
                                 .toList();

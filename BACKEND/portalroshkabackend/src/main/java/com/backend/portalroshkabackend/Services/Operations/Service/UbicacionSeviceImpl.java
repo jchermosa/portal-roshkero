@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
 import com.backend.portalroshkabackend.Models.Ubicacion;
 import com.backend.portalroshkabackend.Repositories.UbicacionRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUbicacionSevice;
@@ -19,11 +19,11 @@ public class UbicacionSeviceImpl implements IUbicacionSevice {
     }
 
     @Override
-    public List<UbicacionDto> getAllUbicacion() {
+    public List<UbicacionDiaDto> getAllUbicacion() {
         List<Ubicacion> ubicaciones = ubicacionRepository.findAll();
 
-        List<UbicacionDto> allUbicacion = ubicaciones.stream()
-                .map(u -> new UbicacionDto(
+        List<UbicacionDiaDto> allUbicacion = ubicaciones.stream()
+                .map(u -> new UbicacionDiaDto(
                         u.getIdUbicacion(),
                         u.getNombre()
                 ))

@@ -6,10 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionConDiasDto;
+
 
 public interface IAsignacionService {
     Page<AsignacionResponseDto> getAllAsignacion(Pageable pageable);
 
-    List<UbicacionDiaDto> getUbicacionesDiasLibresForEquipo(Integer idEquipo);
+    List<UbicacionConDiasDto> getUbicacionesConDiasLibres();
 }

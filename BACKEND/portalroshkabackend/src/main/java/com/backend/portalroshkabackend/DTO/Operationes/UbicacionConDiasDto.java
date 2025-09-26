@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.DTO.Operationes;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UbicacionDto {
+public class UbicacionConDiasDto {
     private Integer idUbicacion;
-    private String nombre;
+    private String ubicacion;
+    private List<DiasLaboralDto> diasLibres;
 }
