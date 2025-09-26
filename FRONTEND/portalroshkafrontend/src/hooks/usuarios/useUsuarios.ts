@@ -9,7 +9,7 @@ export function useUsuarios(
   pageSize: number = 10
 ) {
   return usePaginatedResource<UsuarioItem>(
-    (params) => getUsuarios(token!, params),
+    (params) => getUsuarios(token!, { ...params, size: pageSize }),
     token,
     filtros,
     page,

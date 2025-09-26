@@ -14,17 +14,16 @@ export function useUsuarioForm(
 ) {
   const isEditing = !!id;
 
-  // Estado inicial (creación)
   const [data, setData] = useState<Partial<UsuarioItem>>({
-    nroCedula: cedulaParam || undefined,
-    requiereCambioContrasena: true,
+    nro_cedula: cedulaParam ? String(cedulaParam) : undefined,
+    requiere_cambio_contrasena: true,
     contrasena: "usuario123", // Contraseña por defecto
+    estado: "ACTIVO",
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar usuario si es edición
   useEffect(() => {
     if (!token || !isEditing || !id) return;
 
@@ -33,17 +32,27 @@ export function useUsuarioForm(
       .then((res) => {
         setData({
           ...res,
-          estado: res.estado ?? true,
-          requiereCambioContrasena: res.requiereCambioContrasena ?? false,
+          estado: res.estado ?? "ACTIVO",
+          requiere_cambio_contrasena: res.requiere_cambio_contrasena ?? false,
         });
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [token, id, isEditing]);
 
-  // Guardar (crear o actualizar)
   const handleSubmit = async (formData: Partial<UsuarioItem>) => {
     if (!token) return;
+
+    if (
+      !formData.nro_cedula ||
+      !formData.nombre ||
+      !formData.apellido ||
+      !formData.id_rol ||
+      !formData.id_cargo
+    ) {
+      setError("Faltan datos obligatorios");
+      return;
+    }
 
     try {
       if (isEditing && id) {
@@ -53,7 +62,7 @@ export function useUsuarioForm(
       }
     } catch (err: any) {
       setError(err.message || "Error al guardar el usuario");
-      throw err; // importante para que la Page pueda reaccionar
+      throw err;
     }
   };
 
