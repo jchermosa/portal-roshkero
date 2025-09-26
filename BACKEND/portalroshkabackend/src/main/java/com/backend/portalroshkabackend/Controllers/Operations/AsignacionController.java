@@ -31,7 +31,7 @@ public class AsignacionController {
 
     @GetMapping("")
     public ResponseEntity<Page<AsignacionResponseDto>> getAllAsignacion(
-            @PageableDefault(size = 10, sort = "equipos.idEquipo", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "equipo.idEquipo", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<AsignacionResponseDto> asignaciones = asignacionService.getAllAsignacion(pageable);
         return ResponseEntity.ok(asignaciones);
     }

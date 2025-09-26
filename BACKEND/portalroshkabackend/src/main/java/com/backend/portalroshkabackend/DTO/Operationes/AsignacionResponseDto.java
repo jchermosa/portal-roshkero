@@ -5,24 +5,13 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.backend.portalroshkabackend.Models.Equipos;
-import com.backend.portalroshkabackend.Models.Tecnologias;
-import com.backend.portalroshkabackend.Models.Usuario;
-
 @Data
 public class AsignacionResponseDto {
-    private Integer IdAsignacionUsuarioEquipo;
+    private Integer idAsignacionUsuarioEquipo;
     private LocalDate fechaEntrada;
     private LocalDate fechaFin;
     private Integer porcentajeTrabajo;
-    private Usuario idUsuario; 
-    private Tecnologias idTecnologia;
-    private Equipos equipo;
+    private UsuarioisResponseDto usuario;
+    private EquiposResponseDto equipo;
     private LocalDateTime fechaCreacion;
-
-    public AsignacionResponseDto(){
-        
-    }
-
-
 }

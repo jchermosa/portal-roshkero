@@ -8,7 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.Tecnologias.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 import com.backend.portalroshkabackend.Repositories.AsignacionUbicacionDiaRepository;
 import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
@@ -24,15 +27,35 @@ public class AsignacionServiceImpl implements IAsignacionService {
     public Page<AsignacionResponseDto> getAllAsignacion(Pageable pageable) {
         return asignacionUsuarioRepository.findAll(pageable)
                 .map(asignacion -> {
-                    AsignacionResponseDto Dto = new AsignacionResponseDto();
-                    Dto.setIdAsignacionUsuarioEquipo(asignacion.getIdAsignacionUsuarioEquipo());
-                    Dto.setFechaEntrada(asignacion.getFechaEntrada());
-                    Dto.setFechaFin(asignacion.getFechaFin());
-                    Dto.setPorcentajeTrabajo(asignacion.getPorcentajeTrabajo());
-                    Dto.setIdUsuario(asignacion.getUsuario());
-                    Dto.setEquipo(asignacion.getEquipo());
-                    Dto.setFechaCreacion(asignacion.getFechaCreacion());
-                    return Dto;
+                    AsignacionResponseDto dto = new AsignacionResponseDto();
+
+                    // --- Основные поля ---
+                    dto.setIdAsignacionUsuarioEquipo(asignacion.getIdAsignacionUsuarioEquipo());
+                    dto.setFechaEntrada(asignacion.getFechaEntrada());
+                    dto.setFechaFin(asignacion.getFechaFin());
+                    dto.setPorcentajeTrabajo(asignacion.getPorcentajeTrabajo());
+                    dto.setFechaCreacion(asignacion.getFechaCreacion());
+
+                    // --- Usuario ---
+                    if (asignacion.getUsuario() != null) {
+                        UsuarioisResponseDto usuarioDto = new UsuarioisResponseDto();
+                        usuarioDto.setIdUsuario(asignacion.getUsuario().getIdUsuario());
+                        usuarioDto.setNombre(asignacion.getUsuario().getNombre());
+                        usuarioDto.setApellido(asignacion.getUsuario().getApellido());
+                        usuarioDto.setCorreo(asignacion.getUsuario().getCorreo());
+                        usuarioDto.setDisponibilidad(asignacion.getUsuario().getDisponibilidad());
+                        dto.setUsuario(usuarioDto);
+                    }
+
+                    // --- Equipo ---
+                    if (asignacion.getEquipo() != null) {
+                        EquiposResponseDto equipoDto = new EquiposResponseDto();
+                        equipoDto.setIdEquipo(asignacion.getEquipo().getIdEquipo());
+                        equipoDto.setNombre(asignacion.getEquipo().getNombre());
+                        dto.setEquipo(equipoDto);
+                    }
+
+                    return dto;
                 });
     }
 
@@ -47,5 +70,5 @@ public class AsignacionServiceImpl implements IAsignacionService {
                         (String) row[3]))
                 .toList();
     }
-    
+
 }
