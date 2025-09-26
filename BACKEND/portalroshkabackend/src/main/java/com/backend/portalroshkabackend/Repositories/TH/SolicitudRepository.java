@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Repositories.TH;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Integer> {
     //         @Param("estado") EstadoSolicitudEnum estado,
     //         Pageable pageable);
 
+    Page<Solicitud> findAllByTipoSolicitud(SolicitudesEnum tipoSolicitud, Pageable pageable);
     Page<Solicitud> findAllByEstado(EstadoSolicitudEnum estado, Pageable pageable);
     Page<Solicitud> findAllByUsuario_idUsuario(int idUsuario, Pageable pageable);
 

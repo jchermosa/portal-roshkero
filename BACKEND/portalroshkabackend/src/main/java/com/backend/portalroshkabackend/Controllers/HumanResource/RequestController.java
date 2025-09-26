@@ -4,6 +4,7 @@ package com.backend.portalroshkabackend.Controllers.HumanResource;
 import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Services.HumanResource.IRequestService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,12 @@ public class RequestController {
     }
 
     @GetMapping("/th/users/requests/sortby")
-    public ResponseEntity<Page<SolicitudResponseDto>> getRequestSortByEstado(
-            @RequestParam(value = "estado", required = true) String estado,
+    public ResponseEntity<Page<SolicitudResponseDto>> getRequestSortByType(
+            @RequestParam(value = "type", required = true) String estado,
             @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request
     ){
-        Set<String> allowedParams = Set.of("estado");
+        Set<String> allowedParams = Set.of("type");
 
         for (String paramName : request.getParameterMap().keySet()){
             if (!allowedParams.contains(paramName)){
@@ -46,9 +47,9 @@ public class RequestController {
         Page<SolicitudResponseDto> requests;
 
         switch (estado) {
-            case "A" -> requests = requestService.getByEstado(EstadoSolicitudEnum.A, pageable);
-            case "R" -> requests = requestService.getByEstado(EstadoSolicitudEnum.R, pageable);
-            case "P" -> requests = requestService.getByEstado(EstadoSolicitudEnum.P, pageable);
+            case "beneficio" -> requests = requestService.getByTipoSolicitud(SolicitudesEnum.BENEFICIO, pageable);
+            case "permiso" -> requests = requestService.getByTipoSolicitud(SolicitudesEnum.PERMISO, pageable);
+            case "vacaciones" -> requests = requestService.getByTipoSolicitud(SolicitudesEnum.VACACIONES, pageable);
             default -> throw new IllegalArgumentException("Argumento del parametro invalido: " + estado);
         }
 
