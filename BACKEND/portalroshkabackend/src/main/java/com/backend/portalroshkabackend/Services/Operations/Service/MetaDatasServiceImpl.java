@@ -21,7 +21,7 @@ public class MetaDatasServiceImpl implements IMetaDatasService {
         private final ClientesRepository clientesRepository;
         private final UserRepository userRepository;
 
-        private Integer idTeamLeader = 3;
+        private Integer idTeamLeader = 10;
 
         @Autowired
         public MetaDatasServiceImpl(TecnologiaRepository tecnologiaRepository, ClientesRepository clientesRepository,
@@ -50,7 +50,7 @@ public class MetaDatasServiceImpl implements IMetaDatasService {
                                                 t.getDescripcion(), null))
                                 .toList();
 
-                List<UsuarioisResponseDto> teamLeaders = userRepository.findAllByIdRolId(idTeamLeader)
+                List<UsuarioisResponseDto> teamLeaders = userRepository.findAllByCargo_IdCargo(idTeamLeader)
                                 .stream()
                                 .map(u -> new UsuarioisResponseDto(
                                                 u.getIdUsuario(),
