@@ -45,8 +45,6 @@ import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
-import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
-import com.backend.portalroshkabackend.Repositories.ClientesRepository;
 import com.backend.portalroshkabackend.Repositories.EquipoDiaUbicacionRepository;
 
 @Service("operationsEquiposService")

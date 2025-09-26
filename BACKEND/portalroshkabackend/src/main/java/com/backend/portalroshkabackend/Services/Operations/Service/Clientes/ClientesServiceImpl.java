@@ -3,7 +3,7 @@ package com.backend.portalroshkabackend.Services.Operations.Service.Clientes;
 import com.backend.portalroshkabackend.DTO.Operationes.Clientes.ClientesRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Clientes.ClientesResponseDto;
 import com.backend.portalroshkabackend.Models.Clientes;
-import com.backend.portalroshkabackend.Repositories.ClientesRepository;
+import com.backend.portalroshkabackend.Repositories.OP.ClientesRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.Clientes.IClientesService;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -14,12 +14,11 @@ import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Tecnologias.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 import com.backend.portalroshkabackend.Repositories.AsignacionUbicacionDiaRepository;
-import com.backend.portalroshkabackend.Repositories.AsignacionUsuarioRepository;
 
 @Service("operationsAsignacionService")
 public class AsignacionServiceImpl implements IAsignacionService {
     @Autowired
-    private AsignacionUsuarioRepository asignacionUsuarioRepository;
+    private com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository asignacionUsuarioRepository;
     @Autowired
     private AsignacionUbicacionDiaRepository asignacionUbicacionDiaRepository;
 

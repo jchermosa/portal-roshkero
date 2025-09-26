@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.backend.portalroshkabackend.DTO.Operationes.Tecnologias.TecnologiasRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Tecnologias.TecnologiasResponseDto;
 import com.backend.portalroshkabackend.Models.Tecnologias;
-import com.backend.portalroshkabackend.Repositories.TecnologiaRepository;
+import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.Tecnologias.ITecnologiasService;
 
 @Service

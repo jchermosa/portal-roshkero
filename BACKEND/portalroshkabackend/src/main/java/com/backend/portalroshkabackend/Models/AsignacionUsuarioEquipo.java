@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -52,7 +53,7 @@ public class AsignacionUsuarioEquipo {
     private Equipos equipo;
 
     @Column(name = "fecha_creacion")
-    private LocalDate fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "estado_ac_enum")

@@ -10,7 +10,7 @@ import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceDTO;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.UbicacionDto;
 import com.backend.portalroshkabackend.Models.Ubicacion;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
-import com.backend.portalroshkabackend.Repositories.SYSADMIN.UbicacionRepository;
+import com.backend.portalroshkabackend.Repositories.SYSADMIN.UbicacionCRUDRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -19,9 +19,9 @@ public class UbicacionService {
 
 
     @Autowired 
-    private final UbicacionRepository ubicacionRepository;
+    private final UbicacionCRUDRepository ubicacionRepository;
 
-    public UbicacionService(UbicacionRepository ubicacionRepository) {
+    public UbicacionService(UbicacionCRUDRepository ubicacionRepository) {
         this.ubicacionRepository = ubicacionRepository;
     }
 
