@@ -40,14 +40,14 @@ public class Equipos {
     @Column(name = "id_equipo")
     private Integer idEquipo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_lider")
     private Usuario lider;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente")
     private Clientes cliente;
 
