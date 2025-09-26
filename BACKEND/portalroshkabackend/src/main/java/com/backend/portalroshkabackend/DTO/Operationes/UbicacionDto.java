@@ -9,7 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UbicacionDto {
     private Integer idUbicacion;
-    private String nombre;        // название локации
-    private Integer idDiaLaboral; // id дня
-    private String dia;           // название дня
+    private String nombre;
 }

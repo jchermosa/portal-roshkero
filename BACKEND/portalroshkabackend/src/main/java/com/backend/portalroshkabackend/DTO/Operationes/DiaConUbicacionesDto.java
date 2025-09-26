@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UbicacionConDiasDto {
-    private Integer idUbicacion;
-    private String ubicacion;
-    private List<DiasLaboralDto> diasLibres;
+public class DiaConUbicacionesDto {
+    private Integer idDiaLaboral;
+    private String nombreDia;
+    private List<UbicacionDto> ubicacionesLibres;
 }

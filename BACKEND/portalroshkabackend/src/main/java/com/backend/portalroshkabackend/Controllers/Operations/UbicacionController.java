@@ -2,7 +2,7 @@ package com.backend.portalroshkabackend.Controllers.Operations;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUbicacionSevice;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class UbicacionController {
     }
 
     @GetMapping("/ubicacion")
-    public List<UbicacionDiaDto> getAllUbicacion() {
+    public List<UbicacionDto> getAllUbicacion() {
         return ubicacionService.getAllUbicacion();
     }
 

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.Models.AsignacionEquipoDiaUbicacion;
 
@@ -13,7 +14,7 @@ import com.backend.portalroshkabackend.Models.AsignacionEquipoDiaUbicacion;
 public interface AsignacionUbicacionDiaRepository extends JpaRepository<AsignacionEquipoDiaUbicacion, Integer> {
 
     @Query("""
-            SELECT new com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto(
+            SELECT new com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto(
                 u.idUbicacion,
                 u.nombre,
                 d.idDiaLaboral,
@@ -28,5 +29,5 @@ public interface AsignacionUbicacionDiaRepository extends JpaRepository<Asignaci
                   AND a.diaLaboral.idDiaLaboral = d.idDiaLaboral
             )
             """)
-    List<UbicacionDto> findUbicacionesDiasLibresForEquipos();
+    List<UbicacionDiaDto> findUbicacionesDiasLibresForEquipos();
 }

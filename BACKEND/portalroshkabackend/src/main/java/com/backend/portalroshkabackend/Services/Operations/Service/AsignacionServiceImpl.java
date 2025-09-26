@@ -11,9 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.DiaConUbicacionesDto;
 import com.backend.portalroshkabackend.DTO.Operationes.DiasLaboralDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionConDiasDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
@@ -63,20 +64,20 @@ public class AsignacionServiceImpl implements IAsignacionService {
     }
 
     @Override
-    public List<UbicacionConDiasDto> getUbicacionesConDiasLibres() {
+    public List<DiaConUbicacionesDto> getDiasConUbicacionesLibres() {
+        List<UbicacionDiaDto> results = asignacionUbicacionDiaRepository.findUbicacionesDiasLibresForEquipos();
 
-        List<UbicacionDto> results = asignacionUbicacionDiaRepository.findUbicacionesDiasLibresForEquipos();
+        Map<Integer, DiaConUbicacionesDto> grouped = new HashMap<>();
 
-        Map<Integer, UbicacionConDiasDto> grouped = new HashMap<>();
-
-        for (UbicacionDto row : results) {
+        for (UbicacionDiaDto row : results) {
             grouped.computeIfAbsent(
-                    row.getIdUbicacion(),
-                    k -> new UbicacionConDiasDto(row.getIdUbicacion(), row.getNombre(), new ArrayList<>()))
-                    .getDiasLibres()
-                    .add(new DiasLaboralDto(row.getIdDiaLaboral(), row.getDia()));
+                    row.getIdDiaLaboral(),
+                    k -> new DiaConUbicacionesDto(row.getIdDiaLaboral(), row.getDia(), new ArrayList<>()))
+                    .getUbicacionesLibres()
+                    .add(new UbicacionDto(row.getIdUbicacion(), row.getNombre()));
         }
 
         return new ArrayList<>(grouped.values());
     }
+
 }
