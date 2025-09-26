@@ -19,9 +19,9 @@ export default function UserSearchPage() {
     try {
       const data = await getUsuarioByCedula(token, cedula);
 
-      if (data && data.id) {
+      if (data && data.id_usuario) {
         // Usuario ya existe → ir a editar
-        navigate(`/usuarios/${data.id}`);
+        navigate(`/usuarios/${data.id_usuario}`);
       } else {
         // Usuario no existe o no tiene ID → crear con cédula precargada
         navigate(`/usuarios/nuevo?cedula=${cedula}`);

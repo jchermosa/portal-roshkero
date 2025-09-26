@@ -1,6 +1,6 @@
 import DynamicForm from "../../components/DynamicForm";
-import { useTipoDispositivoForm } from "../../hooks/dispositivos/useTipoDispositivoForm";
-import { buildTipoDispositivoSections } from "../../config/forms/tipoDispositivoFormFields";
+import { useUbicacionForm } from "../../hooks/ubicaciones/useUbicacionForm";
+import { buildUbicacionSections } from "../../config/forms/ubicacionFormField";
 
 interface Props {
   token: string | null;
@@ -9,21 +9,22 @@ interface Props {
   onSaved?: () => void;
 }
 
-export default function TipoDispositivoModal({ token, id, onClose, onSaved }: Props) {
+export default function UbicacionModal({ token, id, onClose, onSaved }: Props) {
   const { data, setData, handleSubmit, handleDelete, loading, error, isEditing } =
-    useTipoDispositivoForm(token, id);
+    useUbicacionForm(token, id);
 
-  const sections = buildTipoDispositivoSections();
+  const sections = buildUbicacionSections();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6">
         <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-          {isEditing ? "Editar tipo de dispositivo" : "Nuevo tipo de dispositivo"}
+          {isEditing ? "Editar ubicación" : "Nueva ubicación"}
         </h2>
 
+        {/* ✅ DynamicForm con ID para manejar submit */}
         <DynamicForm
-          id="tipo-dispositivo-form"
+          id="ubicacion-form"
           sections={sections}
           initialData={data}
           onSubmit={async (formData) => {
@@ -52,7 +53,7 @@ export default function TipoDispositivoModal({ token, id, onClose, onSaved }: Pr
           )}
           <div className="flex gap-2 ml-auto">
             <button
-              form="tipo-dispositivo-form"
+              form="ubicacion-form"
               type="submit"
               disabled={loading}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"

@@ -1,4 +1,3 @@
-// src/hooks/dispositivosAsignados/useDispositivosAsignados.ts
 import { usePaginatedResource } from "../common/usePaginatedResource";
 import { getDispositivosAsignados } from "../../services/DeviceAssignmentService";
 import type { DispositivoAsignadoItem } from "../../types";
