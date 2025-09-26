@@ -3,27 +3,51 @@ export interface CatalogItem {
   nombre: string;
 }
 
+
+export const Estado = {
+  ACTIVO: "ACTIVO",
+  INACTIVO: "INACTIVO",
+} as const;
+export type Estado = typeof Estado[keyof typeof Estado];
+
+export const Seniority = {
+  JUNIOR: "JUNIOR",
+  SEMI_SENIOR: "SEMI_SENIOR",
+  SENIOR: "SENIOR",
+} as const;
+export type Seniority = typeof Seniority[keyof typeof Seniority];
+
+export const Foco = {
+  BACKEND: "BACKEND",
+  FRONTEND: "FRONTEND",
+  FULLSTACK: "FULLSTACK",
+  OTRO: "OTRO",
+} as const;
+export type Foco = typeof Foco[keyof typeof Foco];
+
 export interface UsuarioItem {
-  id: number;
+  id_usuario: number; 
   nombre: string;
   apellido: string;
-  nroCedula: number;
+  nro_cedula: string; 
   correo: string;
-  idRol: number;
-  fechaIngreso: string | null;
-  antiguedad?: string | null;
-  diasVacaciones?: number | null;
+  id_rol: number;
+  fecha_ingreso: string | null; 
+  antiguedad?: string | null; 
+  dias_vacaciones?: number | null;
   contrasena?: string;
   telefono?: string;
-  idCargo: number;
-  fechaNacimiento?: string | null;
-  diasVacacionesRestante?: number | null;
-  requiereCambioContrasena: boolean;
-  fechaCreacion?: string; // timestamp
-  estado: "ACTIVO" | "INACTIVO"; // enum real
-  urlPerfil?: string;
+  id_cargo: number;
+  fecha_nacimiento?: string | null; 
+  dias_vacaciones_restante?: number | null;
+  requiere_cambio_contrasena: boolean;
+  fecha_creacion?: string; 
+  seniority?: Seniority
+  foco?: Foco
+  estado: Estado;
+  url_perfil?: string;
   disponibilidad?: number;
-  antiguedadPretty?: string; 
+  antiguedadPretty?: string;
 }
 
 export type SolicitudEstado = "P" | "A" | "R";
@@ -140,4 +164,10 @@ export interface TipoDispositivoItem {
   nombre: string;
   detalle: string;
   fecha_creacion: string;
+}
+
+export interface UbicacionItem {
+  id_ubicacion: number;
+  nombre: string;
+  estado: string; // viene de enum estado_ac_enum
 }
