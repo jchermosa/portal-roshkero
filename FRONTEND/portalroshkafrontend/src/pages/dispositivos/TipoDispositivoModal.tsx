@@ -18,11 +18,10 @@ export default function TipoDispositivoModal({ token, id, onClose, onSaved }: Pr
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6">
-        <h2 className="text-xl font-bold mb-4">
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
           {isEditing ? "Editar tipo de dispositivo" : "Nuevo tipo de dispositivo"}
         </h2>
 
-        {/* ✅ DynamicForm con ID para poder usar el submit */}
         <DynamicForm
           id="tipo-dispositivo-form"
           sections={sections}
