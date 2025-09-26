@@ -13,19 +13,35 @@ import org.springframework.stereotype.Service;
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.DiaConUbicacionesDto;
 import com.backend.portalroshkabackend.DTO.Operationes.DiasLaboralDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquipoAsignacionUpdateDiasUbicacionesDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.Models.DiaLaboral;
+import com.backend.portalroshkabackend.Models.EquipoDiaUbicacion;
+import com.backend.portalroshkabackend.Models.Ubicacion;
+import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
+import com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository;
+import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.AsignacionUbicacionDiaRepository;
+import com.backend.portalroshkabackend.Repositories.UbicacionRepository;
+import com.backend.portalroshkabackend.Repositories.DiasLaboralRepository;
+import com.backend.portalroshkabackend.Repositories.EquipoDiaUbicacionRepository;
 
 @Service("operationsAsignacionService")
 public class AsignacionServiceImpl implements IAsignacionService {
     @Autowired
-    private com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository asignacionUsuarioRepository;
+    private AsignacionUsuarioRepository asignacionUsuarioRepository;
     @Autowired
     private AsignacionUbicacionDiaRepository asignacionUbicacionDiaRepository;
+    @Autowired
+    private EquiposRepository equiposRepository;
+    @Autowired
+    private DiasLaboralRepository diasLaboralRepository;
+    @Autowired
+    private UbicacionRepository ubicacionRepository;
 
     @Override
     public Page<AsignacionResponseDto> getAllAsignacion(Pageable pageable) {
@@ -78,6 +94,37 @@ public class AsignacionServiceImpl implements IAsignacionService {
         }
 
         return new ArrayList<>(grouped.values());
+    }
+
+    @Override
+    public void asignarDiasUbicaciones(Integer idEquipo, EquipoAsignacionUpdateDiasUbicacionesDto request) {
+        Equipos equipo = equiposRepository.findById(idEquipo)
+                .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+
+        for (EquipoAsignacionUpdateDiasUbicacionesDto.DiaUbicacionDto dto : request.getAsignaciones()) {
+            DiaLaboral dia = diasLaboralRepository.findById(dto.getIdDiaLaboral())
+                    .orElseThrow(() -> new RuntimeException("Día no encontrado"));
+
+            // Если локация не указана, пропускаем запись
+            if (dto.getIdUbicacion() == null) {
+                continue;
+            }
+
+            EquipoDiaUbicacion asignacion = asignacionUbicacionDiaRepository
+                    .findByEquipoAndDiaLaboral(equipo, dia)
+                    .orElseGet(() -> {
+                        EquipoDiaUbicacion nuevo = new EquipoDiaUbicacion();
+                        nuevo.setEquipo(equipo);
+                        nuevo.setDiaLaboral(dia);
+                        return nuevo;
+                    });
+
+            Ubicacion ubicacion = ubicacionRepository.findById(dto.getIdUbicacion())
+                    .orElseThrow(() -> new RuntimeException("Ubicación no encontrada"));
+            asignacion.setUbicacion(ubicacion);
+
+            asignacionUbicacionDiaRepository.save(asignacion);
+        }
     }
 
 }

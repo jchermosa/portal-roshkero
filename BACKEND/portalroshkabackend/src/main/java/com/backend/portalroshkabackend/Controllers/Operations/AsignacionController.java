@@ -10,15 +10,18 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.DiaConUbicacionesDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquipoAsignacionUpdateDiasUbicacionesDto;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
 
 @RestController("asignacionController")
-@RequestMapping("api/v1/admin/operatios/asignacion")
+@RequestMapping("api/v1/admin/operations/asignacion")
 public class AsignacionController {
 
     private final IAsignacionService asignacionService;
@@ -39,5 +42,14 @@ public class AsignacionController {
     @GetMapping("/libres")
     public List<DiaConUbicacionesDto> getDiasConUbicacionesLibres() {
         return asignacionService.getDiasConUbicacionesLibres();
+    }
+
+    @PutMapping("/libres/{idEquipo}")
+    public ResponseEntity<Void> asignarDiasUbicaciones(
+            @PathVariable Integer idEquipo,
+            @RequestBody EquipoAsignacionUpdateDiasUbicacionesDto request) {
+
+        asignacionService.asignarDiasUbicaciones(idEquipo, request);
+        return ResponseEntity.ok().build();
     }
 }

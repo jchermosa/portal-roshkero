@@ -1,33 +1,37 @@
 package com.backend.portalroshkabackend.Repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
-import com.backend.portalroshkabackend.Models.AsignacionEquipoDiaUbicacion;
+import com.backend.portalroshkabackend.Models.DiaLaboral;
+import com.backend.portalroshkabackend.Models.EquipoDiaUbicacion;
+import com.backend.portalroshkabackend.Models.Equipos;
 
 @Repository
-public interface AsignacionUbicacionDiaRepository extends JpaRepository<AsignacionEquipoDiaUbicacion, Integer> {
+public interface AsignacionUbicacionDiaRepository extends JpaRepository<EquipoDiaUbicacion, Integer> {
+
+    Optional<EquipoDiaUbicacion> findByEquipoAndDiaLaboral(Equipos equipo, DiaLaboral dia);
 
     @Query("""
-            SELECT new com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto(
-                u.idUbicacion,
-                u.nombre,
-                d.idDiaLaboral,
-                d.nombreDia
-            )
-            FROM Ubicacion u
-            CROSS JOIN DiaLaboral d
-            WHERE NOT EXISTS (
-                SELECT 1
-                FROM AsignacionEquipoDiaUbicacion a
-                WHERE a.ubicacion.idUbicacion = u.idUbicacion
-                  AND a.diaLaboral.idDiaLaboral = d.idDiaLaboral
-            )
+                SELECT new com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto(
+                    u.idUbicacion,
+                    u.nombre,
+                    d.idDiaLaboral,
+                    d.nombreDia
+                )
+                FROM Ubicacion u
+                CROSS JOIN DiaLaboral d
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM EquipoDiaUbicacion a
+                    WHERE a.ubicacion.idUbicacion = u.idUbicacion
+                      AND a.diaLaboral.idDiaLaboral = d.idDiaLaboral
+                )
             """)
     List<UbicacionDiaDto> findUbicacionesDiasLibresForEquipos();
 }

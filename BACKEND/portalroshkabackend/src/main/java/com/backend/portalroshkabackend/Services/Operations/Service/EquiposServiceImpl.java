@@ -1,6 +1,5 @@
 package com.backend.portalroshkabackend.Services.Operations.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +29,7 @@ import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Clientes;
+import com.backend.portalroshkabackend.Models.DiaLaboral;
 import com.backend.portalroshkabackend.Models.EquipoDiaUbicacion;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
@@ -45,6 +45,7 @@ import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
+import com.backend.portalroshkabackend.Repositories.DiasLaboralRepository;
 import com.backend.portalroshkabackend.Repositories.EquipoDiaUbicacionRepository;
 
 @Service("operationsEquiposService")
@@ -58,6 +59,7 @@ public class EquiposServiceImpl implements IEquiposService {
         private final UsuarioisRepository usuarioisRepository;
         private final AsignacionUsuarioRepository asignacionUsuarioRepository;
         private final EquipoDiaUbicacionRepository equipoDiaUbicacionRepository;
+        private final DiasLaboralRepository diasLaboralRepository;
         private final IUsuarioService usuarioService;
         private final ITecnologiaService tecnologiaService;
 
@@ -71,7 +73,7 @@ public class EquiposServiceImpl implements IEquiposService {
                         AsignacionUsuarioRepository asignacionUsuarioRepository,
                         EquipoDiaUbicacionRepository equipoDiaUbicacionRepository,
                         IUsuarioService usuarioService,
-                        ITecnologiaService tecnologiaService) {
+                        ITecnologiaService tecnologiaService, DiasLaboralRepository diasLaboralRepository) {
                 this.equiposRepository = equiposRepository;
                 this.clientesRepository = clientesRepository;
                 this.tecnologiasRepository = tecnologiasRepository;
@@ -79,6 +81,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 this.usuarioisRepository = usuarioisRepository;
                 this.asignacionUsuarioRepository = asignacionUsuarioRepository;
                 this.equipoDiaUbicacionRepository = equipoDiaUbicacionRepository;
+                this.diasLaboralRepository = diasLaboralRepository;
                 this.usuarioService = usuarioService;
                 this.tecnologiaService = tecnologiaService;
 
@@ -112,17 +115,38 @@ public class EquiposServiceImpl implements IEquiposService {
                 dto.setIdEquipo(e.getIdEquipo());
                 dto.setNombre(e.getNombre());
 
+                List<DiaLaboral> dias = diasLaboralRepository.findAll();
+
                 List<EquipoDiaUbicacion> asignacionesDU = equipoDiaUbicacionRepository
                                 .findAllByEquipo_IdEquipo(e.getIdEquipo());
 
-                List<EquipoDiaUbicacionResponceDto> dtoList = asignacionesDU.stream()
-                                .map(edu -> new EquipoDiaUbicacionResponceDto(
-                                                new DiasLaboralDto(
-                                                                edu.getDiaLaboral().getIdDiaLaboral(),
-                                                                edu.getDiaLaboral().getNombreDia()),
-                                                new UbicacionDto(
-                                                                edu.getUbicacion().getIdUbicacion(),
-                                                                edu.getUbicacion().getNombre())))
+                // для быстрого поиска делаем map
+                Map<Integer, EquipoDiaUbicacion> asignacionesMap = asignacionesDU.stream()
+                                .collect(Collectors.toMap(
+                                                a -> a.getDiaLaboral().getIdDiaLaboral(),
+                                                a -> a));
+
+                List<EquipoDiaUbicacionResponceDto> dtoList = dias.stream()
+                                .map(dia -> {
+                                        EquipoDiaUbicacion asignacion = asignacionesMap.get(dia.getIdDiaLaboral());
+
+                                        if (asignacion != null) {
+                                                // have asignacion
+                                                return new EquipoDiaUbicacionResponceDto(
+                                                                new DiasLaboralDto(dia.getIdDiaLaboral(),
+                                                                                dia.getNombreDia()),
+                                                                new UbicacionDto(
+                                                                                asignacion.getUbicacion()
+                                                                                                .getIdUbicacion(),
+                                                                                asignacion.getUbicacion().getNombre()));
+                                        } else {
+                                                // not have asignacion → ubicacion = null
+                                                return new EquipoDiaUbicacionResponceDto(
+                                                                new DiasLaboralDto(dia.getIdDiaLaboral(),
+                                                                                dia.getNombreDia()),
+                                                                null);
+                                        }
+                                })
                                 .toList();
 
                 dto.setEquipoDiaUbicacion(dtoList);
