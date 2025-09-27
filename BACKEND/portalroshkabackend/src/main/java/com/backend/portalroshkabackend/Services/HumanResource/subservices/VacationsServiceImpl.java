@@ -6,6 +6,7 @@ import com.backend.portalroshkabackend.Models.VacacionesAsignadas;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.Repositories.TH.VacacionesAsignadasRepository;
 import com.backend.portalroshkabackend.tools.RepositoryService;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyAcceptedException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ public class VacationsServiceImpl implements IAcceptRequestService {
     public void acceptRequest(Solicitud request) {
         VacacionesAsignadas vacacionesAsignadas = vacacionesAsignadasRepository.findBySolicitud_idSolicitud(request.getIdSolicitud()).orElseThrow(() -> new RequestNotFoundException(request.getIdSolicitud()));
 
+        if (vacacionesAsignadas.getConfirmacionTH() == true) throw new RequestAlreadyAcceptedException(request.getIdSolicitud());
+        
         vacacionesAsignadas.setConfirmacionTH(true);
 
         repositoryService.save(
