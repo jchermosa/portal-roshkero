@@ -13,6 +13,13 @@ const TEAM_PATH = "/api/v1/admin/operations/team";
 const DELETE_PATH = "/api/v1/admin/operations/team";
 
 type Tecnologia = { idTecnologia: number; nombre: string };
+
+// NUEVO: tipos para días/ubicación
+type EquipoDiaUbicacion = {
+  diaLaboral?: { idDiaLaboral?: number; nombreDia?: string };
+  ubicacion?: { idUbicacion?: number; nombre?: string };
+};
+
 type ApiTeam = {
   idEquipo: number;
   nombre: string;
@@ -22,19 +29,22 @@ type ApiTeam = {
   lider?: { idUsuario: number; nombre: string; apellido: string; correo?: string };
   cliente?: { idCliente: number; nombre: string };
   tecnologias?: Tecnologia[];
+  // NUEVO: viene desde GET /teams
+  equipoDiaUbicacion?: EquipoDiaUbicacion[];
 };
 type Paged<T> = { content: T[]; totalPages: number } | T[];
 
 type IListTeams = {
   idTeam: number;
   nombre: string;
-  fechaInicio?: string;
-  fechaLimite?: string;
   estado: boolean;
   liderNombre: string;
   liderCorreo?: string;
   clienteNombre: string;
   tecnologias: Tecnologia[];
+  // NUEVO: lo que mostramos en vez de fechas
+  dias: string[];          // ej: ["Lunes","Viernes"]
+  ubicaciones: string[];   // ej: ["Mesa 1","Mesa 2"]
 };
 
 export default function OperationsPage() {
@@ -58,7 +68,6 @@ export default function OperationsPage() {
     []
   );
 
-  const fmtDate = (s?: string) => (s ? s.slice(0, 10) : "—");
   const toBoolEstado = (v: ApiTeam["estado"]) =>
     typeof v === "boolean" ? v : v === "A" || v === "ACTIVO" || v === 1 || v === "1" || v === "true";
 
@@ -97,6 +106,7 @@ export default function OperationsPage() {
           return;
         }
 
+        // si el listado no trae tecnologías, pedimos detalle (se mantiene igual)
         const needDetails = items.filter(t => !Array.isArray(t.tecnologias) || t.tecnologias.length === 0);
         const techById = new Map<number, Tecnologia[]>();
 
@@ -117,17 +127,30 @@ export default function OperationsPage() {
           });
         }
 
-        const parsed: IListTeams[] = items.map((t) => ({
-          idTeam: t.idEquipo,
-          nombre: t.nombre ?? "",
-          fechaInicio: t.fechaInicio,
-          fechaLimite: t.fechaLimite,
-          estado: toBoolEstado(t.estado),
-          liderNombre: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" "),
-          liderCorreo: t.lider?.correo,
-          clienteNombre: t.cliente?.nombre ?? "",
-          tecnologias: techById.get(t.idEquipo) ?? (t.tecnologias ?? []),
-        }));
+        const parsed: IListTeams[] = items.map((t) => {
+          const dias = (t.equipoDiaUbicacion ?? [])
+            .map(e => e.diaLaboral?.nombreDia)
+            .filter(Boolean) as string[];
+          const ubicaciones = Array.from(
+            new Set(
+              (t.equipoDiaUbicacion ?? [])
+                .map(e => e.ubicacion?.nombre)
+                .filter(Boolean) as string[]
+            )
+          );
+
+          return {
+            idTeam: t.idEquipo,
+            nombre: t.nombre ?? "",
+            estado: toBoolEstado(t.estado),
+            liderNombre: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" "),
+            liderCorreo: t.lider?.correo,
+            clienteNombre: t.cliente?.nombre ?? "",
+            tecnologias: techById.get(t.idEquipo) ?? (t.tecnologias ?? []),
+            dias,
+            ubicaciones,
+          };
+        });
 
         setEquipos(parsed);
         setTotalPages(Array.isArray(body) ? 1 : (body?.totalPages ?? 1));
@@ -141,68 +164,57 @@ export default function OperationsPage() {
     return () => ac.abort();
   }, [page, token]);
 
-  // Dentro del componente OperationsPage
-const [equipoConfirm, setEquipoConfirm] = useState<IListTeams | null>(null);
-const [changingEstado, setChangingEstado] = useState(false);
+  // Confirmación de cambio de estado (se mantiene)
+  const [equipoConfirm, setEquipoConfirm] = useState<IListTeams | null>(null);
+  const [changingEstado, setChangingEstado] = useState(false);
 
-const confirmToggleEstado = (row: IListTeams) => {
-  setEquipoConfirm(row);
-};
+  const confirmToggleEstado = (row: IListTeams) => setEquipoConfirm(row);
 
-const handleConfirmToggle = async () => {
-  if (!equipoConfirm) return;
-  setChangingEstado(true);
+  const handleConfirmToggle = async () => {
+    if (!equipoConfirm) return;
+    setChangingEstado(true);
 
-  const row = equipoConfirm;
-  const nuevoEstado = row.estado ? "I" : "A";
+    const row = equipoConfirm;
+    const nuevoEstado = row.estado ? "I" : "A";
 
-  try {
-    // Traer detalle para conservar cliente y fechas
-    const detRes = await fetch(`${TEAM_PATH}/${row.idTeam}`, {
-      headers: {
-        Accept: "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      credentials: "include",
-    });
-    if (!detRes.ok) throw new Error("Error al cargar detalle");
-    const det = await detRes.json();
+    try {
+      // Traer detalle para conservar otros campos
+      const detRes = await fetch(`${TEAM_PATH}/${row.idTeam}`, {
+        headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        credentials: "include",
+      });
+      if (!detRes.ok) throw new Error("Error al cargar detalle");
+      const det = await detRes.json();
 
-    const payload: any = {
-      estado: nuevoEstado,
-      idCliente: det?.cliente?.idCliente ?? row.clienteNombre,
-      fechaInicio: det?.fechaInicio ?? row.fechaInicio,
-      fechaLimite: det?.fechaLimite ?? row.fechaLimite,
-    };
+      const payload: any = {
+        estado: nuevoEstado,
+        idCliente: det?.cliente?.idCliente,
+        fechaInicio: det?.fechaInicio,
+        fechaLimite: det?.fechaLimite,
+      };
 
-    const r = await fetch(`${TEAM_PATH}/${row.idTeam}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      credentials: "include",
-      body: JSON.stringify(payload),
-    });
-    if (!r.ok) throw new Error("Error al actualizar estado");
+      const r = await fetch(`${TEAM_PATH}/${row.idTeam}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+      if (!r.ok) throw new Error("Error al actualizar estado");
 
-    setEquipos(prev =>
-      prev.map(e =>
-        e.idTeam === row.idTeam ? { ...e, estado: !row.estado } : e
-      )
-    );
-    setEquipoConfirm(null); // cerrar modal
-  } catch (err: any) {
-    setError(err.message || "Error al cambiar estado");
-  } finally {
-    setChangingEstado(false);
-  }
-};
+      setEquipos(prev => prev.map(e => e.idTeam === row.idTeam ? { ...e, estado: !row.estado } : e));
+      setEquipoConfirm(null);
+    } catch (err: any) {
+      setError(err.message || "Error al cambiar estado");
+    } finally {
+      setChangingEstado(false);
+    }
+  };
 
-
-
-
+  // Columnas
   const columns = [
     { key: "idTeam", label: "ID" },
     { key: "nombre", label: "Proyecto/Equipo" },
@@ -219,8 +231,46 @@ const handleConfirmToggle = async () => {
         </div>
       ),
     },
-    { key: "fechaInicio", label: "Inicio", render: (row: IListTeams) => <span>{fmtDate(row.fechaInicio)}</span> },
-    { key: "fechaLimite", label: "Límite", render: (row: IListTeams) => <span>{fmtDate(row.fechaLimite)}</span> },
+    // NUEVO: Días
+    {
+      key: "dias",
+      label: "Días",
+      render: (row: IListTeams) =>
+        row.dias.length ? (
+          <div className="flex flex-wrap gap-1 max-w-[220px]">
+            {row.dias.map((d, i) => (
+              <span
+                key={`${d}-${i}`}
+                className="px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-100"
+              >
+                {d}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span className="text-gray-500 dark:text-gray-400">—</span>
+        ),
+    },
+    // NUEVO: Ubicación
+    {
+      key: "ubicaciones",
+      label: "Ubicación",
+      render: (row: IListTeams) =>
+        row.ubicaciones.length ? (
+          <div className="flex flex-wrap gap-1 max-w-[220px]">
+            {row.ubicaciones.map((u, i) => (
+              <span
+                key={`${u}-${i}`}
+                className="px-2 py-0.5 text-xs rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-100"
+              >
+                {u}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span className="text-gray-500 dark:text-gray-400">—</span>
+        ),
+    },
     {
       key: "estado",
       label: "Estado",
@@ -230,58 +280,59 @@ const handleConfirmToggle = async () => {
         </span>
       ),
     },
+    // Tecnologías (con pill + tooltip) — igual que antes
     {
-  key: "tecnologias",
-  label: "Tecnologías",
-  render: (row: IListTeams) => {
-    const maxToShow = 2;
-    const extra = row.tecnologias.length - maxToShow;
-    const visibles = row.tecnologias.slice(0, maxToShow);
+      key: "tecnologias",
+      label: "Tecnologías",
+      render: (row: IListTeams) => {
+        const maxToShow = 2;
+        const visibles = row.tecnologias.slice(0, maxToShow);
+        const extra = Math.max(0, row.tecnologias.length - maxToShow);
 
-    if (!extra) return <span className="text-gray-500 dark:text-gray-400">—</span>;
+        if (row.tecnologias.length === 0) {
+          return <span className="text-gray-500 dark:text-gray-400">—</span>;
+        }
 
-    return (
-      <div className="relative group flex flex-wrap gap-1 max-w-[220px]">
-        {visibles.map((tec) => (
-          <span
-            key={tec.idTecnologia}
-            className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-100"
-          >
-            {tec.nombre}
-          </span>
-        ))}
-
-        {/* pill de conteo con tooltip */}
-       {extra > 0 && (
-          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-700 dark:bg-blue-900/60 dark:text-blue-100">
-            +{extra}
-          </span>)}
-
-        {/* tooltip */}
-        <div
-          className="pointer-events-none absolute z-20 hidden group-hover:block top-full left-0 mt-2 w-64 rounded-lg border border-gray-200 dark:border-gray-700
-                     bg-white dark:bg-gray-800 shadow-lg p-3"
-          role="tooltip"
-        >
-          <p className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-2">
-            Tecnologías
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {row.tecnologias.map((t) => (
+        return (
+          <div className="relative group flex flex-wrap gap-1 max-w-[220px]">
+            {visibles.map((tec) => (
               <span
-                key={t.idTecnologia}
-                className="px-2 py-0.5 text-[11px] rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-100"
+                key={tec.idTecnologia}
+                className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-100"
               >
-                {t.nombre}
+                {tec.nombre}
               </span>
             ))}
-          </div>
-        </div>
-      </div>
-    );
-  },
-},
 
+            {extra > 0 && (
+              <span className="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-700 dark:bg-blue-900/60 dark:text-blue-100">
+                +{extra}
+              </span>
+            )}
+
+            <div
+              className="pointer-events-none absolute z-20 hidden group-hover:block top-full left-0 mt-2 w-64 rounded-lg border border-gray-200 dark:border-gray-700
+                       bg-white dark:bg-gray-800 shadow-lg p-3"
+              role="tooltip"
+            >
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                Tecnologías
+              </p>
+              <div className="flex flex-wrap gap-1">
+                {row.tecnologias.map((t) => (
+                  <span
+                    key={t.idTecnologia}
+                    className="px-2 py-0.5 text-[11px] rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-100"
+                  >
+                    {t.nombre}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      },
+    },
     {
       key: "acciones",
       label: "Acciones",
@@ -295,18 +346,16 @@ const handleConfirmToggle = async () => {
             <span className="material-symbols-outlined text-gray-500">edit</span>
           </button>
           <button
-  type="button"
-  onClick={() => confirmToggleEstado(row)}
-  aria-label="Cambiar estado"
-  title="Cambiar estado"
->
-  <span className="material-symbols-outlined text-gray-500">
-    mode_off_on
-  </span>
-</button>
-    </div>
-  ),
-},
+            type="button"
+            onClick={() => confirmToggleEstado(row)}
+            aria-label="Cambiar estado"
+            title="Cambiar estado"
+          >
+            <span className="material-symbols-outlined text-gray-500">mode_off_on</span>
+          </button>
+        </div>
+      ),
+    },
   ];
 
   const limpiarFiltros = () => setTipo("");
@@ -374,7 +423,6 @@ const handleConfirmToggle = async () => {
             )}
           </div>
 
-          {/* Footer de paginación */}
           <PaginationFooter
             currentPage={page}
             totalPages={totalPages}
@@ -383,38 +431,38 @@ const handleConfirmToggle = async () => {
           />
         </div>
       </div>
-      {equipoConfirm && (
-  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
-    <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 w-full max-w-md">
-      <h3 className="text-lg text-gray-800 dark:text-gray-100 mb-4">
-        {equipoConfirm.estado
-          ? `¿Seguro que quieres desactivar "${equipoConfirm.nombre}"?`
-          : `¿Seguro que quieres activar "${equipoConfirm.nombre}"?`}
-      </h3>
-      <div className="flex justify-end gap-3">
-        <button
-          onClick={() => setEquipoConfirm(null)}
-          className="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-          disabled={changingEstado}
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={handleConfirmToggle}
-          className={`px-4 py-2 rounded text-white ${
-            equipoConfirm.estado
-              ? "bg-red-600 hover:bg-red-700"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
-          disabled={changingEstado}
-        >
-          {changingEstado ? "Guardando..." : "Confirmar"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
 
+      {equipoConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+          <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h3 className="text-lg text-gray-800 dark:text-gray-100 mb-4">
+              {equipoConfirm.estado
+                ? `¿Seguro que quieres desactivar "${equipoConfirm.nombre}"?`
+                : `¿Seguro que quieres activar "${equipoConfirm.nombre}"?`}
+            </h3>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setEquipoConfirm(null)}
+                className="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                disabled={changingEstado}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmToggle}
+                className={`px-4 py-2 rounded text-white ${
+                  equipoConfirm.estado
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+                disabled={changingEstado}
+              >
+                {changingEstado ? "Guardando..." : "Confirmar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
