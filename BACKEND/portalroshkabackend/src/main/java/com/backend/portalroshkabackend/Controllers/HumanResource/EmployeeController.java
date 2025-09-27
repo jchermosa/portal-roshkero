@@ -42,7 +42,7 @@ public class EmployeeController {
         return ResponseEntity.ok(response);
     }
 
-
+// TODO traer solo la informacion necesaria
     @GetMapping("/th/users")
     public ResponseEntity<?> getAllEmployees(
             @RequestParam(value = "sortBy", required = false) String sortBy,

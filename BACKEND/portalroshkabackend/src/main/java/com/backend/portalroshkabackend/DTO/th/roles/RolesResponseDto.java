@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class RolesResponseDto {
-    private Integer idCargo;
+    private Integer idRol;
 
     private String nombre;
 

@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+import com.backend.portalroshkabackend.Models.Enum.FocoEnum;
+import com.backend.portalroshkabackend.Models.Enum.SeniorityEnum;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,6 +47,10 @@ public class UserInsertDto {
     private boolean requiereCambioContrasena;
 
     private EstadoActivoInactivo estado;
+
+    private FocoEnum foco;
+
+    private SeniorityEnum seniority;
 
     private String url_perfil;
 

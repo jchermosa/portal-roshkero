@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+import com.backend.portalroshkabackend.Models.Enum.FocoEnum;
+import com.backend.portalroshkabackend.Models.Enum.SeniorityEnum;
 import com.backend.portalroshkabackend.Models.Roles;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +34,10 @@ public class UserUpdateDto {
     private LocalDate fechaNacimiento;
 
     private boolean requiereCambioContrasena;
+
+    private FocoEnum foco;
+
+    private SeniorityEnum seniority;
 
     private Integer disponibilidad;
 
