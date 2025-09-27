@@ -36,7 +36,7 @@ public class VacationsServiceImpl implements IAcceptRequestService {
         VacacionesAsignadas vacacionesAsignadas = vacacionesAsignadasRepository.findBySolicitud_idSolicitud(request.getIdSolicitud()).orElseThrow(() -> new RequestNotFoundException(request.getIdSolicitud()));
 
         if (vacacionesAsignadas.getConfirmacionTH() == true) throw new RequestAlreadyAcceptedException(request.getIdSolicitud());
-        
+
         vacacionesAsignadas.setConfirmacionTH(true);
 
         repositoryService.save(
