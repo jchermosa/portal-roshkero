@@ -9,22 +9,20 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
-// import com.backend.portalroshkabackend.Models.BeneficiosAsignados;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.TipoDispositivo;
-// import com.backend.portalroshkabackend.Models.TipoBeneficios;
 import com.backend.portalroshkabackend.Models.TipoPermisos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
-import com.backend.portalroshkabackend.Repositories.TipoDispositivoRepository;
-import com.backend.portalroshkabackend.Repositories.UserRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.AsigUsuarioEquipoRepository;
-import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.BeneficiosAsignadosRepository;
+// import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.BeneficiosAsignadosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.SolicitudesTHRepository;
-import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoBeneficiosRepository;
+// import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoBeneficiosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoPermisosRepository;
+import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.UsuarioRepository;
+import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoDispositivosRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,7 +40,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     @Autowired
-    UserRepository usuarioRepository;
+    UsuarioRepository usuarioRepository;
 
     @Autowired
     private AsigUsuarioEquipoRepository asignacionUsuarioRepository;
@@ -50,17 +48,17 @@ public class UserService {
     @Autowired
     private TipoPermisosRepository tipoPermisosRepository;
 
-    @Autowired
-    private TipoBeneficiosRepository tipoBeneficiosRepository;
+    // @Autowired
+    // private TipoBeneficiosRepository tipoBeneficiosRepository;
 
     @Autowired
     private SolicitudesTHRepository solicitudesTHRepository;
 
-    @Autowired
-    private BeneficiosAsignadosRepository beneficiosAsignadosRepository;
+    // @Autowired
+    // private BeneficiosAsignadosRepository beneficiosAsignadosRepository;
 
     @Autowired
-    private TipoDispositivoRepository tipoDispositivoRepository;
+    private TipoDispositivosRepository tipoDispositivoRepository;
 
     public List<Usuario> getUsuario() {
         return usuarioRepository.findAll();
@@ -324,23 +322,12 @@ public class UserService {
         }
 
         nuevaSolicitud.setFechaInicio(solBeneficioDto.getFecha_inicio());
-        // nuevaSolicitud.setCantDias(solBeneficioDto.getCant_dias());
+        nuevaSolicitud.setCantDias(solBeneficioDto.getCant_dias());
         nuevaSolicitud.setComentario("(" + solBeneficioDto.getId_tipo_beneficio() + ") " + "{" + solBeneficioDto.getMonto() + "} " + solBeneficioDto.getComentario());
         nuevaSolicitud.setEstado(EstadoSolicitudEnum.P); // Estado inicial pendiente
         nuevaSolicitud.setFechaCreacion(java.time.LocalDateTime.now()); // Fecha y hora actual
 
         nuevaSolicitud.setLider(null); // Dirigido a Talento Humano
-
-        // beneficioAsignado.setBeneficio(tipoBeneficio);
-        // beneficioAsignado.setMontoAprobado(null);
-        // beneficioAsignado.setSolicitud(nuevaSolicitud);
-
-        // Obtener la lista de equipos a los que está asignado el usuario
-        // List<AsignacionUsuarioEquipo> asignaciones = asignacionUsuarioRepository.findByUsuario(usuario);
-
-        // nuevaSolicitud.setDocumentoAdjunto(solPermisoDto.getId_documento_adjunto());
-        // Aquí puedes agregar más campos según lo que necesites
-
 
         System.out.println("\n \n nuevaSolicitud: \n\n" + nuevaSolicitud + "\n \n");
         solicitudesTHRepository.save(nuevaSolicitud);
