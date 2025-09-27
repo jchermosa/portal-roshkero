@@ -62,9 +62,10 @@ public class RequestServiceImpl implements IRequestService{
                 () -> new RequestNotFoundException(idRequest)
         );
 
-        requestValidator.validate(request);
-
-        if (request.getLider() == null) request.setEstado(EstadoSolicitudEnum.A);
+        if (request.getLider() == null) {
+            requestValidator.validate(request);
+            request.setEstado(EstadoSolicitudEnum.A);
+        }
 
         switch (request.getTipoSolicitud()){
             case SolicitudesEnum.VACACIONES -> acceptVacationsService.acceptRequest(request);
