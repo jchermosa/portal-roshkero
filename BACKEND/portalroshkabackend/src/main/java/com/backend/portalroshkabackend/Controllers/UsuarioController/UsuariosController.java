@@ -10,9 +10,14 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Services.UsuarioServicio.UserService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -64,6 +69,21 @@ public class UsuariosController {
         solBeneficioDto = userService.crearBeneficioUsuarioActual(solBeneficioDto);
         return ResponseEntity.ok(solBeneficioDto);
     }
+
+    @PostMapping("/crear_vacacion") // Endpoint para solicitar Vacaciones para el usuario actual
+    public ResponseEntity<UserSolVacacionDto> crearVacacionUsuarioActual(@RequestBody UserSolVacacionDto solVacacionDto) {
+        //TODO: process POST request
+        solVacacionDto = userService.crearVacacionUsuarioActual(solVacacionDto);
+        return ResponseEntity.ok(solVacacionDto);
+    }
+    
+    @PostMapping("/pedir_dispositivo")
+    public ResponseEntity<UserSolDispositivoDto> pedirDispositivoUsuarioActual(@RequestBody UserSolDispositivoDto solDispositivoDto) {
+        //TODO: process POST request
+        solDispositivoDto = userService.pedirDispositivoUsuarioActual(solDispositivoDto);
+        return ResponseEntity.ok(solDispositivoDto);
+    }
+    
     
     // Endpoints comentados para futuras implementaciones
     // @GetMapping("/vacaciones")

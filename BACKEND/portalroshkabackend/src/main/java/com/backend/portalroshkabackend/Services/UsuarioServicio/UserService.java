@@ -4,17 +4,21 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 // import com.backend.portalroshkabackend.Models.BeneficiosAsignados;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Solicitud;
+import com.backend.portalroshkabackend.Models.TipoDispositivo;
 // import com.backend.portalroshkabackend.Models.TipoBeneficios;
 import com.backend.portalroshkabackend.Models.TipoPermisos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.Repositories.TipoDispositivoRepository;
 import com.backend.portalroshkabackend.Repositories.UserRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.AsigUsuarioEquipoRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.BeneficiosAsignadosRepository;
@@ -54,6 +58,9 @@ public class UserService {
 
     @Autowired
     private BeneficiosAsignadosRepository beneficiosAsignadosRepository;
+
+    @Autowired
+    private TipoDispositivoRepository tipoDispositivoRepository;
 
     public List<Usuario> getUsuario() {
         return usuarioRepository.findAll();
@@ -345,6 +352,142 @@ public class UserService {
     }
 
 
+    public UserSolVacacionDto crearVacacionUsuarioActual(UserSolVacacionDto solVacacionDto) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+
+        // Usuario lider = null;
+
+        
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        // TipoPermisos tipoPermiso = tipoPermisosRepository.findById(solPermisoDto.getId_tipo_permiso())
+        //         .orElseThrow(() -> new RuntimeException("Tipo de permiso no encontrado"));
+
+        Solicitud nuevaSolicitud = new Solicitud();
+        nuevaSolicitud.setUsuario(usuario);
+        nuevaSolicitud.setTipoSolicitud(SolicitudesEnum.VACACIONES); // Asigna el tipo de solicitud correspondiente
+        // nuevaSolicitud.setLider(lider); // Asigna el líder correspondiente
+
+        if (solVacacionDto.getFecha_inicio() == null || solVacacionDto.getFecha_fin() == null) {
+            throw new IllegalArgumentException("Fecha de inicio o fin no pueden ser nulos.");
+        }
+
+
+        nuevaSolicitud.setFechaInicio(solVacacionDto.getFecha_inicio());
+        // nuevaSolicitud.setCantDias(solVacacionDto.getCant_dias());
+        // nuevaSolicitud.setComentario();
+        nuevaSolicitud.setEstado(EstadoSolicitudEnum.P); // Estado inicial pendiente
+        nuevaSolicitud.setFechaCreacion(java.time.LocalDateTime.now()); // Fecha y hora actual
+        nuevaSolicitud.setFechaFin(solVacacionDto.getFecha_fin()); // Setea la fecha final
+        nuevaSolicitud.setCantDias((int) ChronoUnit.DAYS.between(solVacacionDto.getFecha_inicio(), solVacacionDto.getFecha_fin()) + 1 ); // Calcula la cantidad de dias entre las dos fechas inclusivo
+
+        if (nuevaSolicitud.getCantDias() > usuario.getDiasVacacionesRestante()) { // si la cantidad de dias solicitados es mayor a los dias de vacaciones restantes
+            throw new IllegalArgumentException(" No tienes suficientes días de vacaciones restantes. Pides: "+ nuevaSolicitud.getCantDias() + " y tienes Días restantes: " + usuario.getDiasVacacionesRestante());
+        }
+
+
+        // nuevaSolicitud.setLider(null); // Dirigido a Talento Humano
+
+    /* ######## Aqui se busca el Team Leader a quien sera dirigido la solicitud ######## */
+
+        // Obtener la lista de equipos a los que está asignado el usuario
+        List<AsignacionUsuarioEquipo> asignaciones = asignacionUsuarioRepository.findByUsuario(usuario);
+
+        // Validar que haya al menos una asignación
+        if (asignaciones == null || asignaciones.isEmpty()) {
+            nuevaSolicitud.setLider(null); // Dirigido a Talento Humano
+            // throw new RuntimeException("El usuario no tiene asignaciones registradas");
+        }else{
+            // Ordenar por porcentaje de trabajo descendente
+            asignaciones.sort(
+                Comparator.comparing(AsignacionUsuarioEquipo::getPorcentajeTrabajo, Comparator.nullsLast(Integer::compareTo)).reversed()
+            );
+
+            // Validar que haya al menos dos equipos asignados para aplicar desempate
+            AsignacionUsuarioEquipo asignacionPrincipal = asignaciones.get(0);
+            Equipos equipoPrincipal = asignacionPrincipal.getEquipo();
+            Usuario lider;
+
+            if (asignaciones.size() > 1) { //si tiene mas de un equipo asignado
+                AsignacionUsuarioEquipo asignacionSecundaria = asignaciones.get(1);
+                Equipos equipoSecundario = asignacionSecundaria.getEquipo();
+
+                Integer porcentaje1 = asignacionPrincipal.getPorcentajeTrabajo();
+                Integer porcentaje2 = asignacionSecundaria.getPorcentajeTrabajo();
+
+
+                if (Objects.equals(porcentaje1, porcentaje2)) { // si tienen el mismo porcentaje de trabajo se desempata por fecha limite del equipo
+                    LocalDate hoy = LocalDate.now();
+                    long tiempoRestante1 = equipoPrincipal.getFechaLimite() != null ? ChronoUnit.DAYS.between(hoy, equipoPrincipal.getFechaLimite()) : -1;
+                    long tiempoRestante2 = equipoSecundario.getFechaLimite() != null ? ChronoUnit.DAYS.between(hoy, equipoSecundario.getFechaLimite()) : -1;
+
+                    lider = tiempoRestante1 >= tiempoRestante2 ? equipoPrincipal.getLider() : equipoSecundario.getLider();
+                } else {
+                    lider = equipoPrincipal.getLider();
+                }
+            } else {
+                lider = equipoPrincipal.getLider(); // si solo tiene un equipo asignado
+            }
+
+            nuevaSolicitud.setLider(lider); // Asigna el líder correspondiente
+            
+            System.out.println("\n \n asignaciones: \n\n" + asignaciones + "\n \n");            
+        }
+
+        System.out.println("\n \n nuevaSolicitud: \n\n" + nuevaSolicitud + "\n \n");
+        solicitudesTHRepository.save(nuevaSolicitud);
+
+        solVacacionDto.setComentario("Solicitud de Vacacion creada con éxito");
+        solVacacionDto.setDestinatario((nuevaSolicitud.getLider() != null ? nuevaSolicitud.getLider().getNombre() + " " + nuevaSolicitud.getLider().getApellido() : "Talento Humano"));
+        solVacacionDto.setCantidadDias(nuevaSolicitud.getCantDias());
+
+        return solVacacionDto;
+    }
+
+    public UserSolDispositivoDto pedirDispositivoUsuarioActual(UserSolDispositivoDto solDispositivoDto) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        TipoDispositivo tipoDispositivo = tipoDispositivoRepository.findById(solDispositivoDto.getId_tipo_dispositivo())
+                .orElseThrow(() -> new RuntimeException("Tipo de dispositivo no encontrado")); 
+
+
+        Solicitud nuevaSolicitud = new Solicitud();
+        nuevaSolicitud.setUsuario(usuario);
+        nuevaSolicitud.setTipoSolicitud(SolicitudesEnum.DISPOSITIVO); // Asigna el tipo de solicitud correspondiente
+        nuevaSolicitud.setComentario("(" + tipoDispositivo.getIdTipoDispositivo() + ") " + solDispositivoDto.getComentario());
+        nuevaSolicitud.setEstado(EstadoSolicitudEnum.P); // Estado inicial pendiente
+        nuevaSolicitud.setFechaCreacion(java.time.LocalDateTime.now()); // Fecha y hora actual
+        nuevaSolicitud.setFechaInicio(java.time.LocalDateTime.now().toLocalDate()); // Fecha de solicitud como fecha de inicio
+
+        System.out.println("\n \n nuevaSolicitud: \n\n" + nuevaSolicitud + "\n \n");
+        solicitudesTHRepository.save(nuevaSolicitud);
+
+        solDispositivoDto.setComentario("Solicitud de Dispositivo creada con éxito y enviada a SysAdmin");
+
+        return solDispositivoDto;
+    }
 
 
     // Mapeo de Solicitud a SolicitudUserDto según el nuevo modelo
