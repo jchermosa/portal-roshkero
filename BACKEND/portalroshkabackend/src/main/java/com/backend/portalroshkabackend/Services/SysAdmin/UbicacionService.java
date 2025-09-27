@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceDTO;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.UbicacionDto;
 import com.backend.portalroshkabackend.Models.Ubicacion;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
