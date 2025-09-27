@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.backend.portalroshkabackend.Models.Dispositivo;
-import com.backend.portalroshkabackend.Models.TipoDispositivo;
 
 @Repository
 public interface DeviceRepository extends JpaRepository<Dispositivo, Integer> {
