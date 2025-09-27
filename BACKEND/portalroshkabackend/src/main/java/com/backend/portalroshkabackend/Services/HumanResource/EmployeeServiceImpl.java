@@ -1,6 +1,5 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
-import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.common.UserInsertDto;
 import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
@@ -9,15 +8,13 @@ import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Repositories.TH.*;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.RepositoryService;
-import com.backend.portalroshkabackend.Repositories.*;
-import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.EmployeeMapper;
-import com.backend.portalroshkabackend.tools.validator.EmployeeValidator;
+import com.backend.portalroshkabackend.tools.validator.ValidatorStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,16 +26,22 @@ import static com.backend.portalroshkabackend.tools.MessagesConst.*;
 @Service
 public class EmployeeServiceImpl implements IEmployeeService {
     private final UserRepository userRepository;
-    private final EmployeeValidator employeeValidator;
     private final RepositoryService repositoryService;
+    private final ValidatorStrategy<UserInsertDto> insertValidator;
+    private final ValidatorStrategy<Usuario> deleteValidator;
+    private final ValidatorStrategy<UserUpdateDto> updateValidator;
 
     @Autowired
     public EmployeeServiceImpl(UserRepository userRepository,
-                               EmployeeValidator employeeValidator,
-                               RepositoryService repositoryService) {
+                               RepositoryService repositoryService,
+                               @Qualifier("employeeInsertValidator") ValidatorStrategy<UserInsertDto> insertValidator,
+                               @Qualifier("employeeDeleteValidator") ValidatorStrategy<Usuario> deleteValidator,
+                               @Qualifier("employeeUpdateValidator") ValidatorStrategy<UserUpdateDto> updateValidator) {
         this.userRepository = userRepository;
-        this.employeeValidator = employeeValidator;
         this.repositoryService = repositoryService;
+        this.insertValidator = insertValidator;
+        this.deleteValidator = deleteValidator;
+        this.updateValidator = updateValidator;
     }
 
     @Override
@@ -126,10 +129,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public DefaultResponseDto addEmployee(UserInsertDto insertDto) {
 
-        employeeValidator.validateUniqueCedula(insertDto.getNroCedula(), null); // Validaciones de reglas de negocio
-        employeeValidator.validateUniqueEmail(insertDto.getCorreo(), null);
-        employeeValidator.validateUniquePhone(insertDto.getTelefono(), null);
-        employeeValidator.validateRelatedEntities(insertDto.getRol(), insertDto.getCargo());  // LLama al metodo que verifica si el rol/equipo o cargo asignado existen
+        insertValidator.validate(insertDto);
 
         Usuario user = EmployeeMapper.toUsuarioFromInsertDto(insertDto); // Para mapear el InserDto a entidad Usuario
 
@@ -152,10 +152,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
                 () -> new UserNotFoundException(id)
         );
 
-        employeeValidator.validateUniqueCedula(updateDto.getNroCedula(), id); // Validaciones de reglas de negocio
-        employeeValidator.validateUniqueEmail(updateDto.getCorreo(), id);
-        employeeValidator.validateUniquePhone(updateDto.getTelefono(), id);
-        employeeValidator.validateRelatedEntities(updateDto.getRoles(), updateDto.getCargos());
+        updateValidator.validate(updateDto);
 
         EmployeeMapper.toUsuarioFromUpdateDto(user, updateDto);
 
@@ -178,8 +175,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
                 () -> new UserNotFoundException(id)
         );
 
-        employeeValidator.validateEmployeeDontHavePendientRequests(id, user.getNombre(), user.getApellido());
-        employeeValidator.validateEmployeeIsActive(user.getEstado(), user.getNombre(), user.getApellido());
+        deleteValidator.validate(user);
 
         user.setEstado(EstadoActivoInactivo.I); // Da de baja el empleado de la base de datos
 

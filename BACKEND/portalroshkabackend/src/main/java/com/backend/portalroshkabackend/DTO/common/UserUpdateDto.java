@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UserUpdateDto {
+    private int idUsuario;
+
     private String nombre;
 
     private String apellido;
