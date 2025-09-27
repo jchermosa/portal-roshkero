@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.common.ErrorResponseDto;
+import com.backend.portalroshkabackend.Exception.DisponibilidadInsuficienteException;
 import com.backend.portalroshkabackend.Exception.NombreDuplicadoException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
 
@@ -39,5 +40,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleNombreDuplicado(NombreDuplicadoException ex) {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+
+    @ExceptionHandler(DisponibilidadInsuficienteException.class)
+    public ResponseEntity<ErrorResponseDto> handleNombreDuplicado(DisponibilidadInsuficienteException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    
 
 }

@@ -27,6 +27,7 @@ import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
+import com.backend.portalroshkabackend.Exception.DisponibilidadInsuficienteException;
 import com.backend.portalroshkabackend.Exception.NombreDuplicadoException;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Clientes;
@@ -501,15 +502,13 @@ public class EquiposServiceImpl implements IEquiposService {
                                 Usuario usuario = usuarioService.getUsuarioById(uDto.getIdUsuario());
 
                                 // --- validaciones obligatorias ---
-                                if (uDto.getPorcentajeTrabajo() == null) {
-                                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                                        "PorcentajeTrabajo obligatorio para usuario "
-                                                                        + usuario.getIdUsuario());
-                                }
-                                if (uDto.getFechaEntrada() == null) {
-                                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                                        "FechaEntrada obligatoria para usuario "
-                                                                        + usuario.getIdUsuario());
+                                if (usuario.getDisponibilidad() < uDto.getPorcentajeTrabajo()) {
+                                        throw new DisponibilidadInsuficienteException(
+                                                        "Usuario " + usuario.getIdUsuario() +
+                                                                        " no tiene suficiente disponibilidad. Actual: "
+                                                                        +
+                                                                        usuario.getDisponibilidad() + ", requerido: "
+                                                                        + uDto.getPorcentajeTrabajo());
                                 }
 
                                 float viejoPorcentaje = actualesMap
