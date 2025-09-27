@@ -20,7 +20,7 @@ public class RolesMapper {
     public static RolesResponseDto toRolesResponseDto(Roles roles){
         RolesResponseDto dto = new RolesResponseDto();
 
-        dto.setIdCargo(roles.getIdRol());
+        dto.setIdRol(roles.getIdRol());
         dto.setNombre(roles.getNombre());
         dto.setFechaCreacion(roles.getFechaCreacion());
 

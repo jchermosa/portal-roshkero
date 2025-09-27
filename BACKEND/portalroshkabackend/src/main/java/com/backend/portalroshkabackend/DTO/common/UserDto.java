@@ -2,6 +2,8 @@ package com.backend.portalroshkabackend.DTO.common;
 
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+import com.backend.portalroshkabackend.Models.Enum.FocoEnum;
+import com.backend.portalroshkabackend.Models.Enum.SeniorityEnum;
 import com.backend.portalroshkabackend.Models.Roles;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,6 +48,10 @@ public class UserDto {
     private boolean requiereCambioContrasena;
 
     private String url;
+
+    private FocoEnum foco;
+
+    private SeniorityEnum seniority;
 
     private Integer disponibilidad;
 }

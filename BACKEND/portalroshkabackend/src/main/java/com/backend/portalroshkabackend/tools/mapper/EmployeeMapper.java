@@ -26,10 +26,30 @@ public class EmployeeMapper {
         return dto;
     }
 
+    // Devolver todos los campos
     public static UserResponseDto toUserResponseDto(Usuario user) {
+
         UserResponseDto dto = new UserResponseDto();
         dto.setIdUsuario(user.getIdUsuario());
-        dto.setNombreApellido(user.getNombre() + " " + user.getApellido());
+        dto.setNombre(user.getNombre());
+        dto.setApellido(user.getApellido());
+        dto.setNroCedula(user.getNroCedula());
+        dto.setIdRol(user.getRol().getIdRol());
+        dto.setRolNombre(user.getRol().getNombre());
+        dto.setIdCargo(user.getCargo().getIdCargo());
+        dto.setCargoNombre(user.getCargo().getNombre());
+        dto.setFechaIngreso(user.getFechaIngreso());
+        dto.setTelefono(user.getTelefono());
+        dto.setFechaNacimiento(user.getFechaNacimiento());
+        dto.setDiasVacaciones(user.getDiasVacaciones());
+        dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
+        dto.setRequiereCambioContrasena(user.getRequiereCambioContrasena());
+        dto.setUrl(user.getUrlPerfil());
+        dto.setFoco(user.getFoco());
+        dto.setSeniority(user.getSeniority());
+        dto.setDisponibilidad(user.getDisponibilidad());
+        dto.setAntiguedad(user.getAntiguedad());
+        dto.setEstado(user.getEstado());
         dto.setCorreo(user.getCorreo());
         dto.setAntiguedad(user.getAntiguedad());
         dto.setEstado(user.getEstado());
@@ -48,9 +68,18 @@ public class EmployeeMapper {
         dto.setTelefono(user.getTelefono());
         dto.setFechaIngreso(user.getFechaIngreso());
         dto.setFechaNacimiento(user.getFechaNacimiento());
-        dto.setRolId(user.getRol().getIdRol());
+        dto.setIdRol(user.getRol().getIdRol());
         dto.setRolNombre(user.getRol().getNombre());
-        dto.setCargoId(user.getCargo().getIdCargo());
+        dto.setIdCargo(user.getCargo().getIdCargo());
+        dto.setCargoNombre(user.getCargo().getNombre());
+        dto.setFoco(user.getFoco());
+        dto.setSeniority(user.getSeniority());
+        dto.setDiasVacaciones(user.getDiasVacaciones());
+        dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
+        dto.setRequiereCambioContrasena(user.getRequiereCambioContrasena());
+        dto.setUrl(user.getUrlPerfil());
+        dto.setDisponibilidad(user.getDisponibilidad());
+        dto.setAntiguedad(user.getAntiguedad());
         dto.setCargoNombre(user.getCargo().getNombre());
         dto.setEstado(user.getEstado());
 
@@ -102,6 +131,8 @@ public class EmployeeMapper {
         user.setContrasena(encoder.encode(insertDto.getNroCedula()));
         user.setTelefono(insertDto.getTelefono());
         user.setCargo(insertDto.getCargo());
+        user.setFoco(insertDto.getFoco());
+        user.setSeniority(insertDto.getSeniority());
         user.setFechaNacimiento(insertDto.getFechaNacimiento());
 
         Period period = Period.between(insertDto.getFechaIngreso(), LocalDate.now());
@@ -133,6 +164,8 @@ public class EmployeeMapper {
         user.setEstado(updateDto.getEstado());
         user.setTelefono(updateDto.getTelefono());
         user.setCargo(updateDto.getCargos());
+        user.setFoco(updateDto.getFoco());
+        user.setSeniority(updateDto.getSeniority());
         user.setFechaNacimiento(updateDto.getFechaNacimiento());
         user.setDisponibilidad(updateDto.getDisponibilidad());
     }
