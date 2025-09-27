@@ -1,4 +1,4 @@
-import type { UsuarioItem } from "../types";
+import type { UsuarioItem, FiltrosUsuarios } from "../types";
 
 export interface PaginatedResponse<T> {
   content: T[];
@@ -10,27 +10,42 @@ export interface PaginatedResponse<T> {
 
 const BASE_URL = "/api/v1/admin/th/users";
 
+/**
+ * GET usuarios paginados con filtro sortBy
+ */
 export async function getUsuarios(
   token: string,
-  params: Record<string, string | number | undefined> = {}
+  filtros: FiltrosUsuarios,
+  page: number = 0,
+  size: number = 10
 ): Promise<PaginatedResponse<UsuarioItem>> {
-  const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
+  const params = new URLSearchParams();
 
-  const res = await fetch(`${BASE_URL}?${query.toString()}`, {
+  if (filtros.sortBy) params.append("sortBy", filtros.sortBy);
+  params.append("page", page.toString());
+  params.append("size", size.toString());
+
+  const res = await fetch(`${BASE_URL}?${params.toString()}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-  if (!res.ok) throw new Error(await res.text());
+
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(error || "Error al obtener usuarios");
+  }
+
   return res.json();
 }
 
+/**
+ * GET usuario por ID
+ * (usa UserByIdResponseDto en el backend)
+ */
 export async function getUsuarioById(
   token: string,
-  id: string
+  id: number
 ): Promise<UsuarioItem> {
   const res = await fetch(`${BASE_URL}/${id}`, {
     headers: {
@@ -41,6 +56,32 @@ export async function getUsuarioById(
   return res.json();
 }
 
+/**
+ * GET usuario por cédula
+ * (usa UserDto en el backend)
+ */
+export async function getUsuarioByCedula(
+  token: string,
+  cedula: string
+): Promise<UsuarioItem> {
+  const res = await fetch(`${BASE_URL}/cedula/${cedula}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    if (res.status === 404) throw new Error("NOT_FOUND");
+    throw new Error(await res.text());
+  }
+
+  return res.json();
+}
+
+/**
+ * POST nuevo usuario
+ * (usa UserInsertDto en el backend)
+ */
 export async function createUsuario(
   token: string,
   data: Partial<UsuarioItem>
@@ -54,12 +95,16 @@ export async function createUsuario(
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return res.json(); // DefaultResponseDto
 }
 
+/**
+ * PUT editar usuario
+ * (usa UserUpdateDto en el backend)
+ */
 export async function updateUsuario(
   token: string,
-  id: string,
+  id: number,
   data: Partial<UsuarioItem>
 ) {
   const res = await fetch(`${BASE_URL}/${id}`, {
@@ -71,13 +116,13 @@ export async function updateUsuario(
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return res.json(); // DefaultResponseDto
 }
 
-export async function deleteUsuario(
-  token: string,
-  id: string
-) {
+/**
+ * DELETE usuario
+ */
+export async function deleteUsuario(token: string, id: number) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
     headers: {
@@ -85,13 +130,13 @@ export async function deleteUsuario(
     },
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return res.json(); // DefaultResponseDto
 }
 
-export async function resetUsuarioPassword(
-  token: string,
-  id: string
-) {
+/**
+ * POST reset contraseña de usuario
+ */
+export async function resetUsuarioPassword(token: string, id: number) {
   const res = await fetch(`${BASE_URL}/${id}/resetpassword`, {
     method: "POST",
     headers: {
@@ -99,5 +144,5 @@ export async function resetUsuarioPassword(
     },
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return res.json(); // DefaultResponseDto
 }

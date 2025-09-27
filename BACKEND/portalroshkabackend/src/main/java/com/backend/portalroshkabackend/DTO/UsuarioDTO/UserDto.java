@@ -18,7 +18,7 @@ public class UserDto {
     private String nroCedula;
     private String correo;
     private Integer idRol;
-    private String nombreRol; // Si quieres exponer el nombre del rol
+    private String nombreRol;
     private LocalDate fechaIngreso;
     private String antiguedad;
     private Integer diasVacaciones;

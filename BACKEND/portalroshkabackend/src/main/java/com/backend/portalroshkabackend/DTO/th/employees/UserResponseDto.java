@@ -16,4 +16,5 @@ public class UserResponseDto {
     private String antiguedad;
     private EstadoActivoInactivo estado;
 
+
 }

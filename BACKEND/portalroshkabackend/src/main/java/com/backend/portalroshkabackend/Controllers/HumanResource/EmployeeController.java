@@ -49,7 +49,7 @@ public class EmployeeController {
             @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request
     ){
-        Set<String> allowedParams = Set.of("sortBy");
+        Set<String> allowedParams = Set.of("sortBy", "page", "size");
 
         for (String paramName : request.getParameterMap().keySet()){
             if (!allowedParams.contains(paramName)){
