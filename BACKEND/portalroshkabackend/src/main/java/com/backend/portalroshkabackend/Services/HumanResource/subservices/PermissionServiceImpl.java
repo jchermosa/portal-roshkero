@@ -8,16 +8,18 @@ import com.backend.portalroshkabackend.Repositories.TH.PermisosAsignadosReposito
 import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.permisos.PermissionTypeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.backend.portalroshkabackend.tools.MessagesConst.DATABASE_DEFAULT_ERROR;
 
 @Service("acceptPermissionsService")
-public class PermissionServiceImpl implements IAcceptRequestService{
+public class PermissionServiceImpl implements IAcceptRequestService {
     private final PermisosAsignadosRepository permisosAsignadosRepository;
     private final PermisosRepository permisosRepository;
     private final RepositoryService repositoryService;
@@ -25,7 +27,7 @@ public class PermissionServiceImpl implements IAcceptRequestService{
     @Autowired
     public PermissionServiceImpl(PermisosAsignadosRepository permisosAsignadosRepository,
                                  PermisosRepository permisosRepository,
-                                 RepositoryService repositoryService){
+                                 RepositoryService repositoryService) {
         this.permisosAsignadosRepository = permisosAsignadosRepository;
         this.permisosRepository = permisosRepository;
         this.repositoryService = repositoryService;
@@ -35,32 +37,43 @@ public class PermissionServiceImpl implements IAcceptRequestService{
     @Transactional
     @Override
     public void acceptRequest(Solicitud request) {
-        PermisosAsignados permisosAsignados = new PermisosAsignados();
+        Optional<PermisosAsignados> permisosAsignadosOptional = permisosAsignadosRepository.findBySolicitud_idSolicitud(request.getIdSolicitud());
 
-        String comentario = request.getComentario();
-        Integer idTipoPermiso = extraerIdTipoPermiso(comentario);
+        PermisosAsignados permisosAsignados;
 
-        if (idTipoPermiso == null) throw new IllegalArgumentException("No se pudo extraer el tipo de permiso del comentario.");
+        if (permisosAsignadosOptional.isPresent()) {
+            permisosAsignados = permisosAsignadosOptional.get();
+            permisosAsignados.setConfirmacionTH(true);
 
-        TipoPermisos tipoPermiso = repositoryService.findByIdOrThrow(
-                permisosRepository,
-                idTipoPermiso,
-                () -> new PermissionTypeNotFoundException(idTipoPermiso)
-        );
+        } else {
+            permisosAsignados = new PermisosAsignados();
 
-        permisosAsignados.setTipoPermiso(tipoPermiso);
-        permisosAsignados.setSolicitud(request);
-        permisosAsignados.setConfirmacionTH(true);
+            String comentario = request.getComentario();
+            Integer idTipoPermiso = extraerIdTipoPermiso(comentario);
+
+            if (idTipoPermiso == null)
+                throw new IllegalArgumentException("No se pudo extraer el tipo de permiso del comentario.");
+
+            TipoPermisos tipoPermiso = repositoryService.findByIdOrThrow(
+                    permisosRepository,
+                    idTipoPermiso,
+                    () -> new PermissionTypeNotFoundException(idTipoPermiso)
+            );
+
+            permisosAsignados.setTipoPermiso(tipoPermiso);
+            permisosAsignados.setSolicitud(request);
+            permisosAsignados.setConfirmacionTH(true);
+
+        }
 
         repositoryService.save(
                 permisosAsignadosRepository,
                 permisosAsignados,
                 DATABASE_DEFAULT_ERROR
         );
-
     }
 
-    private Integer extraerIdTipoPermiso(String comentario){
+    private Integer extraerIdTipoPermiso(String comentario) {
         Pattern pattern = Pattern.compile("\\((\\d+)\\)");
         Matcher matcher = pattern.matcher(comentario);
 

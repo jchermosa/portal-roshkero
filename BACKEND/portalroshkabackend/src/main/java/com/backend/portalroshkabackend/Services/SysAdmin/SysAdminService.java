@@ -1,7 +1,6 @@
 package com.backend.portalroshkabackend.Services.SysAdmin;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,12 +18,9 @@ public class SysAdminService {
     @Autowired
     private SysAdminRepository sysAdminRepository;
 
-    @Autowired
-    private final DispositivoService dispositivoService;
 
-    SysAdminService(SysAdminRepository sysAdminRepository, DispositivoService dispositivoService) {
+    SysAdminService(SysAdminRepository sysAdminRepository) {
         this.sysAdminRepository = sysAdminRepository;
-        this.dispositivoService = dispositivoService;
     }
 
     // Cambiar todos los métodos para retornar RequestDTO

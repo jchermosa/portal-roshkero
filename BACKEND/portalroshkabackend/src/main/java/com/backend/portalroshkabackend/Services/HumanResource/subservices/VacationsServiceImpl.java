@@ -6,6 +6,8 @@ import com.backend.portalroshkabackend.Models.VacacionesAsignadas;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.Repositories.TH.VacacionesAsignadasRepository;
 import com.backend.portalroshkabackend.tools.RepositoryService;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyAcceptedException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,33 +20,23 @@ import static com.backend.portalroshkabackend.tools.MessagesConst.DATABASE_DEFAU
 @Service("acceptVacationsService")
 public class VacationsServiceImpl implements IAcceptRequestService {
     private final VacacionesAsignadasRepository vacacionesAsignadasRepository;
-    private final UserRepository userRepository;
     private final RepositoryService repositoryService;
 
     @Autowired
     public VacationsServiceImpl(VacacionesAsignadasRepository vacacionesAsignadasRepository,
-                                RepositoryService repositoryService,
-                                UserRepository userRepository){
+                                RepositoryService repositoryService
+                                ){
         this.vacacionesAsignadasRepository = vacacionesAsignadasRepository;
-        this.userRepository = userRepository;
         this.repositoryService = repositoryService;
     }
 
     @Transactional
     @Override
     public void acceptRequest(Solicitud request) {
+        VacacionesAsignadas vacacionesAsignadas = vacacionesAsignadasRepository.findBySolicitud_idSolicitud(request.getIdSolicitud()).orElseThrow(() -> new RequestNotFoundException(request.getIdSolicitud()));
 
-        VacacionesAsignadas vacacionesAsignadas = new VacacionesAsignadas();
+        if (vacacionesAsignadas.getConfirmacionTH() == true) throw new RequestAlreadyAcceptedException(request.getIdSolicitud());
 
-        Usuario user = repositoryService.findByIdOrThrow(
-                userRepository,
-                request.getUsuario().getIdUsuario(),
-                () -> new UserNotFoundException(request.getUsuario().getIdUsuario())
-        );
-
-        vacacionesAsignadas.setSolicitud(request);
-        vacacionesAsignadas.setDiasUtilizados(request.getCantDias());
-        vacacionesAsignadas.setFechaCreacion(LocalDateTime.now());
         vacacionesAsignadas.setConfirmacionTH(true);
 
         repositoryService.save(
@@ -52,15 +44,6 @@ public class VacationsServiceImpl implements IAcceptRequestService {
                 vacacionesAsignadas,
                 DATABASE_DEFAULT_ERROR
         );
-
-        user.setDiasVacacionesRestante(user.getDiasVacacionesRestante() - request.getCantDias());
-
-        repositoryService.save(
-                userRepository,
-                user,
-                DATABASE_DEFAULT_ERROR
-        );
-
 
     }
 }

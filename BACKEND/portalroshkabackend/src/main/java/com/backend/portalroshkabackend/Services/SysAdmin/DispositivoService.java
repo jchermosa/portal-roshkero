@@ -19,12 +19,9 @@ import com.backend.portalroshkabackend.Models.Dispositivo;
 import com.backend.portalroshkabackend.Models.TipoDispositivo;
 import com.backend.portalroshkabackend.Models.Ubicacion;
 import com.backend.portalroshkabackend.Models.Usuario;
-import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Enum.EstadoInventario;
 import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceRepository;
 import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceTypesRepository;
-import com.backend.portalroshkabackend.Services.UsuariosService;
-import com.backend.portalroshkabackend.Services.Operations.Service.UsuarioServiceImpl;
 import com.backend.portalroshkabackend.Services.UsuarioServicio.UserService;
 
 

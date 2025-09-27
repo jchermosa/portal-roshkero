@@ -5,14 +5,12 @@ import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Models.Solicitud;
-import com.backend.portalroshkabackend.Repositories.TH.*;
 import com.backend.portalroshkabackend.Repositories.TH.SolicitudRepository;
-import com.backend.portalroshkabackend.Repositories.*;
 import com.backend.portalroshkabackend.Services.HumanResource.subservices.IAcceptRequestService;
 import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.RequestMapper;
-import com.backend.portalroshkabackend.tools.validator.RequestValidator;
+import com.backend.portalroshkabackend.tools.validator.ValidatorStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -25,19 +23,19 @@ import static com.backend.portalroshkabackend.tools.MessagesConst.*;
 @Service("humanRequestService")
 public class RequestServiceImpl implements IRequestService{
     private final SolicitudRepository solicitudRepository;
-    private final RequestValidator requestValidator;
     private final RepositoryService repositoryService;
     private final IAcceptRequestService acceptVacationsService;
     private final IAcceptRequestService acceptBenefitService;
     private final IAcceptRequestService acceptPermissionsService;
+    ValidatorStrategy<Solicitud> requestValidator;
 
     @Autowired
     public RequestServiceImpl (SolicitudRepository solicitudRepository,
-                               RequestValidator requestValidator,
                                RepositoryService repositoryService,
                                @Qualifier("acceptVacationsService") IAcceptRequestService acceptVacationsService,
                                @Qualifier("acceptBenefitService") IAcceptRequestService acceptBenefitService,
-                               @Qualifier("acceptPermissionsService") IAcceptRequestService acceptPermissionsService
+                               @Qualifier("acceptPermissionsService") IAcceptRequestService acceptPermissionsService,
+                               @Qualifier("requestHandlerValidator")ValidatorStrategy<Solicitud> requestValidator
     ){
         this.solicitudRepository = solicitudRepository;
         this.requestValidator = requestValidator;
@@ -50,7 +48,21 @@ public class RequestServiceImpl implements IRequestService{
     @Transactional(readOnly = true)
     @Override
     public Page<SolicitudResponseDto> getByTipoSolicitud(SolicitudesEnum tipoSolicitud, Pageable pageable) {
-        Page<Solicitud> requestSorted = solicitudRepository.findAllByTipoSolicitud(tipoSolicitud, pageable);
+
+        Page<Solicitud> requestSorted;
+
+        switch (tipoSolicitud) {
+            case VACACIONES -> {
+                requestSorted = solicitudRepository.findAllByTipoSolicitudAndEstado(SolicitudesEnum.VACACIONES, EstadoSolicitudEnum.A, pageable);
+            }
+            case PERMISO -> {
+                requestSorted = solicitudRepository.findAllByTipoSolicitudAndEstadoOrTipoSolicitudAndLiderIsNull(SolicitudesEnum.PERMISO, EstadoSolicitudEnum.A, SolicitudesEnum.PERMISO, pageable);
+            }
+            case BENEFICIO -> {
+                requestSorted = solicitudRepository.findAllByTipoSolicitud(tipoSolicitud, pageable);
+            }
+            default -> throw new IllegalArgumentException("Tipo de solicitud no soportado: " + tipoSolicitud);
+        }
 
         return requestSorted.map(RequestMapper::toSolicitudTHResponseDto);
     }
@@ -64,15 +76,16 @@ public class RequestServiceImpl implements IRequestService{
                 () -> new RequestNotFoundException(idRequest)
         );
 
-        requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitud());
+        if (request.getLider() == null) {
+            requestValidator.validate(request);
+            request.setEstado(EstadoSolicitudEnum.A);
+        }
 
         switch (request.getTipoSolicitud()){
             case SolicitudesEnum.VACACIONES -> acceptVacationsService.acceptRequest(request);
             case SolicitudesEnum.BENEFICIO -> acceptBenefitService.acceptRequest(request);
             case SolicitudesEnum.PERMISO -> acceptPermissionsService.acceptRequest(request);
         }
-
-        request.setEstado(EstadoSolicitudEnum.A);
 
         Solicitud acceptedRequest = repositoryService.save(
                 solicitudRepository,
@@ -92,7 +105,7 @@ public class RequestServiceImpl implements IRequestService{
                 () -> new RequestNotFoundException(idRequest)
         );
 
-        requestValidator.validateRequestStatus(request.getEstado(), request.getIdSolicitud());
+        requestValidator.validate(request);
 
         request.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
 
