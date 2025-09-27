@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -105,19 +106,22 @@ public class AsignacionServiceImpl implements IAsignacionService {
             DiaLaboral dia = diasLaboralRepository.findById(dto.getIdDiaLaboral())
                     .orElseThrow(() -> new RuntimeException("Día no encontrado"));
 
-            // Если локация не указана, пропускаем запись
+            Optional<EquipoDiaUbicacion> existing = asignacionUbicacionDiaRepository.findByEquipoAndDiaLaboral(equipo,
+                    dia);
+
             if (dto.getIdUbicacion() == null) {
+                // Удаляем связь, если была
+                existing.ifPresent(asignacionUbicacionDiaRepository::delete);
                 continue;
             }
 
-            EquipoDiaUbicacion asignacion = asignacionUbicacionDiaRepository
-                    .findByEquipoAndDiaLaboral(equipo, dia)
-                    .orElseGet(() -> {
-                        EquipoDiaUbicacion nuevo = new EquipoDiaUbicacion();
-                        nuevo.setEquipo(equipo);
-                        nuevo.setDiaLaboral(dia);
-                        return nuevo;
-                    });
+            // Создаём или обновляем
+            EquipoDiaUbicacion asignacion = existing.orElseGet(() -> {
+                EquipoDiaUbicacion nuevo = new EquipoDiaUbicacion();
+                nuevo.setEquipo(equipo);
+                nuevo.setDiaLaboral(dia);
+                return nuevo;
+            });
 
             Ubicacion ubicacion = ubicacionRepository.findById(dto.getIdUbicacion())
                     .orElseThrow(() -> new RuntimeException("Ubicación no encontrada"));

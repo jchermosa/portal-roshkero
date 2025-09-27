@@ -18,20 +18,19 @@ public interface AsignacionUbicacionDiaRepository extends JpaRepository<EquipoDi
     Optional<EquipoDiaUbicacion> findByEquipoAndDiaLaboral(Equipos equipo, DiaLaboral dia);
 
     @Query("""
-                SELECT new com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto(
-                    u.idUbicacion,
-                    u.nombre,
-                    d.idDiaLaboral,
-                    d.nombreDia
-                )
-                FROM Ubicacion u
-                CROSS JOIN DiaLaboral d
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM EquipoDiaUbicacion a
-                    WHERE a.ubicacion.idUbicacion = u.idUbicacion
-                      AND a.diaLaboral.idDiaLaboral = d.idDiaLaboral
-                )
+            SELECT new com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto(
+                u.idUbicacion,
+                u.nombre,
+                dl.idDiaLaboral,
+                dl.nombreDia
+            )
+            FROM DiaLaboral dl
+            CROSS JOIN Ubicacion u
+            LEFT JOIN EquipoDiaUbicacion a
+                ON a.diaLaboral = dl
+                AND a.ubicacion = u
+            WHERE a.id IS NULL
+            ORDER BY dl.idDiaLaboral, u.idUbicacion
             """)
     List<UbicacionDiaDto> findUbicacionesDiasLibresForEquipos();
 }

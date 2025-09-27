@@ -243,17 +243,38 @@ public class EquiposServiceImpl implements IEquiposService {
                 dto.setIdEquipo(e.getIdEquipo());
                 dto.setNombre(e.getNombre());
 
+                List<DiaLaboral> dias = diasLaboralRepository.findAll();
+
+                // Все текущие asignaciones для команды
                 List<EquipoDiaUbicacion> asignaciones = equipoDiaUbicacionRepository
                                 .findAllByEquipo_IdEquipo(e.getIdEquipo());
 
-                List<EquipoDiaUbicacionResponceDto> dtoList = asignaciones.stream()
-                                .map(edu -> new EquipoDiaUbicacionResponceDto(
-                                                new DiasLaboralDto(
-                                                                edu.getDiaLaboral().getIdDiaLaboral(),
-                                                                edu.getDiaLaboral().getNombreDia()),
-                                                new UbicacionDto(
-                                                                edu.getUbicacion().getIdUbicacion(),
-                                                                edu.getUbicacion().getNombre())))
+                // Map для быстрого поиска asignaciones по дню
+                Map<Integer, EquipoDiaUbicacion> asignacionesMap = asignaciones.stream()
+                                .collect(Collectors.toMap(
+                                                a -> a.getDiaLaboral().getIdDiaLaboral(),
+                                                a -> a));
+
+                // Собираем список для DTO (всегда все дни)
+                List<EquipoDiaUbicacionResponceDto> dtoList = dias.stream()
+                                .map(dia -> {
+                                        EquipoDiaUbicacion asignacion = asignacionesMap.get(dia.getIdDiaLaboral());
+
+                                        if (asignacion != null && asignacion.getUbicacion() != null) {
+                                                return new EquipoDiaUbicacionResponceDto(
+                                                                new DiasLaboralDto(dia.getIdDiaLaboral(),
+                                                                                dia.getNombreDia()),
+                                                                new UbicacionDto(
+                                                                                asignacion.getUbicacion()
+                                                                                                .getIdUbicacion(),
+                                                                                asignacion.getUbicacion().getNombre()));
+                                        } else {
+                                                return new EquipoDiaUbicacionResponceDto(
+                                                                new DiasLaboralDto(dia.getIdDiaLaboral(),
+                                                                                dia.getNombreDia()),
+                                                                null);
+                                        }
+                                })
                                 .toList();
 
                 dto.setEquipoDiaUbicacion(dtoList);
