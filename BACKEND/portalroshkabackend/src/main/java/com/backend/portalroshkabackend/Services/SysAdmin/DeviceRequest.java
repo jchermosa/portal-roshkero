@@ -44,6 +44,7 @@ public class DeviceRequest {
 
         solicitud.setEstado(EstadoSolicitudEnum.A);
         deviceRequestRepository.save(solicitud);
+
         return convertToDto(solicitud);
     }
 
@@ -71,7 +72,7 @@ public class DeviceRequest {
     private DeviceRequestDto convertToDto(Solicitud solicitud) {
         DeviceRequestDto dto = new DeviceRequestDto();
         dto.setFechaInicio(solicitud.getFechaInicio());
-        dto.setCantDias(solicitud.getCantDias());
+        // dto.setCantDias(solicitud.getCantDias());
         dto.setEstado(solicitud.getEstado());
         dto.setComentario(solicitud.getComentario());
         dto.setIdUsuario(solicitud.getUsuario().getIdUsuario());
