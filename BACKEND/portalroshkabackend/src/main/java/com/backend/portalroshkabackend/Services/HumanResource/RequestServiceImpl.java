@@ -48,7 +48,21 @@ public class RequestServiceImpl implements IRequestService{
     @Transactional(readOnly = true)
     @Override
     public Page<SolicitudResponseDto> getByTipoSolicitud(SolicitudesEnum tipoSolicitud, Pageable pageable) {
-        Page<Solicitud> requestSorted = solicitudRepository.findAllByTipoSolicitud(tipoSolicitud, pageable);
+
+        Page<Solicitud> requestSorted;
+
+        switch (tipoSolicitud) {
+            case VACACIONES -> {
+                requestSorted = solicitudRepository.findAllByTipoSolicitudAndEstado(SolicitudesEnum.VACACIONES, EstadoSolicitudEnum.A, pageable);
+            }
+            case PERMISO -> {
+                requestSorted = solicitudRepository.findAllByTipoSolicitudAndEstadoOrTipoSolicitudAndLiderIsNull(SolicitudesEnum.PERMISO, EstadoSolicitudEnum.A, SolicitudesEnum.PERMISO, pageable);
+            }
+            case BENEFICIO -> {
+                requestSorted = solicitudRepository.findAllByTipoSolicitud(tipoSolicitud, pageable);
+            }
+            default -> throw new IllegalArgumentException("Tipo de solicitud no soportado: " + tipoSolicitud);
+        }
 
         return requestSorted.map(RequestMapper::toSolicitudTHResponseDto);
     }

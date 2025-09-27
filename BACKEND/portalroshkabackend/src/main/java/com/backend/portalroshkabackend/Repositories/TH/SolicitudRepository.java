@@ -22,6 +22,8 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Integer> {
     //         Pageable pageable);
 
     Page<Solicitud> findAllByTipoSolicitud(SolicitudesEnum tipoSolicitud, Pageable pageable);
+    Page<Solicitud> findAllByTipoSolicitudAndEstado(SolicitudesEnum tipoSolicitud, EstadoSolicitudEnum estado, Pageable pageable);
+    Page<Solicitud> findAllByTipoSolicitudAndEstadoOrTipoSolicitudAndLiderIsNull(SolicitudesEnum tipoSolicitud, EstadoSolicitudEnum estado, SolicitudesEnum tipoSolicitudT, Pageable pageable);
     Page<Solicitud> findAllByEstado(EstadoSolicitudEnum estado, Pageable pageable);
     Page<Solicitud> findAllByUsuario_idUsuario(int idUsuario, Pageable pageable);
 
