@@ -15,6 +15,7 @@ import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.EstadoAsignacion;
 import com.backend.portalroshkabackend.Models.Enum.EstadoInventario;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceAssignmentRepository;
 import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceRepository;
 import com.backend.portalroshkabackend.Repositories.TH.SolicitudRepository;
@@ -78,6 +79,20 @@ public class DeviceAssignmentService {
 
         if (deviceAssignmentDTO.getIdSolicitud() != null) {
             Solicitud solicitud = new Solicitud();
+
+            // Verificar el tipo de la solicitud
+            Optional<Solicitud> checkSolicitud = solicitudRepository.findById(deviceAssignmentDTO.getIdSolicitud());
+
+            // Verificamos que exista 
+            if (checkSolicitud.isEmpty()) {
+                throw new RuntimeException("Solicitud no encontrada con ID: " + deviceAssignmentDTO.getIdSolicitud());
+            }
+
+            // verificamos que sea del tipo Dispositivo
+            if (checkSolicitud.get().getTipoSolicitud() != SolicitudesEnum.DISPOSITIVO) {
+                throw new RuntimeException("La solicitud no es del tipo Dispositivo.");
+            }
+
             solicitud.setIdSolicitud(deviceAssignmentDTO.getIdSolicitud());
             dispositivoAsignado.setSolicitud(solicitud);
         }

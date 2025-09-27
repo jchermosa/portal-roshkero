@@ -16,4 +16,6 @@ public interface DeviceRepository extends JpaRepository<Dispositivo, Integer> {
    List<Dispositivo> findAllWithoutOwner();
 
    List<Dispositivo> findAllByTipoDispositivo_IdTipoDispositivo(Integer id);
+
+
 } 
