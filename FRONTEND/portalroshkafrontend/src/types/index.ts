@@ -3,6 +3,13 @@ export interface CatalogItem {
   nombre: string;
 }
 
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number; // página actual
+}
 
 export const EstadoActivoInactivo = {
   A: "A",
@@ -23,6 +30,13 @@ export const SeniorityEnum = {
 } as const;
 export type SeniorityEnum = typeof SeniorityEnum[keyof typeof SeniorityEnum];
 
+export const SeniorityLabels: Record<SeniorityEnum, string> = {
+  JUNIOR: "Junior",
+  BOOTCAMPER: "Bootcamper",
+  PLENO: "Pleno",
+  SENIOR: "Senior",
+};
+
 export const FocoEnum = {
   FABRICA: "FABRICA",
   GAMES: "GAMES",
@@ -34,6 +48,17 @@ export const FocoEnum = {
   TERCERIZACION: "TERCERIZACION",
 } as const;
 export type FocoEnum = typeof FocoEnum[keyof typeof FocoEnum];
+
+export const FocoLabels: Record<FocoEnum, string> = {
+  FABRICA: "Fábrica",
+  GAMES: "Games",
+  MANTENIMIENTO: "Mantenimiento",
+  NINGUNO: "Ninguno",
+  PRODUCTO: "Producto",
+  PROYECTO: "Proyecto",
+  STAFF: "Staff",
+  TERCERIZACION: "Tercerización",
+};
 
 
 export interface UsuarioItem {
@@ -52,7 +77,7 @@ export interface UsuarioItem {
   fechaNacimiento?: string | null;
   telefono?: string;
   requiereCambioContrasena?: boolean;
-  estado: "A" | "I"; 
+  estado: EstadoActivoInactivo; 
   antiguedad?: string;
   diasVacaciones?: number;
   diasVacacionesRestante?: number;
@@ -67,11 +92,13 @@ export type SortBy = "active" | "inactive" | "rol" | "cargo";
 
 export interface FiltrosUsuarios {
   sortBy?: SortBy;
+  idRol?: number;                
+  idCargo?: number;            
+  estado?: EstadoActivoInactivo; 
 }
 
-
 export interface RolItem {
-  idCargo: number;          
+  idRol: number;          
   nombre: string;
   fechaCreacion: string;
 }

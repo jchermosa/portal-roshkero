@@ -17,7 +17,7 @@ export function useUsuarioForm(
   const [data, setData] = useState<Partial<UsuarioItem>>({
     nroCedula: cedulaParam ? String(cedulaParam) : undefined,
     requiereCambioContrasena: true,
-    estado: EstadoActivoInactivo.A, // default = Activo
+    estado: "A", // default = Activo
   });
 
   const [loading, setLoading] = useState(false);
@@ -32,10 +32,10 @@ export function useUsuarioForm(
       .then((res) => {
         setData({
           ...res,
-          // 👇 Normalizamos para que el form siempre reciba idRol / idCargo
-          idRol: res.rolId ?? res.idRol,
-          idCargo: res.cargoId ?? res.idCargo,
-          estado: res.estado ?? EstadoActivoInactivo.A,
+          // 👇 Normalizamos: ya usamos idRol / idCargo
+          idRol: res.idRol,
+          idCargo: res.idCargo,
+          estado: res.estado ?? "A",
           requiereCambioContrasena: res.requiereCambioContrasena ?? false,
         });
       })

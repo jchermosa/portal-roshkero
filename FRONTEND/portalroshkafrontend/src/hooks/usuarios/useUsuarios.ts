@@ -35,8 +35,7 @@ export function useUsuarios(
     };
 
     fetchUsuarios();
-  }, [token, filtros.sortBy, page, size]);
-
+  }, [token, JSON.stringify(filtros), page, size]); 
   return {
     data,
     totalPages,
