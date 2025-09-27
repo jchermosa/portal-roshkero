@@ -9,6 +9,7 @@ import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
+import com.backend.portalroshkabackend.Repositories.TH.UsuarioSpecifications;
 import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.EmployeeMapper;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,39 +70,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserResponseDto> getAllEmployees(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAll(pageable);
+    public Page<UserResponseDto> getAllEmployeesByFilters(Integer rolId, Integer cargoId, EstadoActivoInactivo estado, Pageable pageable) {
+        Specification<Usuario> spec = Specification.allOf(
+                UsuarioSpecifications.hasRol(rolId),
+                UsuarioSpecifications.hasCargo(cargoId),
+                UsuarioSpecifications.hasEstado(estado)
+        );
 
-        return users.map(EmployeeMapper::toUserResponseDto);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<UserResponseDto> getAllActiveEmployees(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.A, pageable);
-
-        return users.map(EmployeeMapper::toUserResponseDto); // Retorna una lista de empleados activos (DTOs)
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<UserResponseDto> getAllInactiveEmployees(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByEstado(EstadoActivoInactivo.I, pageable);
-
-        return users.map(EmployeeMapper::toUserResponseDto); // Retorna la lista de empleados inactivos
-    }
-
-    @Override
-    public Page<UserResponseDto> getAllEmployeesByRol(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByRolAsc(pageable);
-
-        return users.map(EmployeeMapper::toUserResponseDto);
-    }
-
-
-    @Override
-    public Page<UserResponseDto> getAllEmployeesByPosition(Pageable pageable) {
-        Page<Usuario> users = userRepository.findAllByOrderByCargoAsc(pageable);
+        Page<Usuario> users = userRepository.findAll(spec, pageable);
 
         return users.map(EmployeeMapper::toUserResponseDto);
     }

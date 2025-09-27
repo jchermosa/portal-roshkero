@@ -7,6 +7,7 @@ import com.backend.portalroshkabackend.DTO.common.UserUpdateDto;
 import com.backend.portalroshkabackend.DTO.th.employees.DefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.employees.UserResponseDto;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Services.HumanResource.IEmployeeService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +46,13 @@ public class EmployeeController {
 // TODO traer solo la informacion necesaria
     @GetMapping("/th/users")
     public ResponseEntity<?> getAllEmployees(
-            @RequestParam(value = "sortBy", required = false) String sortBy,
+            @RequestParam(value = "rol_id", required = false) Integer rolId,
+            @RequestParam(value = "cargo_id", required = false) Integer cargoId,
+            @RequestParam(value = "estado", required = false) String estadoStr,
             @PageableDefault(size = 10, sort = "idUsuario", direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request
     ){
-        Set<String> allowedParams = Set.of("sortBy", "page", "size");
+        Set<String> allowedParams = Set.of("rol_id", "cargo_id", "estado", "page", "size");
 
         for (String paramName : request.getParameterMap().keySet()){
             if (!allowedParams.contains(paramName)){
@@ -57,19 +60,17 @@ public class EmployeeController {
             }
         }
 
-        if (sortBy == null) return ResponseEntity.ok(employeeService.getAllEmployees(pageable));
-
-        if (sortBy.isBlank()) throw new IllegalArgumentException("El argumento del parametro no debe estar vacio");
-
-        Page<UserResponseDto> users;
-
-         switch (sortBy) {
-            case "active" -> users = employeeService.getAllActiveEmployees(pageable);
-            case "inactive" -> users = employeeService.getAllInactiveEmployees(pageable);
-            case "rol" -> users = employeeService.getAllEmployeesByRol(pageable);
-            case "cargo" -> users = employeeService.getAllEmployeesByPosition(pageable);
-            default -> throw new IllegalArgumentException("Argumento del parametro invalido: " + sortBy);
+        EstadoActivoInactivo estado = null;
+        if (estadoStr != null) {
+            try {
+                estado = EstadoActivoInactivo.valueOf(estadoStr);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Valor de 'estado' inválido: " + estadoStr);
+            }
         }
+
+        Page<UserResponseDto> users = employeeService.getAllEmployeesByFilters(rolId, cargoId, estado, pageable);
+
 
         return ResponseEntity.ok(users);
     }
