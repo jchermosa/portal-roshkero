@@ -1,9 +1,9 @@
 import type { FormSection } from "../../components/DynamicForm";
 import type { RolItem, CargoItem } from "../../types";
 import {
-  EstadoActivoInactivo,
-  SeniorityEnum,
-  FocoEnum,
+  EstadoLabels,
+  SeniorityLabels,
+  FocoLabels,
 } from "../../types";
 
 export function buildUsuarioSections(
@@ -29,14 +29,14 @@ export function buildUsuarioSections(
       icon: "🛠️",
       fields: [
         {
-          name: "idRol", // ✅ alineado al backend
+          name: "idRol",
           label: "Rol",
           type: "select",
           required: true,
-          options: roles.map((r) => ({ value: r.idCargo, label: r.nombre })),
+          options: roles.map((r) => ({ value: r.idRol, label: r.nombre })),
         },
         {
-          name: "idCargo", // ✅ alineado al backend
+          name: "idCargo",
           label: "Cargo",
           type: "select",
           required: true,
@@ -53,8 +53,8 @@ export function buildUsuarioSections(
           label: "Estado",
           type: "select",
           required: true,
-          options: Object.entries(EstadoActivoInactivo).map(([code, label]) => ({
-            value: code,
+          options: Object.entries(EstadoLabels).map(([value, label]) => ({
+            value,
             label,
           })),
         },
@@ -62,13 +62,19 @@ export function buildUsuarioSections(
           name: "seniority",
           label: "Seniority",
           type: "select",
-          options: Object.values(SeniorityEnum).map((v) => ({ value: v, label: v })),
+          options: Object.entries(SeniorityLabels).map(([value, label]) => ({
+            value,
+            label,
+          })),
         },
         {
           name: "foco",
           label: "Foco principal",
           type: "select",
-          options: Object.values(FocoEnum).map((v) => ({ value: v, label: v })),
+          options: Object.entries(FocoLabels).map(([value, label]) => ({
+            value,
+            label,
+          })),
         },
         {
           name: "requiereCambioContrasena",
@@ -84,12 +90,12 @@ export function buildUsuarioSections(
           step: 5,
           required: true,
         },
-        {
-          name: "urlPerfil",
-          label: "URL Perfil",
-          type: "text",
-          placeholder: "https://...",
-        },
+        // {
+        //   name: "urlPerfil",
+        //   label: "URL Perfil",
+        //   type: "text",
+        //   placeholder: "https://...",
+        // },
       ],
     },
   ];

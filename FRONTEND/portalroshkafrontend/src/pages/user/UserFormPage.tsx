@@ -5,6 +5,7 @@ import { useCatalogosUsuarios } from "../../hooks/catalogos/useCatalogosUsuarios
 import { useUsuarioForm } from "../../hooks/usuarios/useUsuarioForm.ts";
 import FormLayout from "../../layouts/FormLayout.tsx";
 import { buildUsuarioSections } from "../../config/forms/usuarioFormFields.ts";
+import { EstadoActivoInactivo } from "../../types";
 
 export default function UserFormPage() {
   const { token } = useAuth();
@@ -14,10 +15,10 @@ export default function UserFormPage() {
   const cedulaParamStr = new URLSearchParams(location.search).get("cedula");
   const cedulaParam = cedulaParamStr ? Number(cedulaParamStr) : undefined;
 
-  // ✅ Catálogos (roles y cargos)
+  // Catálogos (roles y cargos)
   const { roles, cargos, loading: loadingCatalogos } = useCatalogosUsuarios(token);
 
-  // ✅ Hook de formulario de usuario
+  // Hook de formulario de usuario
   const {
     data,
     setData,
@@ -27,30 +28,29 @@ export default function UserFormPage() {
     isEditing,
   } = useUsuarioForm(token, id, cedulaParam);
 
-  // 🔄 Loading combinado
+  // Loading combinado
   const loading = loadingCatalogos || loadingUsuario;
 
-  // ✅ Configuración de secciones (roles y cargos actuales)
+  // Configuración de secciones (roles y cargos actuales)
   const sections = buildUsuarioSections(roles, cargos);
 
-  // 🚀 Render
+  // Render
   const readonly = new URLSearchParams(location.search).get("readonly") === "true";
 
- const normalizeData = (formData: Record<string, any>) => {
-  return {
-    ...formData,
-    nroCedula: formData.nroCedula ?? "",
-    rolId: formData.rolId ? Number(formData.rolId) : undefined,
-    cargoId: formData.cargoId ? Number(formData.cargoId) : undefined,
-    estado: formData.estado ?? "A",
-    fechaIngreso: formData.fechaIngreso || null,
-    fechaNacimiento: formData.fechaNacimiento || null,
-    requiereCambioContrasena: formData.requiereCambioContrasena ?? true,
-    url_perfil: formData.url_perfil ?? null,
-    disponibilidad: formData.disponibilidad ?? 0,
+  const normalizeData = (formData: Record<string, any>) => {
+    return {
+      ...formData,
+      nroCedula: formData.nroCedula ?? "",
+      idRol: formData.idRol ? Number(formData.idRol) : undefined,
+      idCargo: formData.idCargo ? Number(formData.idCargo) : undefined,
+      estado: formData.estado ?? EstadoActivoInactivo.A, 
+      fechaIngreso: formData.fechaIngreso || null,
+      fechaNacimiento: formData.fechaNacimiento || null,
+      requiereCambioContrasena: formData.requiereCambioContrasena ?? true,
+      urlPerfil: formData.urlPerfil || null,
+      disponibilidad: formData.disponibilidad ?? 0,
+    };
   };
-};
-
 
   return (
     <FormLayout

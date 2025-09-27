@@ -1,42 +1,41 @@
 import type { UsuarioItem, FiltrosUsuarios } from "../types";
-
-export interface PaginatedResponse<T> {
-  content: T[];
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number;
-}
+import type { PaginatedResponse } from "../types";
+import { mapUserResponseToUsuarioItem } from "../mappers/userMapper";
 
 const BASE_URL = "/api/v1/admin/th/users";
 
 /**
- * GET usuarios paginados con filtro sortBy
+ * GET usuarios paginados con filtros
  */
 export async function getUsuarios(
   token: string,
-  filtros: FiltrosUsuarios,
+  filtros: FiltrosUsuarios = {},
   page: number = 0,
   size: number = 10
 ): Promise<PaginatedResponse<UsuarioItem>> {
   const params = new URLSearchParams();
 
   if (filtros.sortBy) params.append("sortBy", filtros.sortBy);
+  if (filtros.idRol) params.append("rol_id", filtros.idRol.toString());
+  if (filtros.idCargo) params.append("cargo_id", filtros.idCargo.toString());
+  if (filtros.estado) params.append("estado", filtros.estado);
+
   params.append("page", page.toString());
   params.append("size", size.toString());
 
   const res = await fetch(`${BASE_URL}?${params.toString()}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!res.ok) {
-    const error = await res.text();
-    throw new Error(error || "Error al obtener usuarios");
-  }
+  if (!res.ok) throw new Error(await res.text());
 
-  return res.json();
+  const json = await res.json();
+ 
+  console.log("getUsuarios response:", json);
+  return {
+    ...json,
+    content: (json.content || []).map(mapUserResponseToUsuarioItem),
+  };
 }
 
 /**
@@ -48,12 +47,12 @@ export async function getUsuarioById(
   id: number
 ): Promise<UsuarioItem> {
   const res = await fetch(`${BASE_URL}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+
+  const json = await res.json();
+  return mapUserResponseToUsuarioItem(json);
 }
 
 /**
@@ -65,9 +64,7 @@ export async function getUsuarioByCedula(
   cedula: string
 ): Promise<UsuarioItem> {
   const res = await fetch(`${BASE_URL}/cedula/${cedula}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!res.ok) {
@@ -75,7 +72,8 @@ export async function getUsuarioByCedula(
     throw new Error(await res.text());
   }
 
-  return res.json();
+  const json = await res.json();
+  return mapUserResponseToUsuarioItem(json);
 }
 
 /**
@@ -125,9 +123,7 @@ export async function updateUsuario(
 export async function deleteUsuario(token: string, id: number) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json(); // DefaultResponseDto
@@ -139,9 +135,7 @@ export async function deleteUsuario(token: string, id: number) {
 export async function resetUsuarioPassword(token: string, id: number) {
   const res = await fetch(`${BASE_URL}/${id}/resetpassword`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json(); // DefaultResponseDto

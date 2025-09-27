@@ -5,6 +5,7 @@ import { useUsuarios } from "../../hooks/usuarios/useUsuarios";
 import { useCatalogosUsuarios } from "../../hooks/catalogos/useCatalogosUsuarios";
 import { tieneRol } from "../../utils/permisos";
 import { Roles } from "../../types/roles";
+import { EstadoLabels } from "../../types";
 
 import type { UsuarioItem } from "../../types";
 import DataTable from "../../components/DataTable";
@@ -13,15 +14,19 @@ import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
 import { usuariosColumns } from "../../config/tables/usuariosTableConfig";
 import Toast from "../../components/Toast";
+import SelectDropdown from "../../components/SelectDropdown";
 
 export default function UserPage() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [sortBy, setSortBy] = useState<"active" | "inactive" | "rol" | "cargo" | "">("");
+  const [filtros, setFiltros] = useState<{ idRol?: number; idCargo?: number; estado?: "A" | "I" }>({});
   const [page, setPage] = useState(0);
+
+  // ✅ Toast con tipo
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<"success" | "error" | "info" | "warning">("info");
 
   if (!token) return <p>No autorizado</p>;
 
@@ -34,10 +39,10 @@ export default function UserPage() {
     totalPages,
     loading: loadingUsuarios,
     error,
-  } = useUsuarios(token, sortBy ? { sortBy } : {}, page, 10);
+  } = useUsuarios(token, filtros, page, 10);
 
   const limpiarFiltros = () => {
-    setSortBy("");
+    setFiltros({});
     setPage(0);
   };
 
@@ -70,13 +75,22 @@ export default function UserPage() {
 
     if (success === "created") {
       setToastMessage("✅ Usuario creado con éxito");
+      setToastType("success");
     } else if (success === "updated") {
       setToastMessage("✅ Usuario actualizado con éxito");
+      setToastType("success");
     }
   }, [location.search]);
 
   if (loadingUsuarios || loadingCatalogos) return <p>Cargando usuarios...</p>;
-  if (error) return <p>{error}</p>;
+  if (error) {
+    return (
+      <>
+        <p>{error}</p>
+        <Toast message="❌ Error al cargar usuarios" type="error" onClose={() => {}} />
+      </>
+    );
+  }
 
   return (
     <PageLayout
@@ -91,16 +105,65 @@ export default function UserPage() {
         />
       }
     >
-      <div className="flex items-center gap-4 mb-4">
-        <IconButton
-          label="Limpiar filtros"
-          icon={<span>🧹</span>}
-          variant="secondary"
-          onClick={limpiarFiltros}
-          className="h-10 text-sm px-4 flex items-center"
+      {/* 🔽 Filtros */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+        <SelectDropdown
+          label="Rol"
+          name="idRol"
+          value={filtros.idRol ?? ""}
+          onChange={(e) =>
+            setFiltros((prev) => ({
+              ...prev,
+              idRol: e.target.value ? Number(e.target.value) : undefined,
+            }))
+          }
+          options={roles.map((r) => ({ value: r.idRol, label: r.nombre }))}
+          placeholder="Todos"
         />
+
+        <SelectDropdown
+          label="Cargo"
+          name="idCargo"
+          value={filtros.idCargo ?? ""}
+          onChange={(e) =>
+            setFiltros((prev) => ({
+              ...prev,
+              idCargo: e.target.value ? Number(e.target.value) : undefined,
+            }))
+          }
+          options={cargos.map((c) => ({ value: c.idCargo, label: c.nombre }))}
+          placeholder="Todos"
+        />
+
+        <SelectDropdown
+          label="Estado"
+          name="estado"
+          value={filtros.estado ?? ""}
+          onChange={(e) =>
+            setFiltros((prev) => ({
+              ...prev,
+              estado: e.target.value as "A" | "I" | undefined,
+            }))
+          }
+          options={Object.entries(EstadoLabels).map(([value, label]) => ({
+            value,
+            label,
+          }))}
+          placeholder="Todos"
+        />
+
+        <div className="flex items-end">
+          <IconButton
+            label="Limpiar filtros"
+            icon={<span>🧹</span>}
+            variant="secondary"
+            onClick={limpiarFiltros}
+            className="h-10 text-sm px-4 flex items-center w-full"
+          />
+        </div>
       </div>
 
+      {/* 🔽 Tabla */}
       <DataTable
         data={usuarios}
         columns={usuariosColumns}
@@ -109,6 +172,7 @@ export default function UserPage() {
         scrollable={false}
       />
 
+      {/* 🔽 Paginación */}
       <PaginationFooter
         currentPage={page}
         totalPages={totalPages}
@@ -116,9 +180,13 @@ export default function UserPage() {
         onCancel={() => navigate("/home")}
       />
 
-      {/* ✅ Toast flotante */}
+      {/* 🔽 Toast flotante */}
       {toastMessage && (
-        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage(null)}
+        />
       )}
     </PageLayout>
   );
