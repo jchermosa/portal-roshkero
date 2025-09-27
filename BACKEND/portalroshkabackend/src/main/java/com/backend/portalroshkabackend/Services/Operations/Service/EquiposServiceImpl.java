@@ -27,6 +27,7 @@ import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
+import com.backend.portalroshkabackend.Exception.NombreDuplicadoException;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.DiaLaboral;
@@ -320,7 +321,7 @@ public class EquiposServiceImpl implements IEquiposService {
         public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
                 // --- Check name ---
                 if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombre: El nombre ya existe");
+                        throw new NombreDuplicadoException("El nombre ya existe");
                 }
 
                 // --- Check Leader ---
@@ -448,13 +449,13 @@ public class EquiposServiceImpl implements IEquiposService {
                                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
                 // --- update nombre ---
-                if (requestDto.getNombre() != null && !requestDto.getNombre().trim().isEmpty() &&
-                                !equipo.getNombre().equals(requestDto.getNombre().trim())) {
+                String nuevoNombre = requestDto.getNombre() != null ? requestDto.getNombre().trim() : null;
+
+                if (nuevoNombre != null && !nuevoNombre.isEmpty() && !nuevoNombre.equals(equipo.getNombre())) {
                         if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
-                                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                                "nombre: El nombre ya existe");
+                                throw new NombreDuplicadoException("El nombre ya existe");
                         }
-                        equipo.setNombre(requestDto.getNombre().trim());
+                        equipo.setNombre(nuevoNombre);
                 }
 
                 // --- update lider ---
