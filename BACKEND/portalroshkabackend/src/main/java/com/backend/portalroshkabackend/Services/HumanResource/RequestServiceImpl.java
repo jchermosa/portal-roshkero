@@ -64,13 +64,13 @@ public class RequestServiceImpl implements IRequestService{
 
         requestValidator.validate(request);
 
+        if (request.getLider() == null) request.setEstado(EstadoSolicitudEnum.A);
+
         switch (request.getTipoSolicitud()){
             case SolicitudesEnum.VACACIONES -> acceptVacationsService.acceptRequest(request);
             case SolicitudesEnum.BENEFICIO -> acceptBenefitService.acceptRequest(request);
             case SolicitudesEnum.PERMISO -> acceptPermissionsService.acceptRequest(request);
         }
-
-        request.setEstado(EstadoSolicitudEnum.A);
 
         Solicitud acceptedRequest = repositoryService.save(
                 solicitudRepository,
