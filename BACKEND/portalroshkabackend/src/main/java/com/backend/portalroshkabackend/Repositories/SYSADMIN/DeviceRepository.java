@@ -12,7 +12,7 @@ import com.backend.portalroshkabackend.Models.TipoDispositivo;
 @Repository
 public interface DeviceRepository extends JpaRepository<Dispositivo, Integer> {
 
-   @Query("SELECT d FROM Dispositivo d WHERE d.encargado IS NULL") 
+   @Query("SELECT d FROM Dispositivo d WHERE d.encargado IS NULL AND d.estado = 'D'") 
    List<Dispositivo> findAllWithoutOwner();
 
    List<Dispositivo> findAllByTipoDispositivo_IdTipoDispositivo(Integer id);
