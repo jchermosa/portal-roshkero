@@ -1,64 +1,51 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useUsuarios } from "../../hooks/usuarios/useUsuarios";
 import { useCatalogosUsuarios } from "../../hooks/catalogos/useCatalogosUsuarios";
 import { tieneRol } from "../../utils/permisos";
 import { Roles } from "../../types/roles";
 
-import type { UsuarioItem } from "../../types"; 
+import type { UsuarioItem } from "../../types";
 import DataTable from "../../components/DataTable";
 import PaginationFooter from "../../components/PaginationFooter";
-import SelectDropdown from "../../components/SelectDropdown";
 import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
 import { usuariosColumns } from "../../config/tables/usuariosTableConfig";
+import Toast from "../../components/Toast";
 
-
-export default function UsuariosPage() {
+export default function UserPage() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Filtros
-  const [rolId, setRolId] = useState("");
-  const [equipoId, setEquipoId] = useState("");
-  const [cargoId, setCargoId] = useState("");
+  const [sortBy, setSortBy] = useState<"active" | "inactive" | "rol" | "cargo" | "">("");
   const [page, setPage] = useState(0);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Permisos
-  const puedeVerUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+  if (!token) return <p>No autorizado</p>;
 
   // Catálogos
-  const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogosUsuarios(token);
+  const { roles, cargos, loading: loadingCatalogos } = useCatalogosUsuarios(token);
 
-  // Usuarios (hook especializado)
+  // Usuarios
   const {
     data: usuarios,
     totalPages,
     loading: loadingUsuarios,
     error,
-  } = useUsuarios(
-    token,
-    { rolId, equipoId, cargoId }, // filtros
-    page,
-    10
-  );
+  } = useUsuarios(token, sortBy ? { sortBy } : {}, page, 10);
 
   const limpiarFiltros = () => {
-    setRolId("");
-    setEquipoId("");
-    setCargoId("");
+    setSortBy("");
     setPage(0);
   };
 
-  const columns = usuariosColumns;
-
-    const renderActions = (u: UsuarioItem) => {
+  const renderActions = (u: UsuarioItem) => {
     if (tieneRol(user, Roles.OPERACIONES)) {
-      // Solo ver
       return (
         <button
-          onClick={() => navigate(`/usuarios/${u.id}?readonly=true`)}
+          onClick={() => navigate(`/usuarios/${u.idUsuario}?readonly=true`)}
           className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition"
         >
           Ver
@@ -66,10 +53,9 @@ export default function UsuariosPage() {
       );
     }
 
-    // Editar para otros roles
     return (
       <button
-        onClick={() => navigate(`/usuarios/${u.id}`)}
+        onClick={() => navigate(`/usuarios/${u.idUsuario}`)}
         className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
       >
         Editar
@@ -77,8 +63,18 @@ export default function UsuariosPage() {
     );
   };
 
+  // ✅ Mostrar toast en base a query param success
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const success = params.get("success");
 
-  if (!puedeVerUsuarios) return <p>No tenés permisos para ver esta página.</p>;
+    if (success === "created") {
+      setToastMessage("✅ Usuario creado con éxito");
+    } else if (success === "updated") {
+      setToastMessage("✅ Usuario actualizado con éxito");
+    }
+  }, [location.search]);
+
   if (loadingUsuarios || loadingCatalogos) return <p>Cargando usuarios...</p>;
   if (error) return <p>{error}</p>;
 
@@ -96,30 +92,6 @@ export default function UsuariosPage() {
       }
     >
       <div className="flex items-center gap-4 mb-4">
-        <SelectDropdown
-          name="rol"
-          label="Rol"
-          value={rolId}
-          onChange={(e) => setRolId(e.target.value)}
-          options={roles.map((r) => ({ value: r.id, label: r.nombre }))}
-          placeholder="Filtrar por Rol"
-        />
-        <SelectDropdown
-          name="cargo"
-          label="Cargo"
-          value={cargoId}
-          onChange={(e) => setCargoId(e.target.value)}
-          options={cargos.map((c) => ({ value: c.id, label: c.nombre }))}
-          placeholder="Filtrar por Cargo"
-        />
-        <SelectDropdown
-          name="equipo"
-          label="Equipo"
-          value={equipoId}
-          onChange={(e) => setEquipoId(e.target.value)}
-          options={equipos.map((e) => ({ value: e.id, label: e.nombre }))}
-          placeholder="Filtrar por Equipo"
-        />
         <IconButton
           label="Limpiar filtros"
           icon={<span>🧹</span>}
@@ -131,8 +103,8 @@ export default function UsuariosPage() {
 
       <DataTable
         data={usuarios}
-        columns={columns}
-        rowKey={(u) => u.id}
+        columns={usuariosColumns}
+        rowKey={(u) => u.idUsuario}
         actions={renderActions}
         scrollable={false}
       />
@@ -143,6 +115,11 @@ export default function UsuariosPage() {
         onPageChange={setPage}
         onCancel={() => navigate("/home")}
       />
+
+      {/* ✅ Toast flotante */}
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      )}
     </PageLayout>
   );
 }

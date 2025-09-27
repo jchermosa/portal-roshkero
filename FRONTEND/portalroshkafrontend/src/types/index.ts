@@ -4,51 +4,96 @@ export interface CatalogItem {
 }
 
 
-export const Estado = {
-  ACTIVO: "ACTIVO",
-  INACTIVO: "INACTIVO",
+export const EstadoActivoInactivo = {
+  A: "A",
+  I: "I",
 } as const;
-export type Estado = typeof Estado[keyof typeof Estado];
+export type EstadoActivoInactivo = keyof typeof EstadoActivoInactivo; // "A" | "I"
 
-export const Seniority = {
+// Para la UI
+export const EstadoLabels: Record<EstadoActivoInactivo, string> = {
+  A: "Activo",
+  I: "Inactivo",
+};
+export const SeniorityEnum = {
   JUNIOR: "JUNIOR",
-  SEMI_SENIOR: "SEMI_SENIOR",
+  BOOTCAMPER: "BOOTCAMPER",
+  PLENO: "PLENO",
   SENIOR: "SENIOR",
 } as const;
-export type Seniority = typeof Seniority[keyof typeof Seniority];
+export type SeniorityEnum = typeof SeniorityEnum[keyof typeof SeniorityEnum];
 
-export const Foco = {
-  BACKEND: "BACKEND",
-  FRONTEND: "FRONTEND",
-  FULLSTACK: "FULLSTACK",
-  OTRO: "OTRO",
+export const FocoEnum = {
+  FABRICA: "FABRICA",
+  GAMES: "GAMES",
+  MANTENIMIENTO: "MANTENIMIENTO",
+  NINGUNO: "NINGUNO",
+  PRODUCTO: "PRODUCTO",
+  PROYECTO: "PROYECTO",
+  STAFF: "STAFF",
+  TERCERIZACION: "TERCERIZACION",
 } as const;
-export type Foco = typeof Foco[keyof typeof Foco];
+export type FocoEnum = typeof FocoEnum[keyof typeof FocoEnum];
+
 
 export interface UsuarioItem {
-  id_usuario: number; 
+  idUsuario: number;
   nombre: string;
   apellido: string;
-  nro_cedula: string; 
+  nombreApellido?: string; 
+  nroCedula: string;
   correo: string;
-  id_rol: number;
-  fecha_ingreso: string | null; 
-  antiguedad?: string | null; 
-  dias_vacaciones?: number | null;
-  contrasena?: string;
+  idRol: number;
+  nombreRol?: string;
+  rolNombre?: string;
+  idCargo: number;
+  cargoNombre?: string;
+  fechaIngreso: string | null;
+  fechaNacimiento?: string | null;
   telefono?: string;
-  id_cargo: number;
-  fecha_nacimiento?: string | null; 
-  dias_vacaciones_restante?: number | null;
-  requiere_cambio_contrasena: boolean;
-  fecha_creacion?: string; 
-  seniority?: Seniority
-  foco?: Foco
-  estado: Estado;
-  url_perfil?: string;
+  requiereCambioContrasena?: boolean;
+  estado: "A" | "I"; 
+  antiguedad?: string;
+  diasVacaciones?: number;
+  diasVacacionesRestante?: number;
+  seniority?: SeniorityEnum;
+  foco?: FocoEnum;
   disponibilidad?: number;
-  antiguedadPretty?: string;
+  urlPerfil?: string;
 }
+
+
+export type SortBy = "active" | "inactive" | "rol" | "cargo";
+
+export interface FiltrosUsuarios {
+  sortBy?: SortBy;
+}
+
+
+export interface RolItem {
+  idCargo: number;          
+  nombre: string;
+  fechaCreacion: string;
+}
+
+export interface CargoItem {
+  idCargo: number;
+  nombre: string;
+  fechaCreacion: string;
+}
+
+export interface EquipoItem {
+  equipoId: number;
+  nombre: string;
+  idLider: number;
+  idCliente: number;
+  fechaInicio: string;
+  fechaLimite: string;
+  fechaCreacion: string;
+  estado: string;
+}
+
+
 
 export type SolicitudEstado = "P" | "A" | "R";
 
@@ -84,27 +129,7 @@ export interface SolicitudBeneficio extends SolicitudBase {}
 // Unión
 export type SolicitudItem = SolicitudPermiso | SolicitudBeneficio;
 
-export interface EquipoItem {
-  id: number;
-  nombre: string;
-  fechaInicio?: string | null;
-  fechaLimite?: string | null;
-  idCliente: number;
-  fechaCreacion?: string;
-  estado: "ACTIVO" | "INACTIVO"; // enum real
-}
 
-export interface RolItem {
-  id: number;
-  nombre: string;
-  fechaCreacion?: string;
-}
-
-export interface CargoItem {
-  id: number;
-  nombre: string;
-  fechaCreacion?: string;
-}
 
 export interface TipoPermisoItem {
   id: number;

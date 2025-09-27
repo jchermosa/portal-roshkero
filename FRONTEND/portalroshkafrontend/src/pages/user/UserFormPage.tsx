@@ -5,6 +5,7 @@ import { useCatalogosUsuarios } from "../../hooks/catalogos/useCatalogosUsuarios
 import { useUsuarioForm } from "../../hooks/usuarios/useUsuarioForm.ts";
 import FormLayout from "../../layouts/FormLayout.tsx";
 import { buildUsuarioSections } from "../../config/forms/usuarioFormFields.ts";
+
 export default function UserFormPage() {
   const { token } = useAuth();
   const { id } = useParams();
@@ -13,13 +14,13 @@ export default function UserFormPage() {
   const cedulaParamStr = new URLSearchParams(location.search).get("cedula");
   const cedulaParam = cedulaParamStr ? Number(cedulaParamStr) : undefined;
 
-
-  // ✅ Catálogos
-  const { roles, cargos, equipos, loading: loadingCatalogos } = useCatalogosUsuarios(token);
+  // ✅ Catálogos (roles y cargos)
+  const { roles, cargos, loading: loadingCatalogos } = useCatalogosUsuarios(token);
 
   // ✅ Hook de formulario de usuario
   const {
     data,
+    setData,
     loading: loadingUsuario,
     error,
     handleSubmit,
@@ -29,36 +30,55 @@ export default function UserFormPage() {
   // 🔄 Loading combinado
   const loading = loadingCatalogos || loadingUsuario;
 
-  // ✅ Configuración de secciones
-  const sections = buildUsuarioSections(equipos, roles, cargos);
+  // ✅ Configuración de secciones (roles y cargos actuales)
+  const sections = buildUsuarioSections(roles, cargos);
 
   // 🚀 Render
   const readonly = new URLSearchParams(location.search).get("readonly") === "true";
 
+ const normalizeData = (formData: Record<string, any>) => {
+  return {
+    ...formData,
+    nroCedula: formData.nroCedula ?? "",
+    rolId: formData.rolId ? Number(formData.rolId) : undefined,
+    cargoId: formData.cargoId ? Number(formData.cargoId) : undefined,
+    estado: formData.estado ?? "A",
+    fechaIngreso: formData.fechaIngreso || null,
+    fechaNacimiento: formData.fechaNacimiento || null,
+    requiereCambioContrasena: formData.requiereCambioContrasena ?? true,
+    url_perfil: formData.url_perfil ?? null,
+    disponibilidad: formData.disponibilidad ?? 0,
+  };
+};
+
 
   return (
     <FormLayout
-  title={isEditing ? (readonly ? "Detalle usuario" : "Editar usuario") : "Crear usuario"}
-  subtitle={
-    readonly
-      ? "Vista de solo lectura"
-      : isEditing
-        ? "Modifica los campos necesarios"
-        : "Completá la información del nuevo usuario"
-  }
-  icon={isEditing ? (readonly ? "👀" : "✏️") : "🧑‍💻"}
-  onCancel={() => navigate("/usuarios")}
-  onSubmitLabel={readonly ? undefined : (isEditing ? "Guardar cambios" : "Crear usuario")}
-  onCancelLabel={readonly ? "Volver" : "Cancelar"}   
->
+      title={isEditing ? (readonly ? "Detalle usuario" : "Editar usuario") : "Crear usuario"}
+      subtitle={
+        readonly
+          ? "Vista de solo lectura"
+          : isEditing
+          ? "Modifica los campos necesarios"
+          : "Completá la información del nuevo usuario"
+      }
+      icon={isEditing ? (readonly ? "👀" : "✏️") : "🧑‍💻"}
+      onCancel={() => navigate("/usuarios")}
+      onSubmitLabel={readonly ? undefined : isEditing ? "Guardar cambios" : "Crear usuario"}
+      onCancelLabel={readonly ? "Volver" : "Cancelar"}
+    >
       <DynamicForm
         id="dynamic-form"
         sections={sections}
         initialData={data}
+        onChange={setData}
         onSubmit={async (formData) => {
           if (!readonly) {
-            await handleSubmit(formData);
-            navigate("/usuarios");
+            const normalized = normalizeData(formData);
+            const ok = await handleSubmit(normalized);
+            if (ok) {
+              navigate(`/usuarios?success=${isEditing ? "updated" : "created"}`);
+            }
           }
         }}
         loading={loading}
