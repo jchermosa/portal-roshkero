@@ -91,9 +91,14 @@ public class SysAdminService {
             if (solicitud.getTipoSolicitud() != null) {
                 dto.setTipoSolicitud(solicitud.getTipoSolicitud().name());
             }
-            
-            dto.setComentario(solicitud.getComentario());
-            
+
+            // Obtener el comentario y remover lo que tenga entre parentesis 
+            String comentario = solicitud.getComentario();
+            if (comentario != null) {
+                comentario = comentario.replaceAll("\\(.*?\\)", "").trim();
+            }
+            dto.setComentario(comentario);
+
             if (solicitud.getEstado() != null) {
                 dto.setEstado(solicitud.getEstado());
             }
