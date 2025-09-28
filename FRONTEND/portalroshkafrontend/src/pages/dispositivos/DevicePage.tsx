@@ -12,6 +12,7 @@ import SelectDropdown from "../../components/SelectDropdown";
 import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
 import { dispositivosColumns } from "../../config/tables/dispositivoTableConfig";
+import { CategoriaEnum, CategoriaLabels, EstadoInventarioEnum, EstadoInventarioLabels } from "../../types";
 
 export default function DevicePage() {
   const { token, user } = useAuth();
@@ -23,21 +24,12 @@ export default function DevicePage() {
   const [encargado, setEncargado] = useState("");
   const [page, setPage] = useState(0);
 
-  // Permisos
-  const puedeVerDispositivos = tieneRol(user, Roles.SYSADMIN );
-
   // Dispositivos (hook especializado)
-  const {
-    data: dispositivos,
-    totalPages,
-    loading,
-    error,
-  } = useDispositivos(
-    token,
-    { categoria, estado, encargado },
-    page,
-    10
-  );
+const {
+  data: dispositivos,
+  loading,
+  error,
+} = useDispositivos(token);
 
   const limpiarFiltros = () => {
     setCategoria("");
@@ -54,7 +46,7 @@ export default function DevicePage() {
       return (
         <button
           onClick={() =>
-            navigate(`/dispositivos/${d.id_dispositivo}?readonly=true`)
+            navigate(`/dispositivos/${d.idDispositivo}?readonly=true`)
           }
           className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition"
         >
@@ -65,7 +57,7 @@ export default function DevicePage() {
 
     return (
       <button
-        onClick={() => navigate(`/dispositivos/${d.id_dispositivo}`)}
+        onClick={() => navigate(`/dispositivos/${d.idDispositivo}`)}
         className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
       >
         Editar
@@ -73,8 +65,6 @@ export default function DevicePage() {
     );
   };
 
-  if (!puedeVerDispositivos)
-    return <p>No tenés permisos para ver esta página.</p>;
   if (loading) return <p>Cargando dispositivos...</p>;
   if (error) return <p>{error}</p>;
 
@@ -97,11 +87,10 @@ export default function DevicePage() {
           label="Categoría"
           value={categoria}
           onChange={(e) => setCategoria(e.target.value)}
-          options={[
-            { value: "Laptop", label: "Laptop" },
-            { value: "Impresora", label: "Impresora" },
-            { value: "Servidor", label: "Servidor" },
-          ]}
+          options={Object.values(CategoriaEnum).map((value) => ({
+            value,
+            label: CategoriaLabels[value],
+          }))}
           placeholder="Filtrar por Categoría"
         />
         <SelectDropdown
@@ -109,11 +98,10 @@ export default function DevicePage() {
           label="Estado"
           value={estado}
           onChange={(e) => setEstado(e.target.value)}
-          options={[
-            { value: "Activo", label: "Activo" },
-            { value: "En reparación", label: "En reparación" },
-            { value: "Inactivo", label: "Inactivo" },
-          ]}
+          options={Object.values(EstadoInventarioEnum).map((value) => ({
+            value,
+            label: EstadoInventarioLabels[value],
+          }))}
           placeholder="Filtrar por Estado"
         />
         <SelectDropdown
@@ -122,8 +110,8 @@ export default function DevicePage() {
           value={encargado}
           onChange={(e) => setEncargado(e.target.value)}
           options={[
-            { value: "Juan Pérez", label: "Juan Pérez" },
-            { value: "María López", label: "María López" },
+            { value: "1", label: "Juan Pérez" },
+            { value: "2", label: "María López" },
           ]}
           placeholder="Filtrar por Encargado"
         />
@@ -139,7 +127,7 @@ export default function DevicePage() {
       <DataTable
         data={dispositivos}
         columns={columns}
-        rowKey={(d) => d.id_dispositivo}
+        rowKey={(d) => d.idDispositivo}
         actions={renderActions}
         scrollable={false}
       />

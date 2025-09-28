@@ -1,65 +1,57 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { SolicitudDispositivoItem } from "../../types";
 import {
-  getSolicitudDispositivoById,
-  createSolicitudDispositivo,
-  updateSolicitudDispositivo,
+  acceptSolicitudDispositivo,
+  rejectSolicitudDispositivo,
 } from "../../services/DeviceRequestService";
+import { EstadoSolicitudEnum } from "../../types";
 
 export function useSolicitudDispositivoForm(
   token: string | null,
-  userId?: number, // 👈 nuevo parámetro para inyectar el usuario loggeado
-  id?: string
+  id?: number
 ) {
   const isEditing = !!id;
 
-  // Estado inicial (para creación)
+  // Estado inicial (para visualización, no creación)
   const [data, setData] = useState<Partial<SolicitudDispositivoItem>>({
-    tipo_solicitud: "Dispositivo",   // ⚡ siempre forzado
-    estado: "Pendiente",             // valor inicial
-    fecha_inicio: new Date().toISOString().split("T")[0],
+    tipoSolicitud: "Dispositivo",
+    estado: EstadoSolicitudEnum.P, // Pendiente por defecto
+    fechaInicio: new Date().toISOString().split("T")[0],
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar solicitud si es edición
-  useEffect(() => {
-    if (!token || !isEditing || !id) return;
-
+  // Guardar (solo aceptar o rechazar)
+  const handleAccept = async () => {
+    if (!token || !id) return;
     setLoading(true);
-    getSolicitudDispositivoById(token, id)
-      .then((res) => {
-        setData({
-          ...res,
-          tipo_solicitud: "Dispositivo", // aseguramos tipo
-        });
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [token, id, isEditing]);
-
-  // Guardar (crear o actualizar)
-  const handleSubmit = async (formData: Partial<SolicitudDispositivoItem>) => {
-    if (!token) return;
-
-    const payload: Partial<SolicitudDispositivoItem> = {
-      ...formData,
-      id_usuario: userId, // siempre el usuario loggeado
-      tipo_solicitud: "Dispositivo", // nunca se pierde
-    };
 
     try {
-      if (isEditing && id) {
-        await updateSolicitudDispositivo(token, id, payload);
-      } else {
-        await createSolicitudDispositivo(token, payload);
-      }
+      const updated = await acceptSolicitudDispositivo(token, id);
+      setData(updated);
     } catch (err: any) {
-      setError(err.message || "Error al guardar la solicitud de dispositivo");
+      setError(err.message || "Error al aceptar la solicitud");
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { data, setData, loading, error, handleSubmit, isEditing };
+  const handleReject = async () => {
+    if (!token || !id) return;
+    setLoading(true);
+
+    try {
+      const updated = await rejectSolicitudDispositivo(token, id);
+      setData(updated);
+    } catch (err: any) {
+      setError(err.message || "Error al rechazar la solicitud");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { data, setData, loading, error, handleAccept, handleReject, isEditing };
 }

@@ -1,4 +1,6 @@
+// src/config/forms/ubicacionFormFields.ts
 import type { FormSection } from "../../components/DynamicForm";
+import { EstadoActivoInactivo, EstadoLabels } from "../../types";
 
 export function buildUbicacionSections(): FormSection[] {
   return [
@@ -18,10 +20,10 @@ export function buildUbicacionSections(): FormSection[] {
           label: "Estado",
           type: "select",
           required: true,
-          options: [
-            { value: "ACTIVO", label: "Activo" },
-            { value: "INACTIVO", label: "Inactivo" },
-          ],
+          options: Object.values(EstadoActivoInactivo).map((value) => ({
+            value,
+            label: EstadoLabels[value],
+          })),
         },
       ],
     },

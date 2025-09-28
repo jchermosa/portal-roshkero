@@ -1,5 +1,6 @@
 import type { DispositivoAsignadoItem } from "../../types";
 import type { ReactNode } from "react";
+import { EstadoAsignacionLabels } from "../../types";
 
 // Definición genérica de una columna
 export interface TableColumn<T> {
@@ -9,35 +10,35 @@ export interface TableColumn<T> {
 }
 
 export const dispositivosAsignadosColumns: TableColumn<DispositivoAsignadoItem>[] = [
-  { key: "id_dispositivo_asignado", label: "ID" },
-  { key: "id_dispositivo", label: "Dispositivo" },
-  { key: "id_solicitud", label: "Solicitud" },
+  { key: "idDispositivoAsignado", label: "ID" },
+  { key: "idDispositivo", label: "Dispositivo" },
+  { key: "idSolicitud", label: "Solicitud" },
   {
-    key: "fecha_entrega",
+    key: "fechaEntrega",
     label: "Fecha de Entrega",
     render: (d: DispositivoAsignadoItem) =>
-      d.fecha_entrega ? new Date(d.fecha_entrega).toLocaleDateString() : "-",
+      d.fechaEntrega ? new Date(d.fechaEntrega).toLocaleDateString() : "-",
   },
   {
-    key: "fecha_devolucion",
+    key: "fechaDevolucion",
     label: "Fecha de Devolución",
     render: (d: DispositivoAsignadoItem) =>
-      d.fecha_devolucion ? new Date(d.fecha_devolucion).toLocaleDateString() : "-",
+      d.fechaDevolucion ? new Date(d.fechaDevolucion).toLocaleDateString() : "-",
   },
   {
-    key: "estado_asignacion",
+    key: "estadoAsignacion",
     label: "Estado",
-    render: (d: DispositivoAsignadoItem) =>
-      d.estado_asignacion === "Activo" ? (
-        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-          Activo
-        </span>
-      ) : (
-        <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">
-          {d.estado_asignacion}
-        </span>
-      ),
+    render: (d: DispositivoAsignadoItem) => (
+      <span
+        className={`px-2 py-1 text-xs font-medium rounded-full ${
+          d.estadoAsignacion === "U"
+            ? "bg-green-100 text-green-700"
+            : "bg-yellow-100 text-yellow-700"
+        }`}
+      >
+        {EstadoAsignacionLabels[d.estadoAsignacion]}
+      </span>
+    ),
   },
-  { key: "encargado", label: "Encargado" },
   { key: "observaciones", label: "Observaciones" },
 ];

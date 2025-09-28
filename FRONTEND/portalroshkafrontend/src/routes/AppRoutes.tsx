@@ -27,7 +27,7 @@ import DevicePage from "../pages/dispositivos/DevicePage.tsx";
 import DeviceFormPage from "../pages/dispositivos/DeviceFormPage.tsx";
 import DeviceAssignmentFormPage from "../pages/dispositivos/DeviceAssignmentFormPage.tsx";
 import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
-import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
+import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoModal.tsx";
 import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage.tsx";
 import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage.tsx";
 import UbicacionPage from "../pages/varios/UbicacionPage.tsx";

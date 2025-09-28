@@ -1,3 +1,4 @@
+// src/config/forms/tipoDispositivoFormFields.ts
 import type { FormSection } from "../../components/DynamicForm";
 
 export function buildTipoDispositivoSections(): FormSection[] {

@@ -1,7 +1,12 @@
 // src/config/forms/dispositivoFormFields.ts
 import type { FormSection } from "../../components/DynamicForm";
+import { EstadoInventarioEnum, EstadoInventarioLabels, CategoriaEnum, CategoriaLabels } from "../../types";
 
-export function buildDispositivoSections(): FormSection[] {
+export function buildDispositivoSections(
+  tiposDispositivo: { value: number; label: string }[] = [],
+  ubicaciones: { value: number; label: string }[] = [],
+  usuarios: { value: number; label: string }[] = []
+): FormSection[] {
   return [
     {
       title: "Información básica",
@@ -9,9 +14,8 @@ export function buildDispositivoSections(): FormSection[] {
       fields: [
         { name: "nroSerie", label: "Número de serie", type: "text", required: true },
         { name: "modelo", label: "Modelo", type: "text", required: true },
-        { name: "detalles", label: "Detalles", type: "textarea" },
+        { name: "detalle", label: "Detalles", type: "textarea" },
         { name: "fechaFabricacion", label: "Fecha de fabricación", type: "date" },
-        { name: "fechaCreacion", label: "Fecha de creación", type: "date" },
       ],
     },
     {
@@ -19,35 +23,31 @@ export function buildDispositivoSections(): FormSection[] {
       icon: "📦",
       fields: [
         {
-          name: "idTipoDispositivo",
+          name: "tipoDispositivo",
           label: "Tipo de dispositivo",
           type: "select",
           required: true,
-          // Opciones vendrán desde catálogos en el futuro
-          options: [],
+          options: tiposDispositivo,
         },
         {
           name: "categoria",
           label: "Categoría",
           type: "select",
           required: true,
-          options: [
-            { value: "Laptop", label: "Laptop" },
-            { value: "Impresora", label: "Impresora" },
-            { value: "Servidor", label: "Servidor" },
-            { value: "Otro", label: "Otro" },
-          ],
+          options: Object.values(CategoriaEnum).map((value) => ({
+            value,
+            label: CategoriaLabels[value],
+          })),
         },
         {
           name: "estado",
           label: "Estado",
           type: "select",
           required: true,
-          options: [
-            { value: "Activo", label: "Activo" },
-            { value: "En reparación", label: "En reparación" },
-            { value: "Inactivo", label: "Inactivo" },
-          ],
+          options: Object.values(EstadoInventarioEnum).map((value) => ({
+            value,
+            label: EstadoInventarioLabels[value],
+          })),
         },
       ],
     },
@@ -56,13 +56,19 @@ export function buildDispositivoSections(): FormSection[] {
       icon: "👤",
       fields: [
         {
-          name: "idUbicacion",
+          name: "ubicacion",
           label: "Ubicación",
           type: "select",
           required: true,
-          options: [], // se llena dinámicamente desde catálogos si existiera
+          options: ubicaciones,
         },
-        { name: "encargado", label: "Encargado", type: "text" },
+        {
+          name: "encargado",
+          label: "Encargado",
+          type: "select",
+          required: false,
+          options: usuarios,
+        },
       ],
     },
   ];
