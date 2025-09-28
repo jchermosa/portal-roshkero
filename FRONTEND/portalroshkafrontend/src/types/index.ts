@@ -120,6 +120,18 @@ export interface EquipoItem {
   estado: string;
 }
 
+export const EstadoAsignacionEnum = {
+  U: "U",
+  D: "D", 
+} as const;
+
+export type EstadoAsignacionEnum =
+  typeof EstadoAsignacionEnum[keyof typeof EstadoAsignacionEnum];
+
+export const EstadoAsignacionLabels: Record<EstadoAsignacionEnum, string> = {
+  U: "En uso",
+  D: "Devuelto",
+};
 
 
 export type SolicitudEstado = "P" | "A" | "R";
@@ -174,52 +186,115 @@ export interface TipoBeneficioItem {
 
 
 export interface DispositivoItem {
-  id_dispositivo: number;
-  id_tipo_dispositivo: number;
-  id_ubicacion: number;
-  nro_serie: string;
+  idDispositivo: number;
+  tipoDispositivo: number;
+  ubicacion: number;
+  nroSerie: string;
   modelo: string;
-  detalles: string;
-  fecha_fabricacion: string; // YYYY-MM-DD
-  estado: string;
-  categoria: string;
-  encargado: string;
-  fecha_creacion: string; // YYYY-MM-DD
+  detalle: string;
+  fechaFabricacion: string; // YYYY-MM-DD
+  estado: EstadoInventarioEnum;
+  categoria: CategoriaEnum;
+  encargado: number; // idUsuario encargado
 }
 
 export interface DispositivoAsignadoItem {
-  id_dispositivo_asignado: number;
-  id_dispositivo: number;
-  id_solicitud: number;
-  fecha_entrega: string;
-  fecha_devolucion?: string | null;
-  estado_asignacion: string;
+  idDispositivoAsignado: number;
+  idDispositivo: number;
+  idSolicitud: number;
+  fechaEntrega: string;
+  fechaDevolucion?: string | null;
+  estadoAsignacion: EstadoAsignacionEnum;
   observaciones?: string | null;
 }
 
 export interface SolicitudDispositivoItem {
-  id_solicitud: number;
-  id_usuario: number;
-  id_documento_adjunto?: number | null;
-  tipo_solicitud: "Dispositivo"; // restringido
+  idSolicitud: number;
+  idUsuario: number;
+  idDocumentoAdjunto?: number | null;
+  idLider?: number | null;
+  tipoSolicitud: "Dispositivo";
   comentario?: string;
-  estado: string; // enum estado_solicitud_enum
-  fecha_inicio: string;
-  cant_dias?: number | null;
-  fecha_fin?: string | null;
-  fecha_creacion: string;
+  estado: EstadoSolicitudEnum;
+  fechaInicio: string;
+  cantDias?: number | null;
+  fechaFin?: string | null;
 }
 
-
 export interface TipoDispositivoItem {
-  id_tipo_dispositivo: number;
+  idTipoDispositivo: number;
   nombre: string;
   detalle: string;
-  fecha_creacion: string;
 }
 
 export interface UbicacionItem {
-  id_ubicacion: number;
+  idUbicacion: number;
   nombre: string;
-  estado: string; // viene de enum estado_ac_enum
+  dispositivos?: DispositivoItem[];
+  estado: EstadoActivoInactivo;
 }
+
+export const EstadoInventarioEnum = {
+  D: "D",   
+  A: "A",   
+  ND: "ND", 
+  R: "R",   
+} as const;
+
+export type EstadoInventarioEnum =
+  typeof EstadoInventarioEnum[keyof typeof EstadoInventarioEnum];
+
+export const EstadoInventarioLabels: Record<EstadoInventarioEnum, string> = {
+  D: "Disponible",
+  A: "Asignado",
+  ND: "No disponible",
+  R: "En reparación",
+};
+
+export const EstadoSolicitudEnum = {
+  A: "A",   
+  R: "R",   
+  P: "P",   
+  RC: "RC",
+} as const;
+
+export type EstadoSolicitudEnum =
+  typeof EstadoSolicitudEnum[keyof typeof EstadoSolicitudEnum];
+
+export const EstadoSolicitudLabels: Record<EstadoSolicitudEnum, string> = {
+  A: "Aprobado",
+  R: "Rechazado",
+  P: "Pendiente",
+  RC: "Recalendarizado",
+};
+
+export const SolicitudesEnum = {
+  PERMISO: "Permiso",
+  BENEFICIO: "Beneficio",
+  DISPOSITIVO: "Dispositivo",
+  VACACIONES: "Vacaciones",
+} as const;
+
+export type SolicitudesEnum =
+  typeof SolicitudesEnum[keyof typeof SolicitudesEnum];
+
+export const SolicitudesLabels: Record<SolicitudesEnum, string> = {
+  Permiso: "Permiso",
+  Beneficio: "Beneficio",
+  Dispositivo: "Dispositivo",
+  Vacaciones: "Vacaciones",
+};
+
+
+export const CategoriaEnum = {
+  CONCEDIDO: "Concedido",
+  OFICINA: "Oficina",
+} as const;
+
+export type CategoriaEnum =
+  typeof CategoriaEnum[keyof typeof CategoriaEnum];
+
+export const CategoriaLabels: Record<CategoriaEnum, string> = {
+  Concedido: "Concedido",
+  Oficina: "Oficina",
+};

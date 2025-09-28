@@ -1,5 +1,5 @@
+// src/pages/solicitudes/SolicitudDispositivoPage.tsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { tieneRol } from "../../utils/permisos";
 import { Roles } from "../../types/roles";
@@ -12,70 +12,40 @@ import PaginationFooter from "../../components/PaginationFooter";
 import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
 
-interface Props {
-  embedded?: boolean;
-}
+import SolicitudDispositivoModal from "./SolicitudDispositivoModal";
 
-export default function SolicitudDispositivoPage({ embedded = false }: Props) {
+export default function SolicitudDispositivoPage() {
   const { token, user } = useAuth();
-  const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
+  const [selected, setSelected] = useState<SolicitudDispositivoItem | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
-  const { data: solicitudes, totalPages, loading, error } =
-    useSolicitudesDispositivo(token, {}, page, 10);
+  // ✅ Hook listado
+  const {
+    data: solicitudes,
+    totalPages,
+    loading,
+    error,
+    refresh,
+  } = useSolicitudesDispositivo(token, {}, page, 10);
 
-  const canSee = true; // cualquier usuario puede ver sus solicitudes
-  const canEdit = !tieneRol(user, Roles.OPERACIONES); // ejemplo
+  const canEdit = !tieneRol(user, Roles.OPERACIONES);
 
   const renderActions = (s: SolicitudDispositivoItem) => (
-    <>
+    <div className="flex gap-2">
       <button
-        onClick={() =>
-          navigate(`/solicitud-dispositivo/${s.id_solicitud}?readonly=true`)
-        }
-        className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition"
+        onClick={() => {
+          setSelected(s);
+          setShowModal(true);
+        }}
+        className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
       >
-        Ver
+        Editar
       </button>
-      {canEdit && (
-        <button
-          onClick={() => navigate(`/solicitud-dispositivo/${s.id_solicitud}`)}
-          className="ml-2 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-        >
-          Editar
-        </button>
-      )}
-    </>
+    </div>
   );
 
-  if (!canSee) return <p>No tenés permisos para ver esta página.</p>;
-  if (loading) return <p>Cargando solicitudes...</p>;
-  if (error) return <p>{error}</p>;
-
-  const body = (
-    <>
-      <DataTable
-        data={solicitudes}
-        columns={solicitudDispositivoColumns}
-        rowKey={(s) => s.id_solicitud}
-        actions={renderActions}
-        scrollable={false}
-      />
-      <PaginationFooter
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
-    </>
-  );
-
-  // 👉 Modo embebido: sin botón "Nueva Solicitud"
-  if (embedded) {
-    return <div>{body}</div>;
-  }
-
-  // 👉 Modo página completa: con botón "Nueva Solicitud"
   return (
     <PageLayout
       title="Solicitudes de Dispositivo"
@@ -84,12 +54,42 @@ export default function SolicitudDispositivoPage({ embedded = false }: Props) {
           label="Nueva Solicitud"
           icon={<span>➕</span>}
           variant="primary"
-          onClick={() => navigate("/solicitud-dispositivo/nuevo")}
+          onClick={() => {
+            setSelected(null);
+            setShowModal(true);
+          }}
           className="h-10 text-sm px-4 flex items-center"
         />
       }
     >
-      {body}
+      {/* Tabla */}
+      <DataTable
+        data={solicitudes}
+        columns={solicitudDispositivoColumns}
+        rowKey={(s) => s.idSolicitud}
+        actions={canEdit ? renderActions : undefined}
+        scrollable={false}
+      />
+
+      <PaginationFooter
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
+
+      {/* Modal Form */}
+      {showModal && (
+        <SolicitudDispositivoModal
+          token={token}
+          userId={user?.id!}
+          id={selected?.idSolicitud}
+          onClose={() => setShowModal(false)}
+          onSaved={refresh}
+        />
+      )}
+
+      {loading && <p>Cargando...</p>}
+      {error && <p className="text-red-500">{error}</p>}
     </PageLayout>
   );
 }

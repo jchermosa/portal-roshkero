@@ -10,9 +10,9 @@ export default function DashboardLayout() {
 
 
   // Permisos usando tieneRol
-  const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-  const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-  const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN);
+  // const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+  // const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+  // const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN, Roles.ADMINISTRADOR_DEL_SISTEMA);
 
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
@@ -20,9 +20,9 @@ export default function DashboardLayout() {
     { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: true },
     { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: true },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: true},
-    { id: "/ubicacion", label: "Ubicaciones", icon: "📍", available: puedeGestionarDispositivos },
-    { id: "/tipo-dispositivo", label: "Tipos Dispositivos", icon: "🛠️", available: puedeGestionarDispositivos },
-    { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: puedeGestionarSolicitudes },
+    { id: "/ubicacion", label: "Ubicaciones", icon: "📍", available: true },
+    { id: "/tipo-dispositivo", label: "Tipos Dispositivos", icon: "🛠️", available: true},
+    { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: true },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/solicitud-dispositivo", label: "Solicitud Dispositivo", icon: "📱", available: true },

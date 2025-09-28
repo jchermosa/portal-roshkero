@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { SolicitudDispositivoItem } from "../../types";
+import { EstadoSolicitudLabels } from "../../types";
 
 // Definición genérica de una columna
 export interface TableColumn<T> {
@@ -9,11 +10,11 @@ export interface TableColumn<T> {
 }
 
 export const solicitudDispositivoColumns: TableColumn<SolicitudDispositivoItem>[] = [
-  { key: "id_solicitud", label: "ID" },
+  { key: "idSolicitud", label: "ID" },
   {
-    key: "id_usuario",
+    key: "idUsuario",
     label: "Usuario",
-    render: (s: SolicitudDispositivoItem) => `${s.id_usuario}`,
+    render: (s: SolicitudDispositivoItem) => `${s.idUsuario}`,
   },
   {
     key: "comentario",
@@ -24,40 +25,32 @@ export const solicitudDispositivoColumns: TableColumn<SolicitudDispositivoItem>[
     key: "estado",
     label: "Estado",
     render: (s: SolicitudDispositivoItem) => {
-      switch (s.estado) {
-        case "Pendiente":
-          return (
-            <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">
-              Pendiente
-            </span>
-          );
-        case "Aprobada":
-          return (
-            <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-              Aprobada
-            </span>
-          );
-        case "Rechazada":
-          return (
-            <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
-              Rechazada
-            </span>
-          );
-        default:
-          return s.estado;
-      }
+      const label = EstadoSolicitudLabels[s.estado];
+      const color =
+        s.estado === "P"
+          ? "bg-yellow-100 text-yellow-700"
+          : s.estado === "A"
+          ? "bg-green-100 text-green-700"
+          : s.estado === "R"
+          ? "bg-red-100 text-red-700"
+          : "bg-blue-100 text-blue-700"; 
+      return (
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${color}`}>
+          {label}
+        </span>
+      );
     },
   },
   {
-    key: "fecha_inicio",
+    key: "fechaInicio",
     label: "Fecha Inicio",
     render: (s: SolicitudDispositivoItem) =>
-      s.fecha_inicio ? new Date(s.fecha_inicio).toLocaleDateString() : "-",
+      s.fechaInicio ? new Date(s.fechaInicio).toLocaleDateString() : "-",
   },
   {
-    key: "fecha_fin",
+    key: "fechaFin",
     label: "Fecha Fin",
     render: (s: SolicitudDispositivoItem) =>
-      s.fecha_fin ? new Date(s.fecha_fin).toLocaleDateString() : "-",
+      s.fechaFin ? new Date(s.fechaFin).toLocaleDateString() : "-",
   },
 ];

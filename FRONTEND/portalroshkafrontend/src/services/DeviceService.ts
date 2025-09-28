@@ -1,40 +1,34 @@
 import type { DispositivoItem } from "../types";
-import mockDispositivos from "../data/mockDispositivos.json";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
-// Copia mutable del mock
-let mockData: DispositivoItem[] = [...(mockDispositivos as DispositivoItem[])];
+async function getDispositivos(
+  token: string
+): Promise<DispositivoItem[]> {
+  const res = await fetch(`/api/v1/admin/sysadmin/devices/allDevices`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
 
-// ========================
-// API real (cuando exista)
-// ========================
-async function getDispositivosApi(
+async function getDispositivosWithoutOwner(
   token: string,
-  params: Record<string, string | number | undefined> = {}
-): Promise<{ content: DispositivoItem[]; totalPages: number; totalElements: number; size: number; number: number }> {
+  sortBy: string = "default",
+  filterValue?: string
+): Promise<DispositivoItem[]> {
   const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
+  if (sortBy) query.append("sortBy", sortBy);
+  if (filterValue) query.append("filterValue", filterValue);
 
-  const res = await fetch(`/api/dispositivos?${query.toString()}`, {
+  const res = await fetch(`/api/v1/admin/sysadmin/devices/allDevicesWithoutOwner?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-async function getDispositivoByIdApi(token: string, id: string | number): Promise<DispositivoItem> {
-  const res = await fetch(`/api/dispositivos/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-async function createDispositivoApi(token: string, data: Partial<DispositivoItem>) {
-  const res = await fetch(`/api/dispositivos`, {
+async function createDispositivo(token: string, data: Partial<DispositivoItem>) {
+  const res = await fetch(`/api/v1/admin/sysadmin/devices/create`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -46,8 +40,8 @@ async function createDispositivoApi(token: string, data: Partial<DispositivoItem
   return res.json();
 }
 
-async function updateDispositivoApi(token: string, id: string | number, data: Partial<DispositivoItem>) {
-  const res = await fetch(`/api/dispositivos/${id}`, {
+async function updateDispositivo(token: string, id: string | number, data: Partial<DispositivoItem>) {
+  const res = await fetch(`/api/v1/admin/sysadmin/devices/update/${id}`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -59,45 +53,18 @@ async function updateDispositivoApi(token: string, id: string | number, data: Pa
   return res.json();
 }
 
-// ========================
-// Mocks
-// ========================
-async function getDispositivosMock(): Promise<{ content: DispositivoItem[]; totalPages: number; totalElements: number; size: number; number: number }> {
-  return {
-    content: mockData,
-    totalPages: 1,
-    totalElements: mockData.length,
-    size: mockData.length,
-    number: 0,
-  };
+async function deleteDispositivo(token: string, id: string | number) {
+  const res = await fetch(`/api/v1/admin/sysadmin/devices/delete/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(await res.text());
 }
 
-async function getDispositivoByIdMock(_token: string, id: string | number): Promise<DispositivoItem> {
-  const item = mockData.find((d) => d.id_dispositivo === Number(id));
-  if (!item) throw new Error("Dispositivo no encontrado");
-  return item;
-}
-
-async function createDispositivoMock(_token: string, data: Partial<DispositivoItem>) {
-  const newItem: DispositivoItem = {
-    ...(data as DispositivoItem),
-    id_dispositivo: mockData.length + 1,
-  };
-  mockData.push(newItem);
-  return newItem;
-}
-
-async function updateDispositivoMock(_token: string, id: string | number, data: Partial<DispositivoItem>) {
-  const index = mockData.findIndex((d) => d.id_dispositivo === Number(id));
-  if (index === -1) throw new Error("Dispositivo no encontrado");
-  mockData[index] = { ...mockData[index], ...(data as DispositivoItem) };
-  return mockData[index];
-}
-
-// ========================
-// Export condicional
-// ========================
-export const getDispositivos = USE_MOCK ? getDispositivosMock : getDispositivosApi;
-export const getDispositivoById = USE_MOCK ? getDispositivoByIdMock : getDispositivoByIdApi;
-export const createDispositivo = USE_MOCK ? createDispositivoMock : createDispositivoApi;
-export const updateDispositivo = USE_MOCK ? updateDispositivoMock : updateDispositivoApi;
+export {
+  getDispositivos,
+  getDispositivosWithoutOwner,
+  createDispositivo,
+  updateDispositivo,
+  deleteDispositivo,
+};

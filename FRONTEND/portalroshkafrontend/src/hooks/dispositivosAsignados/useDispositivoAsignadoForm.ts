@@ -1,42 +1,32 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { DispositivoAsignadoItem } from "../../types";
 import {
-  getDispositivoAsignadoById,
   createDispositivoAsignado,
   updateDispositivoAsignado,
 } from "../../services/DeviceAssignmentService";
+import { EstadoAsignacionEnum } from "../../types";
 
 export function useDispositivoAsignadoForm(
   token: string | null,
-  id?: string,
-  solicitudPreasignada?: number // ⚡ nueva prop
+  id?: number,
+  solicitudPreasignada?: number
 ) {
   const isEditing = !!id;
 
   // Estado inicial
   const [data, setData] = useState<Partial<DispositivoAsignadoItem>>({
-    estado_asignacion: "Activo", // por defecto
-    fecha_entrega: new Date().toISOString().split("T")[0], // fecha actual
-    ...(solicitudPreasignada ? { id_solicitud: solicitudPreasignada } : {}), // ⚡ si viene de aprobación, se guarda
+    estadoAsignacion: EstadoAsignacionEnum.U, // por defecto "En uso"
+    fechaEntrega: new Date().toISOString().split("T")[0], // default hoy
+    ...(solicitudPreasignada ? { idSolicitud: solicitudPreasignada } : {}),
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar registro si es edición
-  useEffect(() => {
-    if (!token || !isEditing || !id) return;
-
-    setLoading(true);
-    getDispositivoAsignadoById(token, id)
-      .then((res) => setData(res))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [token, id, isEditing]);
-
   // Guardar (crear o actualizar)
   const handleSubmit = async (formData: Partial<DispositivoAsignadoItem>) => {
     if (!token) return;
+    setLoading(true);
 
     try {
       if (isEditing && id) {
@@ -44,12 +34,14 @@ export function useDispositivoAsignadoForm(
       } else {
         await createDispositivoAsignado(token, {
           ...formData,
-          ...(solicitudPreasignada ? { id_solicitud: solicitudPreasignada } : {}),
+          ...(solicitudPreasignada ? { idSolicitud: solicitudPreasignada } : {}),
         });
       }
     } catch (err: any) {
-      setError(err.message || "Error al guardar el dispositivo asignado");
+      setError(err.message || "Error al guardar la asignación de dispositivo");
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 

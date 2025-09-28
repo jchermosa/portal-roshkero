@@ -1,5 +1,6 @@
 // src/config/forms/dispositivoAsignadoFormFields.ts
 import type { FormSection } from "../../components/DynamicForm";
+import { EstadoAsignacionEnum, EstadoAsignacionLabels } from "../../types";
 
 export function buildDispositivoAsignadoSections(
   dispositivos: { value: number; label: string }[] = [],
@@ -12,28 +13,28 @@ export function buildDispositivoAsignadoSections(
       icon: "💻",
       fields: [
         {
-          name: "id_dispositivo",
+          name: "idDispositivo",
           label: "Dispositivo",
           type: "select",
           required: true,
           options: dispositivos,
         },
         {
-          name: "id_solicitud",
+          name: "idSolicitud",
           label: "Solicitud",
           type: "select",
           required: true,
           options: solicitudes,
-          disabled: !!solicitudPreasignada, // ⚡ si viene de aprobación, no se puede cambiar
+          disabled: !!solicitudPreasignada, 
         },
         {
-          name: "fecha_entrega",
+          name: "fechaEntrega",
           label: "Fecha de entrega",
           type: "date",
           required: true,
         },
         {
-          name: "fecha_devolucion",
+          name: "fechaDevolucion",
           label: "Fecha de devolución",
           type: "date",
         },
@@ -44,15 +45,14 @@ export function buildDispositivoAsignadoSections(
       icon: "📋",
       fields: [
         {
-          name: "estado_asignacion",
+          name: "estadoAsignacion",
           label: "Estado",
           type: "select",
           required: true,
-          options: [
-            { value: "Activo", label: "Activo" },
-            { value: "Devuelto", label: "Devuelto" },
-            { value: "EnReparacion", label: "En reparación" },
-          ],
+          options: Object.values(EstadoAsignacionEnum).map((value) => ({
+            value,
+            label: EstadoAsignacionLabels[value],
+          })),
         },
         {
           name: "observaciones",

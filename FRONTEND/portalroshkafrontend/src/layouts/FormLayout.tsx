@@ -61,7 +61,7 @@ export default function FormLayout({
 
             {/* Footer con botones */}
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row gap-4">
-              {onSubmitLabel && (   // 👈 solo mostrar si está definido
+              {onSubmitLabel && (   
                 <button
                   type="submit"
                   form="dynamic-form"

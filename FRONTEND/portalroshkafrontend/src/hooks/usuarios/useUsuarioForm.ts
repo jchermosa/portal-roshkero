@@ -23,7 +23,7 @@ export function useUsuarioForm(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 🔄 Cargar usuario si estamos editando
+  // Cargar usuario si estamos editando
   useEffect(() => {
     if (!token || !isEditing || !id) return;
 
@@ -32,7 +32,6 @@ export function useUsuarioForm(
       .then((res) => {
         setData({
           ...res,
-          // 👇 Normalizamos: ya usamos idRol / idCargo
           idRol: res.idRol,
           idCargo: res.idCargo,
           estado: res.estado ?? "A",

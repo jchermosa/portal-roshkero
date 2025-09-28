@@ -1,7 +1,7 @@
 import type { UbicacionItem } from "../../types";
 import type { ReactNode } from "react";
+import { EstadoLabels } from "../../types";
 
-// Definición genérica de una columna
 export interface TableColumn<T> {
   key: string;
   label: string;
@@ -9,20 +9,27 @@ export interface TableColumn<T> {
 }
 
 export const ubicacionColumns: TableColumn<UbicacionItem>[] = [
-  { key: "id_ubicacion", label: "ID" },
+  { key: "idUbicacion", label: "ID" },
   { key: "nombre", label: "Nombre" },
   {
     key: "estado",
     label: "Estado",
-    render: (u: UbicacionItem) =>
-      u.estado === "ACTIVO" ? (
-        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-          Activo
+    render: (u: UbicacionItem) => {
+      const label = EstadoLabels[u.estado];
+      const color =
+        u.estado === "A"
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-700";
+      return (
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${color}`}>
+          {label}
         </span>
-      ) : (
-        <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
-          Inactivo
-        </span>
-      ),
+      );
+    },
+  },
+  {
+    key: "dispositivos",
+    label: "Dispositivos",
+    render: (u: UbicacionItem) => u.dispositivos?.length ?? 0,
   },
 ];
