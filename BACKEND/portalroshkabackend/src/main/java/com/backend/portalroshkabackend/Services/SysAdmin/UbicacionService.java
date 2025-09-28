@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.SYSADMIN.UbicacionDto;
@@ -44,19 +46,15 @@ public class UbicacionService {
 
     @Transactional
     // Encontrar todas las ubicaciones
-    public List<UbicacionDto> getAllUbicaciones(){
-        List<com.backend.portalroshkabackend.Models.Ubicacion> ubicaciones = ubicacionRepository.findAll();
-        return ubicaciones.stream()
-                .map(ubicacion -> {
+    public Page<UbicacionDto> getAllUbicaciones(Pageable pageable){
+        Page<Ubicacion> ubicaciones = ubicacionRepository.findAll(pageable);
+        return ubicaciones.map(ubicacion -> {
                     UbicacionDto dto = new UbicacionDto();
                     dto.setIdUbicacion(ubicacion.getIdUbicacion());
                     dto.setNombre(ubicacion.getNombre());
                     dto.setEstado(ubicacion.getEstado());
-                    
-                    
                     return dto;
-                })
-                .toList();
+                });
     }
     
 

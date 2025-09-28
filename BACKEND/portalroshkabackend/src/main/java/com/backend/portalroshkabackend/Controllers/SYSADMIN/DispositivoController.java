@@ -3,6 +3,8 @@ package com.backend.portalroshkabackend.Controllers.SYSADMIN;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,24 +39,24 @@ public class DispositivoController {
 
     // Obtener los tipos de dispositivos 
     @GetMapping("/getDeviceTypes")
-    public List<DeviceTypeDTO> getDeviceTypes() {
-        return dispositivoService.getAllTypes();
+    public Page<DeviceTypeDTO> getDeviceTypes(Pageable pageable) {
+        return dispositivoService.getAllTypes(pageable);
     }
 
     // Listar los dispositivos 
     @GetMapping("/allDevices")
-    public List<DeviceDTO> getAllDevices() {
-        return dispositivoService.getAllDevices();
+    public Page<DeviceDTO> getAllDevices(Pageable pageable) {
+        return dispositivoService.getAllDevices(pageable);
     }  
 
     // Listar los dispositivos sin duenho
     // Listar los dispositivos sin dueño
     @GetMapping("/allDevicesWithoutOwner")
-    public List<DeviceDTO> getAllDevicesWithoutOwner(
+    public Page<DeviceDTO> getAllDevicesWithoutOwner(
         @RequestParam(required = false, defaultValue = "default") String sortBy,
-        @RequestParam(required = false) String filterValue
-    ) {
-        return dispositivoService.getAllDevicesWithoutOwner(sortBy, filterValue);
+        @RequestParam(required = false) String filterValue,
+        Pageable pageable) {
+        return dispositivoService.getAllDevicesWithoutOwner(pageable, sortBy, filterValue);
     }
 
 

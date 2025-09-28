@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.Controllers.SYSADMIN;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceAssignmentDTO;
@@ -29,9 +31,9 @@ public class AsignacionDispositivoController {
 
     // Listar las asignaciones de dispositivos 
     @GetMapping("/listAssignments")
-    public List<DeviceAssignmentDTO> listarAsignaciones() {
+    public Page<DeviceAssignmentDTO> listarAsignaciones(Pageable pageable) {
 
-        return deviceAssignmentService.listarAsignaciones();
+        return deviceAssignmentService.listarAsignaciones(pageable);
 
     }
     
