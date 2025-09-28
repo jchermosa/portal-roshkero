@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeviceDTO {
 
+    private Integer idDispositivo;
     private Integer tipoDispositivo;
     private String nroSerie;
     private String modelo;

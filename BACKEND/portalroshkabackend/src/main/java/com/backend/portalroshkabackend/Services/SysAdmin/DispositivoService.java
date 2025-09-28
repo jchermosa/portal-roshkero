@@ -263,6 +263,7 @@ public class DispositivoService {
     private DeviceDTO convertToDto(Dispositivo dispositivo) {
     DeviceDTO dto = new DeviceDTO();
     try {
+        dto.setIdDispositivo(dispositivo.getIdDispositivo());
         dto.setNroSerie(dispositivo.getNroSerie());
         dto.setModelo(dispositivo.getModelo());
         dto.setFechaFabricacion(dispositivo.getFechaFabricacion());
