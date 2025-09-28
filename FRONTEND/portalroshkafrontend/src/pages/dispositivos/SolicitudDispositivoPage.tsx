@@ -81,7 +81,7 @@ export default function SolicitudDispositivoPage() {
       {showModal && (
         <SolicitudDispositivoModal
           token={token}
-          userId={user?.id!}
+          userId={user?.id}
           id={selected?.idSolicitud}
           onClose={() => setShowModal(false)}
           onSaved={refresh}

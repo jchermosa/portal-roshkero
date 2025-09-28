@@ -4,7 +4,7 @@ import type { SolicitudDispositivoItem } from "../types";
 async function getSolicitudesDispositivo(
   token: string
 ): Promise<SolicitudDispositivoItem[]> {
-  const res = await fetch(`/api/v1/admin/sysadmin/allRequests`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/allRequests`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());

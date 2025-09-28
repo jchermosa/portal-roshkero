@@ -186,7 +186,7 @@ export interface TipoBeneficioItem {
 
 
 export interface DispositivoItem {
-  idDispositivo: number;
+  idDispositivo?: number; // Opcional, puede no estar en respuestas del backend
   tipoDispositivo: number;
   ubicacion: number;
   nroSerie: string;
@@ -287,14 +287,14 @@ export const SolicitudesLabels: Record<SolicitudesEnum, string> = {
 
 
 export const CategoriaEnum = {
-  CONCEDIDO: "Concedido",
-  OFICINA: "Oficina",
+  CONCEDIDO: "CONCEDIDO",
+  OFICINA: "OFICINA",
 } as const;
 
 export type CategoriaEnum =
   typeof CategoriaEnum[keyof typeof CategoriaEnum];
 
 export const CategoriaLabels: Record<CategoriaEnum, string> = {
-  Concedido: "Concedido",
-  Oficina: "Oficina",
+  CONCEDIDO: "Concedido",
+  OFICINA: "Oficina",
 };
