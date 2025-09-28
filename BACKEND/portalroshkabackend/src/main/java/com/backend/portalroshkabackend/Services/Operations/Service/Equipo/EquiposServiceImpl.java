@@ -42,7 +42,6 @@ import com.backend.portalroshkabackend.Repositories.OP.TecnologiasEquiposReposit
 import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
-import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquipoDiaUbicacionService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquiposService;
 import com.backend.portalroshkabackend.tools.mapper.EquiposMapper;
 
@@ -58,7 +57,6 @@ public class EquiposServiceImpl implements IEquiposService {
         private final AsignacionUsuarioRepository asignacionUsuarioRepository;
         private final IUsuarioService usuarioService;
         private final ITecnologiaEquiposService tecnologiaEquiposService;
-        private final IEquipoDiaUbicacionService equipoDiaUbicacionService;
         private final EquiposMapper equiposMapper;
 
         private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
@@ -71,7 +69,6 @@ public class EquiposServiceImpl implements IEquiposService {
                         AsignacionUsuarioRepository asignacionUsuarioRepository,
                         IUsuarioService usuarioService,
                         ITecnologiaEquiposService tecnologiaEquiposService,
-                        IEquipoDiaUbicacionService equipoDiaUbicacionService,
                         EquiposMapper equiposMapper) {
                 this.equiposRepository = equiposRepository;
                 this.clientesRepository = clientesRepository;
@@ -81,7 +78,6 @@ public class EquiposServiceImpl implements IEquiposService {
                 this.asignacionUsuarioRepository = asignacionUsuarioRepository;
                 this.usuarioService = usuarioService;
                 this.tecnologiaEquiposService = tecnologiaEquiposService;
-                this.equipoDiaUbicacionService = equipoDiaUbicacionService;
                 this.equiposMapper = equiposMapper;
 
                 sortingMap = new HashMap<>();
@@ -109,7 +105,7 @@ public class EquiposServiceImpl implements IEquiposService {
         public EquiposResponseDto getTeamById(Integer id) {
                 Equipos e = equiposRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
-                return equiposMapper.toDto(e);
+                return equiposMapper.getTeam(e);
         }
 
         // Method for show team with sort
@@ -120,10 +116,10 @@ public class EquiposServiceImpl implements IEquiposService {
                 Function<Pageable, Page<Equipos>> func = sortingMap.getOrDefault(sortBy, sortingMap.get("default"));
                 Page<Equipos> page = func.apply(pageable);
 
-                // Маппим контент в DTO
+                // Маппим контент в DTO через маппер
                 List<EquiposResponseDto> contentDto = page.getContent()
                                 .stream()
-                                .map(this::mapToDto)
+                                .map(equiposMapper::getAllTeams)
                                 .toList();
 
                 // Создаём новый PageImpl с DTO
@@ -133,56 +129,12 @@ public class EquiposServiceImpl implements IEquiposService {
                                 page.getTotalElements());
         }
 
-        // Map in DTO
-        public EquiposResponseDto mapToDto(Equipos e) {
-                EquiposResponseDto dto = new EquiposResponseDto();
-                dto.setIdEquipo(e.getIdEquipo());
-                dto.setNombre(e.getNombre());
-
-                List<EquipoDiaUbicacionResponceDto> dtoList = equipoDiaUbicacionService
-                                .EquipoDiaUbicacion(e.getIdEquipo());
-
-                dto.setEquipoDiaUbicacion(dtoList);
-
-                dto.setFechaInicio(e.getFechaInicio());
-                dto.setFechaLimite(e.getFechaLimite());
-                dto.setFechaCreacion(e.getFechaCreacion());
-                dto.setEstado(e.getEstado());
-
-                // Lider
-                if (e.getLider() != null) {
-                        Usuario u = e.getLider();
-                        dto.setLider(new UsuarioisResponseDto(
-                                        u.getIdUsuario(),
-                                        u.getNombre(),
-                                        u.getApellido(),
-                                        u.getCorreo(),
-                                        u.getDisponibilidad()));
-                }
-
-                // Client
-                if (e.getCliente() != null) {
-                        dto.setCliente(new ClientesResponseDto(
-                                        e.getCliente().getIdCliente(),
-                                        e.getCliente().getNombre()));
-                }
-
-                // Tecnologias
-                List<TecnologiasDto> tecnologias = tecnologiaEquiposService.getTecnologiasByEquipo(e.getIdEquipo());
-                dto.setTecnologias(tecnologias);
-
-                return dto;
-        }
-
         @Override
         public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
                 // --- Check name ---
                 if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
                         throw new NombreDuplicadoException("El nombre ya existe");
                 }
-
-                // ClassWithCheckingAll all = new ClassWithCheckingAll;
-                // all.CheckName(requestDto.getNombre().trim());
 
                 // --- Check Leader ---
                 Usuario lider = null;
@@ -253,9 +205,6 @@ public class EquiposServiceImpl implements IEquiposService {
                                                 l.getCorreo(), l.getDisponibilidad()))
                                 .orElse(null);
 
-                // --- Tech ---
-                // classPutInfoInTecnologiasEquiposRepository.putinfo(requestDto.getIdTecnologias());
-
                 List<TecnologiasDto> tecnologias = new ArrayList<>();
                 if (requestDto.getIdTecnologias() != null) {
                         for (Integer idTec : requestDto.getIdTecnologias()) {
@@ -269,7 +218,6 @@ public class EquiposServiceImpl implements IEquiposService {
                         }
                 }
 
-                // classPutInfoInasignacionUsuarioRepository.putinfo(requestDto.getUsuarios());
                 // --- Assign Users ---
                 List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
                 if (requestDto.getUsuarios() != null) {
