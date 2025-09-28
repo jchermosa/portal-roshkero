@@ -41,8 +41,8 @@ export default function UserFormPage() {
     return {
       ...formData,
       nroCedula: formData.nroCedula ?? "",
-      idRol: formData.idRol ? Number(formData.idRol) : undefined,
-      idCargo: formData.idCargo ? Number(formData.idCargo) : undefined,
+      rol: { idRol: Number(formData.idRol) },
+      cargo: { idCargo: Number(formData.idCargo) },
       estado: formData.estado ?? EstadoActivoInactivo.A, 
       fechaIngreso: formData.fechaIngreso || null,
       fechaNacimiento: formData.fechaNacimiento || null,
