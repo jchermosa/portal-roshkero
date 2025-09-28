@@ -1,4 +1,4 @@
-import type { UsuarioItem, FiltrosUsuarios } from "../types";
+import type { UsuarioItem, FiltrosUsuarios, SolicitudUserItem } from "../types";
 import type { PaginatedResponse } from "../types";
 import { mapUserResponseToUsuarioItem } from "../mappers/userMapper";
 
@@ -140,3 +140,5 @@ export async function resetUsuarioPassword(token: string, id: number) {
   if (!res.ok) throw new Error(await res.text());
   return res.json(); // DefaultResponseDto
 }
+
+

@@ -1,3 +1,11 @@
+export interface PageResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+}
+
 export interface CatalogItem {
   id: number;
   nombre: string;
@@ -213,12 +221,18 @@ export interface SolicitudDispositivoItem {
   idUsuario: number;
   idDocumentoAdjunto?: number | null;
   idLider?: number | null;
-  tipoSolicitud: "Dispositivo";
+  tipoSolicitud: "DISPOSITIVO";
   comentario?: string;
   estado: EstadoSolicitudEnum;
   fechaInicio: string;
   cantDias?: number | null;
   fechaFin?: string | null;
+  idTipoDispositivo?: number | null;
+}
+
+export interface UserSolDispositivoDto {
+  id_tipo_dispositivo: number; // requerido
+  comentario?: string;         // opcional
 }
 
 export interface TipoDispositivoItem {
@@ -298,3 +312,27 @@ export const CategoriaLabels: Record<CategoriaEnum, string> = {
   CONCEDIDO: "Concedido",
   OFICINA: "Oficina",
 };
+
+export interface SolicitudUserItem {
+  idSolicitud: number;
+  tipoSolicitud: "PERMISO" | "VACACIONES" | "BENEFICIO" | "DISPOSITIVO";
+  estado: EstadoSolicitudEnum;
+  comentario?: string;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  cantDias?: number | null;
+  idTipoDispositivo?: number | null;
+}
+
+export interface SolicitudDispositivoUI {
+  idSolicitud: number;
+  usuarioId?: number;        
+  tipoSolicitud: "DISPOSITIVO";
+  comentario?: string;
+  estado: EstadoSolicitudEnum;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  cantDias?: number | null;
+  idTipoDispositivo?: number | null;
+  fuente: "ADMINISTRADOR" | "USUARIO"; 
+}

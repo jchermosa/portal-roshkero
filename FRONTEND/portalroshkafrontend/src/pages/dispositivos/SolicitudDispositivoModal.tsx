@@ -1,4 +1,3 @@
-// src/modals/SolicitudDispositivoModal.tsx
 import DynamicForm from "../../components/DynamicForm";
 import { useSolicitudDispositivoForm } from "../../hooks/deviceRequest/useSolicitudDispositivoForm";
 import { useGetDeviceTypes } from "../../hooks/dispositivos/useGetDeviceTypes";
@@ -6,7 +5,6 @@ import { buildSolicitudDispositivoSections } from "../../config/forms/solicitudD
 
 interface Props {
   token: string | null;
-  userId: number;
   id?: number | string;
   readonly?: boolean;
   gestion?: boolean;
@@ -16,23 +14,34 @@ interface Props {
 
 export default function SolicitudDispositivoModal({
   token,
-  userId: _userId,
   id,
   readonly = false,
   gestion = false,
   onClose,
   onSaved,
 }: Props) {
-  const { data, setData, handleAccept, handleReject, loading, error, isEditing } =
-    useSolicitudDispositivoForm(token, typeof id === 'string' ? parseInt(id) : id);
+  const {
+    data,
+    setData,
+    create,
+    accept,
+    reject,
+    loading,
+    error,
+    isEditing,
+  } = useSolicitudDispositivoForm(
+    token,
+    typeof id === "string" ? parseInt(id) : id,
+    gestion 
+  );
 
   // Obtener tipos de dispositivos desde la API
   const { data: deviceTypes, loading: loadingTypes } = useGetDeviceTypes(token);
 
   // Transformar tipos de dispositivos para el formulario
-  const tipoDispositivoOptions = deviceTypes.map(tipo => ({
+  const tipoDispositivoOptions = deviceTypes.map((tipo) => ({
     value: tipo.idTipoDispositivo,
-    label: tipo.nombre
+    label: tipo.nombre,
   }));
 
   const sections = buildSolicitudDispositivoSections(tipoDispositivoOptions);
@@ -40,7 +49,7 @@ export default function SolicitudDispositivoModal({
   const handleAprobar = async () => {
     if (!id) return;
     try {
-      await handleAccept();
+      await accept();
       if (onSaved) onSaved();
       onClose();
     } catch {
@@ -51,7 +60,7 @@ export default function SolicitudDispositivoModal({
   const handleRechazar = async () => {
     if (!id) return;
     try {
-      await handleReject();
+      await reject();
       if (onSaved) onSaved();
       onClose();
     } catch {
@@ -75,16 +84,19 @@ export default function SolicitudDispositivoModal({
         <DynamicForm
           id="solicitud-dispositivo-form"
           sections={sections}
-          initialData={data}
+          initialData={data ?? {}}   
           onSubmit={async (formData) => {
             if (!readonly && !gestion) {
-              // Para crear nuevas solicitudes, solo actualizar el estado local
-              setData(formData);
-              if (onSaved) onSaved();
-              onClose();
+              try {
+                await create(formData as any); 
+                if (onSaved) onSaved();
+                onClose();
+              } catch {
+                // error ya se maneja en el hook
+              }
             }
           }}
-          onChange={setData}
+          onChange={(formData) => setData(formData as any)} 
           loading={loading || loadingTypes}
           readonly={readonly || gestion}
         />
@@ -96,15 +108,17 @@ export default function SolicitudDispositivoModal({
             <div className="flex gap-2 ml-auto">
               <button
                 onClick={handleRechazar}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                disabled={loading}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
               >
-                Rechazar
+                {loading ? "Procesando..." : "Rechazar"}
               </button>
               <button
                 onClick={handleAprobar}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                disabled={loading}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
               >
-                Aprobar
+                {loading ? "Procesando..." : "Aprobar"}
               </button>
             </div>
           ) : (
@@ -115,7 +129,11 @@ export default function SolicitudDispositivoModal({
                 disabled={loading || readonly}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
               >
-                {isEditing ? "Guardar cambios" : "Crear"}
+                {loading
+                  ? "Procesando..."
+                  : isEditing
+                  ? "Guardar cambios"
+                  : "Crear"}
               </button>
               <button
                 onClick={onClose}

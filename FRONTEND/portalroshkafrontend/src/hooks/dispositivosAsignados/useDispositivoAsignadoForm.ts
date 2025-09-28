@@ -15,8 +15,8 @@ export function useDispositivoAsignadoForm(
 
   // Estado inicial
   const [data, setData] = useState<Partial<DispositivoAsignadoItem>>({
-    estadoAsignacion: EstadoAsignacionEnum.U, // por defecto "En uso"
-    fechaEntrega: new Date().toISOString().split("T")[0], // default hoy
+    estadoAsignacion: EstadoAsignacionEnum.U, // default: "En uso"
+    fechaEntrega: new Date().toISOString().split("T")[0],
     ...(solicitudPreasignada ? { idSolicitud: solicitudPreasignada } : {}),
   });
 

@@ -27,7 +27,6 @@ import DevicePage from "../pages/dispositivos/DevicePage.tsx";
 import DeviceFormPage from "../pages/dispositivos/DeviceFormPage.tsx";
 import DeviceAssignmentFormPage from "../pages/dispositivos/DeviceAssignmentFormPage.tsx";
 import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
-import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoModal.tsx";
 import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage.tsx";
 import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage.tsx";
 import UbicacionPage from "../pages/varios/UbicacionPage.tsx";
@@ -80,8 +79,6 @@ export default function AppRoutes() {
 
           {/* Solicitud de Dispositivos (usuarios normales) */}
           <Route path="/solicitud-dispositivo" element={<SolicitudDispositivoPage />} />
-          <Route path="/solicitud-dispositivo/nuevo" element={<SolicitudDispositivoFormPage />} />
-          <Route path="/solicitud-dispositivo/:id" element={<SolicitudDispositivoFormPage />} />
 
           {/* Gestión de Dispositivos (SYSADMIN → Tabs: Solicitudes + Asignaciones) */}
           <Route path="/gestion-dispositivos" element={<GestionDispositivosPage />} />
