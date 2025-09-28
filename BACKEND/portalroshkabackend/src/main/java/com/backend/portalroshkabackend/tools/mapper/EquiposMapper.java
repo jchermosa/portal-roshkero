@@ -1,12 +1,14 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
 import com.backend.portalroshkabackend.DTO.Operationes.EquipoDiaUbicacionResponceDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
 import com.backend.portalroshkabackend.Models.Equipos;
@@ -96,5 +98,32 @@ public class EquiposMapper {
         dto.setTecnologias(tecnologias);
 
         return dto;
+    }
+
+    public EquiposResponseDto toDto(Equipos equipo,
+            UsuarioisResponseDto liderDto,
+            List<TecnologiasDto> tecnologias,
+            List<UsuarioAsignacionDto> usuariosDto) {
+        EquiposResponseDto dto = new EquiposResponseDto();
+        dto.setIdEquipo(equipo.getIdEquipo());
+        dto.setNombre(equipo.getNombre());
+        dto.setCliente(Optional.ofNullable(equipo.getCliente())
+                .map(c -> new ClientesResponseDto(c.getIdCliente(), c.getNombre()))
+                .orElse(null));
+        dto.setLider(liderDto);
+        dto.setFechaInicio(equipo.getFechaInicio());
+        dto.setFechaLimite(equipo.getFechaLimite());
+        dto.setEstado(equipo.getEstado());
+        dto.setTecnologias(tecnologias);
+        dto.setUsuariosAsignacion(usuariosDto);
+        dto.setFechaCreacion(equipo.getFechaCreacion());
+        return dto;
+    }
+
+    public UsuarioisResponseDto toDto(Usuario usuario) {
+        if (usuario == null)
+            return null;
+        return new UsuarioisResponseDto(usuario.getIdUsuario(), usuario.getNombre(), usuario.getApellido(),
+                usuario.getCorreo(), usuario.getDisponibilidad());
     }
 }

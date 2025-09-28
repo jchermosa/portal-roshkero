@@ -1,49 +1,34 @@
 package com.backend.portalroshkabackend.Services.Operations.Service.Equipo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.server.ResponseStatusException;
 
-import com.backend.portalroshkabackend.DTO.Operationes.EquipoDiaUbicacionResponceDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
-import com.backend.portalroshkabackend.Exception.DisponibilidadInsuficienteException;
-import com.backend.portalroshkabackend.Exception.NombreDuplicadoException;
-import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
-import com.backend.portalroshkabackend.Models.Clientes;
 import com.backend.portalroshkabackend.Models.Equipos;
-import com.backend.portalroshkabackend.Models.Tecnologias;
-import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
-import com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository;
 import com.backend.portalroshkabackend.Repositories.OP.ClientesRepository;
 import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
-import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
-import com.backend.portalroshkabackend.Repositories.OP.TecnologiasEquiposRepository;
-import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquiposService;
 import com.backend.portalroshkabackend.tools.mapper.EquiposMapper;
+import com.backend.portalroshkabackend.tools.validator.TeamValidator;
 
 @Service("operationsEquiposService")
 @Validated
@@ -51,33 +36,27 @@ public class EquiposServiceImpl implements IEquiposService {
 
         private final EquiposRepository equiposRepository;
         private final ClientesRepository clientesRepository;
-        private final TecnologiaRepository tecnologiasRepository;
-        private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
-        private final UsuarioisRepository usuarioisRepository;
-        private final AsignacionUsuarioRepository asignacionUsuarioRepository;
         private final IUsuarioService usuarioService;
         private final ITecnologiaEquiposService tecnologiaEquiposService;
+        private final TeamValidator teamValidator;
         private final EquiposMapper equiposMapper;
 
+        // сортировка страниц
         private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
 
         @Autowired
-        public EquiposServiceImpl(EquiposRepository equiposRepository, ClientesRepository clientesRepository,
-                        TecnologiaRepository tecnologiasRepository,
-                        TecnologiasEquiposRepository tecnologiasEquiposRepository,
-                        UsuarioisRepository usuarioisRepository,
-                        AsignacionUsuarioRepository asignacionUsuarioRepository,
+        public EquiposServiceImpl(
+                        EquiposRepository equiposRepository,
+                        ClientesRepository clientesRepository,
                         IUsuarioService usuarioService,
                         ITecnologiaEquiposService tecnologiaEquiposService,
+                        TeamValidator teamValidator,
                         EquiposMapper equiposMapper) {
                 this.equiposRepository = equiposRepository;
                 this.clientesRepository = clientesRepository;
-                this.tecnologiasRepository = tecnologiasRepository;
-                this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
-                this.usuarioisRepository = usuarioisRepository;
-                this.asignacionUsuarioRepository = asignacionUsuarioRepository;
                 this.usuarioService = usuarioService;
                 this.tecnologiaEquiposService = tecnologiaEquiposService;
+                this.teamValidator = teamValidator;
                 this.equiposMapper = equiposMapper;
 
                 sortingMap = new HashMap<>();
@@ -129,277 +108,60 @@ public class EquiposServiceImpl implements IEquiposService {
                                 page.getTotalElements());
         }
 
-        @Override
         public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
-                // --- Check name ---
-                if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
-                        throw new NombreDuplicadoException("El nombre ya existe");
-                }
+                teamValidator.validateUniqueName(requestDto.getNombre());
+                Usuario lider = teamValidator.validateLeader(requestDto.getIdLider());
+                Map<Integer, Usuario> usuariosValidados = teamValidator.validateUsers(requestDto.getUsuarios());
 
-                // --- Check Leader ---
-                Usuario lider = null;
-                if (requestDto.getIdLider() != null) {
-                        lider = usuarioisRepository.findById(requestDto.getIdLider()).orElse(null);
-                }
-
-                // --- Check Client ---
-                Clientes cliente = Optional.ofNullable(requestDto.getIdCliente())
-                                .flatMap(clientesRepository::findById)
-                                .orElse(null);
-
-                // --- Check Users (validate before creating team) ---
-                Map<Integer, Usuario> usuariosValidados = new HashMap<>();
-                if (requestDto.getUsuarios() != null) {
-                        for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
-                                Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
-                                                .orElseThrow(() -> new ResponseStatusException(
-                                                                HttpStatus.BAD_REQUEST,
-                                                                "Usuario not found: " + uDto.getIdUsuario()));
-
-                                // Проверки обязательных полей
-                                if (uDto.getPorcentajeTrabajo() == null) {
-                                        throw new ResponseStatusException(
-                                                        HttpStatus.BAD_REQUEST,
-                                                        "PorcentajeTrabajo obligatorio para usuario "
-                                                                        + usuario.getIdUsuario());
-                                }
-                                if (uDto.getFechaEntrada() == null) {
-                                        throw new ResponseStatusException(
-                                                        HttpStatus.BAD_REQUEST,
-                                                        "FechaEntrada obligatoria para usuario "
-                                                                        + usuario.getIdUsuario());
-                                }
-
-                                // Проверка доступности через кастомное исключение
-                                if (usuario.getDisponibilidad() == null
-                                                || usuario.getDisponibilidad() < uDto.getPorcentajeTrabajo()) {
-                                        throw new DisponibilidadInsuficienteException(
-                                                        "Usuario " + usuario.getIdUsuario() +
-                                                                        " no tiene suficiente disponibilidad. Actual: "
-                                                                        +
-                                                                        (usuario.getDisponibilidad() == null ? 0
-                                                                                        : usuario.getDisponibilidad())
-                                                                        +
-                                                                        ", requerido: " + uDto.getPorcentajeTrabajo());
-                                }
-
-                                usuariosValidados.put(usuario.getIdUsuario(), usuario);
-                        }
-                }
-
-                // --- Create team ---
                 Equipos equipo = new Equipos();
                 equipo.setNombre(requestDto.getNombre().trim());
                 equipo.setLider(lider);
-                equipo.setCliente(cliente);
+                equipo.setCliente(Optional.ofNullable(requestDto.getIdCliente()).flatMap(clientesRepository::findById)
+                                .orElse(null));
                 equipo.setFechaInicio(requestDto.getFechaInicio());
-                equipo.setFechaLimite(requestDto.getFechaLimite()); // может быть null
+                equipo.setFechaLimite(requestDto.getFechaLimite());
                 equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
                 equipo.setFechaCreacion(LocalDateTime.now());
-
                 Equipos savedEquipo = equiposRepository.save(equipo);
 
-                // --- DTO Lider ---
-                UsuarioisResponseDto liderDto = Optional.ofNullable(lider)
-                                .map(l -> new UsuarioisResponseDto(l.getIdUsuario(), l.getNombre(), l.getApellido(),
-                                                l.getCorreo(), l.getDisponibilidad()))
-                                .orElse(null);
+                List<TecnologiasDto> tecnologias = tecnologiaEquiposService.updateTecnologiasEquipo(savedEquipo,
+                                requestDto.getIdTecnologias());
+                List<UsuarioAsignacionDto> usuarios = usuarioService.assignUsers(savedEquipo, requestDto.getUsuarios(),
+                                usuariosValidados);
 
-                List<TecnologiasDto> tecnologias = new ArrayList<>();
-                if (requestDto.getIdTecnologias() != null) {
-                        for (Integer idTec : requestDto.getIdTecnologias()) {
-                                Tecnologias tecnologia = tecnologiasRepository.findByIdTecnologia(idTec);
-                                TecnologiasEquipos tecEquipo = new TecnologiasEquipos();
-                                tecEquipo.setEquipo(savedEquipo);
-                                tecEquipo.setTecnologia(tecnologia);
-                                tecnologiasEquiposRepository.save(tecEquipo);
-                                tecnologias.add(new TecnologiasDto(tecnologia.getIdTecnologia(),
-                                                tecnologia.getNombre(), tecnologia.getDescripcion()));
-                        }
-                }
-
-                // --- Assign Users ---
-                List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
-                if (requestDto.getUsuarios() != null) {
-                        for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
-                                Usuario usuario = usuariosValidados.get(uDto.getIdUsuario());
-
-                                usuario.setDisponibilidad(
-                                                usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue());
-                                usuarioisRepository.save(usuario);
-
-                                AsignacionUsuarioEquipo asignacion = new AsignacionUsuarioEquipo();
-                                asignacion.setEquipo(savedEquipo);
-                                asignacion.setUsuario(usuario);
-                                asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
-                                asignacion.setFechaEntrada(uDto.getFechaEntrada());
-                                asignacion.setFechaFin(uDto.getFechaFin());
-                                asignacion.setFechaCreacion(LocalDateTime.now());
-                                asignacionUsuarioRepository.save(asignacion);
-
-                                usuariosDto.add(new UsuarioAsignacionDto(
-                                                usuario.getIdUsuario(), usuario.getNombre(), usuario.getApellido(),
-                                                usuario.getCorreo(), uDto.getPorcentajeTrabajo(),
-                                                uDto.getFechaEntrada(), uDto.getFechaFin()));
-                        }
-                }
-
-                // --- Final DTO ---
-                EquiposResponseDto responseDto = new EquiposResponseDto();
-                responseDto.setIdEquipo(savedEquipo.getIdEquipo());
-                responseDto.setNombre(savedEquipo.getNombre());
-                responseDto.setCliente(Optional.ofNullable(savedEquipo.getCliente())
-                                .map(c -> new ClientesResponseDto(c.getIdCliente(), c.getNombre()))
-                                .orElse(null));
-                responseDto.setLider(liderDto);
-                responseDto.setFechaInicio(savedEquipo.getFechaInicio());
-                responseDto.setFechaLimite(savedEquipo.getFechaLimite());
-                responseDto.setEstado(savedEquipo.getEstado());
-                responseDto.setTecnologias(tecnologias);
-                responseDto.setUsuariosAsignacion(usuariosDto);
-                responseDto.setFechaCreacion(savedEquipo.getFechaCreacion());
-
-                return responseDto;
+                return equiposMapper.toDto(savedEquipo, equiposMapper.toDto(lider), tecnologias, usuarios);
         }
 
-        @Override
         public EquiposResponseDto updateTeam(Integer id, EquiposRequestDto requestDto) {
-                // --- load team ---
                 Equipos equipo = equiposRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
-                // --- update nombre ---
-                String nuevoNombre = requestDto.getNombre() != null ? requestDto.getNombre().trim() : null;
-
-                if (nuevoNombre != null && !nuevoNombre.isEmpty() && !nuevoNombre.equals(equipo.getNombre())) {
-                        if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
-                                throw new NombreDuplicadoException("El nombre ya existe");
-                        }
-                        equipo.setNombre(nuevoNombre);
-                }
-
-                // --- update lider ---
-                if (requestDto.getIdLider() != null) {
-                        Usuario nuevoLider = usuarioService.getUsuarioById(requestDto.getIdLider());
-                        equipo.setLider(nuevoLider);
-                } else {
-                        equipo.setLider(null);
-                }
-
-                // --- update cliente ---
-                if (requestDto.getIdCliente() != null) {
-                        Clientes nuevoCliente = clientesRepository.findById(requestDto.getIdCliente())
-                                        .orElseThrow(() -> new RuntimeException("Cliente not found"));
-                        equipo.setCliente(nuevoCliente);
-                } else {
-                        equipo.setCliente(null);
-                }
-
-                // --- update estado y fechas ---
+                // update nombre, lider, cliente, fechas, estado
+                String nuevoNombre = Optional.ofNullable(requestDto.getNombre()).map(String::trim).orElse(null);
+                if (nuevoNombre != null && !nuevoNombre.equals(equipo.getNombre()))
+                        teamValidator.validateUniqueName(nuevoNombre);
+                equipo.setNombre(nuevoNombre);
+                equipo.setLider(teamValidator.validateLeader(requestDto.getIdLider()));
+                equipo.setCliente(Optional.ofNullable(requestDto.getIdCliente()).flatMap(clientesRepository::findById)
+                                .orElse(null));
                 Optional.ofNullable(requestDto.getFechaInicio()).ifPresent(equipo::setFechaInicio);
-                equipo.setFechaLimite(requestDto.getFechaLimite()); // puede ser null
+                equipo.setFechaLimite(requestDto.getFechaLimite());
                 Optional.ofNullable(requestDto.getEstado())
                                 .ifPresent(e -> equipo.setEstado(EstadoActivoInactivo.valueOf(e)));
-
-                // --- update tecnologias ---
-                if (requestDto.getIdTecnologias() != null) {
-                        tecnologiaEquiposService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
-                }
-
-                // --- save cambios básicos ---
                 equiposRepository.save(equipo);
 
-                // --- update usuarios asignados ---
-                Map<Integer, AsignacionUsuarioEquipo> actualesMap = asignacionUsuarioRepository
-                                .findAllByEquipo_IdEquipo(id)
-                                .stream()
-                                .collect(Collectors.toMap(a -> a.getUsuario().getIdUsuario(), a -> a));
+                // tecnologias y usuarios
+                if (requestDto.getIdTecnologias() != null)
+                        tecnologiaEquiposService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
+                Map<Integer, Usuario> usuariosValidados = teamValidator.validateUsers(requestDto.getUsuarios());
+                List<UsuarioAsignacionDto> usuariosDto = usuarioService.updateUsers(equipo, requestDto.getUsuarios(),
+                                usuariosValidados);
 
-                List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
-                if (requestDto.getUsuarios() != null) {
-                        for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
-                                Usuario usuario = usuarioService.getUsuarioById(uDto.getIdUsuario());
+                List<TecnologiasDto> tecnologias = tecnologiaEquiposService
+                                .getTecnologiasByEquipo(equipo.getIdEquipo());
+                UsuarioisResponseDto liderDto = equiposMapper.toDto(equipo.getLider());
 
-                                // --- validaciones obligatorias ---
-                                if (usuario.getDisponibilidad() < uDto.getPorcentajeTrabajo()) {
-                                        throw new DisponibilidadInsuficienteException(
-                                                        "Usuario " + usuario.getIdUsuario() +
-                                                                        " no tiene suficiente disponibilidad. Actual: "
-                                                                        +
-                                                                        usuario.getDisponibilidad() + ", requerido: "
-                                                                        + uDto.getPorcentajeTrabajo());
-                                }
-
-                                float viejoPorcentaje = actualesMap
-                                                .getOrDefault(usuario.getIdUsuario(), new AsignacionUsuarioEquipo())
-                                                .getPorcentajeTrabajo();
-                                float delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
-                                usuarioService.ajustarDisponibilidadConDelta(usuario, delta);
-
-                                AsignacionUsuarioEquipo asignacion = actualesMap.get(usuario.getIdUsuario());
-                                if (asignacion != null) {
-                                        asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
-                                        asignacion.setFechaEntrada(uDto.getFechaEntrada());
-                                        asignacion.setFechaFin(uDto.getFechaFin());
-                                        asignacionUsuarioRepository.save(asignacion);
-                                } else {
-                                        AsignacionUsuarioEquipo nueva = new AsignacionUsuarioEquipo();
-                                        nueva.setEquipo(equipo);
-                                        nueva.setUsuario(usuario);
-                                        nueva.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
-                                        nueva.setFechaEntrada(uDto.getFechaEntrada());
-                                        nueva.setFechaFin(uDto.getFechaFin());
-                                        nueva.setFechaCreacion(LocalDateTime.now());
-                                        asignacionUsuarioRepository.save(nueva);
-                                }
-                                usuariosDto.add(uDto);
-                        }
-
-                        // --- eliminar usuarios que ya no están asignados ---
-                        for (AsignacionUsuarioEquipo asignacion : actualesMap.values()) {
-                                if (requestDto.getUsuarios().stream()
-                                                .noneMatch(u -> u.getIdUsuario()
-                                                                .equals(asignacion.getUsuario().getIdUsuario()))) {
-                                        Usuario usuario = asignacion.getUsuario();
-                                        usuario.setDisponibilidad(usuario.getDisponibilidad()
-                                                        + asignacion.getPorcentajeTrabajo());
-                                        usuarioisRepository.save(usuario);
-                                        asignacionUsuarioRepository.delete(asignacion);
-                                }
-                        }
-                }
-
-                // --- form response dto ---
-                UsuarioisResponseDto liderDto = Optional.ofNullable(equipo.getLider())
-                                .map(l -> new UsuarioisResponseDto(l.getIdUsuario(), l.getNombre(), l.getApellido(),
-                                                l.getCorreo(), l.getDisponibilidad()))
-                                .orElse(null);
-
-                List<TecnologiasDto> tecnologias = tecnologiasEquiposRepository
-                                .findAllByEquipo_IdEquipo(equipo.getIdEquipo())
-                                .stream()
-                                .map(te -> {
-                                        Tecnologias t = te.getTecnologia();
-                                        return new TecnologiasDto(t.getIdTecnologia(), t.getNombre(),
-                                                        t.getDescripcion());
-                                })
-                                .toList();
-
-                EquiposResponseDto responseDto = new EquiposResponseDto();
-                responseDto.setIdEquipo(equipo.getIdEquipo());
-                responseDto.setNombre(equipo.getNombre());
-                responseDto.setCliente(Optional.ofNullable(equipo.getCliente())
-                                .map(c -> new ClientesResponseDto(c.getIdCliente(), c.getNombre()))
-                                .orElse(null));
-                responseDto.setLider(liderDto);
-                responseDto.setFechaInicio(equipo.getFechaInicio());
-                responseDto.setFechaLimite(equipo.getFechaLimite());
-                responseDto.setEstado(equipo.getEstado());
-                responseDto.setTecnologias(tecnologias);
-                responseDto.setUsuariosAsignacion(usuariosDto);
-                responseDto.setFechaCreacion(equipo.getFechaCreacion());
-
-                return responseDto;
+                return equiposMapper.toDto(equipo, liderDto, tecnologias, usuariosDto);
         }
 
         @Override

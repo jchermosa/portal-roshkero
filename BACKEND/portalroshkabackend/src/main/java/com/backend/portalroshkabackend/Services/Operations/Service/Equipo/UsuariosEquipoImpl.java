@@ -94,15 +94,6 @@ public class UsuariosEquipoImpl implements IUsuarioisEquipoService {
         @Override
         public UsuariosEquipoResponseDto addUsuarioToEquipo(Integer idEquipo, UsuarioEquipoRequestDto requestDto) {
 
-                // // Проверяем, существует ли уже пользователь в этой команде
-                // boolean exists =
-                // asignacionUsuarioRepository.existsByIdUsuarioAndEquiposIdEquipo(
-                // requestDto.getIdUsuario(), idEquipo);
-
-                // if (exists) {
-                // throw new RuntimeException("El usuario ya está asignado a este equipo");
-                // }
-
                 // Проверка существования команды
                 Equipos equipo = equiposRepository.findById(idEquipo)
                                 .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));

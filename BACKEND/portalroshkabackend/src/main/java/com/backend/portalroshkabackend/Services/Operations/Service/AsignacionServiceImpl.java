@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.DiaConUbicacionesDto;
-import com.backend.portalroshkabackend.DTO.Operationes.DiasLaboralDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquipoAsignacionUpdateDiasUbicacionesDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
@@ -29,7 +28,6 @@ import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.AsignacionUbicacionDiaRepository;
 import com.backend.portalroshkabackend.Repositories.UbicacionRepository;
 import com.backend.portalroshkabackend.Repositories.DiasLaboralRepository;
-import com.backend.portalroshkabackend.Repositories.EquipoDiaUbicacionRepository;
 
 @Service("operationsAsignacionService")
 public class AsignacionServiceImpl implements IAsignacionService {

@@ -9,5 +9,5 @@ import com.backend.portalroshkabackend.Models.Tecnologias;
 public interface ITecnologiaEquiposService {
     Tecnologias getTecnologiaById(Integer id);
     List<TecnologiasDto> getTecnologiasByEquipo(Integer equipoId);
-    void updateTecnologiasEquipo(Equipos equipo, List<Integer> nuevasTecnologiasIds);
+    List<TecnologiasDto>  updateTecnologiasEquipo(Equipos equipo, List<Integer> nuevasTecnologiasIds);
 }

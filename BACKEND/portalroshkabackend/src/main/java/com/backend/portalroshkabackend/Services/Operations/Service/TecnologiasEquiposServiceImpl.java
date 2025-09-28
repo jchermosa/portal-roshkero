@@ -19,15 +19,10 @@ import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologia
 @Service
 public class TecnologiasEquiposServiceImpl implements ITecnologiaEquiposService {
 
-    private final TecnologiaRepository tecnologiaRepository;
-    private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
-
     @Autowired
-    public TecnologiasEquiposServiceImpl(TecnologiaRepository tecnologiaRepository,
-            TecnologiasEquiposRepository tecnologiasEquiposRepository) {
-        this.tecnologiaRepository = tecnologiaRepository;
-        this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
-    }
+    private TecnologiaRepository tecnologiaRepository;
+    @Autowired
+    private TecnologiasEquiposRepository tecnologiasEquiposRepository;
 
     @Override
     public Tecnologias getTecnologiaById(Integer id) {
@@ -36,7 +31,7 @@ public class TecnologiasEquiposServiceImpl implements ITecnologiaEquiposService 
     }
 
     @Override
-    public void updateTecnologiasEquipo(Equipos equipo, List<Integer> nuevasTecnologiasIds) {
+    public List<TecnologiasDto> updateTecnologiasEquipo(Equipos equipo, List<Integer> nuevasTecnologiasIds) {
         List<TecnologiasEquipos> actuales = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(equipo.getIdEquipo());
         Set<Integer> actualesIds = actuales.stream()
                 .map(te -> te.getTecnologia().getIdTecnologia())
@@ -60,7 +55,13 @@ public class TecnologiasEquiposServiceImpl implements ITecnologiaEquiposService 
                 tecnologiasEquiposRepository.save(tecEquipo);
             }
         }
-
+        return tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(equipo.getIdEquipo())
+                .stream()
+                .map(te -> {
+                    Tecnologias t = te.getTecnologia();
+                    return new TecnologiasDto(t.getIdTecnologia(), t.getNombre(), t.getDescripcion());
+                })
+                .toList();
     }
 
     @Override
