@@ -1,8 +1,8 @@
 // src/modals/SolicitudDispositivoModal.tsx
 import DynamicForm from "../../components/DynamicForm";
 import { useSolicitudDispositivoForm } from "../../hooks/deviceRequest/useSolicitudDispositivoForm";
+import { useGetDeviceTypes } from "../../hooks/dispositivos/useGetDeviceTypes";
 import { buildSolicitudDispositivoSections } from "../../config/forms/solicitudDispositivoFormFields";
-import { EstadoSolicitudEnum } from "../../types";
 
 interface Props {
   token: string | null;
@@ -16,38 +16,47 @@ interface Props {
 
 export default function SolicitudDispositivoModal({
   token,
-  userId,
+  userId: _userId,
   id,
   readonly = false,
   gestion = false,
   onClose,
   onSaved,
 }: Props) {
-  const { data, setData, handleSubmit, loading, error, isEditing } =
-    useSolicitudDispositivoForm(token, userId, id?.toString());
+  const { data, setData, handleAccept, handleReject, loading, error, isEditing } =
+    useSolicitudDispositivoForm(token, typeof id === 'string' ? parseInt(id) : id);
 
-  const tipoDispositivoOptions = [
-    { value: 1, label: "Laptop" },
-    { value: 2, label: "Impresora" },
-    { value: 3, label: "Monitor" },
-    { value: 4, label: "Tablet" },
-    { value: 5, label: "Smartphone" },
-    { value: 6, label: "Cables" },
-  ];
+  // Obtener tipos de dispositivos desde la API
+  const { data: deviceTypes, loading: loadingTypes } = useGetDeviceTypes(token);
+
+  // Transformar tipos de dispositivos para el formulario
+  const tipoDispositivoOptions = deviceTypes.map(tipo => ({
+    value: tipo.idTipoDispositivo,
+    label: tipo.nombre
+  }));
+
   const sections = buildSolicitudDispositivoSections(tipoDispositivoOptions);
 
   const handleAprobar = async () => {
     if (!id) return;
-    await handleSubmit({ ...data, estado: EstadoSolicitudEnum.A });
-    if (onSaved) onSaved();
-    onClose();
+    try {
+      await handleAccept();
+      if (onSaved) onSaved();
+      onClose();
+    } catch {
+      // El error ya se maneja en el hook
+    }
   };
 
   const handleRechazar = async () => {
     if (!id) return;
-    await handleSubmit({ ...data, estado: EstadoSolicitudEnum.R });
-    if (onSaved) onSaved();
-    onClose();
+    try {
+      await handleReject();
+      if (onSaved) onSaved();
+      onClose();
+    } catch {
+      // El error ya se maneja en el hook
+    }
   };
 
   return (
@@ -69,13 +78,14 @@ export default function SolicitudDispositivoModal({
           initialData={data}
           onSubmit={async (formData) => {
             if (!readonly && !gestion) {
-              await handleSubmit(formData);
+              // Para crear nuevas solicitudes, solo actualizar el estado local
+              setData(formData);
               if (onSaved) onSaved();
               onClose();
             }
           }}
           onChange={setData}
-          loading={loading}
+          loading={loading || loadingTypes}
           readonly={readonly || gestion}
         />
 
