@@ -24,12 +24,18 @@ export default function DevicePage() {
   const [encargado, setEncargado] = useState("");
   const [page, setPage] = useState(0);
 
-  // Dispositivos (hook especializado)
-const {
-  data: dispositivos,
-  loading,
-  error,
-} = useDispositivos(token);
+  // Dispositivos (hook especializado) - Pasar los filtros y página
+  const {
+    data: dispositivos,
+    loading,
+    error,
+    totalPages,
+  } = useDispositivos(
+    token,
+    { categoria, estado, encargado }, // Pasar filtros
+    page, // Pasar página actual
+    10 // pageSize
+  );
 
   const limpiarFiltros = () => {
     setCategoria("");
@@ -127,14 +133,14 @@ const {
       <DataTable
         data={dispositivos}
         columns={columns}
-        rowKey={(d) => d.idDispositivo}
+        rowKey={(d) => d.idDispositivo || `temp-${d.nroSerie}-${d.modelo}`}
         actions={renderActions}
         scrollable={false}
       />
 
       <PaginationFooter
         currentPage={page}
-        totalPages={totalPages}
+        totalPages={totalPages || 1}
         onPageChange={setPage}
         onCancel={() => navigate("/home")}
       />
