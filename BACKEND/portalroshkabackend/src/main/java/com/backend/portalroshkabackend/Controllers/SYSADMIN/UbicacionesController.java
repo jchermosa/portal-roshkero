@@ -1,5 +1,7 @@
 package com.backend.portalroshkabackend.Controllers.SYSADMIN;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,8 +39,8 @@ public class UbicacionesController {
 
     // Get todas las ubicaciones 
     @GetMapping("/getAll")
-    public List<UbicacionDto> getAllUbicaciones() {
-        return ubicacionService.getAllUbicaciones();
+    public Page<UbicacionDto> getAllUbicaciones(Pageable pageable) {
+        return ubicacionService.getAllUbicaciones(pageable);
     }
 
     // Get ubicacion por id 

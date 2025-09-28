@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,53 +27,48 @@ public class SysAdminService {
 
     // Cambiar todos los métodos para retornar RequestDTO
     @Transactional(readOnly = true)
-    public List<RequestDTO> getAllRejectedRequest(){
+    public Page<RequestDTO> getAllRejectedRequest(Pageable pageable) {
         try {
-            return convertToDto(sysAdminRepository.findSolicitudesRechazadas());
+            Page<Solicitud> solicitudesRechazadas = sysAdminRepository.findSolicitudesRechazadas(pageable);
+            return solicitudesRechazadas.map(this::toDto);
         } catch (Exception e) {
             System.err.println("Error al obtener solicitudes rechazadas: " + e.getMessage());
-            return new ArrayList<>();
+            throw new RuntimeException("Error al obtener las solicitudes rechazadas");
         }
     }
 
     @Transactional(readOnly = true)
-    public List<RequestDTO> getAllApprovedRequest(){
+    public Page<RequestDTO> getAllApprovedRequest(Pageable pageable) {
         try {
-            return convertToDto(sysAdminRepository.findSolicitudesAprobadas());
+            Page<Solicitud> solicitudesAprobadas = sysAdminRepository.findSolicitudesAprobadas(pageable);
+            return solicitudesAprobadas.map(this::toDto);
         } catch (Exception e) {
             System.err.println("Error al obtener solicitudes aprobadas: " + e.getMessage());
-            return new ArrayList<>();
+            throw new RuntimeException("Error al obtener las solicitudes aprobadas");
         }
     }
 
     @Transactional(readOnly = true)
-    public List<RequestDTO> getAllPendingRequest(){
+    public Page<RequestDTO> getAllPendingRequest(Pageable pageable) {
         try {
-            return convertToDto(sysAdminRepository.findSolicitudesPendientes());
+            Page<Solicitud> solicitudesPendientes = sysAdminRepository.findSolicitudesPendientes(pageable);
+            return solicitudesPendientes.map(this::toDto);
         } catch (Exception e) {
             System.err.println("Error al obtener solicitudes pendientes: " + e.getMessage());
-            return new ArrayList<>();
+            throw new RuntimeException("Error al obtener las solicitudes pendientes");
         }
     }
 
     @Transactional(readOnly = true)
-    public List<RequestDTO> findAllSolicitudes(){
+    public Page<RequestDTO> findAllSolicitudes(Pageable pageable) {
         try {
-            List<Solicitud> solicitudes = sysAdminRepository.findAllSolicitudes();
-            return convertToDto(solicitudes);
+            Page<Solicitud> solicitudes = sysAdminRepository.findAllSolicitudes(pageable);
+            return solicitudes.map(this::toDto);
         } catch (Exception e) {
-            System.err.println("Error al obtener solicitudes: " + e.getMessage());
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
+            System.err.println("Error al obtener las solicitudes: " + e.getMessage());
+            throw new RuntimeException("Error al obtener las solicitudes");
+        }    }
 
-
-    private List<RequestDTO> convertToDto(List<Solicitud> solicitudes) {
-        return solicitudes.stream()
-            .map(this::toDto)
-            .collect(Collectors.toList());
-    }
 
     private RequestDTO toDto(Solicitud solicitud) {
         RequestDTO dto = new RequestDTO();

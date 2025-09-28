@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +45,7 @@ public class DispositivoService {
     @Autowired
     private final DeviceRepository deviceRepository;
 
-    private final Map<String, Function<String, List<Dispositivo>>> sortingMap;
+    private final Map<String, BiFunction<String, Pageable,Page<Dispositivo>>> sortingMapPage;
 
 
     public DispositivoService(DeviceTypesRepository deviceTypesRepository,
@@ -53,10 +56,10 @@ public class DispositivoService {
         this.ubicacionService = ubicacionService;
 
 
-        sortingMap = new HashMap<>();
+        sortingMapPage = new HashMap<>();
 
-        sortingMap.put("tipoDispositivo", idStr -> 
-            deviceRepository.findAllByTipoDispositivo_IdTipoDispositivo(Integer.parseInt(idStr))
+        sortingMapPage.put("tipoDispositivo", (idStr, pageable) ->
+            deviceRepository.findAllByTipoDispositivo_IdTipoDispositivoAndEncargadoIsNull(Integer.parseInt(idStr), pageable)
         );
     }
 
@@ -64,12 +67,10 @@ public class DispositivoService {
     // Listar los tipos de dispositivos
 
     @Transactional(readOnly = true)
-    public List<DeviceDTO> getAllDevices() {
+    public Page<DeviceDTO> getAllDevices(Pageable pageable) {
         try {
-            List<Dispositivo> dispositivos = deviceRepository.findAll();
-            return dispositivos.stream()
-                    .map(this::convertToDto)
-                    .collect(Collectors.toList());
+            Page<Dispositivo> dispositivos = deviceRepository.findAll(pageable);
+            return dispositivos.map(this::convertToDto);
         } catch (Exception e) {
             System.err.println("Error al obtener dispositivos: " + e.getMessage());
             e.printStackTrace();
@@ -80,35 +81,26 @@ public class DispositivoService {
     // OBTENRE TODOS LOS TIPOS DE DISPOSITIVOS
 
     @Transactional
-    public List<DeviceTypeDTO> getAllTypes(){
-        List<TipoDispositivo> tiposDispositivos = deviceTypesRepository.findAll();
-        return tiposDispositivos.stream()
-                .map(this::convertToDto)
-                .toList();
+    public Page<DeviceTypeDTO> getAllTypes(Pageable pageable){
+        Page<TipoDispositivo> tiposDispositivos = deviceTypesRepository.findAll(pageable);
+        return tiposDispositivos.map(this::convertToDto);
     }
 
 
     // Listar los dispositivos que no tienen duenho 
-    public List<DeviceDTO> getAllDevicesWithoutOwner(String sortBy, String filterValue) {
+    public Page<DeviceDTO> getAllDevicesWithoutOwner(Pageable pageable,String sortBy, String filterValue) {
 
-    List<Dispositivo> dispositivos;
+    Page<Dispositivo> dispositivos;
 
     // Caso default: sin filtro
-    if (sortBy == null || sortBy.isBlank() || !sortingMap.containsKey(sortBy)) {
-        dispositivos = deviceRepository.findAllWithoutOwner();
+    if (sortBy == null || sortBy.isBlank() || !sortingMapPage.containsKey(sortBy)) {
+        dispositivos = deviceRepository.findAllWithoutOwner(pageable);
     } else {
         // Aplico el filtro que está en el mapa (ej: tipoDispositivo)
-        dispositivos = sortingMap.get(sortBy).apply(filterValue);
+        dispositivos = sortingMapPage.get(sortBy).apply(filterValue, pageable);
 
-        // Filtrar solo los que no tienen dueño
-        dispositivos = dispositivos.stream()
-                .filter(d -> d.getEncargado() == null)
-                .toList();
     }
-
-    return dispositivos.stream()
-            .map(this::convertToDto)
-            .collect(Collectors.toList());
+    return dispositivos.map(this::convertToDto);
 }
 
 
