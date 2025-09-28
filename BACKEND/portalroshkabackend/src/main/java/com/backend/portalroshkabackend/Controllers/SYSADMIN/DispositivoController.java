@@ -56,7 +56,7 @@ public class DispositivoController {
         @RequestParam(required = false, defaultValue = "default") String sortBy,
         @RequestParam(required = false) String filterValue,
         Pageable pageable) {
-        return dispositivoService.getAllDevicesWithoutOwner(pageable, filterValue, sortBy);
+        return dispositivoService.getAllDevicesWithoutOwner(pageable, sortBy, filterValue);
     }
 
 

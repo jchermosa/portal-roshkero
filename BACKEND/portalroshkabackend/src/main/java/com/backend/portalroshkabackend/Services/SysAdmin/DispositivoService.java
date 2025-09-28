@@ -88,22 +88,38 @@ public class DispositivoService {
 
 
     // Listar los dispositivos que no tienen duenho 
-    public Page<DeviceDTO> getAllDevicesWithoutOwner(Pageable pageable,String sortBy, String filterValue) {
+    // En DispositivoService.java
+    public Page<DeviceDTO> getAllDevicesWithoutOwner(Pageable pageable, String sortBy, String filterValue) {
+        Page<Dispositivo> dispositivos;
 
-    Page<Dispositivo> dispositivos;
+        // Considerar "default" como ausencia de filtro
+        boolean shouldApplyFilter = sortBy != null && 
+                                !sortBy.isBlank() && 
+                                !"default".equals(sortBy) && 
+                                sortingMapPage.containsKey(sortBy) &&
+                                filterValue != null && 
+                                !filterValue.isBlank();
 
-    // Caso default: sin filtro
-    if (sortBy == null || sortBy.isBlank() || !sortingMapPage.containsKey(sortBy)) {
-        dispositivos = deviceRepository.findAllWithoutOwner(pageable);
-    } else {
-        // Aplico el filtro que está en el mapa (ej: tipoDispositivo)
-        dispositivos = sortingMapPage.get(sortBy).apply(filterValue, pageable);
-
+        if (!shouldApplyFilter) {
+            // Sin filtro: devolver todos los dispositivos sin dueño
+            dispositivos = deviceRepository.findAllWithoutOwner(pageable);
+        } else {
+            try {
+                // Con filtro: aplicar el filtro específico
+                if ("tipoDispositivo".equals(sortBy)) {
+                    Integer.parseInt(filterValue); // Validar que sea número
+                }
+                
+                dispositivos = sortingMapPage.get(sortBy).apply(filterValue, pageable);
+                
+            } catch (NumberFormatException e) {
+                System.err.println("Error: filterValue no es un número válido: " + filterValue);
+                dispositivos = deviceRepository.findAllWithoutOwner(pageable);
+            }
+        }
+        
+        return dispositivos.map(this::convertToDto);
     }
-    return dispositivos.map(this::convertToDto);
-}
-
-
     
 
     // CRUD DEVICES
