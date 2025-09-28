@@ -8,22 +8,23 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
 import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.OP.TecnologiasEquiposRepository;
-import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaEquiposService;
 
 @Service
-public class TecnologiasEquiposServiceImpl implements ITecnologiaService {
+public class TecnologiasEquiposServiceImpl implements ITecnologiaEquiposService {
 
     private final TecnologiaRepository tecnologiaRepository;
     private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
 
     @Autowired
     public TecnologiasEquiposServiceImpl(TecnologiaRepository tecnologiaRepository,
-                                 TecnologiasEquiposRepository tecnologiasEquiposRepository) {
+            TecnologiasEquiposRepository tecnologiasEquiposRepository) {
         this.tecnologiaRepository = tecnologiaRepository;
         this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
     }
@@ -59,6 +60,21 @@ public class TecnologiasEquiposServiceImpl implements ITecnologiaService {
                 tecnologiasEquiposRepository.save(tecEquipo);
             }
         }
+
+    }
+
+    @Override
+    public List<TecnologiasDto> getTecnologiasByEquipo(Integer equipoId) {
+        List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(equipoId);
+        List<TecnologiasDto> tecnologias = tecs.stream()
+                .map(te -> {
+                    Tecnologias t = te.getTecnologia();
+                    return new TecnologiasDto(
+                            t.getIdTecnologia(),
+                            t.getNombre(),
+                            t.getDescripcion());
+                })
+                .toList();
+        return tecnologias;
     }
 }
-

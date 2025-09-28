@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services.Operations.Service;
+package com.backend.portalroshkabackend.Services.Operations.Service.Equipo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,12 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.backend.portalroshkabackend.DTO.Operationes.DiasLaboralDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquipoDiaUbicacionResponceDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
@@ -31,8 +29,6 @@ import com.backend.portalroshkabackend.Exception.DisponibilidadInsuficienteExcep
 import com.backend.portalroshkabackend.Exception.NombreDuplicadoException;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Clientes;
-import com.backend.portalroshkabackend.Models.DiaLaboral;
-import com.backend.portalroshkabackend.Models.EquipoDiaUbicacion;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
@@ -44,11 +40,11 @@ import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.OP.TecnologiasEquiposRepository;
 import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
-import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
-import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
-import com.backend.portalroshkabackend.Repositories.DiasLaboralRepository;
-import com.backend.portalroshkabackend.Repositories.EquipoDiaUbicacionRepository;
+import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquipoDiaUbicacionService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquiposService;
+
 
 @Service("operationsEquiposService")
 @Validated
@@ -60,10 +56,9 @@ public class EquiposServiceImpl implements IEquiposService {
         private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
         private final UsuarioisRepository usuarioisRepository;
         private final AsignacionUsuarioRepository asignacionUsuarioRepository;
-        private final EquipoDiaUbicacionRepository equipoDiaUbicacionRepository;
-        private final DiasLaboralRepository diasLaboralRepository;
         private final IUsuarioService usuarioService;
-        private final ITecnologiaService tecnologiaService;
+        private final ITecnologiaEquiposService tecnologiaEquiposService;
+        private final IEquipoDiaUbicacionService equipoDiaUbicacionService;
 
         private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
 
@@ -73,19 +68,18 @@ public class EquiposServiceImpl implements IEquiposService {
                         TecnologiasEquiposRepository tecnologiasEquiposRepository,
                         UsuarioisRepository usuarioisRepository,
                         AsignacionUsuarioRepository asignacionUsuarioRepository,
-                        EquipoDiaUbicacionRepository equipoDiaUbicacionRepository,
                         IUsuarioService usuarioService,
-                        ITecnologiaService tecnologiaService, DiasLaboralRepository diasLaboralRepository) {
+                        ITecnologiaEquiposService tecnologiaEquiposService,
+                        IEquipoDiaUbicacionService equipoDiaUbicacionService) {
                 this.equiposRepository = equiposRepository;
                 this.clientesRepository = clientesRepository;
                 this.tecnologiasRepository = tecnologiasRepository;
                 this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
                 this.usuarioisRepository = usuarioisRepository;
                 this.asignacionUsuarioRepository = asignacionUsuarioRepository;
-                this.equipoDiaUbicacionRepository = equipoDiaUbicacionRepository;
-                this.diasLaboralRepository = diasLaboralRepository;
                 this.usuarioService = usuarioService;
-                this.tecnologiaService = tecnologiaService;
+                this.tecnologiaEquiposService = tecnologiaEquiposService;
+                this.equipoDiaUbicacionService = equipoDiaUbicacionService;
 
                 sortingMap = new HashMap<>();
 
@@ -117,39 +111,8 @@ public class EquiposServiceImpl implements IEquiposService {
                 dto.setIdEquipo(e.getIdEquipo());
                 dto.setNombre(e.getNombre());
 
-                List<DiaLaboral> dias = diasLaboralRepository.findAll();
-
-                List<EquipoDiaUbicacion> asignacionesDU = equipoDiaUbicacionRepository
-                                .findAllByEquipo_IdEquipo(e.getIdEquipo());
-
-                // для быстрого поиска делаем map
-                Map<Integer, EquipoDiaUbicacion> asignacionesMap = asignacionesDU.stream()
-                                .collect(Collectors.toMap(
-                                                a -> a.getDiaLaboral().getIdDiaLaboral(),
-                                                a -> a));
-
-                List<EquipoDiaUbicacionResponceDto> dtoList = dias.stream()
-                                .map(dia -> {
-                                        EquipoDiaUbicacion asignacion = asignacionesMap.get(dia.getIdDiaLaboral());
-
-                                        if (asignacion != null) {
-                                                // have asignacion
-                                                return new EquipoDiaUbicacionResponceDto(
-                                                                new DiasLaboralDto(dia.getIdDiaLaboral(),
-                                                                                dia.getNombreDia()),
-                                                                new UbicacionDto(
-                                                                                asignacion.getUbicacion()
-                                                                                                .getIdUbicacion(),
-                                                                                asignacion.getUbicacion().getNombre()));
-                                        } else {
-                                                // not have asignacion → ubicacion = null
-                                                return new EquipoDiaUbicacionResponceDto(
-                                                                new DiasLaboralDto(dia.getIdDiaLaboral(),
-                                                                                dia.getNombreDia()),
-                                                                null);
-                                        }
-                                })
-                                .toList();
+                List<EquipoDiaUbicacionResponceDto> dtoList = equipoDiaUbicacionService
+                                .EquipoDiaUbicacion(e.getIdEquipo());
 
                 dto.setEquipoDiaUbicacion(dtoList);
 
@@ -177,16 +140,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 }
 
                 // --- Tecnologias ---
-                List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(e.getIdEquipo());
-                List<TecnologiasDto> tecnologias = tecs.stream()
-                                .map(te -> {
-                                        Tecnologias t = te.getTecnologia();
-                                        return new TecnologiasDto(
-                                                        t.getIdTecnologia(),
-                                                        t.getNombre(),
-                                                        t.getDescripcion());
-                                })
-                                .toList();
+                List<TecnologiasDto> tecnologias = tecnologiaEquiposService.getTecnologiasByEquipo(id);
                 dto.setTecnologias(tecnologias);
 
                 // --- Users with porcentaje_trabajo ---
@@ -245,39 +199,8 @@ public class EquiposServiceImpl implements IEquiposService {
                 dto.setIdEquipo(e.getIdEquipo());
                 dto.setNombre(e.getNombre());
 
-                List<DiaLaboral> dias = diasLaboralRepository.findAll();
-
-                // Все текущие asignaciones для команды
-                List<EquipoDiaUbicacion> asignaciones = equipoDiaUbicacionRepository
-                                .findAllByEquipo_IdEquipo(e.getIdEquipo());
-
-                // Map для быстрого поиска asignaciones по дню
-                Map<Integer, EquipoDiaUbicacion> asignacionesMap = asignaciones.stream()
-                                .collect(Collectors.toMap(
-                                                a -> a.getDiaLaboral().getIdDiaLaboral(),
-                                                a -> a));
-
-                // Собираем список для DTO (всегда все дни)
-                List<EquipoDiaUbicacionResponceDto> dtoList = dias.stream()
-                                .map(dia -> {
-                                        EquipoDiaUbicacion asignacion = asignacionesMap.get(dia.getIdDiaLaboral());
-
-                                        if (asignacion != null && asignacion.getUbicacion() != null) {
-                                                return new EquipoDiaUbicacionResponceDto(
-                                                                new DiasLaboralDto(dia.getIdDiaLaboral(),
-                                                                                dia.getNombreDia()),
-                                                                new UbicacionDto(
-                                                                                asignacion.getUbicacion()
-                                                                                                .getIdUbicacion(),
-                                                                                asignacion.getUbicacion().getNombre()));
-                                        } else {
-                                                return new EquipoDiaUbicacionResponceDto(
-                                                                new DiasLaboralDto(dia.getIdDiaLaboral(),
-                                                                                dia.getNombreDia()),
-                                                                null);
-                                        }
-                                })
-                                .toList();
+                List<EquipoDiaUbicacionResponceDto> dtoList = equipoDiaUbicacionService
+                                .EquipoDiaUbicacion(e.getIdEquipo());
 
                 dto.setEquipoDiaUbicacion(dtoList);
 
@@ -305,14 +228,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 }
 
                 // Tecnologias
-                List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(e.getIdEquipo());
-                List<TecnologiasDto> tecnologias = tecs.stream()
-                                .map(te -> {
-                                        Tecnologias t = te.getTecnologia();
-                                        return new TecnologiasDto(t.getIdTecnologia(), t.getNombre(),
-                                                        t.getDescripcion());
-                                })
-                                .toList();
+                List<TecnologiasDto> tecnologias = tecnologiaEquiposService.getTecnologiasByEquipo(e.getIdEquipo());
                 dto.setTecnologias(tecnologias);
 
                 return dto;
@@ -324,6 +240,9 @@ public class EquiposServiceImpl implements IEquiposService {
                 if (!equiposRepository.findAllByNombre(requestDto.getNombre().trim()).isEmpty()) {
                         throw new NombreDuplicadoException("El nombre ya existe");
                 }
+
+                // ClassWithCheckingAll all = new ClassWithCheckingAll;
+                // all.CheckName(requestDto.getNombre().trim());
 
                 // --- Check Leader ---
                 Usuario lider = null;
@@ -341,26 +260,35 @@ public class EquiposServiceImpl implements IEquiposService {
                 if (requestDto.getUsuarios() != null) {
                         for (UsuarioAsignacionDto uDto : requestDto.getUsuarios()) {
                                 Usuario usuario = usuarioisRepository.findById(uDto.getIdUsuario())
-                                                .orElseThrow(() -> new RuntimeException(
+                                                .orElseThrow(() -> new ResponseStatusException(
+                                                                HttpStatus.BAD_REQUEST,
                                                                 "Usuario not found: " + uDto.getIdUsuario()));
 
+                                // Проверки обязательных полей
                                 if (uDto.getPorcentajeTrabajo() == null) {
-                                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        throw new ResponseStatusException(
+                                                        HttpStatus.BAD_REQUEST,
                                                         "PorcentajeTrabajo obligatorio para usuario "
                                                                         + usuario.getIdUsuario());
                                 }
-
                                 if (uDto.getFechaEntrada() == null) {
-                                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        throw new ResponseStatusException(
+                                                        HttpStatus.BAD_REQUEST,
                                                         "FechaEntrada obligatoria para usuario "
                                                                         + usuario.getIdUsuario());
                                 }
 
+                                // Проверка доступности через кастомное исключение
                                 if (usuario.getDisponibilidad() == null
                                                 || usuario.getDisponibilidad() < uDto.getPorcentajeTrabajo()) {
-                                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                                        "Usuario " + usuario.getIdUsuario()
-                                                                        + " no tiene suficiente disponibilidad");
+                                        throw new DisponibilidadInsuficienteException(
+                                                        "Usuario " + usuario.getIdUsuario() +
+                                                                        " no tiene suficiente disponibilidad. Actual: "
+                                                                        +
+                                                                        (usuario.getDisponibilidad() == null ? 0
+                                                                                        : usuario.getDisponibilidad())
+                                                                        +
+                                                                        ", requerido: " + uDto.getPorcentajeTrabajo());
                                 }
 
                                 usuariosValidados.put(usuario.getIdUsuario(), usuario);
@@ -386,6 +314,8 @@ public class EquiposServiceImpl implements IEquiposService {
                                 .orElse(null);
 
                 // --- Tech ---
+                // classPutInfoInTecnologiasEquiposRepository.putinfo(requestDto.getIdTecnologias());
+
                 List<TecnologiasDto> tecnologias = new ArrayList<>();
                 if (requestDto.getIdTecnologias() != null) {
                         for (Integer idTec : requestDto.getIdTecnologias()) {
@@ -399,6 +329,7 @@ public class EquiposServiceImpl implements IEquiposService {
                         }
                 }
 
+                // classPutInfoInasignacionUsuarioRepository.putinfo(requestDto.getUsuarios());
                 // --- Assign Users ---
                 List<UsuarioAsignacionDto> usuariosDto = new ArrayList<>();
                 if (requestDto.getUsuarios() != null) {
@@ -484,7 +415,7 @@ public class EquiposServiceImpl implements IEquiposService {
 
                 // --- update tecnologias ---
                 if (requestDto.getIdTecnologias() != null) {
-                        tecnologiaService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
+                        tecnologiaEquiposService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
                 }
 
                 // --- save cambios básicos ---

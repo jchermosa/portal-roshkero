@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services.Operations.Service;
+package com.backend.portalroshkabackend.Services.Operations.Service.Equipo;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +21,7 @@ import com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioReposito
 import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
-import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioisEquipoService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IUsuarioisEquipoService;
 
 @Service
 public class UsuariosEquipoImpl implements IUsuarioisEquipoService {

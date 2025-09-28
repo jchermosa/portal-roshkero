@@ -25,9 +25,8 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.MetaDatasDto;
-import com.backend.portalroshkabackend.Services.Operations.Interface.IEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IMetaDatasService;
-
+import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquiposService;
 
 import jakarta.validation.Valid;
 
