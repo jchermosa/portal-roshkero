@@ -1,51 +1,106 @@
-import type { SolicitudDispositivoItem } from "../types";
+import type {
+  SolicitudDispositivoItem,
+  UserSolDispositivoDto,
+  PageResponse,
+  SolicitudUserItem,
+} from "../types";
 
-// Listar todas las solicitudes de dispositivos
-async function getSolicitudesDispositivo(
-  token: string
-): Promise<SolicitudDispositivoItem[]> {
-  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/allRequests`, {
+/**
+ * Listar solicitudes de dispositivos (SysAdmin, paginado).
+ */
+async function getSolicitudesDispositivoAdmin(
+  token: string,
+  page: number = 0,
+  size: number = 10
+): Promise<PageResponse<SolicitudDispositivoItem>> {
+  const url = `/api/v1/admin/sysadmin/allRequests?page=${page}&size=${size}`;
+
+  const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-// Aceptar solicitud de dispositivo
+/**
+ * Listar solicitudes del usuario autenticado (no paginado).
+ */
+async function getSolicitudesDispositivoUsuario(
+  token: string
+): Promise<SolicitudUserItem[]> {
+  const url = `/api/v1/usuarios/solicitudes`;
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+/**
+ * Aceptar solicitud de dispositivo (solo SysAdmin).
+ */
 async function acceptSolicitudDispositivo(
   token: string,
   idSolicitud: number
 ): Promise<SolicitudDispositivoItem> {
-  const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/accept`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  const url = `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/accept`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-// Rechazar solicitud de dispositivo
+/**
+ * Rechazar solicitud de dispositivo (solo SysAdmin).
+ */
 async function rejectSolicitudDispositivo(
   token: string,
   idSolicitud: number
 ): Promise<SolicitudDispositivoItem> {
-  const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/reject`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  const url = `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/reject`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
+/**
+ * Crear nueva solicitud de dispositivo (usuario autenticado).
+ */
+async function createSolicitudDispositivo(
+  token: string,
+  data: UserSolDispositivoDto
+): Promise<SolicitudUserItem> {
+  const url = `/api/v1/usuarios/pedir_dispositivo`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
 
 export {
-  getSolicitudesDispositivo,
+  getSolicitudesDispositivoAdmin,
+  getSolicitudesDispositivoUsuario,
   acceptSolicitudDispositivo,
   rejectSolicitudDispositivo,
+  createSolicitudDispositivo,
 };

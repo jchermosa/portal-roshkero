@@ -17,18 +17,6 @@ export function buildSolicitudDispositivoSections(
           options: tiposDispositivo,
         },
         {
-          name: "fechaInicio",
-          label: "Fecha de inicio",
-          type: "date",
-          required: true,
-        },
-        {
-          name: "cantDias",
-          label: "Cantidad de días",
-          type: "number",
-          required: true,
-        },
-        {
           name: "comentario",
           label: "Comentario",
           type: "textarea",

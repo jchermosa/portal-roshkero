@@ -1,3 +1,4 @@
+// src/pages/dispositivos/DeviceAssignmentsPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -20,21 +21,20 @@ export default function DeviceAssignmentsPage({ embedded = false }: Props) {
   const { token, user } = useAuth();
   const navigate = useNavigate();
 
-  const [estado, setEstado] = useState("");
-  const [encargado, setEncargado] = useState("");
   const [page, setPage] = useState(0);
 
-  const puedeVerAsignaciones = tieneRol(user, Roles.SYSADMIN, Roles.OPERACIONES);
+  // const puedeVerAsignaciones = tieneRol(user, Roles.SYSADMIN, Roles.OPERACIONES);
 
+  // ✅ Hook especializado con paginación real
   const { data: asignaciones, totalPages, loading, error } =
-    useDispositivosAsignados(token, { estado, encargado }, page, 10);
+    useDispositivosAsignados(token, page, 10);
 
   const renderActions = (d: DispositivoAsignadoItem) => {
     if (tieneRol(user, Roles.OPERACIONES)) {
       return (
         <button
           onClick={() =>
-            navigate(`/dispositivos-asignados/${d.id_dispositivo_asignado}?readonly=true`)
+            navigate(`/dispositivos-asignados/${d.idDispositivoAsignado}?readonly=true`)
           }
           className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition"
         >
@@ -44,7 +44,7 @@ export default function DeviceAssignmentsPage({ embedded = false }: Props) {
     }
     return (
       <button
-        onClick={() => navigate(`/dispositivos-asignados/${d.id_dispositivo_asignado}`)}
+        onClick={() => navigate(`/dispositivos-asignados/${d.idDispositivoAsignado}`)}
         className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
       >
         Editar
@@ -52,46 +52,16 @@ export default function DeviceAssignmentsPage({ embedded = false }: Props) {
     );
   };
 
-  if (!puedeVerAsignaciones) return <p>No tenés permisos para ver esta página.</p>;
+  // if (!puedeVerAsignaciones) return <p>No tenés permisos para ver esta página.</p>;
   if (loading) return <p>Cargando asignaciones...</p>;
   if (error) return <p>{error}</p>;
 
-  const limpiarFiltros = () => {
-    setEstado("");
-    setEncargado("");
-    setPage(0);
-  };
-
   const body = (
     <>
-      <div className="flex items-center gap-4 mb-4">
-        <input
-          type="text"
-          value={estado}
-          onChange={(e) => setEstado(e.target.value)}
-          placeholder="Filtrar por estado"
-          className="px-3 py-2 border rounded-lg text-sm"
-        />
-        <input
-          type="text"
-          value={encargado}
-          onChange={(e) => setEncargado(e.target.value)}
-          placeholder="Filtrar por encargado"
-          className="px-3 py-2 border rounded-lg text-sm"
-        />
-        <IconButton
-          label="Limpiar filtros"
-          icon={<span>🧹</span>}
-          variant="secondary"
-          onClick={limpiarFiltros}
-          className="h-10 text-sm px-4 flex items-center"
-        />
-      </div>
-
       <DataTable
         data={asignaciones}
         columns={dispositivosAsignadosColumns}
-        rowKey={(d) => d.id_dispositivo_asignado}
+        rowKey={(d) => d.idDispositivoAsignado}
         actions={renderActions}
         scrollable={false}
       />
@@ -121,7 +91,7 @@ export default function DeviceAssignmentsPage({ embedded = false }: Props) {
     );
   }
 
-  // Modo página tradicional
+  // Modo página completa
   return (
     <PageLayout
       title="Gestión de Dispositivos Asignados"

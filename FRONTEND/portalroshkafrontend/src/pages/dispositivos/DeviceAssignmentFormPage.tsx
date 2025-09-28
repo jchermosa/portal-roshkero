@@ -1,3 +1,4 @@
+// src/pages/dispositivos/DeviceAssignmentFormPage.tsx
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import DynamicForm from "../../components/DynamicForm";
@@ -15,15 +16,20 @@ export default function DeviceAssignmentFormPage() {
   const solicitudIdStr = new URLSearchParams(location.search).get("solicitudId");
   const solicitudId = solicitudIdStr ? Number(solicitudIdStr) : undefined;
 
-  // ✅ Hook de formulario de dispositivo asignado (ahora soporta solicitudPreasignada)
+  // ✅ Hook de formulario de dispositivo asignado
   const { data, setData, loading, error, handleSubmit, isEditing } =
-    useDispositivoAsignadoForm(token, id, solicitudId);
+    useDispositivoAsignadoForm(
+      token,
+      id ? Number(id) : undefined, // 👈 casteo a number
+      solicitudId
+    );
 
   // ✅ Configuración de secciones (puede recibir catálogos en el futuro)
   const sections = buildDispositivoAsignadoSections();
 
-  // 🚀 Render
-  const readonly = new URLSearchParams(location.search).get("readonly") === "true";
+  // 🚀 Flags de contexto
+  const readonly =
+    new URLSearchParams(location.search).get("readonly") === "true";
 
   return (
     <FormLayout
@@ -38,7 +44,7 @@ export default function DeviceAssignmentFormPage() {
         readonly
           ? "Vista de solo lectura"
           : isEditing
-          ? "Modifica los datos de la asignación"
+          ? "Modificá los datos de la asignación"
           : "Completá los datos para asignar un dispositivo"
       }
       icon={isEditing ? (readonly ? "👀" : "✏️") : "📦"}
