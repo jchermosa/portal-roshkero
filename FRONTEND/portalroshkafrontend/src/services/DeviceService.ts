@@ -4,7 +4,7 @@ import type { DispositivoItem } from "../types";
 async function getDispositivos(
   token: string
 ): Promise<DispositivoItem[]> {
-  const res = await fetch(`/api/v1/admin/sysadmin/devices/allDevices`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/devices/allDevices`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
@@ -20,7 +20,7 @@ async function getDispositivosWithoutOwner(
   if (sortBy) query.append("sortBy", sortBy);
   if (filterValue) query.append("filterValue", filterValue);
 
-  const res = await fetch(`/api/v1/admin/sysadmin/devices/allDevicesWithoutOwner?${query.toString()}`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/devices/allDevicesWithoutOwner?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
@@ -28,7 +28,7 @@ async function getDispositivosWithoutOwner(
 }
 
 async function createDispositivo(token: string, data: Partial<DispositivoItem>) {
-  const res = await fetch(`/api/v1/admin/sysadmin/devices/create`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/devices/create`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
