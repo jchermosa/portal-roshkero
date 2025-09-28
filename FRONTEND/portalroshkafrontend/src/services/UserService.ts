@@ -2,7 +2,7 @@ import type { UsuarioItem, FiltrosUsuarios } from "../types";
 import type { PaginatedResponse } from "../types";
 import { mapUserResponseToUsuarioItem } from "../mappers/userMapper";
 
-const BASE_URL = "/api/v1/admin/th/users";
+const BASE_URL = "http://localhost:8080/api/v1/admin/th/users";
 
 /**
  * GET usuarios paginados con filtros
