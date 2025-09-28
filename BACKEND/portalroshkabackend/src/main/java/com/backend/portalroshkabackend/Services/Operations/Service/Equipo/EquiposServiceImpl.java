@@ -44,7 +44,7 @@ import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologia
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquipoDiaUbicacionService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquiposService;
-
+import com.backend.portalroshkabackend.tools.mapper.EquiposMapper;
 
 @Service("operationsEquiposService")
 @Validated
@@ -59,6 +59,7 @@ public class EquiposServiceImpl implements IEquiposService {
         private final IUsuarioService usuarioService;
         private final ITecnologiaEquiposService tecnologiaEquiposService;
         private final IEquipoDiaUbicacionService equipoDiaUbicacionService;
+        private final EquiposMapper equiposMapper;
 
         private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
 
@@ -70,7 +71,8 @@ public class EquiposServiceImpl implements IEquiposService {
                         AsignacionUsuarioRepository asignacionUsuarioRepository,
                         IUsuarioService usuarioService,
                         ITecnologiaEquiposService tecnologiaEquiposService,
-                        IEquipoDiaUbicacionService equipoDiaUbicacionService) {
+                        IEquipoDiaUbicacionService equipoDiaUbicacionService,
+                        EquiposMapper equiposMapper) {
                 this.equiposRepository = equiposRepository;
                 this.clientesRepository = clientesRepository;
                 this.tecnologiasRepository = tecnologiasRepository;
@@ -80,6 +82,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 this.usuarioService = usuarioService;
                 this.tecnologiaEquiposService = tecnologiaEquiposService;
                 this.equipoDiaUbicacionService = equipoDiaUbicacionService;
+                this.equiposMapper = equiposMapper;
 
                 sortingMap = new HashMap<>();
 
@@ -106,70 +109,7 @@ public class EquiposServiceImpl implements IEquiposService {
         public EquiposResponseDto getTeamById(Integer id) {
                 Equipos e = equiposRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
-
-                EquiposResponseDto dto = new EquiposResponseDto();
-                dto.setIdEquipo(e.getIdEquipo());
-                dto.setNombre(e.getNombre());
-
-                List<EquipoDiaUbicacionResponceDto> dtoList = equipoDiaUbicacionService
-                                .EquipoDiaUbicacion(e.getIdEquipo());
-
-                dto.setEquipoDiaUbicacion(dtoList);
-
-                dto.setFechaInicio(e.getFechaInicio());
-                dto.setFechaLimite(e.getFechaLimite());
-                dto.setFechaCreacion(e.getFechaCreacion());
-                dto.setEstado(e.getEstado());
-
-                // --- Lider ---
-                if (e.getLider() != null) {
-                        Usuario u = e.getLider();
-                        dto.setLider(new UsuarioisResponseDto(
-                                        u.getIdUsuario(),
-                                        u.getNombre(),
-                                        u.getApellido(),
-                                        u.getCorreo(),
-                                        u.getDisponibilidad()));
-                }
-
-                // --- Cliente ---
-                if (e.getCliente() != null) {
-                        dto.setCliente(new ClientesResponseDto(
-                                        e.getCliente().getIdCliente(),
-                                        e.getCliente().getNombre()));
-                }
-
-                // --- Tecnologias ---
-                List<TecnologiasDto> tecnologias = tecnologiaEquiposService.getTecnologiasByEquipo(id);
-                dto.setTecnologias(tecnologias);
-
-                // --- Users with porcentaje_trabajo ---
-                List<AsignacionUsuarioEquipo> asignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(id);
-                List<UsuarioAsignacionDto> usuariosAsignacion = asignaciones.stream()
-                                .map(asig -> new UsuarioAsignacionDto(
-                                                asig.getUsuario().getIdUsuario(),
-                                                asig.getUsuario().getNombre(),
-                                                asig.getUsuario().getApellido(),
-                                                asig.getUsuario().getCorreo(),
-                                                asig.getPorcentajeTrabajo(),
-                                                asig.getFechaEntrada(),
-                                                asig.getFechaFin()))
-                                .toList();
-                dto.setUsuariosAsignacion(usuariosAsignacion);
-
-                // --- Users Not in This Team ---
-                List<UsuarioisResponseDto> usuariosFueraEquipo = usuarioisRepository.findUsuariosNoEnEquipo(id)
-                                .stream()
-                                .map(u -> new UsuarioisResponseDto(
-                                                u.getIdUsuario(),
-                                                u.getNombre(),
-                                                u.getApellido(),
-                                                u.getCorreo(),
-                                                u.getDisponibilidad()))
-                                .toList();
-                dto.setUsuariosNoEnEquipo(usuariosFueraEquipo);
-
-                return dto;
+                return equiposMapper.toDto(e);
         }
 
         // Method for show team with sort
