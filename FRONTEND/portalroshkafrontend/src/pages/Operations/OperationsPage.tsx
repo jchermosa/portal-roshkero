@@ -128,29 +128,36 @@ export default function OperationsPage() {
         }
 
         const parsed: IListTeams[] = items.map((t) => {
-          const dias = (t.equipoDiaUbicacion ?? [])
-            .map(e => e.diaLaboral?.nombreDia)
-            .filter(Boolean) as string[];
-          const ubicaciones = Array.from(
-            new Set(
-              (t.equipoDiaUbicacion ?? [])
-                .map(e => e.ubicacion?.nombre)
-                .filter(Boolean) as string[]
-            )
-          );
+  // ✅ solo entradas con ubicación
+  const conUbicacion = (t.equipoDiaUbicacion ?? []).filter(
+    (e) => e?.ubicacion?.nombre
+  );
 
-          return {
-            idTeam: t.idEquipo,
-            nombre: t.nombre ?? "",
-            estado: toBoolEstado(t.estado),
-            liderNombre: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" "),
-            liderCorreo: t.lider?.correo,
-            clienteNombre: t.cliente?.nombre ?? "",
-            tecnologias: techById.get(t.idEquipo) ?? (t.tecnologias ?? []),
-            dias,
-            ubicaciones,
-          };
-        });
+  const dias = conUbicacion
+    .map((e) => e.diaLaboral?.nombreDia)
+    .filter(Boolean) as string[];
+
+  const ubicaciones = Array.from(
+    new Set(
+      conUbicacion
+        .map((e) => e.ubicacion?.nombre)
+        .filter(Boolean) as string[]
+    )
+  );
+
+  return {
+    idTeam: t.idEquipo,
+    nombre: t.nombre ?? "",
+    estado: toBoolEstado(t.estado),
+    liderNombre: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" "),
+    liderCorreo: t.lider?.correo,
+    clienteNombre: t.cliente?.nombre ?? "",
+    tecnologias: techById.get(t.idEquipo) ?? (t.tecnologias ?? []),
+    dias,
+    ubicaciones,
+  };
+});
+
 
         setEquipos(parsed);
         setTotalPages(Array.isArray(body) ? 1 : (body?.totalPages ?? 1));
@@ -216,7 +223,6 @@ export default function OperationsPage() {
 
   // Columnas
   const columns = [
-    { key: "idTeam", label: "ID" },
     { key: "nombre", label: "Proyecto/Equipo" },
     { key: "clienteNombre", label: "Cliente" },
     {
@@ -231,46 +237,67 @@ export default function OperationsPage() {
         </div>
       ),
     },
-    // NUEVO: Días
-    {
-      key: "dias",
-      label: "Días",
-      render: (row: IListTeams) =>
-        row.dias.length ? (
-          <div className="flex flex-wrap gap-1 max-w-[220px]">
-            {row.dias.map((d, i) => (
-              <span
-                key={`${d}-${i}`}
-                className="px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-100"
-              >
-                {d}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <span className="text-gray-500 dark:text-gray-400">—</span>
-        ),
-    },
-    // NUEVO: Ubicación
-    {
-      key: "ubicaciones",
-      label: "Ubicación",
-      render: (row: IListTeams) =>
-        row.ubicaciones.length ? (
-          <div className="flex flex-wrap gap-1 max-w-[220px]">
-            {row.ubicaciones.map((u, i) => (
-              <span
-                key={`${u}-${i}`}
-                className="px-2 py-0.5 text-xs rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-100"
-              >
-                {u}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <span className="text-gray-500 dark:text-gray-400">—</span>
-        ),
-    },
+    // DÍAS (máx 2 + +n)
+{
+  key: "dias",
+  label: "Días",
+  render: (row: IListTeams) => {
+    if (!row.dias.length) return <span className="text-gray-500 dark:text-gray-400">—</span>;
+
+    const maxToShow = 2;
+    const visibles = row.dias.slice(0, maxToShow);
+    const extra = Math.max(0, row.dias.length - maxToShow);
+
+    return (
+      <div className="flex flex-col gap-1 max-w-[220px]">
+        {visibles.map((d, i) => (
+          <span
+            key={`${d}-${i}`}
+            className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-100"
+          >
+            {d}
+          </span>
+        ))}
+        {extra > 0 && (
+          <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-100">
+            +{extra}
+          </span>
+        )}
+      </div>
+    );
+  },
+},
+
+// UBICACIÓN (máx 2 + +n)
+{
+  key: "ubicaciones",
+  label: "Ubicación",
+  render: (row: IListTeams) => {
+    if (!row.ubicaciones.length) return <span className="text-gray-500 dark:text-gray-400">—</span>;
+
+    const maxToShow = 2;
+    const visibles = row.ubicaciones.slice(0, maxToShow);
+    const extra = Math.max(0, row.ubicaciones.length - maxToShow);
+
+    return (
+      <div className="flex flex-col gap-1 max-w-[220px]">
+        {visibles.map((u, i) => (
+          <span
+            key={`${u}-${i}`}
+            className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-100"
+          >
+            {u}
+          </span>
+        ))}
+        {extra > 0 && (
+          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100">
+            +{extra}
+          </span>
+        )}
+      </div>
+    );
+  },
+},
     {
       key: "estado",
       label: "Estado",

@@ -30,9 +30,21 @@ type ITeam = {
   leadNombre?: string | null;
 };
 
+type DiaLaboral = { idDiaLaboral: number; nombreDia: string };
+type Ubicacion = { idUbicacion: number; nombre: string };
+
+type AsignDU = {
+  idDiaLaboral: number;
+  nombreDia: string;
+  idUbicacion: number;
+  nombreUbicacion: string;
+};
+
 const METADATAS_PATH = "/api/v1/admin/operations/metadatas";
-const TEAM_PATH = "/api/v1/admin/operations/team";   // /:id
-const USERS_PATH = "/api/v1/admin/operations/users"; // fallback listado
+const TEAM_PATH = "/api/v1/admin/operations/team";
+const USERS_PATH = "/api/v1/admin/operations/users";
+const DIAS_PATH = "/api/v1/admin/operations/diaslaborales";
+const LIBRES_PATH = "/api/v1/admin/operations/asignacion/libres";
 
 function useIsDark() {
   const [isDark, setIsDark] = useState(
@@ -47,17 +59,14 @@ function useIsDark() {
   return isDark;
 }
 
-/** Normaliza valores de disponibilidad:
- * - Si viene 0..1 => lo convierte a porcentaje (0..100)
- * - Si viene 1..100 => asume porcentaje y lo limita a 0..100
- */
+/** Normaliza disponibilidad a 0..100 */
 const toPercent = (v: any) => {
   const n = Number(v);
   if (!isFinite(n)) return 100;
   if (n <= 1) return Math.round(n * 100);
   return Math.max(0, Math.min(100, Math.round(n)));
 };
-/** Convierte el valor de UI (0..100 o 0..1) a fracción para el backend */
+/** Convierte UI (0..100 o 0..1) a fracción 0..1 */
 const toFraction = (p: any) => {
   const n = Number(p);
   if (!isFinite(n)) return 1;
@@ -74,18 +83,14 @@ export default function EditarEquipoPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // errores externos para campos (p.ej. nombre duplicado)
   const [externalErrors, setExternalErrors] = useState<Record<string, string>>({});
-
-  // datos base del equipo
   const [team, setTeam] = useState<ITeam | null>(null);
 
-  // form editable
   const [formData, setFormData] = useState<{ nombre: string; fechaInicio: string; fechaFin: string; estado: boolean; }>(
     { nombre: "", fechaInicio: "", fechaFin: "", estado: true }
   );
 
-  // Selects: cliente, lead, tecnologías
+  // Cliente / Lead / Tec
   const [clienteOptions, setClienteOptions] = useState<Array<{ value: number; label: string }>>([]);
   const [clienteSel, setClienteSel] = useState<{ value: number; label: string } | null>(null);
 
@@ -98,7 +103,7 @@ export default function EditarEquipoPage() {
   const [tecnologiasSel, setTecnologiasSel] = useState<Array<{ value: number; label: string }>>([]);
   const [tecPick, setTecPick] = useState<number | "">("");
 
-  // miembros
+  // Miembros
   const [miembros, setMiembros] = useState<IMiembrosEquipo[]>([]);
   const [memberOptions, setMemberOptions] = useState<Array<{ value: number; label: string; idCargo: number }>>([]);
   const [selectedMember, setSelectedMember] = useState<{ value: number; label: string; idCargo: number } | null>(null);
@@ -106,9 +111,79 @@ export default function EditarEquipoPage() {
   const [newMemberStart, setNewMemberStart] = useState<string>("");
   const [newMemberEnd, setNewMemberEnd] = useState<string>("");
 
-  const firstArray = (...cands: any[][]) => cands.find(a => Array.isArray(a) && a.length) ?? [];
+  // Días / Ubicaciones libres / Asignaciones
+  const [diasOptions, setDiasOptions] = useState<Array<{ value: number; label: string }>>([]);
+  const [libresByDay, setLibresByDay] = useState<Map<number, Ubicacion[]>>(new Map());
+  const [diaSel, setDiaSel] = useState<{ value: number; label: string } | null>(null);
+  const [ubicSel, setUbicSel] = useState<{ value: number; label: string } | null>(null);
+  const [asignaciones, setAsignaciones] = useState<AsignDU[]>([]);
 
-  // cargar metadatas + team (+ fallback users)
+  const firstArray = (...cands: any[][]) => cands.find(a => Array.isArray(a) && a.length) ?? [];
+  // Guarda el nombre original para saber si cambió
+const originalName = team?.nombre ?? "";
+
+// Valida nombre en caliente con debounce
+useEffect(() => {
+  if (!team) return;
+  const nombre = (formData.nombre || "").trim();
+
+  // si está vacío: muestra error local y no llama al backend
+  if (!nombre) {
+    setExternalErrors((p) => ({ ...p, nombre: "Ingresá un nombre" }));
+    return;
+  }
+
+  // si no cambió respecto al original: limpia error y no llama
+  if (nombre === originalName) {
+    setExternalErrors((p) => {
+      const n = { ...p }; delete n.nombre; return n;
+    });
+    return;
+  }
+
+  const ac = new AbortController();
+  const t = setTimeout(async () => {
+    try {
+      const r = await fetch(`${TEAM_PATH}/${team.idEquipo}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+        body: JSON.stringify({ nombre }),
+        signal: ac.signal,
+      });
+
+      if (!r.ok) {
+        const txt = await r.text();
+        const msg =
+          /existe|duplic/i.test(txt) || r.status === 409
+            ? "El nombre ya existe"
+            : "No se pudo verificar el nombre";
+        setExternalErrors((p) => ({ ...p, nombre: msg }));
+      } else {
+        // disponible
+        setExternalErrors((p) => {
+          const n = { ...p }; delete n.nombre; return n;
+        });
+      }
+    } catch {
+      if (!ac.signal.aborted) {
+        setExternalErrors((p) => ({ ...p, nombre: "No se pudo verificar el nombre" }));
+      }
+    }
+  }, 500); // debounce 500ms
+
+  return () => {
+    clearTimeout(t);
+    ac.abort();
+  };
+}, [formData.nombre, team?.idEquipo, token, originalName]);
+
+
+  // Carga inicial
   useEffect(() => {
     const ac = new AbortController();
     (async () => {
@@ -116,7 +191,7 @@ export default function EditarEquipoPage() {
         setLoading(true);
         setError(null);
 
-        // METADATAS
+        // Metadatas
         const md = await fetch(METADATAS_PATH, {
           headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           credentials: "include",
@@ -128,13 +203,8 @@ export default function EditarEquipoPage() {
         setClienteOptions((meta.clientes ?? []).map((c: any) => ({ value: c.idCliente, label: c.nombre })));
 
         const rawLeads = firstArray(
-          meta.teamleaders,
-          meta.teamLeaders,
-          meta.team_leaders,
-          meta.lideres,
-          meta.leaders,
-          meta.usuariosLideres,
-          meta.usuarios // fallback
+          meta.teamleaders, meta.teamLeaders, meta.team_leaders,
+          meta.lideres, meta.leaders, meta.usuariosLideres, meta.usuarios
         );
         setLeadOptions(
           rawLeads.map((u: any) => ({
@@ -145,7 +215,7 @@ export default function EditarEquipoPage() {
 
         setTecnologiaOptions((meta.tecnologias ?? []).map((t: any) => ({ value: t.idTecnologia, label: t.nombre })));
 
-        // TEAM (usamos usuariosNoEnEquipo si viene para el selector)
+        // Team
         const tr = await fetch(`${TEAM_PATH}/${id}`, {
           headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           credentials: "include",
@@ -154,6 +224,7 @@ export default function EditarEquipoPage() {
         if (!tr.ok) throw new Error(`Team ${tr.status} ${tr.statusText}`);
         const t = await tr.json();
 
+        // Usuarios no en equipo (selector agregar miembro)
         const notIn = Array.isArray(t.usuariosNoEnEquipo) ? t.usuariosNoEnEquipo : [];
         if (notIn.length) {
           setMemberOptions(
@@ -164,7 +235,6 @@ export default function EditarEquipoPage() {
             }))
           );
         } else {
-          // Fallback users (por si la API no envía usuariosNoEnEquipo)
           const ur = await fetch(USERS_PATH, {
             headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
             credentials: "include",
@@ -187,20 +257,13 @@ export default function EditarEquipoPage() {
         const fechaFin = t.fechaLimite ?? t.fechaFin ?? "";
 
         const miembrosFuente = firstArray(
-          t.usuariosAsignacion,
-          t.usuariosEnEquipo,
-          t.usuarios,
-          t.miembros,
-          t.integrantes,
-          t.miembrosEquipo
+          t.usuariosAsignacion, t.usuariosEnEquipo, t.usuarios,
+          t.miembros, t.integrantes, t.miembrosEquipo
         );
 
         const miembrosInicial: IMiembrosEquipo[] = miembrosFuente.map((u: any) => ({
           id: u.idUsuario ?? u.id ?? u.usuarioId,
-          nombre:
-            u.nombreCompleto ??
-            [u.nombre, u.apellido].filter(Boolean).join(" ") ??
-            String(u.nombre ?? u.apellido ?? "Sin nombre"),
+          nombre: u.nombreCompleto ?? [u.nombre, u.apellido].filter(Boolean).join(" ") ?? String(u.nombre ?? u.apellido ?? "Sin nombre"),
           idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
           disponibilidad: toPercent(u.disponibilidad ?? u.porcentajeTrabajo ?? 100),
           fechaEntrada: u.fechaEntrada ?? "",
@@ -233,17 +296,47 @@ export default function EditarEquipoPage() {
 
         const lId = t.lider?.idUsuario ?? null;
         setLeadId(lId);
-        setClienteSel(
-          t.cliente?.idCliente
-            ? { value: t.cliente.idCliente, label: t.cliente.nombre }
-            : null
-        );
-        if (lId && !rawLeads.find((u: any) => (u.idUsuario ?? u.id ?? u.usuarioId) === lId)) {
-          const phantom = { value: lId, label: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" ") || "Team Lead" };
-          setLeadOptions(prev => [...prev, phantom]);
-          setLeadSel(phantom);
-        } else {
-          setLeadSel(lId ? { value: lId, label: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" ") } : null);
+        setClienteSel(t.cliente?.idCliente ? { value: t.cliente.idCliente, label: t.cliente.nombre } : null);
+        setLeadSel(lId ? { value: lId, label: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" ") } : null);
+
+        // Precargar asignaciones con ubicación
+        const duSrc = Array.isArray(t.equipoDiaUbicacion) ? t.equipoDiaUbicacion : [];
+        const inicialDU: AsignDU[] = duSrc
+          .filter((e: any) => e?.diaLaboral?.idDiaLaboral && e?.ubicacion?.idUbicacion)
+          .map((e: any) => ({
+            idDiaLaboral: e.diaLaboral.idDiaLaboral,
+            nombreDia: e.diaLaboral.nombreDia ?? "—",
+            idUbicacion: e.ubicacion.idUbicacion,
+            nombreUbicacion: e.ubicacion.nombre ?? "—",
+          }));
+        setAsignaciones(inicialDU);
+
+        // Días
+        const dr = await fetch(DIAS_PATH, {
+          headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          credentials: "include",
+          signal: ac.signal,
+        });
+        if (dr.ok) {
+          const dias: DiaLaboral[] = await dr.json();
+          setDiasOptions(dias.map(d => ({ value: d.idDiaLaboral, label: d.nombreDia })));
+        }
+
+        // Libres por día
+        const lr = await fetch(LIBRES_PATH, {
+          headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          credentials: "include",
+          signal: ac.signal,
+        });
+        if (lr.ok) {
+          const libres = await lr.json();
+          const map = new Map<number, Ubicacion[]>();
+          libres.forEach((entry: any) => {
+            const idDia = entry.idDiaLaboral;
+            const arr: Ubicacion[] = Array.isArray(entry.ubicacionesLibres) ? entry.ubicacionesLibres : [];
+            map.set(idDia, arr);
+          });
+          setLibresByDay(map);
         }
       } catch (e: any) {
         if (e?.name !== "AbortError") setError(e.message || "Error");
@@ -254,7 +347,7 @@ export default function EditarEquipoPage() {
     return () => ac.abort();
   }, [id, token]);
 
-  // limpiar error externo por campo
+  // Limpiar error externo por campo
   const onClearExternalError = (name: string) =>
     setExternalErrors((prev) => {
       const next = { ...prev };
@@ -262,42 +355,25 @@ export default function EditarEquipoPage() {
       return next;
     });
 
-  // secciones base con botón de verificación de nombre
+  // Secciones formulario principal
   const getSections = () => [
-    {
-      title: "Editar Equipo",
-      icon: "🛠️",
-      fields: [
-        {
-          name: "asyncCheck",
-          label: " ",
-          type: "custom" as const,
-          fullWidth: true,
-          render: () => (
-            <div className="flex items-center justify-end">
-              <button
-                type="button"
-                onClick={handleCheckNombre}
-                className="px-3 py-1.5 text-sm rounded bg-amber-500 hover:bg-amber-600 text-white"
-                title="Verificar si el nombre ya existe sin guardar"
-              >
-                Verificar nombre
-              </button>
-            </div>
-          ),
-        },
-        { name: "nombre", label: "Nombre del equipo", type: "text" as const, required: true },
-        { name: "fechaInicio", label: "Fecha de inicio", type: "date" as const, required: true },
-        { name: "fechaFin", label: "Fecha límite", type: "date" as const, required: true },
-        { name: "estado", label: "Activo", type: "checkbox" as const, required: true },
-      ],
-    },
-  ];
+  {
+    title: "Editar Equipo",
+    icon: "🛠️",
+    fields: [
+      { name: "nombre", label: "Nombre del equipo", type: "text" as const, required: true },
+      { name: "fechaInicio", label: "Fecha de inicio", type: "date" as const, required: true },
+      { name: "fechaFin", label: "Fecha límite", type: "date" as const, required: true },
+      { name: "estado", label: "Activo", type: "checkbox" as const, required: true },
+    ],
+  },
+];
+
 
   const handleFormChange = (updated: Record<string, any>) =>
     setFormData(prev => ({ ...prev, ...updated }));
 
-  // Verificar nombre llamando PATCH /team/:id solo con {nombre}
+  // Verificar nombre con PATCH parcial
   const handleCheckNombre = async () => {
     if (!team) return;
     const nombre = (formData.nombre || "").trim();
@@ -339,7 +415,7 @@ export default function EditarEquipoPage() {
     }
   };
 
-  // tecnologías
+  // Tecnologías
   const handleAddTec = () => {
     if (tecPick === "") return;
     const opt = tecnologiaOptions.find(o => o.value === Number(tecPick));
@@ -351,7 +427,7 @@ export default function EditarEquipoPage() {
   const handleRemoveTec = (idTec: number) =>
     setTecnologiasSel(prev => prev.filter(t => t.value !== idTec));
 
-  // miembros
+  // Miembros
   const handleAddMember = () => {
     if (!selectedMember) return;
     if (miembros.some(m => m.id === selectedMember.value)) return;
@@ -381,6 +457,7 @@ export default function EditarEquipoPage() {
   const updateMemberEnd = (id: number, v: string) =>
     setMiembros(ms => ms.map(m => (m.id === id ? { ...m, fechaFin: v } : m)));
 
+  // Columnas miembros
   const columns = [
     { key: "id", label: "ID" },
     {
@@ -455,7 +532,7 @@ export default function EditarEquipoPage() {
     },
   ];
 
-  // theme select
+  // Tema de react-select
   const selectTheme = useMemo(
     () => (base: any) => ({
       ...base,
@@ -495,7 +572,7 @@ export default function EditarEquipoPage() {
     [isDark]
   );
 
-  // PATCH inmediato para cambiar Team Lead (botón "Cambiar")
+  // PATCH inmediato para cambiar Team Lead
   const patchLeadNow = async () => {
     if (!team) return;
     try {
@@ -515,7 +592,7 @@ export default function EditarEquipoPage() {
         const txt = await r.text();
         throw new Error(`${r.status} ${r.statusText} — ${txt.slice(0,160)}`);
       }
-      setLeadId(leadSel ? leadSel.value : null); // éxito
+      setLeadId(leadSel ? leadSel.value : null);
     } catch (e: any) {
       alert(e.message || "No se pudo actualizar el Team Lead");
     } finally {
@@ -523,7 +600,7 @@ export default function EditarEquipoPage() {
     }
   };
 
-  // submit: payload completo (convierte disponibilidad a fracción 0..1)
+  // Submit (si querés persistir DU: descomenta en payload)
   const onSubmit = async (_data: Record<string, any>) => {
     try {
       if (!team) return;
@@ -548,6 +625,7 @@ export default function EditarEquipoPage() {
           fechaFin: m.fechaFin || null,
           estado: "A",
         })),
+        // equipoDiaUbicacion: asignaciones.map(a => ({ idDiaLaboral: a.idDiaLaboral, idUbicacion: a.idUbicacion })),
       };
 
       const r = await fetch(`${TEAM_PATH}/${team.idEquipo}`, {
@@ -575,6 +653,63 @@ export default function EditarEquipoPage() {
       setSaving(false);
     }
   };
+
+  // ===== LÓGICA SELECTORES DÍA/UBICACIÓN =====
+
+  // Días disponibles: excluir los ya agregados a la tabla
+  const availableDaysOptions = useMemo(() => {
+    const tomados = new Set(asignaciones.map(a => a.idDiaLaboral));
+    return diasOptions.filter(d => !tomados.has(d.value));
+  }, [diasOptions, asignaciones]);
+
+  // Ubicaciones del día seleccionado, excluyendo las ya usadas ese día
+  const ubicacionesOptions = useMemo(() => {
+    if (!diaSel) return [];
+    const yaUsadas = new Set(
+      asignaciones.filter(a => a.idDiaLaboral === diaSel.value).map(a => a.idUbicacion)
+    );
+    const arr = (libresByDay.get(diaSel.value) ?? []).filter(u => !yaUsadas.has(u.idUbicacion));
+    return arr.map(u => ({ value: u.idUbicacion, label: u.nombre }));
+  }, [diaSel, libresByDay, asignaciones]);
+
+  // Agregar asignación
+  const addAsignDU = () => {
+    if (!diaSel || !ubicSel) return;
+    const exists = asignaciones.some(a => a.idDiaLaboral === diaSel.value && a.idUbicacion === ubicSel.value);
+    if (exists) return;
+    setAsignaciones(prev => [
+      ...prev,
+      {
+        idDiaLaboral: diaSel.value,
+        nombreDia: diaSel.label,
+        idUbicacion: ubicSel.value,
+        nombreUbicacion: ubicSel.label,
+      },
+    ]);
+    setUbicSel(null);
+  };
+
+  // Columnas tabla Día–Ubicación
+  const duColumns = [
+    { key: "nombreDia", label: "Día" },
+    { key: "nombreUbicacion", label: "Ubicación" },
+    {
+      key: "acciones",
+      label: "Acciones",
+      render: (row: AsignDU) => (
+        <button
+          onClick={() =>
+            setAsignaciones(prev =>
+              prev.filter(a => !(a.idDiaLaboral === row.idDiaLaboral && a.idUbicacion === row.idUbicacion))
+            )
+          }
+          className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+        >
+          Eliminar
+        </button>
+      ),
+    },
+  ];
 
   if (loading) return <div className="p-4 text-sm">Cargando…</div>;
   if (error) return <div className="p-4 text-sm text-red-600">Error: {error}</div>;
@@ -609,6 +744,61 @@ export default function EditarEquipoPage() {
               externalErrors={externalErrors}
               onClearExternalError={onClearExternalError}
             />
+
+            {/* === Día + Ubicación (arriba de Cliente/Lead) === */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+              <div className="md:col-span-1">
+                <label className="block text-sm mb-2">Día laboral</label>
+                <Select
+                  options={availableDaysOptions}
+                  value={diaSel}
+                  onChange={(opt) => { setDiaSel(opt as any); setUbicSel(null); }}
+                  isClearable
+                  placeholder="Seleccionar día…"
+                  theme={selectTheme}
+                  styles={selectStyles}
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                />
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-sm mb-2">Ubicación libre</label>
+                <Select
+                  options={ubicacionesOptions}
+                  value={ubicSel}
+                  onChange={(opt) => setUbicSel(opt as any)}
+                  isClearable
+                  isDisabled={!diaSel}
+                  placeholder={diaSel ? "Seleccionar ubicación…" : "Elegí un día primero"}
+                  theme={selectTheme}
+                  styles={selectStyles}
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                />
+              </div>
+              <div className="flex md:justify-start">
+                <button
+                  type="button"
+                  onClick={addAsignDU}
+                  disabled={!diaSel || !ubicSel}
+                  className="self-end h-10 px-4 rounded bg-blue-600 text-white text-sm disabled:opacity-60"
+                >
+                  Agregar
+                </button>
+              </div>
+            </div>
+
+            {/* Tabla Día–Ubicación */}
+            <div>
+              <h3 className="text-sm font-semibold mb-2">Días y ubicaciones asignadas</h3>
+              <DataTable
+                data={asignaciones}
+                columns={duColumns}
+                rowKey={(r: AsignDU) => `${r.idDiaLaboral}-${r.idUbicacion}`}
+                scrollable={false}
+                enableSearch={false}
+              />
+            </div>
 
             {/* Cliente y Team Lead + botón Cambiar */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
@@ -691,7 +881,7 @@ export default function EditarEquipoPage() {
               )}
             </div>
 
-            {/* Agregar miembro con fecha inicio/fin y disponibilidad */}
+            {/* Agregar miembro */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
               <div className="md:col-span-2">
                 <label className="block text-sm mb-2">Agregar miembro</label>
