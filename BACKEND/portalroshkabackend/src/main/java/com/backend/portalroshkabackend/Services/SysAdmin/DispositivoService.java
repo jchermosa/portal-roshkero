@@ -67,6 +67,13 @@ public class DispositivoService {
     // Listar los tipos de dispositivos
 
     @Transactional(readOnly = true)
+    public DeviceDTO getDeviceById(Integer id) {
+        Dispositivo dispositivo = deviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Dispositivo no encontrado con ID: " + id));
+        return convertToDto(dispositivo);
+    }
+
+    @Transactional(readOnly = true)
     public Page<DeviceDTO> getAllDevices(Pageable pageable) {
         try {
             Page<Dispositivo> dispositivos = deviceRepository.findAll(pageable);

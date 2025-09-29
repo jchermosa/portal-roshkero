@@ -19,7 +19,7 @@ public class DeviceRequestDto {
     private LocalDate fechaInicio;
 
     @NotNull ( message = "Se debe indicar la cantidad de dias solicitados")
-    private int cantDias;
+    private Integer cantDias;
 
     private boolean aprobacionAdmin;
 
