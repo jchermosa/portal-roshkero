@@ -47,7 +47,7 @@ export default function GestionDispositivosPage() {
       }
     >
       <div className="mt-4">
-        {activeTab === "solicitudes" && <SolicitudDispositivoPage embedded />}
+        {activeTab === "solicitudes" && <SolicitudDispositivoPage embedded forceSysAdmin />}
         {activeTab === "asignaciones" && <DeviceAssignmentsPage embedded />}
       </div>
     </PageLayout>

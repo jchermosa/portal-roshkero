@@ -16,7 +16,9 @@ export function useSolicitudDispositivoForm(token: string | null, id?: number, i
 
   // Crear nueva solicitud (usuario normal)
   const create = async (formData: UserSolDispositivoDto) => {
+     console.log("[Hook] create() called", { hasToken: !!token, formData }); 
     if (!token) return;
+    console.warn("[Hook] sin token → no se hace fetch");   
     setLoading(true);
     try {
       const created = await createSolicitudDispositivo(token, formData);

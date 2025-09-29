@@ -16,12 +16,13 @@ export function useGetDeviceTypes(token: string | null) {
 
     setLoading(true);
     setError(null);
-    
+
     try {
-      const deviceTypes = await getDeviceTypes(token);
+      const deviceTypes = await getDeviceTypes(token); 
       setData(deviceTypes);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Error al cargar tipos de dispositivos";
+      const errorMessage =
+        err instanceof Error ? err.message : "Error al cargar tipos de dispositivos";
       setError(errorMessage);
       setData([]);
     } finally {

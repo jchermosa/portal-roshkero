@@ -38,7 +38,7 @@ export default function AppRoutes() {
     <Routes>
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/cambiar-contraseña" element={<ChangePasswordPage />} />
+      {/* <Route path="/cambiar-contraseña" element={<ChangePasswordPage />} /> */}
 
       {/* Rutas privadas */}
       <Route element={<ProtectedRoute />}>
@@ -76,6 +76,7 @@ export default function AppRoutes() {
           {/* Dispositivos */}
           <Route path="/dispositivos" element={<DevicePage />} />
           <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
+          <Route path="/dispositivos/:id" element={<DeviceFormPage />} />
 
           {/* Solicitud de Dispositivos (usuarios normales) */}
           <Route path="/solicitud-dispositivo" element={<SolicitudDispositivoPage />} />

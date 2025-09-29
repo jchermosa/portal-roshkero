@@ -1,12 +1,27 @@
-import type { DispositivoItem } from "../types";
+import type { DispositivoItem, PageResponse } from "../types";
 
+
+// async function getDispositivos(
+//   token: string
+// ): Promise<DispositivoItem[]> {
+//   const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/devices/allDevices`, {
+//     headers: { Authorization: `Bearer ${token}` },
+//   });
+//   if (!res.ok) throw new Error(await res.text());
+//   return res.json();
+// }
 
 async function getDispositivos(
-  token: string
-): Promise<DispositivoItem[]> {
-  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/devices/allDevices`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  token: string,
+  page: number = 0,
+  size: number = 10
+): Promise<PageResponse<DispositivoItem>> {
+  const res = await fetch(
+    `http://localhost:8080/api/v1/admin/sysadmin/devices/allDevices?page=${page}&size=${size}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }

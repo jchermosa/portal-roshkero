@@ -12,11 +12,11 @@ export default function DeviceAssignmentFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ Extraer solicitudId del query param (cuando se aprueba una solicitud)
+  //  Extraer solicitudId del query param (cuando se aprueba una solicitud)
   const solicitudIdStr = new URLSearchParams(location.search).get("solicitudId");
   const solicitudId = solicitudIdStr ? Number(solicitudIdStr) : undefined;
 
-  // ✅ Hook de formulario de dispositivo asignado
+  //  Hook de formulario de dispositivo asignado
   const { data, setData, loading, error, handleSubmit, isEditing } =
     useDispositivoAsignadoForm(
       token,
@@ -24,10 +24,10 @@ export default function DeviceAssignmentFormPage() {
       solicitudId
     );
 
-  // ✅ Configuración de secciones (puede recibir catálogos en el futuro)
+  //  Configuración de secciones (puede recibir catálogos en el futuro)
   const sections = buildDispositivoAsignadoSections();
 
-  // 🚀 Flags de contexto
+  //  Flags de contexto
   const readonly =
     new URLSearchParams(location.search).get("readonly") === "true";
 

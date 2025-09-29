@@ -83,7 +83,7 @@ async function createSolicitudDispositivo(
   data: UserSolDispositivoDto
 ): Promise<SolicitudUserItem> {
   const url = `/api/v1/usuarios/pedir_dispositivo`;
-
+  console.log("[Service] POST /api/v1/usuarios/pedir_dispositivo", { data });
   const res = await fetch(url, {
     method: "POST",
     headers: {
@@ -93,7 +93,11 @@ async function createSolicitudDispositivo(
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    const txt = await res.text();
+    console.error("Error crear solicitud dispositivo:", res.status, txt);
+    throw new Error(txt || `HTTP ${res.status}`);
+  }
   return res.json();
 }
 

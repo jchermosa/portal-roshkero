@@ -25,47 +25,33 @@ export function useDispositivos(
     setLoading(true);
     setError(null);
 
-    getDispositivos(token)
-      .then((allDevices) => {
+    getDispositivos(token, page, pageSize)
+      .then((res) => {
         if (!isMounted) return;
 
-        // Asegurar que cada dispositivo tenga un ID único
-        const devicesWithIds = allDevices.map((device, index) => ({
-          ...device,
-          idDispositivo: device.idDispositivo ?? index + 1, // Usar index como fallback
-        }));
+        // El backend ya devuelve { content, totalPages, totalElements }
+        let dispositivos = res.content ?? [];
 
-        // Aplicar filtros localmente
-        let filteredDevices = devicesWithIds;
-        
-        if (filtros.categoria && filtros.categoria !== "") {
-          filteredDevices = filteredDevices.filter(device => 
-            device.categoria === filtros.categoria
+        // Filtros locales (por si quieres mantenerlos en frontend)
+        if (filtros.categoria) {
+          dispositivos = dispositivos.filter(
+            (d) => d.categoria === filtros.categoria
           );
         }
-        
-        if (filtros.estado && filtros.estado !== "") {
-          filteredDevices = filteredDevices.filter(device => 
-            device.estado === filtros.estado
+        if (filtros.estado) {
+          dispositivos = dispositivos.filter(
+            (d) => d.estado === filtros.estado
           );
         }
-        
-        if (filtros.encargado && filtros.encargado !== "") {
-          filteredDevices = filteredDevices.filter(device => 
-            device.encargado?.toString() === filtros.encargado
+        if (filtros.encargado) {
+          dispositivos = dispositivos.filter(
+            (d) => d.encargado?.toString() === filtros.encargado
           );
         }
 
-        // Calcular paginación
-        const totalItems = filteredDevices.length;
-        const calculatedTotalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-        const startIndex = page * pageSize;
-        const endIndex = startIndex + pageSize;
-        const paginatedData = filteredDevices.slice(startIndex, endIndex);
-
-        setData(paginatedData);
-        setTotalPages(calculatedTotalPages);
-        setTotalElements(totalItems);
+        setData(dispositivos);
+        setTotalPages(res.totalPages ?? 1);
+        setTotalElements(res.totalElements ?? dispositivos.length);
       })
       .catch((err) => {
         if (isMounted) {
@@ -83,11 +69,11 @@ export function useDispositivos(
     };
   }, [token, page, pageSize, filtros.categoria, filtros.estado, filtros.encargado]);
 
-  return { 
-    data, 
-    totalPages, 
-    totalElements, 
-    loading, 
-    error 
+  return {
+    data,
+    totalPages,
+    totalElements,
+    loading,
+    error,
   };
 }

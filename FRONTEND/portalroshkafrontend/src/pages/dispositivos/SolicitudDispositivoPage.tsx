@@ -15,17 +15,17 @@ import SolicitudDispositivoModal from "./SolicitudDispositivoModal";
 
 interface Props {
   embedded?: boolean;
+  forceSysAdmin?: boolean; 
 }
 
-export default function SolicitudDispositivoPage({ embedded = false }: Props) {
+export default function SolicitudDispositivoPage({ embedded = false, forceSysAdmin = false }: Props) {
   const { token, user } = useAuth();
 
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<SolicitudDispositivoUI | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const isSysAdmin = tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
-
+   const isSysAdmin = forceSysAdmin || tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
   // Hook listado
   const {
     data: solicitudes,
