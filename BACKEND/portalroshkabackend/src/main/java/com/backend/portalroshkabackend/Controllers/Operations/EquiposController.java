@@ -79,8 +79,8 @@ public class EquiposController {
 
     // ----------------- CREATE -----------------
     @PostMapping("/team")
-    public EquiposResponseDto postNewTeam(@Valid @RequestBody EquiposRequestDto equipoRequest) {
-        return equiposService.postNewTeam(equipoRequest);
+    public void postNewTeam(@Valid @RequestBody EquiposRequestDto equipoRequest) {
+        equiposService.postNewTeam(equipoRequest);
     }
 
     // ----------------- DELETE -----------------
@@ -91,11 +91,11 @@ public class EquiposController {
 
     // ----------------- UPDATE -----------------
     @PatchMapping("/team/{id}")
-    public EquiposResponseDto patchTeam(
+    public void patchTeam(
             @PathVariable int id,
             @RequestBody EquiposRequestDto equipoRequest) { // Не @Valid!
 
-        return equiposService.updateTeam(id, equipoRequest);
+        equiposService.updateTeam(id, equipoRequest);
     }
 
 

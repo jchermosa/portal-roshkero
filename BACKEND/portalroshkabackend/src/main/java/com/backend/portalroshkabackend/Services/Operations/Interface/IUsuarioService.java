@@ -14,9 +14,7 @@ public interface IUsuarioService {
 
     void devolverDisponibilidad(Usuario usuario, float delta);
 
-    List<UsuarioAsignacionDto> updateUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto,
-            Map<Integer, Usuario> usuariosValidados);
+    List<UsuarioAsignacionDto> updateUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto);
 
-    List<UsuarioAsignacionDto> assignUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto,
-            Map<Integer, Usuario> usuariosValidados);
+    List<UsuarioAsignacionDto> assignUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto);
 }

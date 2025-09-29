@@ -53,8 +53,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public List<UsuarioAsignacionDto> updateUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto,
-            Map<Integer, Usuario> usuariosValidados) {
+    public List<UsuarioAsignacionDto> updateUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto) {
         Map<Integer, AsignacionUsuarioEquipo> actualesMap = asignacionUsuarioRepository
                 .findAllByEquipo_IdEquipo(equipo.getIdEquipo())
                 .stream()
@@ -64,7 +63,8 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
         if (usuariosDto != null) {
             for (UsuarioAsignacionDto uDto : usuariosDto) {
-                Usuario usuario = usuariosValidados.get(uDto.getIdUsuario());
+                Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
 
                 float viejoPorcentaje = actualesMap.getOrDefault(usuario.getIdUsuario(), new AsignacionUsuarioEquipo())
                         .getPorcentajeTrabajo();
@@ -105,13 +105,19 @@ public class UsuarioServiceImpl implements IUsuarioService {
         return result;
     }
 
-    public List<UsuarioAsignacionDto> assignUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto,
-            Map<Integer, Usuario> usuariosValidados) {
+    public List<UsuarioAsignacionDto> assignUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto) {
         List<UsuarioAsignacionDto> result = new ArrayList<>();
         if (usuariosDto != null) {
             for (UsuarioAsignacionDto uDto : usuariosDto) {
-                Usuario usuario = usuariosValidados.get(uDto.getIdUsuario());
-                usuario.setDisponibilidad(usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue());
+                Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
+
+                // Проверка и уменьшение доступности
+                int nuevaDisponibilidad = usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue();
+                if (nuevaDisponibilidad < 0) {
+                    throw new RuntimeException("Disponibilidad insuficiente para usuario: " + usuario.getIdUsuario());
+                }
+                usuario.setDisponibilidad(nuevaDisponibilidad);
                 usuarioRepository.save(usuario);
 
                 AsignacionUsuarioEquipo asignacion = new AsignacionUsuarioEquipo();

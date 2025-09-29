@@ -94,46 +94,51 @@ public class UsuariosEquipoImpl implements IUsuarioisEquipoService {
         @Override
         public UsuariosEquipoResponseDto addUsuarioToEquipo(Integer idEquipo, UsuarioEquipoRequestDto requestDto) {
 
-                // Проверка существования команды
+                // --- 1. Проверка существования команды ---
                 Equipos equipo = equiposRepository.findById(idEquipo)
                                 .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
 
-                // Проверка существования пользователя
+                // --- 2. Проверка существования пользователя ---
                 Usuario usuario = userRepository.findById(requestDto.getIdUsuario())
                                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-                // Проверка существования технологии
-                Tecnologias tecnologia = tecnologiaRepository.findById(requestDto.getIdTecnologia())
-                                .orElseThrow(() -> new RuntimeException("Tecnologia no encontrada"));
+                // --- 4. Получение текущих назначений пользователя ---
+                Integer porcentajeActualAsignado = asignacionUsuarioRepository
+                                .findByUsuario_IdUsuario(usuario.getIdUsuario())
+                                .stream()
+                                .mapToInt(AsignacionUsuarioEquipo::getPorcentajeTrabajo)
+                                .sum();
 
-                // Создание новой ассоциации
-                AsignacionUsuarioEquipo asignacion = new AsignacionUsuarioEquipo();
-                Integer porcentajeAsignado = requestDto.getPorcentajeTrabajo();
-                int disponibilidadActual = usuario.getDisponibilidad();
+                Integer disponibilidadActual = usuario.getDisponibilidad() == null ? 0 : usuario.getDisponibilidad();
 
-                if (porcentajeAsignado > disponibilidadActual) {
-                        throw new RuntimeException("El usuario no tiene suficiente disponibilidad");
+                // --- 5. Проверка, хватает ли доступности для нового назначения ---
+                if (porcentajeActualAsignado + requestDto.getPorcentajeTrabajo() > disponibilidadActual) {
+                        throw new RuntimeException(
+                                        "El usuario no tiene suficiente disponibilidad. Actual asignado: "
+                                                        + porcentajeActualAsignado + ", disponible: "
+                                                        + disponibilidadActual
+                                                        + ", requerido: " + requestDto.getPorcentajeTrabajo());
                 }
 
-                // Вычитаем проценты
-                usuario.setDisponibilidad(disponibilidadActual - porcentajeAsignado.intValue());
+                // --- 6. Вычитаем назначенный процент из доступности ---
+                usuario.setDisponibilidad(disponibilidadActual - requestDto.getPorcentajeTrabajo());
                 userRepository.save(usuario);
 
-                // Создаём назначение
+                // --- 7. Создание новой ассоциации ---
+                AsignacionUsuarioEquipo asignacion = new AsignacionUsuarioEquipo();
                 asignacion.setEquipo(equipo);
                 asignacion.setUsuario(usuario);
                 asignacion.setFechaEntrada(requestDto.getFechaEntrada());
                 asignacion.setFechaFin(requestDto.getFechaFin());
-                asignacion.setPorcentajeTrabajo(porcentajeAsignado);
+                asignacion.setPorcentajeTrabajo(requestDto.getPorcentajeTrabajo());
                 asignacion.setFechaCreacion(LocalDateTime.now());
 
                 asignacionUsuarioRepository.save(asignacion);
 
-                // Преобразуем в DTO
+                // --- 8. Преобразуем в DTO для возврата ---
                 UsuariosEquipoResponseDto response = new UsuariosEquipoResponseDto();
                 response.setIdAsignacionUsuarioEquipo(asignacion.getIdAsignacionUsuarioEquipo());
                 response.setIdUsuario(usuario);
-                response.setIdTecnologia(tecnologia);
                 response.setEquipos(equipo);
                 response.setFechaEntrada(asignacion.getFechaEntrada());
                 response.setFechaFin(asignacion.getFechaFin());

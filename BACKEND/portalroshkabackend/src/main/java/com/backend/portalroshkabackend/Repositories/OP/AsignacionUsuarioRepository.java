@@ -17,4 +17,5 @@ public interface AsignacionUsuarioRepository extends JpaRepository<AsignacionUsu
     Page<AsignacionUsuarioEquipo> findByEquipo_IdEquipo(Integer idEquipo, Pageable pageable);
     List<AsignacionUsuarioEquipo> findAllByEquipo_IdEquipo(Integer idEquipo);
     Optional<AsignacionUsuarioEquipo> findByEquipo_IdEquipoAndUsuario_IdUsuario(Integer idEquipo, Integer idUsuario);
+    List<AsignacionUsuarioEquipo> findByUsuario_IdUsuario(Integer idUsuario);
 }

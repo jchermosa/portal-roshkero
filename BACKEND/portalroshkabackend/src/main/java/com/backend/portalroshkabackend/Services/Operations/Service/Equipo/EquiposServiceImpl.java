@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Services.Operations.Service.Equipo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquiposService;
+import com.backend.portalroshkabackend.Services.Operations.Service.UsuarioServiceImpl;
 import com.backend.portalroshkabackend.tools.mapper.EquiposMapper;
 import com.backend.portalroshkabackend.tools.validator.TeamValidator;
 
@@ -40,6 +42,7 @@ public class EquiposServiceImpl implements IEquiposService {
         private final ITecnologiaEquiposService tecnologiaEquiposService;
         private final TeamValidator teamValidator;
         private final EquiposMapper equiposMapper;
+        private final UsuarioServiceImpl UsuarioServiceImpl;
 
         // сортировка страниц
         private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
@@ -51,13 +54,15 @@ public class EquiposServiceImpl implements IEquiposService {
                         IUsuarioService usuarioService,
                         ITecnologiaEquiposService tecnologiaEquiposService,
                         TeamValidator teamValidator,
-                        EquiposMapper equiposMapper) {
+                        EquiposMapper equiposMapper,
+                        UsuarioServiceImpl UsuarioServiceImpl) {
                 this.equiposRepository = equiposRepository;
                 this.clientesRepository = clientesRepository;
                 this.usuarioService = usuarioService;
                 this.tecnologiaEquiposService = tecnologiaEquiposService;
                 this.teamValidator = teamValidator;
                 this.equiposMapper = equiposMapper;
+                this.UsuarioServiceImpl = UsuarioServiceImpl;
 
                 sortingMap = new HashMap<>();
 
@@ -108,15 +113,21 @@ public class EquiposServiceImpl implements IEquiposService {
                                 page.getTotalElements());
         }
 
-        public EquiposResponseDto postNewTeam(EquiposRequestDto requestDto) {
+        @Override
+        public void postNewTeam(EquiposRequestDto requestDto) {
+                // --- 1. Валидация уникального имени и дат команды ---
                 teamValidator.validateUniqueName(requestDto.getNombre());
-                Usuario lider = teamValidator.validateLeader(requestDto.getIdLider());
-                Map<Integer, Usuario> usuariosValidados = teamValidator.validateUsers(requestDto.getUsuarios());
+                teamValidator.validateFechaInicioAntesDeLimite(requestDto);
 
+                // --- 2. Валидация лидера ---
+                Usuario lider = teamValidator.validateLeader(requestDto.getIdLider());
+
+                // --- 3. Создание команды ---
                 Equipos equipo = new Equipos();
                 equipo.setNombre(requestDto.getNombre().trim());
                 equipo.setLider(lider);
-                equipo.setCliente(Optional.ofNullable(requestDto.getIdCliente()).flatMap(clientesRepository::findById)
+                equipo.setCliente(Optional.ofNullable(requestDto.getIdCliente())
+                                .flatMap(clientesRepository::findById)
                                 .orElse(null));
                 equipo.setFechaInicio(requestDto.getFechaInicio());
                 equipo.setFechaLimite(requestDto.getFechaLimite());
@@ -124,44 +135,61 @@ public class EquiposServiceImpl implements IEquiposService {
                 equipo.setFechaCreacion(LocalDateTime.now());
                 Equipos savedEquipo = equiposRepository.save(equipo);
 
-                List<TecnologiasDto> tecnologias = tecnologiaEquiposService.updateTecnologiasEquipo(savedEquipo,
-                                requestDto.getIdTecnologias());
-                List<UsuarioAsignacionDto> usuarios = usuarioService.assignUsers(savedEquipo, requestDto.getUsuarios(),
-                                usuariosValidados);
+                // --- 4. Сохранение технологий команды ---
+                tecnologiaEquiposService.updateTecnologiasEquipo(savedEquipo, requestDto.getIdTecnologias());
 
-                return equiposMapper.toDto(savedEquipo, equiposMapper.toDto(lider), tecnologias, usuarios);
+                // --- 5. Валидация только дат пользователей ---
+                if (requestDto.getUsuarios() != null && !requestDto.getUsuarios().isEmpty()) {
+                        // Валидация дат пользователей
+                        teamValidator.validateFechasUsuarios(requestDto.getUsuarios());
+                }
+                // Назначение пользователей на команду и проверку процентов у них
+                usuarioService.assignUsers(savedEquipo, requestDto.getUsuarios());
         }
 
-        public EquiposResponseDto updateTeam(Integer id, EquiposRequestDto requestDto) {
+        @Override
+        public void updateTeam(Integer id, EquiposRequestDto requestDto) {
+                // Получаем команду
                 Equipos equipo = equiposRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Equipo not found"));
 
-                // update nombre, lider, cliente, fechas, estado
-                String nuevoNombre = Optional.ofNullable(requestDto.getNombre()).map(String::trim).orElse(null);
-                if (nuevoNombre != null && !nuevoNombre.equals(equipo.getNombre()))
+                // Обновление имени с валидацией уникальности
+                String nuevoNombre = Optional.ofNullable(requestDto.getNombre())
+                                .map(String::trim)
+                                .orElse(null);
+                if (nuevoNombre != null && !nuevoNombre.equals(equipo.getNombre())) {
                         teamValidator.validateUniqueName(nuevoNombre);
-                equipo.setNombre(nuevoNombre);
+                        equipo.setNombre(nuevoNombre);
+                }
+
+                // Валидация дат команды
+                teamValidator.validateFechaInicioAntesDeLimite(requestDto);
+
+                // Обновление лидера и клиента
                 equipo.setLider(teamValidator.validateLeader(requestDto.getIdLider()));
-                equipo.setCliente(Optional.ofNullable(requestDto.getIdCliente()).flatMap(clientesRepository::findById)
+                equipo.setCliente(Optional.ofNullable(requestDto.getIdCliente())
+                                .flatMap(clientesRepository::findById)
                                 .orElse(null));
+
+                // Обновление дат и статуса
                 Optional.ofNullable(requestDto.getFechaInicio()).ifPresent(equipo::setFechaInicio);
                 equipo.setFechaLimite(requestDto.getFechaLimite());
                 Optional.ofNullable(requestDto.getEstado())
                                 .ifPresent(e -> equipo.setEstado(EstadoActivoInactivo.valueOf(e)));
+
+                // Технологии
+                if (requestDto.getIdTecnologias() != null) {
+                        tecnologiaEquiposService.updateTecnologiasEquipo(equipo,
+                                        requestDto.getIdTecnologias());
+                }
+
+                // Validate users dates
+                if (requestDto.getUsuarios() != null && !requestDto.getUsuarios().isEmpty()) {
+                        teamValidator.validateFechasUsuarios(requestDto.getUsuarios());
+                }
+                usuarioService.updateUsers(equipo, requestDto.getUsuarios());
                 equiposRepository.save(equipo);
 
-                // tecnologias y usuarios
-                if (requestDto.getIdTecnologias() != null)
-                        tecnologiaEquiposService.updateTecnologiasEquipo(equipo, requestDto.getIdTecnologias());
-                Map<Integer, Usuario> usuariosValidados = teamValidator.validateUsers(requestDto.getUsuarios());
-                List<UsuarioAsignacionDto> usuariosDto = usuarioService.updateUsers(equipo, requestDto.getUsuarios(),
-                                usuariosValidados);
-
-                List<TecnologiasDto> tecnologias = tecnologiaEquiposService
-                                .getTecnologiasByEquipo(equipo.getIdEquipo());
-                UsuarioisResponseDto liderDto = equiposMapper.toDto(equipo.getLider());
-
-                return equiposMapper.toDto(equipo, liderDto, tecnologias, usuariosDto);
         }
 
         @Override
