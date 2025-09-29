@@ -4,7 +4,7 @@ import type {
   PageResponse,
   SolicitudUserItem,
 } from "../types";
-
+import { throwIfNotOk } from "../utils/http";
 /**
  * Listar solicitudes de dispositivos (SysAdmin, paginado).
  */
@@ -35,7 +35,7 @@ async function getSolicitudesDispositivoUsuario(
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!res.ok) throw new Error(await res.text());
+  await throwIfNotOk(res);
   return res.json();
 }
 
@@ -45,7 +45,7 @@ async function getSolicitudesDispositivoUsuario(
 async function acceptSolicitudDispositivo(
   token: string,
   idSolicitud: number
-): Promise<SolicitudDispositivoItem> {
+): Promise<void> {                         // 👈 ahora void
   const url = `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/accept`;
 
   const res = await fetch(url, {
@@ -53,8 +53,10 @@ async function acceptSolicitudDispositivo(
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  
+    await throwIfNotOk(res); 
+  
+  
 }
 
 /**
@@ -63,7 +65,7 @@ async function acceptSolicitudDispositivo(
 async function rejectSolicitudDispositivo(
   token: string,
   idSolicitud: number
-): Promise<SolicitudDispositivoItem> {
+): Promise<void> {                        
   const url = `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/reject`;
 
   const res = await fetch(url, {
@@ -71,8 +73,9 @@ async function rejectSolicitudDispositivo(
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  
+    await throwIfNotOk(res); 
+  
 }
 
 /**
@@ -93,11 +96,7 @@ async function createSolicitudDispositivo(
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) {
-    const txt = await res.text();
-    console.error("Error crear solicitud dispositivo:", res.status, txt);
-    throw new Error(txt || `HTTP ${res.status}`);
-  }
+  await throwIfNotOk(res);
   return res.json();
 }
 

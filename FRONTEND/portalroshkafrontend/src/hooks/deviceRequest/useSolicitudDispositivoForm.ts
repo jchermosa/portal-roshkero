@@ -1,71 +1,105 @@
-import { useState } from "react";
+// src/hooks/deviceRequest/useSolicitudDispositivoForm.ts
+import { useCallback, useState } from "react";
 import {
   acceptSolicitudDispositivo,
   rejectSolicitudDispositivo,
   createSolicitudDispositivo,
 } from "../../services/DeviceRequestService";
 import type { SolicitudDispositivoUI, UserSolDispositivoDto } from "../../types";
-import { mapAdminSolicitudToUI, mapUserSolicitudToUI } from "../../mappers/solicitudDispositivoMapper";
+import { mapUserSolicitudToUI } from "../../mappers/solicitudDispositivoMapper";
 
-export function useSolicitudDispositivoForm(token: string | null, id?: number, isSysAdmin: boolean = false) {
+export function useSolicitudDispositivoForm(
+  token: string | null,
+  id?: number,
+  isSysAdmin: boolean = false
+) {
   const isEditing = !!id;
 
   const [data, setData] = useState<SolicitudDispositivoUI | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Crear nueva solicitud (usuario normal)
-  const create = async (formData: UserSolDispositivoDto) => {
-     console.log("[Hook] create() called", { hasToken: !!token, formData }); 
-    if (!token) return;
-    console.warn("[Hook] sin token → no se hace fetch");   
+  // Crear (usuario)
+  const create = useCallback(async (formData: UserSolDispositivoDto) => {
+    if (!token) {
+      const msg = "No hay token de autenticación. Inicia sesión nuevamente.";
+      setError(msg);
+      throw new Error(msg);
+    }
     setLoading(true);
+    setError(null);
     try {
       const created = await createSolicitudDispositivo(token, formData);
-      const mapped = mapUserSolicitudToUI(created);
+      // opcional: map para feedback local; el refresh externo sigue siendo la fuente de verdad
+      const mapped = mapUserSolicitudToUI({
+        idSolicitud: (created as any).idSolicitud ?? 0,
+        tipoSolicitud: "DISPOSITIVO",
+        estado: (created as any).estado ?? "P",
+        comentario: (created as any).comentario ?? "",
+        fechaInicio: (created as any).fechaInicio ?? null,
+        fechaFin: (created as any).fechaFin ?? null,
+        cantDias: (created as any).cantDias ?? null,
+        idTipoDispositivo:
+          (created as any).idTipoDispositivo ??
+          (formData as any).id_tipo_dispositivo ??
+          null,
+      });
       setData(mapped);
       return mapped;
-    } catch (err: any) {
-      setError(err.message || "Error al crear la solicitud");
-      throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
-  // Aceptar solicitud (solo admin)
-  const accept = async () => {
-    if (!token || !id || !isSysAdmin) return;
+  // Aceptar (admin)
+  const accept = useCallback(async () => {
+    if (!token) {
+      const msg = "No hay token de autenticación.";
+      setError(msg);
+      throw new Error(msg);
+    }
+    if (!id || !isSysAdmin) {
+      const msg = "Operación no permitida.";
+      setError(msg);
+      throw new Error(msg);
+    }
     setLoading(true);
+    setError(null);
     try {
-      const updated = await acceptSolicitudDispositivo(token, id);
-      const mapped = mapAdminSolicitudToUI(updated);
-      setData(mapped);
-      return mapped;
+      await acceptSolicitudDispositivo(token, id); // 👈 ignoramos body
+      return true;                                 // 👈 el caller hará refresh()
     } catch (err: any) {
-      setError(err.message || "Error al aceptar la solicitud");
+      setError(err?.message || "Error al aceptar la solicitud");
       throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, id, isSysAdmin]);
 
-  // Rechazar solicitud (solo admin)
-  const reject = async () => {
-    if (!token || !id || !isSysAdmin) return;
+  // Rechazar (admin)
+  const reject = useCallback(async () => {
+    if (!token) {
+      const msg = "No hay token de autenticación.";
+      setError(msg);
+      throw new Error(msg);
+    }
+    if (!id || !isSysAdmin) {
+      const msg = "Operación no permitida.";
+      setError(msg);
+      throw new Error(msg);
+    }
     setLoading(true);
+    setError(null);
     try {
-      const updated = await rejectSolicitudDispositivo(token, id);
-      const mapped = mapAdminSolicitudToUI(updated);
-      setData(mapped);
-      return mapped;
+      await rejectSolicitudDispositivo(token, id); // 👈 ignoramos body
+      return true;                                 // 👈 el caller hará refresh()
     } catch (err: any) {
-      setError(err.message || "Error al rechazar la solicitud");
+      setError(err?.message || "Error al rechazar la solicitud");
       throw err;
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, id, isSysAdmin]);
 
   return {
     data,

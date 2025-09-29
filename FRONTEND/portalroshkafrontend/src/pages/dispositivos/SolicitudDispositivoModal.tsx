@@ -4,6 +4,8 @@ import { buildSolicitudDispositivoSections } from "../../config/forms/solicitudD
 import BaseModal from "../../components/BaseModal";
 import DynamicForm from "../../components/DynamicForm";
 import { mapFormToUserSolicitudDto } from "../../mappers/solicitudDispositivoMapper";
+import { useNavigate } from "react-router-dom";
+import { Alert } from "../../components/Alert";
 
 interface SolicitudDispositivoModalProps {
   token: string | null;
@@ -22,6 +24,8 @@ export default function SolicitudDispositivoModal({
   onClose,
   onSaved,
 }: SolicitudDispositivoModalProps) {
+  const navigate = useNavigate(); 
+
   const { data, create, accept, reject, loading, error, isEditing } =
     useSolicitudDispositivoForm(
       token,
@@ -42,12 +46,17 @@ export default function SolicitudDispositivoModal({
 
   // Handlers de gestión
   const handleAprobar = async () => {
-    if (!id) return;
+    const solicitudId =
+      typeof id === "string" ? parseInt(id, 10) : (id as number | undefined);
+
+    if (!solicitudId) return;
     try {
       await accept();
       onSaved?.();
+      navigate(`/dispositivos-asignados/nuevo?solicitudId=${solicitudId}`);
       onClose();
-    } catch {}
+    } catch {
+    }
   };
 
   const handleRechazar = async () => {
@@ -76,11 +85,8 @@ export default function SolicitudDispositivoModal({
         sections={sections}
         initialData={data ?? {}}
         onSubmit={async (formData) => {
-          console.log("[Modal] onSubmit fired", { formData, readonly, gestion }); 
           if (!readonly && !gestion) {
-            const dto = mapFormToUserSolicitudDto(formData); 
-            console.log("[Modal] token y DTO", { token, dto });     
-            console.log("DTO que se enviará:", dto);
+            const dto = mapFormToUserSolicitudDto(formData);
             await create(dto);
             onSaved?.();
             onClose();
@@ -90,7 +96,7 @@ export default function SolicitudDispositivoModal({
         readonly={readonly || gestion}
       />
 
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+     {error && <Alert kind="error">{error}</Alert>}
 
       <div className="flex justify-between mt-4">
         {gestion && !readonly ? (
@@ -104,10 +110,10 @@ export default function SolicitudDispositivoModal({
             </button>
             <button
               onClick={handleAprobar}
-              disabled={loading}
+              disabled={loading || !id}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
             >
-              {loading ? "Procesando..." : "Aprobar"}
+              {loading ? "Procesando..." : "Aprobar y asignar"}
             </button>
           </div>
         ) : (

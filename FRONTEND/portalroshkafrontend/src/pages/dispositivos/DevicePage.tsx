@@ -32,9 +32,9 @@ export default function DevicePage() {
     totalPages,
   } = useDispositivos(
     token,
-    { categoria, estado, encargado }, // Pasar filtros
-    page, // Pasar página actual
-    10 // pageSize
+    { categoria, estado, encargado },
+    page, 
+    10 
   );
 
   const limpiarFiltros = () => {
@@ -48,7 +48,7 @@ export default function DevicePage() {
 
   const renderActions = (d: DispositivoItem) => {
     if (tieneRol(user, Roles.OPERACIONES)) {
-      // Solo ver
+      
       return (
         <button
           onClick={() =>
