@@ -37,6 +37,12 @@ public class DispositivoController {
 
     // =======> LISTANDO
 
+    // Listar un solo dispositivo 
+    @GetMapping("/getDevice/{id}")
+    public DeviceDTO getDeviceById(@PathVariable Integer id) {
+        return dispositivoService.getDeviceById(id);
+    }
+
     // Obtener los tipos de dispositivos 
     @GetMapping("/getDeviceTypes")
     public Page<DeviceTypeDTO> getDeviceTypes(Pageable pageable) {
