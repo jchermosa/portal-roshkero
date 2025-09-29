@@ -100,7 +100,14 @@ public class DeviceRequest {
         dto.setFechaInicio(solicitud.getFechaInicio());
         // dto.setCantDias(solicitud.getCantDias());
         dto.setEstado(solicitud.getEstado());
-        dto.setComentario(solicitud.getComentario());
+
+        // Remover el ID del tipo de dispositivo del comentario (contenido entre paréntesis)
+        String comentarioLimpio = solicitud.getComentario();
+        if (comentarioLimpio != null) {
+            comentarioLimpio = comentarioLimpio.replaceFirst("^[\\(\\{]\\d+[\\)\\}]\\s*", "").trim();
+        }
+        dto.setComentario(comentarioLimpio);
+
         dto.setIdUsuario(solicitud.getUsuario().getIdUsuario());
         dto.setIdTipoDispositivo(solicitud.getIdSolicitud());
         return dto;
