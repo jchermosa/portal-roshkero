@@ -19,7 +19,7 @@ export function buildSolicitudDispositivoSections(
         {
           name: "comentario",
           label: "Comentario",
-          type: "textarea",
+          type: "text",
         },
       ],
     },

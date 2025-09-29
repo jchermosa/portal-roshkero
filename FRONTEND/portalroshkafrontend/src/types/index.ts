@@ -336,3 +336,29 @@ export interface SolicitudDispositivoUI {
   idTipoDispositivo?: number | null;
   fuente: "ADMINISTRADOR" | "USUARIO"; 
 }
+
+/** 
+* Clientes
+*/
+export type ClienteRequest = {
+  nombre: string;
+  nroTelefono: string;
+  correo: string;
+  ruc: string;
+};
+
+export type ClienteResponse = {
+  idCliente: number;
+  nombre: string;
+  nroTelefono: string;
+  correo: string;
+  ruc: string;
+  fechaCreacion: string; // ISO string; el backend envía LocalDateTime
+};
+
+export type ClientesPageResponse = {
+  content: ClienteResponse[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
+};
