@@ -120,8 +120,9 @@ public class DeviceRequest {
             return null;
         }
 
-        // Patrón regex para encontrar números entre paréntesis al inicio del string
-        Pattern pattern = Pattern.compile("^\\((\\d+)\\)");
+        // Patrón regex para encontrar números entre paréntesis o llaves al inicio del string
+        
+        Pattern pattern = Pattern.compile("^[\\(\\{](\\d+)[\\)\\}]");
         Matcher matcher = pattern.matcher(comentario.trim());
 
         if (matcher.find()) {
