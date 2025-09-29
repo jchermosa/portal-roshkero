@@ -32,7 +32,8 @@ export function useSolicitudesDispositivo(
       } else {
         // USUARIO → array simple
         const res = await getSolicitudesDispositivoUsuario(token);
-        setData(res.map(mapUserSolicitudToUI));
+        const onlyDevices = res.filter((s) => s.tipoSolicitud === "DISPOSITIVO");
+        setData(onlyDevices.map(mapUserSolicitudToUI));
         setTotalPages(1); // no hay paginación
       }
     } catch (err: any) {

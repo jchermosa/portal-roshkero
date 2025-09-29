@@ -54,6 +54,7 @@ export interface FormMessage {
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
+  id,
   sections,
   initialData = {},
   onSubmit,
@@ -311,7 +312,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   };
 
   return (
-    <form id="dynamic-form" onSubmit={handleSubmit} className={`flex flex-col h-full ${className}`}>
+    <form id={id ?? "dynamic-form"} onSubmit={handleSubmit} className={`flex flex-col h-full ${className}`}>
       {/* Mensajes */}
       {message && (
         <div

@@ -231,8 +231,8 @@ export interface SolicitudDispositivoItem {
 }
 
 export interface UserSolDispositivoDto {
-  id_tipo_dispositivo: number; // requerido
-  comentario?: string;         // opcional
+  id_tipo_dispositivo: number; 
+  comentario?: string;         
 }
 
 export interface TipoDispositivoItem {

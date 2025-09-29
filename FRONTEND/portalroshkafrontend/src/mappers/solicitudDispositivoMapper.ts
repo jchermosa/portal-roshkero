@@ -1,5 +1,18 @@
 import type { SolicitudDispositivoItem, SolicitudUserItem } from "../types";
 import type { SolicitudDispositivoUI } from "../types";
+import type { UserSolDispositivoDto } from "../types";
+
+/**
+ * Convierte el form (camelCase, strings) al DTO que espera el backend (snake_case, number).
+ */
+export function mapFormToUserSolicitudDto(form: Record<string, any>): UserSolDispositivoDto {
+  return {
+    id_tipo_dispositivo: Number(
+      form.idTipoDispositivo ?? form.id_tipo_dispositivo
+    ),
+    comentario: (form.comentario ?? "").toString().trim(),
+  };
+}
 
 /**
  * Mapper de SysAdmin → UI

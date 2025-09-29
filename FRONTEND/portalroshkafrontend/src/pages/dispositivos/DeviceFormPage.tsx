@@ -10,20 +10,20 @@ export default function DeviceFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-
-  // ✅ Hook de formulario de dispositivo
+const idParam = id ? parseInt(id, 10) : undefined;
+  // Hook de formulario de dispositivo
   const {
     data,
     loading,
     error,
     handleSubmit,
     isEditing,
-  } = useDispositivoForm(token, id);
+  } = useDispositivoForm(token, idParam);
 
-  // 🚀 Readonly
+  // Readonly
   const readonly = new URLSearchParams(location.search).get("readonly") === "true";
 
-  // ✅ Configuración de secciones
+  // Configuración de secciones
   const sections = buildDispositivoSections();
 
   return (

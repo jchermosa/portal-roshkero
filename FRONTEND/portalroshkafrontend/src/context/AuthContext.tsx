@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       setUser(basicUser);
 
-      const res = await fetch("/api/usuarios/me", {
+      const res = await fetch("/api/v1/usuarios/me", {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
 
