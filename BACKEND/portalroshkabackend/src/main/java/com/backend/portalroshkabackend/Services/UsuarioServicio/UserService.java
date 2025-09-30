@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Services.UsuarioServicio;
 
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCambContrasDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
@@ -27,6 +28,7 @@ import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoDisp
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -545,6 +547,36 @@ public class UserService {
             LocalDate.of(2028, 12, 8),  // Virgen de Caacupé
             LocalDate.of(2028, 12, 25)  // Navidad
         );
+    }
+
+    //servicio para actualizar contraseña del usuario actual
+    public boolean actualizarContrasena(UserCambContrasDto dto) {
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();// Instancia del codificador
+        
+        String nuevaContrasena = dto.getNuevaContrasena(); // Nueva contraseña en texto plano
+        String contrasenaActual = dto.getContrasenaActual(); // Contraseña actual en texto plano
+
+        if (!encoder.matches(contrasenaActual, usuario.getContrasena())) { // Verifica si la contraseña actual coincide
+            return false;
+        }
+
+        usuario.setContrasena(encoder.encode(nuevaContrasena)); // Actualiza la contraseña con la nueva codificada
+        usuarioRepository.save(usuario);
+        return true;
     }
 
     // Mapeo de Solicitud a SolicitudUserDto según el nuevo modelo
