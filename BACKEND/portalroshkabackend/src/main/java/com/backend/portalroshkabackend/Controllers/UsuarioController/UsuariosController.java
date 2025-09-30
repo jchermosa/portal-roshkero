@@ -16,9 +16,11 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateFoto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposBeneficiosDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposPermisosDto;
 import com.backend.portalroshkabackend.Services.UsuarioServicio.UserService;
+
 
 
 
@@ -108,6 +110,19 @@ public class UsuariosController {
         List<tiposBeneficiosDto> beneficios = userService.getTiposBeneficios();
         return ResponseEntity.ok(beneficios);
     }
+
+    @PostMapping("/actualizar_foto")
+    public ResponseEntity<?> actualizarFoto(@RequestBody UserUpdateFoto dto) {
+        
+        boolean actualizado = userService.actualizarFoto(dto);
+
+        if (actualizado) {
+            return ResponseEntity.ok("Foto actualizada correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No se pudo actualizar la foto");
+        }
+    }
+    
 
 
 }
