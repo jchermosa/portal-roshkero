@@ -16,6 +16,8 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposBeneficiosDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposPermisosDto;
 import com.backend.portalroshkabackend.Services.UsuarioServicio.UserService;
 
 
@@ -94,5 +96,18 @@ public class UsuariosController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("La contraseña actual es incorrecta");
         }
     }
+
+    @GetMapping("/tipos_permisos") // Endpoint para obtener las solicitudes del usuario actual 
+    public ResponseEntity<List<tiposPermisosDto>> getTiposPermisos() {
+        List<tiposPermisosDto> permisos = userService.getTiposPermisos();
+        return ResponseEntity.ok(permisos);
+    }
+
+    @GetMapping("/tipos_beneficios") // Endpoint para obtener las solicitudes del usuario actual 
+    public ResponseEntity<List<tiposBeneficiosDto>> getTiposBeneficios() {
+        List<tiposBeneficiosDto> beneficios = userService.getTiposBeneficios();
+        return ResponseEntity.ok(beneficios);
+    }
+
 
 }
