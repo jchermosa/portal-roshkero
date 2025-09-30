@@ -22,6 +22,8 @@ export function useAvailableDevicesOptions(
       params.set("sortBy", "default");
     }
 
+    console.log("PARAMS ",params.toString());
+
     fetch(`/api/v1/admin/sysadmin/devices/allDevicesWithoutOwner?${params.toString()}`, {
       headers: { Authorization: `Bearer ${token}` },
     })

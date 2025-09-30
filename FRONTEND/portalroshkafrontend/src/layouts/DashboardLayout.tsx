@@ -17,6 +17,7 @@ export default function DashboardLayout() {
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
+    { id: "/gestion-th", label: "Gestión TH", icon: "🧑‍💼", available: true },
     { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: true },
     { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: true },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: true},
@@ -28,6 +29,7 @@ export default function DashboardLayout() {
     { id: "/solicitud-dispositivo", label: "Solicitud Dispositivo", icon: "📱", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
     { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
+    { id: "/clientes", label: "Clientes", icon: "🏢", available: true },
    
   ].filter((o) => o.available);
 

@@ -25,7 +25,7 @@ async function getTipoDispositivoById(token: string, id: number): Promise<TipoDi
 
 // Crear nuevo tipo de dispositivo
 async function createTipoDispositivo(token: string, data: Partial<TipoDispositivoItem>): Promise<TipoDispositivoItem> {
-  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/deviceTypes/createType`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/deviceTypes/createTypeDevice`, {
     method: 'POST',
     headers: { 
       Authorization: `Bearer ${token}`,
