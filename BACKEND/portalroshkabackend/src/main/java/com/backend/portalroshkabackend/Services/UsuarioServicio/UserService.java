@@ -9,18 +9,22 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposBeneficiosDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposPermisosDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Solicitud;
+import com.backend.portalroshkabackend.Models.TipoBeneficios;
 import com.backend.portalroshkabackend.Models.TipoDispositivo;
 import com.backend.portalroshkabackend.Models.TipoPermisos;
 import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.AsigUsuarioEquipoRepository;
 // import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.BeneficiosAsignadosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.SolicitudesTHRepository;
-// import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoBeneficiosRepository;
+import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoBeneficiosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoPermisosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.UsuarioRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoDispositivosRepository;
@@ -50,8 +54,8 @@ public class UserService {
     @Autowired
     private TipoPermisosRepository tipoPermisosRepository;
 
-    // @Autowired
-    // private TipoBeneficiosRepository tipoBeneficiosRepository;
+    @Autowired
+    private TipoBeneficiosRepository tipoBeneficiosRepository;
 
     @Autowired
     private SolicitudesTHRepository solicitudesTHRepository;
@@ -183,6 +187,48 @@ public class UserService {
                 .map(this::mapSolicitudToDto)
                 .collect(Collectors.toList());
     }
+
+    public List<tiposPermisosDto> getTiposPermisos() {
+        List<TipoPermisos> tiposPermisos = tipoPermisosRepository.findAll();
+
+        // Mapea cada TipoPermisos a tiposPermisosDto
+        return tiposPermisos.stream()
+                .map(this::mapTipoPermisosToDto)
+                .collect(Collectors.toList());
+    }
+
+    private tiposPermisosDto mapTipoPermisosToDto(TipoPermisos tipoPermisos) {
+        tiposPermisosDto dto = new tiposPermisosDto();
+        dto.setIdTipoPermiso(tipoPermisos.getIdTipoPermiso());
+        dto.setNombre(tipoPermisos.getNombre());
+        dto.setCantDias(tipoPermisos.getCantDias());
+        dto.setObservaciones(tipoPermisos.getObservaciones());
+        dto.setRemunerado(tipoPermisos.getRemunerado());
+        dto.setFuerzaMenor(tipoPermisos.getFuerzaMenor());
+        return dto;
+    }
+
+    public List<tiposBeneficiosDto> getTiposBeneficios() {
+
+        // Obtiene todos los tipos de beneficios con vigencia Activa desde el repositorio
+        // List<TipoBeneficios> tiposBeneficios = tipoBeneficiosRepository.findAll();
+        List<TipoBeneficios> tiposBeneficios = tipoBeneficiosRepository.findByVigencia(EstadoActivoInactivo.A);
+
+        // Mapea cada TipoBeneficios a tiposBeneficiosDto
+        return tiposBeneficios.stream()
+                .map(this::mapTipoBeneficiosToDto)
+                .collect(Collectors.toList());
+    }
+
+    private tiposBeneficiosDto mapTipoBeneficiosToDto(TipoBeneficios tipoBeneficios) {
+        tiposBeneficiosDto dto = new tiposBeneficiosDto();
+        dto.setIdTipoBeneficio(tipoBeneficios.getIdTipoBeneficio());
+        dto.setNombre(tipoBeneficios.getNombre());
+        dto.setDescripcion(tipoBeneficios.getDescripcion());
+        dto.setMontoMaximo(tipoBeneficios.getMontoMaximo());
+        return dto;
+    }
+
 
     public UserSolPermisoDto crearPermisoUsuarioActual(UserSolPermisoDto solPermisoDto) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
