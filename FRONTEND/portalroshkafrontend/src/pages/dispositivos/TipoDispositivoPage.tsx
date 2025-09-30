@@ -1,4 +1,3 @@
-// src/pages/dispositivos/TipoDispositivoPage.tsx
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useTiposDispositivo } from "../../hooks/dispositivos/useTiposDispositivo";
@@ -64,7 +63,7 @@ export default function TipoDispositivoPage() {
       <DataTable
         data={dispositivos}
         columns={columns}
-        rowKey={(d) => d.id_tipo_dispositivo}
+        rowKey={(d) => d.idTipoDispositivo}
         actions={renderActions}
         scrollable={false}
       />
@@ -79,7 +78,7 @@ export default function TipoDispositivoPage() {
       {showModal && (
         <TipoDispositivoModal
           token={token}
-          id={selected?.id_tipo_dispositivo}
+          id={selected?.idTipoDispositivo}
           onClose={() => setShowModal(false)}
           onSaved={refresh}
         />

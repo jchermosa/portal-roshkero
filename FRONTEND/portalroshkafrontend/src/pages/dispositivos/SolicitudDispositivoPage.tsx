@@ -92,7 +92,7 @@ export default function SolicitudDispositivoPage({ embedded = false, forceSysAdm
         <SolicitudDispositivoModal
           token={token}
           id={selected?.idSolicitud}
-          gestion={isSysAdmin} // 🔹 ahora usamos el rol real, no el campo fuente
+          gestion={isSysAdmin} 
           onClose={() => setShowModal(false)}
           onSaved={refresh}
         />

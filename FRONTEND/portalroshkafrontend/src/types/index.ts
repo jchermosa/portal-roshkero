@@ -362,3 +362,77 @@ export type ClientesPageResponse = {
   totalItems: number;
   totalPages: number;
 };
+
+export interface PageSpring<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number; 
+  size: number;
+  first?: boolean;
+  last?: boolean;
+  numberOfElements?: number;
+  empty?: boolean;
+}
+
+// Cargos
+export interface CargoListItem {
+  idCargo: number;
+  nombre: string;
+}
+
+/** Detalle de cargo (GET /th/cargos/{idCargo}) */
+export interface CargoDetail {
+  idCargo: number;
+  nombre: string;
+  empleadosAsignados: UsuarioSimple[]; 
+}
+
+/** Representación mínima del UsuarioSimpleDto del back */
+export interface UsuarioSimple {
+  idUsuario: number;
+  nombre: string;
+}
+
+/** Insert/Update DTO (POST/PUT) */
+export interface CargoInsert {
+  nombre: string;
+}
+
+/** Respuesta por defecto */
+export interface CargoActionResponse {
+  idCargo: number;
+  message: string;
+}
+
+
+//Roles
+export interface RolListItem {
+  idRol: number;
+  nombre: string;
+}
+
+/** Detalle (GET /th/roles/{idRol}) */
+export interface RolDetail {
+  idRol: number;
+  nombre: string;
+  empleadosAsignados: UsuarioSimple[];
+}
+
+
+export interface UsuarioSimple {
+  idUsuario: number;
+  nombre: string;
+}
+
+/** Insert/Update DTO (POST/PUT) */
+export interface RolInsert {
+  nombre: string;
+}
+
+/** Respuesta del back en create/update/delete */
+export interface RolActionResponse {
+  idRol: number;
+  message: string;
+}
+
