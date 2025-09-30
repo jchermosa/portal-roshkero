@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useSolicitudesTH, type SolicitudData } from "../../hooks/solicitudes/useSolicitudesTH";
+import { useSolicitudesTH } from "../../hooks/solicitudes/useSolicitudesTH";
 import { useCatalogosSolicitudes } from "../../hooks/catalogos/useCatalogosSolicitudes";
 import { tieneRol } from "../../utils/permisos";
 import { Roles } from "../../types/roles";
@@ -11,6 +11,7 @@ import PaginationFooter from "../../components/PaginationFooter";
 import SelectDropdown from "../../components/SelectDropdown";
 import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
+import type { SolicitudItem } from "../../types/";
 
 export default function SolicitudesTHPage() {
   const { token, user } = useAuth();
@@ -53,21 +54,49 @@ export default function SolicitudesTHPage() {
 
   // Columnas
   const columns = [
-    { key: "id", label: "ID" },
-    { key: "usuario", label: "Usuario", render: (s: SolicitudData) => `${s.nombre} ${s.apellido}`.trim() || "—" },
-    { key: "tipo", label: "Tipo", render: (s: SolicitudData) => s.tipoNombre || "—" },
-    { key: "estado", label: "Estado", render: (s: SolicitudData) => {
+    { key: "idSolicitud", label: "ID" },
+    {
+      key: "usuario",
+      label: "Usuario",
+      render: (s: SolicitudItem) => {
+        const [nombre, ...apellidoArr] = s.usuario.split(" ");
+        const apellido = apellidoArr.join(" ");
+        return `${nombre} ${apellido}`.trim();
+      },
+    },
+    {
+      key: "tipoSolicitud",
+      label: "Tipo",
+      render: (s: SolicitudItem) => s.tipoSolicitud,
+    },
+    {
+      key: "estado",
+      label: "Estado",
+      render: (s: SolicitudItem) => {
         const estados = { P: "Pendiente", A: "Aprobada", R: "Rechazada" };
-        const colores = { P: "bg-yellow-100 text-yellow-700", A: "bg-green-100 text-green-700", R: "bg-red-100 text-red-700" };
-        return <span className={`px-2 py-1 text-xs font-medium rounded-full ${colores[s.estado] || "bg-gray-100 text-gray-700"}`}>{estados[s.estado] || s.estado}</span>
-    }},
+        const colores = {
+          P: "bg-yellow-100 text-yellow-700",
+          A: "bg-green-100 text-green-700",
+          R: "bg-red-100 text-red-700",
+        };
+        return (
+          <span
+            className={`px-2 py-1 text-xs font-medium rounded-full ${
+              colores[s.estado] || "bg-gray-100 text-gray-700"
+            }`}
+          >
+            {estados[s.estado] || s.estado}
+          </span>
+        );
+      },
+    },
   ];
 
-  const renderActions = (s: SolicitudData) => {
+  const renderActions = (s: SolicitudItem) => {
     if (s.estado === "P") {
       return (
         <button
-          onClick={() => navigate(`/solicitudes/${s.id}/evaluar`)}
+          onClick={() => navigate(`/solicitudesTH/${s.idSolicitud}/evaluar`)}
           className="w-16 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition-colors duration-200"
         >
           Evaluar
@@ -76,7 +105,7 @@ export default function SolicitudesTHPage() {
     } else {
       return (
         <button
-          onClick={() => navigate(`/solicitudes/${s.id}/ver`)}
+          onClick={() => navigate(`/solicitudesTH/${s.idSolicitud}/ver`)}
           className="w-16 px-3 py-1 bg-gray-400 text-white rounded-lg text-xs hover:bg-gray-500 transition-colors duration-200"
         >
           Ver
@@ -84,7 +113,6 @@ export default function SolicitudesTHPage() {
       );
     }
   };
-
 
   if (!puedeVerSolicitudes) return <p>No tenés permisos para ver esta página.</p>;
   if (loading || loadingCatalogos) return <p>Cargando solicitudes...</p>;
@@ -99,8 +127,6 @@ export default function SolicitudesTHPage() {
   return (
     <PageLayout title="Gestión de Solicitudes">
       <div className="flex items-center gap-4 mb-4">
-
-        {/* Tipo específico solo si hay opciones */}
         {tipoSolicitud && opcionesTipoEspecifico.length > 0 && (
           <SelectDropdown
             name="tipoEspecifico"
@@ -112,7 +138,6 @@ export default function SolicitudesTHPage() {
           />
         )}
 
-        {/* Filtro por estado */}
         <SelectDropdown
           name="estado"
           label="Estado"
@@ -134,7 +159,7 @@ export default function SolicitudesTHPage() {
       <DataTable
         data={solicitudes}
         columns={columns}
-        rowKey={(s) => s.id}
+        rowKey={(s) => s.idSolicitud}
         actions={renderActions}
         scrollable={false}
       />

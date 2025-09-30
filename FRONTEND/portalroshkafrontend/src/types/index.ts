@@ -26,39 +26,17 @@ export interface UsuarioItem {
   antiguedadPretty?: string; 
 }
 
-export type SolicitudEstado = "P" | "A" | "R";
 
-export interface LiderItem {
-  id: number;
-  nombre: string;
-  aprobado: boolean;
+
+export interface SolicitudItem {
+  idSolicitud: number;
+  usuario: string;                  // nombre completo
+  tipoSolicitud: "PERMISO" | "BENEFICIO";
+  fechaInicio: string;
+  cantidadDias: number | null;
+  fechaCreacion: string;
+  estado: "P" | "A" | "R";
 }
-
-
-export interface SolicitudBase {
-  id: number;
-  id_usuario: number;
-  nombre: string;
-  apellido: string;
-  tipo_solicitud: "PERMISO" | "BENEFICIO";
-  subtipo: { id: number; nombre: string };
-  comentario?: string;
-  estado: "P" | "A" | "R"; // Pendiente, Aprobada, Rechazada
-}
-
-// Solicitud de permisos
-export interface SolicitudPermiso extends SolicitudBase {
-  lider: { id: number; nombre: string; apellido: string };
-  cantidad_dias: number;
-  fecha_inicio: string;
-  fecha_fin: string;
-}
-
-// Solicitud de beneficios (solo tiene lo de base, sin extras)
-export interface SolicitudBeneficio extends SolicitudBase {}
-
-// Unión
-export type SolicitudItem = SolicitudPermiso | SolicitudBeneficio;
 
 export interface EquipoItem {
   id: number;

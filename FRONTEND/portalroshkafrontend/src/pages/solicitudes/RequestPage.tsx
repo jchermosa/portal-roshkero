@@ -1,103 +1,57 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-import SelectDropdown from "../components/SelectDropdown";
-import DataTable from "../components/DataTable";
-import PaginationFooter from "../components/PaginationFooter";
-import IconButton from "../components/IconButton";
-import rawPermisos from "../data/mockSolicitudPermiso.json";
-import rawBeneficios from "../data/mockSolicitudBeneficios.json";
-import type { SolicitudItem } from "../types";
-=======
 import SelectDropdown from "../../components/SelectDropdown";
 import DataTable from "../../components/DataTable";
 import PaginationFooter from "../../components/PaginationFooter";
 import IconButton from "../../components/IconButton";
-import rawSolicitudes from "../../data/mockSolicitudes.json";
-import type { SolicitudItem } from "../../types";
->>>>>>> f55da6450365035892de2d564de124cb6bd6a42c
+import { useSolicitudesPermiso } from "../../hooks/solicitudes/useRequestPage";
+import type { SolicitudPermiso } from "../../types";
 
 export default function RequestPage() {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [solicitudes, setSolicitudes] = useState<SolicitudItem[]>([]);
-  const [tipo, setTipo] = useState<string>("");
+  const [subtipo, setSubtipo] = useState<string>("");
   const [page, setPage] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const modoDesarrollo = true;
-
-  // Combinar mock de permisos y beneficios
-  const mockSolicitudes: SolicitudItem[] = [
-    ...(rawPermisos as SolicitudItem[]),
-    ...(rawBeneficios as SolicitudItem[]),
-  ];
-
-  useEffect(() => {
-    if (modoDesarrollo) {
-      const solicitudesFiltradas = mockSolicitudes.filter(
-        (s) => !tipo || s.subtipo.nombre === tipo
-      );
-
-      setSolicitudes(solicitudesFiltradas);
-      setTotalPages(1);
-      setLoading(false);
-      return;
-    }
-
-    if (!token || !user?.id) return;
-
-    setLoading(true);
-    setSolicitudes([]);
-
-    const params = new URLSearchParams();
-    params.append("usuarioId", user.id.toString());
-    if (tipo) params.append("tipo", tipo);
-    params.append("page", page.toString());
-    params.append("size", "10");
-
-    fetch(`/api/solicitudes?${params.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(await res.text());
-        return res.json();
-      })
-      .then((data) => {
-        setSolicitudes(data.content);
-        setTotalPages(data.totalPages);
-      })
-      .catch((err) => {
-        setError("Error al cargar solicitudes: " + err.message);
-      })
-      .finally(() => setLoading(false));
-  }, [token, user?.id, tipo, page]);
+  // Hook para obtener solicitudes de permiso del usuario
+  const { solicitudes, totalPages, loading, error } = useSolicitudesPermiso(
+    page,
+    subtipo || undefined
+  );
 
   const limpiarFiltros = () => {
-    setTipo("");
+    setSubtipo("");
     setPage(0);
   };
 
   const columns = [
-<<<<<<< HEAD
     { key: "id", label: "ID" },
-    { key: "tipo_solicitud", label: "Categoría" },
     {
       key: "subtipo",
-      label: "Subtipo",
-      render: (s: SolicitudItem) => s.subtipo?.nombre ?? "—",
+      label: "Tipo de Permiso",
+      render: (s: SolicitudPermiso) => s.subtipo?.nombre ?? "—",
     },
-    { key: "comentario", label: "Comentario" },
+    {
+      key: "cantidad_dias",
+      label: "Días",
+      render: (s: SolicitudPermiso) => s.cantidad_dias,
+    },
+    {
+      key: "fecha_inicio",
+      label: "Fecha Inicio",
+      render: (s: SolicitudPermiso) => s.fecha_inicio,
+    },
+    {
+      key: "lider",
+      label: "Líder Asignado",
+      render: (s: SolicitudPermiso) => `${s.lider?.nombre} ${s.lider?.apellido}`.trim() || "—",
+    },
     {
       key: "estado",
       label: "Estado",
-      render: (s: SolicitudItem) => {
+      render: (s: SolicitudPermiso) => {
         const estados = { P: "Pendiente", A: "Aprobado", R: "Rechazado" };
         const colores = {
           P: "bg-yellow-100 text-yellow-700",
@@ -113,64 +67,32 @@ export default function RequestPage() {
         );
       },
     },
-    {
-      key: "acciones",
-      label: "Acciones",
-      render: (s: SolicitudItem) => (
-        <button
-          onClick={() => navigate(`/requests/${s.id}`)}
-          className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
-=======
-  {
-    key: "id",
-    label: "ID",
-  },
-  {
-    key: "tipo",
-    label: "Tipo",
-    render: (s: SolicitudItem) => s.tipo?.nombre ?? "—",
-  },
-  {
-    key: "comentario",
-    label: "Comentario",
-  },
-  {
-    key: "estado",
-    label: "Estado",
-    render: (s: SolicitudItem) => {
-      const estados = { P: "Pendiente", A: "Aprobado", R: "Rechazado" };
-      const colores = {
-        P: "bg-yellow-100 text-yellow-700",
-        A: "bg-green-100 text-green-700",
-        R: "bg-red-100 text-red-700",
-      };
-      return (
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${colores[s.estado]}`}
->>>>>>> f55da6450365035892de2d564de124cb6bd6a42c
-        >
-          Ver / Editar
-        </button>
-      ),
-    },
   ];
 
-  if (loading) return <p>Cargando solicitudes...</p>;
-  if (error) return <p>{error}</p>;
+  const renderActions = (s: SolicitudPermiso) => (
+    <button
+      onClick={() => navigate(`/requests/${s.id}`)}
+      className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
+      disabled={loading}
+    >
+      {s.estado === "P" ? "Ver / Editar" : "Ver"}
+    </button>
+  );
 
-  const tiposUnicos: { value: string; label: string }[] =
-    solicitudes.length > 0
-      ? Array.from(
-          new Set(
-            solicitudes
-              .map((s) => s.subtipo?.nombre)
-              .filter((nombre): nombre is string => typeof nombre === "string")
-          )
-        ).map((nombre) => ({
-          value: nombre,
-          label: nombre,
-        }))
-      : [];
+  if (loading) return <p>Cargando solicitudes...</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
+
+  // Generar opciones de filtro de subtipo basado en los datos actuales
+  const subtiposUnicos = Array.from(
+    new Set(
+      solicitudes
+        .map((s) => s.subtipo?.nombre)
+        .filter((nombre): nombre is string => typeof nombre === "string")
+    )
+  ).map((nombre) => ({
+    value: nombre,
+    label: nombre,
+  }));
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -191,7 +113,7 @@ export default function RequestPage() {
           <div className="p-6 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-brand-blue">
-                Mis Solicitudes
+                Mis Solicitudes de Permiso
               </h2>
               <IconButton
                 label="Nueva Solicitud"
@@ -204,12 +126,12 @@ export default function RequestPage() {
 
             <div className="flex items-center gap-4">
               <SelectDropdown
-                label="Subtipo"
-                name="tipo"
-                value={tipo}
-                onChange={(e) => setTipo(e.target.value)}
-                options={tiposUnicos}
-                placeholder="Filtrar por subtipo"
+                label="Tipo de Permiso"
+                name="subtipo"
+                value={subtipo}
+                onChange={(e) => setSubtipo(e.target.value)}
+                options={subtiposUnicos}
+                placeholder="Filtrar por tipo"
               />
 
               <div className="mb-4">
@@ -232,6 +154,7 @@ export default function RequestPage() {
               data={solicitudes}
               columns={columns}
               rowKey={(s) => s.id}
+              actions={renderActions}
               scrollable={false}
             />
           </div>

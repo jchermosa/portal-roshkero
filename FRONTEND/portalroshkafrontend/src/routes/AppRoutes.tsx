@@ -26,6 +26,7 @@ import DeviceAssignmentsPage from "../pages/dispositivos/DeviceAssignmentsPage.t
 import DeviceAssignmentsFormPage from "../pages/dispositivos/DeviceAssignmentFormPage.tsx";
 import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
 import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
+import RequestViewPage from "../pages/solicitudes/RequestViewPage.tsx";
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -48,6 +49,8 @@ export default function AppRoutes() {
           <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage />} />
           <Route path="/solicitudesTH/permisos" element={<RequestManagementPage/>} />
           <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage/>} />
+          <Route path="/solicitudesTH/:id/ver" element={<RequestViewPage/>}/>
+      <Route path="/solicitudesTH/:id/evaluar" element={<RequestViewPage/>}/>
 
           {/* Usuarios */}
           <Route path="/usuarios" element={<UsuariosPage />} />

@@ -1,37 +1,28 @@
 // src/hooks/solicitudes/useSolicitudesTH.ts
 import { useState, useEffect } from "react";
-import { getSolicitudesTH } from "../../services/RequestService";
+import { getSolicitudes } from "../../services/RequestTHService";
+import mockSolicitudes from "../../data/mockSolicitudes.json";
+import type { SolicitudItem } from "../../types";
 
-// Importar los mocks actualizados
-import mockPermisos from "../../data/mockSolicitudPermiso.json";
-import mockBeneficios from "../../data/mockSolicitudBeneficios.json";
-
-// Tipo normalizado que usará la tabla
-export interface SolicitudData {
-  id: number;
-  nombre: string;
-  apellido: string;
-  tipoNombre: string;
-  cantidad_dias?: number | null;
-  fecha_inicio?: string | null;
-  fecha_fin?: string | null;
-  estado: "P" | "A" | "R";
-  comentario?: string;
+interface FiltrosTH {
+  tipoSolicitud?: "PERMISO" | "BENEFICIO";
+  tipoId?: string;
+  estado?: string;
+  usuarioNombre?: string;
 }
 
 export function useSolicitudesTH(
   token: string | null,
-  filtros: Record<string, string | undefined>,
+  filtros: FiltrosTH,
   page: number,
   size: number = 10
 ) {
-  const [data, setData] = useState<SolicitudData[]>([]);
+  const [data, setData] = useState<SolicitudItem[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Cambiar a false en producción
-  const modoDesarrollo = true;
+  const modoDesarrollo = true; // cambiar a false en producción
 
   useEffect(() => {
     if (!token) {
@@ -43,41 +34,39 @@ export function useSolicitudesTH(
     setLoading(true);
     setError(null);
 
+    // -----------------------
+    // MODO DESARROLLO (MOCKS)
+    // -----------------------
     if (modoDesarrollo) {
       setTimeout(() => {
         try {
-          let rawData: any[] = [];
+          let rawData: any[] = [...(mockSolicitudes as any[])];
 
-          // Seleccionar dataset según filtro
-          if (filtros.tipoSolicitud === "PERMISO") {
-            rawData = [...(mockPermisos as any[])];
-          } else if (filtros.tipoSolicitud === "BENEFICIO") {
-            rawData = [...(mockBeneficios as any[])];
-          } else {
-            rawData = [
-              ...(mockPermisos as any[]),
-              ...(mockBeneficios as any[]),
-            ];
-          }
-
-          // Filtros adicionales
-          if (filtros.tipoId) {
+          // Filtro por tipoSolicitud (PERMISO/BENEFICIO)
+          if (filtros.tipoSolicitud) {
             rawData = rawData.filter(
-              (s) => s.subtipo?.id === Number(filtros.tipoId)
+              (s) => (s.tipoSolicitud ?? s.tipo_solicitud) === filtros.tipoSolicitud
             );
           }
 
+          // Filtro por tipoId (subtipo)
+          if (filtros.tipoId) {
+            rawData = rawData.filter((s) => s.id_subtipo === Number(filtros.tipoId));
+          }
+
+          // Filtro por estado
+          if (filtros.estado) {
+            rawData = rawData.filter((s) => s.estado === filtros.estado);
+          }
+
+          // Filtro por nombre de usuario
           if (filtros.usuarioNombre) {
             const searchText = filtros.usuarioNombre.toLowerCase();
             rawData = rawData.filter(
               (s) =>
-                s.nombre?.toLowerCase().includes(searchText) ||
-                s.apellido?.toLowerCase().includes(searchText)
+                `${s.nombre ?? ""} ${s.apellido ?? ""}`.toLowerCase().includes(searchText) ||
+                (s.usuario ?? "").toLowerCase().includes(searchText)
             );
-          }
-
-          if (filtros.estado) {
-            rawData = rawData.filter((s) => s.estado === filtros.estado);
           }
 
           // Paginación
@@ -85,23 +74,21 @@ export function useSolicitudesTH(
           const start = page * size;
           const paginatedData = rawData.slice(start, start + size);
 
-          // Normalizar al formato de tabla
-          const normalizedData: SolicitudData[] = paginatedData.map((s) => ({
-            id: s.id,
-            nombre: s.nombre,
-            apellido: s.apellido,
-            tipoNombre: s.subtipo?.nombre ?? s.tipo_solicitud,
-            cantidad_dias: s.cantidad_dias ?? null,
-            fecha_inicio: s.fecha_inicio ?? null,
-            fecha_fin: s.fecha_fin ?? null,
+          // Normalización a SolicitudItem
+          const normalizedData: SolicitudItem[] = paginatedData.map((s) => ({
+            idSolicitud: s.idSolicitud ?? s.id,
+            usuario: s.usuario ?? `${s.nombre ?? ""} ${s.apellido ?? ""}`.trim(),
+            tipoSolicitud: s.tipoSolicitud ?? s.tipo_solicitud,
+            fechaInicio: s.fechaInicio ?? s.fecha_inicio,
+            cantidadDias: s.cantidadDias ?? s.cantidad_dias ?? 0,
+            fechaCreacion: s.fechaCreacion ?? s.fecha_creacion ?? new Date().toISOString(),
             estado: s.estado,
-            comentario: s.comentario ?? "",
           }));
 
           setData(normalizedData);
           setTotalPages(Math.ceil(totalElements / size));
         } catch (err) {
-          console.error("Error procesando mock:", err);
+          console.error("Error procesando mocks:", err);
           setError("Error al procesar datos mock");
         } finally {
           setLoading(false);
@@ -111,7 +98,9 @@ export function useSolicitudesTH(
       return;
     }
 
-    // Fetch real del backend
+    // -----------------------
+    // PRODUCCIÓN (API REAL)
+    // -----------------------
     const fetchData = async () => {
       try {
         const params = {
@@ -120,18 +109,16 @@ export function useSolicitudesTH(
           size,
         };
 
-        const response = await getSolicitudesTH(token, params);
-
-        const normalizedData: SolicitudData[] = response.content.map((s: any) => ({
-          id: s.id,
-          nombre: s.nombre,
-          apellido: s.apellido,
-          tipoNombre: s.subtipo?.nombre ?? s.tipo_solicitud,
-          cantidad_dias: s.cantidad_dias ?? null,
-          fecha_inicio: s.fecha_inicio ?? null,
-          fecha_fin: s.fecha_fin ?? null,
+        const response = await getSolicitudes(token, params);
+        
+        const normalizedData: SolicitudItem[] = response.content.map((s: any) => ({
+          idSolicitud: s.idSolicitud ?? s.id,
+          usuario: s.usuario ?? `${s.nombre ?? ""} ${s.apellido ?? ""}`.trim(),
+          tipoSolicitud: s.tipoSolicitud ?? s.tipo_solicitud,
+          fechaInicio: s.fechaInicio ?? s.fecha_inicio,
+          cantidadDias: s.cantidadDias ?? s.cantidad_dias ?? 0,
+          fechaCreacion: s.fechaCreacion ?? s.fecha_creacion ?? new Date().toISOString(),
           estado: s.estado,
-          comentario: s.comentario ?? "",
         }));
 
         setData(normalizedData);
@@ -146,10 +133,5 @@ export function useSolicitudesTH(
     fetchData();
   }, [token, JSON.stringify(filtros), page, size, modoDesarrollo]);
 
-  return {
-    data,
-    totalPages,
-    loading,
-    error,
-  };
+  return { data, totalPages, loading, error };
 }

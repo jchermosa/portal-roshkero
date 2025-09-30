@@ -1,35 +1,33 @@
-import type { SolicitudItem } from "../types";
-import mockPermisos from "../data/mockSolicitudPermiso.json";
-import mockBeneficios from "../data/mockSolicitudBeneficios.json";
+import type { SolicitudItem} from "../types";
+import mockSolicitudes from "../data/mockSolicitudes.json";
+
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
-// ================================
-// Respuesta estándar de Spring
-// ================================
 export interface PaginatedResponse<T> {
   content: T[];
   totalPages: number;
   totalElements: number;
   size: number;
-  number: number; // página actual
+  number: number;
 }
 
 // ================================
-// Métodos reales (API)
+// API Methods
 // ================================
-
-// Listado paginado de todas las solicitudes (para TH)
-async function getSolicitudesApi(
+async function getSolicitudesUsuarioApi(
   token: string,
+  usuarioId: number,
   params: Record<string, string | number | undefined> = {}
 ): Promise<PaginatedResponse<SolicitudItem>> {
   const query = new URLSearchParams();
+  query.append("usuarioId", usuarioId.toString());
+  
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== "") query.append(k, String(v));
   });
 
-  const res = await fetch(`/api/solicitudes/todas?${query.toString()}`, {
+  const res = await fetch(`/api/solicitudes/usuario?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -37,18 +35,20 @@ async function getSolicitudesApi(
   return res.json();
 }
 
-// Solo solicitudes de PERMISO
-async function getSolicitudesPermisoApi(
+async function getSolicitudesPermisoUsuarioApi(
   token: string,
+  usuarioId: number,
   params: Record<string, string | number | undefined> = {}
 ): Promise<PaginatedResponse<SolicitudItem>> {
   const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
+  query.append("usuarioId", usuarioId.toString());
   query.append("tipo", "PERMISO");
+  
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== "") query.append(k, String(v));
+  });
 
-  const res = await fetch(`/api/solicitudes/todas?${query.toString()}`, {
+  const res = await fetch(`/api/solicitudes/usuario?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -56,7 +56,6 @@ async function getSolicitudesPermisoApi(
   return res.json();
 }
 
-// Obtener una solicitud por ID
 async function getSolicitudByIdApi(
   token: string,
   id: string
@@ -69,156 +68,151 @@ async function getSolicitudByIdApi(
   return res.json();
 }
 
-// Aprobar solicitud
-async function aprobarSolicitudApi(
+async function createSolicitudApi(
   token: string,
-  id: string
-) {
-  const res = await fetch(`/api/solicitudes/${id}/aprobar`, {
+  solicitud: Partial<SolicitudItem>
+): Promise<SolicitudItem> {
+  const res = await fetch(`/api/solicitudes`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
+    body: JSON.stringify(solicitud),
   });
 
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-// Rechazar solicitud (sin comentario)
-async function rechazarSolicitudApi(
+async function updateSolicitudApi(
   token: string,
-  id: string
-) {
-  const res = await fetch(`/api/solicitudes/${id}/rechazar`, {
-    method: "POST",
+  id: string,
+  solicitud: Partial<SolicitudItem>
+): Promise<SolicitudItem> {
+  const res = await fetch(`/api/solicitudes/${id}`, {
+    method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({}), // ya no enviamos comentario
+    body: JSON.stringify(solicitud),
   });
 
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-// Obtener estadísticas de solicitudes
-async function getEstadisticasSolicitudesApi(
-  token: string
-): Promise<{
-  total: number;
-  pendientes: number;
-  aprobadas: number;
-  rechazadas: number;
-}> {
-  const res = await fetch(`/api/solicitudes/estadisticas`, {
-    headers: { Authorization: `Bearer ${token}` },
+
+
+// ================================
+// Mock Methods
+// ================================
+async function getSolicitudesUsuarioMock(
+  _token: string,
+  usuarioId: number,
+  params: Record<string, string | number | undefined> = {}
+): Promise<PaginatedResponse<SolicitudItem>> {
+  let filteredData = (mockSolicitudes as SolicitudItem[]).filter(
+    s => s.id_usuario === usuarioId
+  );
+
+  if (params.tipo_solicitud) {
+    filteredData = filteredData.filter(
+      s => s.tipo_solicitud === params.tipo_solicitud
+    );
+  }
+
+  if (params.id_subtipo) {
+    filteredData = filteredData.filter(
+      s => s.id_subtipo === Number(params.id_subtipo)
+    );
+  }
+
+  const page = Number(params.page) || 0;
+  const size = Number(params.size) || 10;
+  const start = page * size;
+  const end = start + size;
+
+  return {
+    content: filteredData.slice(start, end),
+    totalPages: Math.ceil(filteredData.length / size),
+    totalElements: filteredData.length,
+    size,
+    number: page,
+  };
+}
+
+async function getSolicitudesPermisoUsuarioMock(
+  token: string,
+  usuarioId: number,
+  params: Record<string, string | number | undefined> = {}
+): Promise<PaginatedResponse<SolicitudItem>> {
+  return getSolicitudesUsuarioMock(token, usuarioId, {
+    ...params,
+    tipo_solicitud: "PERMISO",
   });
-
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-// ================================
-// Métodos MOCK
-// ================================
-async function getSolicitudesMock(): Promise<PaginatedResponse<SolicitudItem>> {
-  const data = [
-    ...(mockPermisos as SolicitudItem[]),
-    ...(mockBeneficios as SolicitudItem[]),
-  ];
-
-  return {
-    content: data,
-    totalPages: 1,
-    totalElements: data.length,
-    size: data.length,
-    number: 0,
-  };
-}
-
-async function getSolicitudesPermisoMock(): Promise<PaginatedResponse<SolicitudItem>> {
-  const data = mockPermisos as SolicitudItem[];
-
-  return {
-    content: data,
-    totalPages: 1,
-    totalElements: data.length,
-    size: data.length,
-    number: 0,
-  };
 }
 
 async function getSolicitudByIdMock(
   _token: string,
   id: string
 ): Promise<SolicitudItem> {
-  const data = [
-    ...(mockPermisos as SolicitudItem[]),
-    ...(mockBeneficios as SolicitudItem[]),
-  ];
-  const solicitud = data.find((s) => s.id === Number(id));
+  const solicitud = (mockSolicitudes as SolicitudItem[]).find(
+    s => s.id === Number(id)
+  );
   if (!solicitud) throw new Error("Solicitud no encontrada");
   return solicitud;
 }
 
-async function aprobarSolicitudMock(
-  _token: string,
-  id: string
-) {
-  return { success: true, id };
-}
 
-async function rechazarSolicitudMock(
+async function createSolicitudMock(
   _token: string,
-  id: string
-) {
-  return { success: true, id };
-}
-
-async function getEstadisticasSolicitudesMock(): Promise<{
-  total: number;
-  pendientes: number;
-  aprobadas: number;
-  rechazadas: number;
-}> {
-  const data = [
-    ...(mockPermisos as SolicitudItem[]),
-    ...(mockBeneficios as SolicitudItem[]),
-  ];
+  solicitud: Partial<SolicitudItem>
+): Promise<SolicitudItem> {
   return {
-    total: data.length,
-    pendientes: data.filter((s) => s.estado === "P").length,
-    aprobadas: data.filter((s) => s.estado === "A").length,
-    rechazadas: data.filter((s) => s.estado === "R").length,
+    id: Date.now(),
+    id_usuario: solicitud.id_usuario || 1,
+    nombre: solicitud.nombre || "",
+    apellido: solicitud.apellido || "",
+    tipo_solicitud: solicitud.tipo_solicitud || "PERMISO",
+    id_subtipo: solicitud.id_subtipo || 0,
+    comentario: solicitud.comentario || "",
+    cant_dias: solicitud.cant_dias || 0,
+    fecha_inicio: solicitud.fecha_inicio || "",
+    fecha_fin: solicitud.fecha_fin || "",
+    estado: "P",
   };
 }
 
-// ================================
-// Export condicional
-// ================================
-export const getSolicitudesTH = USE_MOCK
-  ? getSolicitudesMock
-  : getSolicitudesApi;
+async function updateSolicitudMock(
+  _token: string,
+  id: string,
+  solicitud: Partial<SolicitudItem>
+): Promise<SolicitudItem> {
+  return { ...solicitud, id: Number(id) } as SolicitudItem;
+}
 
-export const getSolicitudesPermiso = USE_MOCK
-  ? getSolicitudesPermisoMock
-  : getSolicitudesPermisoApi;
+
+// ================================
+// Exports condicionales
+// ================================
+export const getSolicitudesUsuario = USE_MOCK
+  ? getSolicitudesUsuarioMock
+  : getSolicitudesUsuarioApi;
+
+export const getSolicitudesPermisoUsuario = USE_MOCK
+  ? getSolicitudesPermisoUsuarioMock
+  : getSolicitudesPermisoUsuarioApi;
 
 export const getSolicitudById = USE_MOCK
   ? getSolicitudByIdMock
   : getSolicitudByIdApi;
 
-export const aprobarSolicitud = USE_MOCK
-  ? aprobarSolicitudMock
-  : aprobarSolicitudApi;
+export const createSolicitud = USE_MOCK
+  ? createSolicitudMock
+  : createSolicitudApi;
 
-export const rechazarSolicitud = USE_MOCK
-  ? rechazarSolicitudMock
-  : rechazarSolicitudApi;
-
-export const getEstadisticasSolicitudes = USE_MOCK
-  ? getEstadisticasSolicitudesMock
-  : getEstadisticasSolicitudesApi;
+export const updateSolicitud = USE_MOCK
+  ? updateSolicitudMock
+  : updateSolicitudApi;

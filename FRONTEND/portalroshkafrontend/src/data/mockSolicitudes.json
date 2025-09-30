@@ -1,0 +1,48 @@
+[
+        {
+            "idSolicitud": 8,
+            "usuario": "Andrés Sebastián Villalba Peña",
+            "tipoSolicitud": "BENEFICIO",
+            "fechaInicio": "2025-09-01",
+            "cantidadDias": 0,
+            "fechaCreacion": "2025-09-24T21:58:10.182787",
+            "estado": "A"
+        },
+        {
+            "idSolicitud": 9,
+            "usuario": "Camila Victoria Duarte Silva",
+            "tipoSolicitud": "BENEFICIO",
+            "fechaInicio": "2025-09-18",
+            "cantidadDias": 0,
+            "fechaCreacion": "2025-09-24T21:58:10.182787",
+            "estado": "P"
+        },
+        {
+            "idSolicitud": 10,
+            "usuario": "Jose Aguilar",
+            "tipoSolicitud": "BENEFICIO",
+            "fechaInicio": "2025-09-27",
+            "cantidadDias": null,
+            "fechaCreacion": "2025-09-26T11:55:39.579105",
+            "estado": "P"
+        },
+        {
+            "idSolicitud": 11,
+            "usuario": "Jose Aguilar",
+            "tipoSolicitud": "BENEFICIO",
+            "fechaInicio": "2025-09-27",
+            "cantidadDias": null,
+            "fechaCreacion": "2025-09-26T11:58:22.579788",
+            "estado": "P"
+        },
+        {
+            "idSolicitud": 12,
+            "usuario": "Jose Aguilar",
+            "tipoSolicitud": "PERMISO",
+            "fechaInicio": "2025-09-27",
+            "cantidadDias": 15,
+            "fechaCreacion": "2025-09-26T11:55:39.579105",
+            "estado": "P"
+        }
+
+    ]
