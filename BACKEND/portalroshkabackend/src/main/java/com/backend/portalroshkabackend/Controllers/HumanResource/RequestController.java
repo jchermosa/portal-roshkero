@@ -65,6 +65,14 @@ public class RequestController {
     }
 
     // TODO: getyByIdSolicitud?
+    @GetMapping("/th/users/requests/{idRequest}")
+    public ResponseEntity<SolicitudByIdResponseDto> getRequestById(
+            @PathVariable int idRequest
+    ){
+        SolicitudByIdResponseDto request = requestService.getRequestById(idRequest);
+
+        return ResponseEntity.ok(request);
+    }
 
     @PostMapping("/th/users/requests/{idRequest}/accept")
     public ResponseEntity<RequestResponseDto> acceptRequest(@PathVariable int idRequest){
@@ -90,20 +98,5 @@ public class RequestController {
         return ResponseEntity.ok("agregar nuevo tipo de request") ;
     }
 
-
-
-
-
-    //TODO: dias disponibles{id}, dias totales de vacaciones, historial de solicitudes
-
-
-    // ---------------------
-
-    // mis solicitudes.GET
-    // Listar por tipo de solicitud,
-    // GET-Tipos de BENEFICIO, DISPOSITIVOS, PERMISOS. - LISTO
-    // GET:Solicitudes aprobadas por lideres{PENDIENTES, FECHA} - LISTO
-    // GET: listar por estado de la solicitud (A,I,P)
-    // GET: Tipo de solicitudes
 
 }

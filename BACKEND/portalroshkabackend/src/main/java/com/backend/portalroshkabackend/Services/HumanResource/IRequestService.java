@@ -12,7 +12,7 @@ public interface IRequestService {
 
     Page<SolicitudResponseDto> getBenefitsOrPermissions(SolicitudesEnum tipoSolicitud, Pageable pageable);
     Page<SolicitudResponseDto> getVacations(SolicitudesEnum tipoSolicitud, Pageable pageable);
-
+    SolicitudByIdResponseDto getRequestById(int idSolicitud);
     RequestResponseDto acceptRequest(int idRequest);
     RequestResponseDto rejectRequest(int idRequest);
     // RequestDto addNewRequestType();
