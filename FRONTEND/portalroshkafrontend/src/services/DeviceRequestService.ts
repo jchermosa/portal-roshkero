@@ -100,10 +100,26 @@ async function createSolicitudDispositivo(
   return res.json();
 }
 
+async function getSolicitudById(
+  token: string,
+  idSolicitud: number
+): Promise<SolicitudUserItem> {
+  const url = `/api/v1/admin/sysadmin/request/${idSolicitud}`;
+  console.log("[Service] GET", url);
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  await throwIfNotOk(res);
+  const json = await res.json();
+  console.log("[Service] detalle recibido:", json);
+  return json;
+}
+
 export {
   getSolicitudesDispositivoAdmin,
   getSolicitudesDispositivoUsuario,
   acceptSolicitudDispositivo,
   rejectSolicitudDispositivo,
   createSolicitudDispositivo,
+  getSolicitudById,
 };
