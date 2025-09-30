@@ -104,6 +104,20 @@ public class TeamLeaderService {
 
     public SolicitudRespuestaDto acceptRequest(int idSolicitud) {
 
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            return null;
+        }
+
         //Optional<Solicitud> solicitud = solicitudesTHRepository.findById(idSolicitud);
 
         Solicitud solicitud = getSolicitudById(idSolicitud);
@@ -111,6 +125,11 @@ public class TeamLeaderService {
         if (solicitud == null) {
             throw new RuntimeException("Solicitud no encontrada");
         }
+
+        if (solicitud.getLider().getIdUsuario() != usuario.getIdUsuario()) {
+            throw new RuntimeException("No tienes permiso para aceptar esta solicitud de" + solicitud.getTipoSolicitud() );
+        }
+
 
         switch (solicitud.getTipoSolicitud()) {
             case SolicitudesEnum.VACACIONES -> acceptSolicitudVacaciones(solicitud);
@@ -199,12 +218,29 @@ public class TeamLeaderService {
 
     public SolicitudRespuestaDto rejectRequest(int idSolicitud) {
 
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            return null;
+        }
+
         //Optional<Solicitud> solicitud = solicitudesTHRepository.findById(idSolicitud);
 
         Solicitud solicitud = getSolicitudById(idSolicitud);
 
         if (solicitud == null) {
             throw new RuntimeException("Solicitud no encontrada");
+        }
+
+        if (solicitud.getLider().getIdUsuario() != usuario.getIdUsuario()) {
+            throw new RuntimeException("No tienes permiso para aceptar esta solicitud de" + solicitud.getTipoSolicitud() );
         }
 
         solicitud.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
