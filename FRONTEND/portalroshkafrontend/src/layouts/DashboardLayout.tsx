@@ -17,8 +17,8 @@ export default function DashboardLayout() {
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
-    { id: "/gestion-th", label: "Gestión TH", icon: "🧑‍💼", available: true },
-    { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: true },
+    { id: "/gestion-th", label: "Cargas TH", icon: "👥", available: true },
+    { id: "/usuarios", label: "Gestión TH", icon: "🧑‍💼", available: true },
     { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: true },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: true},
     { id: "/ubicacion", label: "Ubicaciones", icon: "📍", available: true },
