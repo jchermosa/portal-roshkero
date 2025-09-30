@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.DiaConUbicacionesDto;
-import com.backend.portalroshkabackend.DTO.Operationes.EquipoAsignacionUpdateDiasUbicacionesDto;
+import com.backend.portalroshkabackend.DTO.Operationes.DiaUbicacionDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquipoDiaUbicacionResponceDto;
 
 public interface IAsignacionService {
     Page<AsignacionResponseDto> getAllAsignacion(Pageable pageable);
 
     List<DiaConUbicacionesDto> getDiasConUbicacionesLibres();
 
-    void asignarDiasUbicaciones(@PathVariable Integer idEquipo, @RequestBody EquipoAsignacionUpdateDiasUbicacionesDto request);
+    // void asignarDiasUbicaciones(@PathVariable Integer idEquipo, @RequestBody
+    // EquipoAsignacionUpdateDiasUbicacionesDto request);
+    void asignarDiasUbicacionesEquipo(Integer idEquipo, List<DiaUbicacionDto> diasUbicacionesEquipo);
 }

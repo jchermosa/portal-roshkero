@@ -4,16 +4,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
+import com.backend.portalroshkabackend.Exception.ProcenteExisits;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository;
+import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
 
@@ -24,17 +27,15 @@ public class UsuarioServiceImpl implements IUsuarioService {
     private UsuarioisRepository usuarioRepository;
     @Autowired
     private AsignacionUsuarioRepository asignacionUsuarioRepository;
-
-    public Usuario getUsuarioById(Integer id) {
-        return usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario not found: " + id));
-    }
+    @Autowired
+    private EquiposRepository equiposRepository;
 
     public void ajustarDisponibilidadConDelta(Usuario usuario, float delta) {
         if (delta > 0) {
             // Увеличиваем нагрузку → вычитаем из disponibilidad
             if (usuario.getDisponibilidad() == null || usuario.getDisponibilidad() < delta) {
-                throw new RuntimeException(
+                // !
+                throw new ProcenteExisits(
                         "Usuario " + usuario.getIdUsuario() +
                                 " no tiene suficiente disponibilidad. Actual: " + usuario.getDisponibilidad() +
                                 ", requerido: " + delta);
@@ -44,12 +45,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
             // Уменьшение нагрузки → возвращаем обратно
             usuario.setDisponibilidad(usuario.getDisponibilidad() + (int) (-delta));
         }
-        // delta == 0 → ничего не делаем
-        usuarioRepository.save(usuario);
-    }
-
-    public void devolverDisponibilidad(Usuario usuario, float porcentaje) {
-        usuario.setDisponibilidad(usuario.getDisponibilidad() + (int) porcentaje);
+        // if delta == 0 → save
         usuarioRepository.save(usuario);
     }
 
@@ -66,37 +62,41 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
 
-                float viejoPorcentaje = actualesMap.getOrDefault(usuario.getIdUsuario(), new AsignacionUsuarioEquipo())
-                        .getPorcentajeTrabajo();
-                float delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
+                // Считаем дельту относительно старого процента
+                Integer viejoPorcentaje = actualesMap
+                        .getOrDefault(usuario.getIdUsuario(), new AsignacionUsuarioEquipo()).getPorcentajeTrabajo();
+                Integer delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
+
+                // Проверка и применение
                 ajustarDisponibilidadConDelta(usuario, delta);
 
+                // Обновляем или создаём запись
                 AsignacionUsuarioEquipo asignacion = actualesMap.get(usuario.getIdUsuario());
                 if (asignacion != null) {
                     asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
                     asignacion.setFechaEntrada(uDto.getFechaEntrada());
                     asignacion.setFechaFin(uDto.getFechaFin());
-                    asignacionUsuarioRepository.save(asignacion);
                 } else {
-                    AsignacionUsuarioEquipo nueva = new AsignacionUsuarioEquipo();
-                    nueva.setEquipo(equipo);
-                    nueva.setUsuario(usuario);
-                    nueva.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
-                    nueva.setFechaEntrada(uDto.getFechaEntrada());
-                    nueva.setFechaFin(uDto.getFechaFin());
-                    nueva.setFechaCreacion(LocalDateTime.now());
-                    asignacionUsuarioRepository.save(nueva);
+                    asignacion = new AsignacionUsuarioEquipo();
+                    asignacion.setEquipo(equipo);
+                    asignacion.setUsuario(usuario);
+                    asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
+                    asignacion.setFechaEntrada(uDto.getFechaEntrada());
+                    asignacion.setFechaFin(uDto.getFechaFin());
+                    asignacion.setFechaCreacion(LocalDateTime.now());
                 }
+                asignacionUsuarioRepository.save(asignacion);
+
                 result.add(uDto);
             }
 
-            // удалить пользователей, которых больше нет в команде
-            for (AsignacionUsuarioEquipo asignacion : actualesMap.values()) {
+            // Удаляем пользователей, которых больше нет в списке
+            for (AsignacionUsuarioEquipo asignacion : new ArrayList<>(actualesMap.values())) {
                 if (usuariosDto.stream()
                         .noneMatch(u -> u.getIdUsuario().equals(asignacion.getUsuario().getIdUsuario()))) {
                     Usuario usuario = asignacion.getUsuario();
-                    usuario.setDisponibilidad(usuario.getDisponibilidad() + asignacion.getPorcentajeTrabajo());
-                    usuarioRepository.save(usuario);
+                    // Возвращаем процент доступности
+                    ajustarDisponibilidadConDelta(usuario, -asignacion.getPorcentajeTrabajo());
                     asignacionUsuarioRepository.delete(asignacion);
                 }
             }
@@ -105,21 +105,34 @@ public class UsuarioServiceImpl implements IUsuarioService {
         return result;
     }
 
-    public List<UsuarioAsignacionDto> assignUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto) {
+    public List<UsuarioAsignacionDto> calculateprocenteusuarios(List<UsuarioAsignacionDto> usuariosDto) {
+        List<UsuarioAsignacionDto> result = new ArrayList<>();
+        for (UsuarioAsignacionDto uDto : usuariosDto) {
+            Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
+
+            // Проверка и уменьшение доступност
+            int nuevaDisponibilidad = usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue();
+            if (nuevaDisponibilidad < 0) {
+                throw new ProcenteExisits("Usuario " + usuario.getIdUsuario() +
+                        " no tiene suficiente disponibilidad. Actual: " + usuario.getDisponibilidad() +
+                        ", requerido: " + uDto.getPorcentajeTrabajo().intValue());
+            }
+            usuario.setDisponibilidad(nuevaDisponibilidad);
+            usuarioRepository.save(usuario);
+            result.add(uDto);
+        }
+        return result;
+    }
+
+    public List<UsuarioAsignacionDto> assignUsers(Integer equipoId, List<UsuarioAsignacionDto> usuariosDto) {
         List<UsuarioAsignacionDto> result = new ArrayList<>();
         if (usuariosDto != null) {
             for (UsuarioAsignacionDto uDto : usuariosDto) {
+                // Проверка и уменьшение доступности
+                Equipos equipo = equiposRepository.findByIdEquipo(equipoId);
                 Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
-
-                // Проверка и уменьшение доступности
-                int nuevaDisponibilidad = usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue();
-                if (nuevaDisponibilidad < 0) {
-                    throw new RuntimeException("Disponibilidad insuficiente para usuario: " + usuario.getIdUsuario());
-                }
-                usuario.setDisponibilidad(nuevaDisponibilidad);
-                usuarioRepository.save(usuario);
-
                 AsignacionUsuarioEquipo asignacion = new AsignacionUsuarioEquipo();
                 asignacion.setEquipo(equipo);
                 asignacion.setUsuario(usuario);

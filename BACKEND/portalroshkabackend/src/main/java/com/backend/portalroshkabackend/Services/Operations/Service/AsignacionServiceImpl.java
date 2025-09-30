@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.Operationes.AsignacionResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.DiaConUbicacionesDto;
-import com.backend.portalroshkabackend.DTO.Operationes.EquipoAsignacionUpdateDiasUbicacionesDto;
+import com.backend.portalroshkabackend.DTO.Operationes.DiaUbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
@@ -96,24 +96,31 @@ public class AsignacionServiceImpl implements IAsignacionService {
     }
 
     @Override
-    public void asignarDiasUbicaciones(Integer idEquipo, EquipoAsignacionUpdateDiasUbicacionesDto request) {
+    public void asignarDiasUbicacionesEquipo(Integer idEquipo, List<DiaUbicacionDto> diasUbicacionesEquipo) {
+        // Получаем команду
         Equipos equipo = equiposRepository.findById(idEquipo)
                 .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
 
-        for (EquipoAsignacionUpdateDiasUbicacionesDto.DiaUbicacionDto dto : request.getAsignaciones()) {
+        if (diasUbicacionesEquipo == null || diasUbicacionesEquipo.isEmpty()) {
+            return; // если список пустой или null — выходим
+        }
+
+        for (DiaUbicacionDto dto : diasUbicacionesEquipo) {
+            // Находим день
             DiaLaboral dia = diasLaboralRepository.findById(dto.getIdDiaLaboral())
                     .orElseThrow(() -> new RuntimeException("Día no encontrado"));
 
+            // Проверяем, есть ли уже назначение для этой команды и дня
             Optional<EquipoDiaUbicacion> existing = asignacionUbicacionDiaRepository.findByEquipoAndDiaLaboral(equipo,
                     dia);
 
             if (dto.getIdUbicacion() == null) {
-                // Удаляем связь, если была
+                // Если idUbicacion == null → удаляем существующую связь
                 existing.ifPresent(asignacionUbicacionDiaRepository::delete);
                 continue;
             }
 
-            // Создаём или обновляем
+            // Создаём или обновляем запись
             EquipoDiaUbicacion asignacion = existing.orElseGet(() -> {
                 EquipoDiaUbicacion nuevo = new EquipoDiaUbicacion();
                 nuevo.setEquipo(equipo);
@@ -121,12 +128,52 @@ public class AsignacionServiceImpl implements IAsignacionService {
                 return nuevo;
             });
 
+            // Находим локацию
             Ubicacion ubicacion = ubicacionRepository.findById(dto.getIdUbicacion())
                     .orElseThrow(() -> new RuntimeException("Ubicación no encontrada"));
+
             asignacion.setUbicacion(ubicacion);
 
+            // Сохраняем
             asignacionUbicacionDiaRepository.save(asignacion);
         }
     }
+
+    // @Override
+    // public void asignarDiasUbicaciones(Integer idEquipo,
+    // EquipoAsignacionUpdateDiasUbicacionesDto request) {
+    // Equipos equipo = equiposRepository.findById(idEquipo)
+    // .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+
+    // for (EquipoAsignacionUpdateDiasUbicacionesDto.DiaUbicacionDto dto :
+    // request.getAsignaciones()) {
+    // DiaLaboral dia = diasLaboralRepository.findById(dto.getIdDiaLaboral())
+    // .orElseThrow(() -> new RuntimeException("Día no encontrado"));
+
+    // Optional<EquipoDiaUbicacion> existing =
+    // asignacionUbicacionDiaRepository.findByEquipoAndDiaLaboral(equipo,
+    // dia);
+
+    // if (dto.getIdUbicacion() == null) {
+    // // Удаляем связь, если была
+    // existing.ifPresent(asignacionUbicacionDiaRepository::delete);
+    // continue;
+    // }
+
+    // // Создаём или обновляем
+    // EquipoDiaUbicacion asignacion = existing.orElseGet(() -> {
+    // EquipoDiaUbicacion nuevo = new EquipoDiaUbicacion();
+    // nuevo.setEquipo(equipo);
+    // nuevo.setDiaLaboral(dia);
+    // return nuevo;
+    // });
+
+    // Ubicacion ubicacion = ubicacionRepository.findById(dto.getIdUbicacion())
+    // .orElseThrow(() -> new RuntimeException("Ubicación no encontrada"));
+    // asignacion.setUbicacion(ubicacion);
+
+    // asignacionUbicacionDiaRepository.save(asignacion);
+    // }
+    // }
 
 }

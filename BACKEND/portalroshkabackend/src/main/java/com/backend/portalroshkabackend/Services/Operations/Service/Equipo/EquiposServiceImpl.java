@@ -15,11 +15,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import com.backend.portalroshkabackend.DTO.Operationes.DiaUbicacionDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquipoDiaUbicacionResponceDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
 import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
-import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
-import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
@@ -28,6 +28,7 @@ import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaEquiposService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IUsuarioService;
 import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquiposService;
+import com.backend.portalroshkabackend.Services.Operations.Service.AsignacionServiceImpl;
 import com.backend.portalroshkabackend.Services.Operations.Service.UsuarioServiceImpl;
 import com.backend.portalroshkabackend.tools.mapper.EquiposMapper;
 import com.backend.portalroshkabackend.tools.validator.TeamValidator;
@@ -43,6 +44,7 @@ public class EquiposServiceImpl implements IEquiposService {
         private final TeamValidator teamValidator;
         private final EquiposMapper equiposMapper;
         private final UsuarioServiceImpl UsuarioServiceImpl;
+        private final AsignacionServiceImpl asignacionServiceImpl;
 
         // сортировка страниц
         private final Map<String, Function<Pageable, Page<Equipos>>> sortingMap;
@@ -55,7 +57,8 @@ public class EquiposServiceImpl implements IEquiposService {
                         ITecnologiaEquiposService tecnologiaEquiposService,
                         TeamValidator teamValidator,
                         EquiposMapper equiposMapper,
-                        UsuarioServiceImpl UsuarioServiceImpl) {
+                        UsuarioServiceImpl UsuarioServiceImpl,
+                        AsignacionServiceImpl asignacionServiceImpl) {
                 this.equiposRepository = equiposRepository;
                 this.clientesRepository = clientesRepository;
                 this.usuarioService = usuarioService;
@@ -63,6 +66,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 this.teamValidator = teamValidator;
                 this.equiposMapper = equiposMapper;
                 this.UsuarioServiceImpl = UsuarioServiceImpl;
+                this.asignacionServiceImpl = asignacionServiceImpl;
 
                 sortingMap = new HashMap<>();
 
@@ -133,18 +137,24 @@ public class EquiposServiceImpl implements IEquiposService {
                 equipo.setFechaLimite(requestDto.getFechaLimite());
                 equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
                 equipo.setFechaCreacion(LocalDateTime.now());
-                Equipos savedEquipo = equiposRepository.save(equipo);
 
+                if (requestDto.getUsuarios() != null && !requestDto.getUsuarios().isEmpty()) {
+                        teamValidator.validateFechasUsuarios(requestDto.getUsuarios());
+                }
+
+                List<UsuarioAsignacionDto> procentedUsuarios = usuarioService
+                                .calculateprocenteusuarios(requestDto.getUsuarios());
+                Equipos savedEquipo = equiposRepository.save(equipo);
+                usuarioService.assignUsers(savedEquipo.getIdEquipo(), procentedUsuarios);
+
+                List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
+                asignacionServiceImpl.asignarDiasUbicacionesEquipo(savedEquipo.getIdEquipo(), diasUbicaciones);
                 // --- 4. Сохранение технологий команды ---
                 tecnologiaEquiposService.updateTecnologiasEquipo(savedEquipo, requestDto.getIdTecnologias());
 
-                // --- 5. Валидация только дат пользователей ---
-                if (requestDto.getUsuarios() != null && !requestDto.getUsuarios().isEmpty()) {
-                        // Валидация дат пользователей
-                        teamValidator.validateFechasUsuarios(requestDto.getUsuarios());
-                }
+                // asignacionServiceImpl.asignarDiasUbicacionesEquipo(requestDto.getIdEquipo(),
+                // requestDto.getEquipoDiaUbicacion());
                 // Назначение пользователей на команду и проверку процентов у них
-                usuarioService.assignUsers(savedEquipo, requestDto.getUsuarios());
         }
 
         @Override
@@ -188,6 +198,8 @@ public class EquiposServiceImpl implements IEquiposService {
                         teamValidator.validateFechasUsuarios(requestDto.getUsuarios());
                 }
                 usuarioService.updateUsers(equipo, requestDto.getUsuarios());
+                List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
+                asignacionServiceImpl.asignarDiasUbicacionesEquipo(id, diasUbicaciones);
                 equiposRepository.save(equipo);
 
         }

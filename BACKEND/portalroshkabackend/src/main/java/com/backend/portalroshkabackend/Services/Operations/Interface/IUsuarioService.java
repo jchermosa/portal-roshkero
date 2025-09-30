@@ -8,13 +8,12 @@ import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Usuario;
 
 public interface IUsuarioService {
-    Usuario getUsuarioById(Integer id);
 
     void ajustarDisponibilidadConDelta(Usuario usuario, float delta);
 
-    void devolverDisponibilidad(Usuario usuario, float delta);
-
     List<UsuarioAsignacionDto> updateUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto);
 
-    List<UsuarioAsignacionDto> assignUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto);
+    List<UsuarioAsignacionDto> assignUsers(Integer equipoId, List<UsuarioAsignacionDto> usuariosDto);
+
+    List<UsuarioAsignacionDto> calculateprocenteusuarios(List<UsuarioAsignacionDto> usuariosDto);
 }

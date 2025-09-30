@@ -4,6 +4,7 @@ import com.backend.portalroshkabackend.DTO.Operationes.UsersEquipoErrores;
 import com.backend.portalroshkabackend.DTO.common.ErrorResponseDto;
 import com.backend.portalroshkabackend.Exception.DisponibilidadInsuficienteException;
 import com.backend.portalroshkabackend.Exception.NombreDuplicadoException;
+import com.backend.portalroshkabackend.Exception.ProcenteExisits;
 import com.backend.portalroshkabackend.Exception.ValidateFechaInicioAntesDeLimiteException;
 import com.backend.portalroshkabackend.Exception.UsuarioFechasInvalidasException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.equipos.EquipoNotFoundException;
@@ -43,9 +44,13 @@ public class EquiposExceptionHandler extends BaseExceptionHandler {
         UsersEquipoErrores response = new UsersEquipoErrores();
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         response.setMessage("Errores en las fechas de los usuarios");
-        response.setDetails(ex.getErrores()); 
+        response.setDetails(ex.getErrores());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    
+    @ExceptionHandler(ProcenteExisits.class)
+    public ResponseEntity<ErrorResponseDto> ProcenteExisits(
+            ProcenteExisits ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
 }
