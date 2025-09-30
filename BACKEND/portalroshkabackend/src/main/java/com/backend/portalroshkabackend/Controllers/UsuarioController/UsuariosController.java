@@ -3,10 +3,12 @@ package com.backend.portalroshkabackend.Controllers.UsuarioController;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCambContrasDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
@@ -15,8 +17,6 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
 import com.backend.portalroshkabackend.Services.UsuarioServicio.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -84,17 +84,15 @@ public class UsuariosController {
         return ResponseEntity.ok(solDispositivoDto);
     }
     
-    
-    // Endpoints comentados para futuras implementaciones
-    // @GetMapping("/vacaciones")
-    // public ResponseEntity<VacacionesDto> getVacacionesUsuarioActual() {
-    //     VacacionesDto vacaciones = userService.getVacacionesUsuarioActual();
-    //     return ResponseEntity.ok(vacaciones);
-    // }
+    @PostMapping("/cambiar_contrasena")
+    public ResponseEntity<?> cambiarContrasena(@RequestBody UserCambContrasDto dto) {
+        boolean actualizado = userService.actualizarContrasena(dto);
 
-    // @PostMapping("/solicitudes")
-    // public ResponseEntity<String> crearSolicitud(@RequestBody SolicitudDto solicitudDto) {
-    //     userService.crearSolicitudUsuarioActual(solicitudDto);
-    //     return ResponseEntity.status(HttpStatus.CREATED).body("Solicitud creada con éxito");
-    // }
+        if (actualizado) {
+            return ResponseEntity.ok("Contraseña actualizada correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("La contraseña actual es incorrecta");
+        }
+    }
+
 }
