@@ -10,7 +10,7 @@ type IMiembrosEquipo = {
   id: number;
   nombre: string;
   idCargo: number;
-  disponibilidad?: number;
+  disponibilidad?: number; // int 1..100
   fechaEntrada?: string;
   fechaFin?: string;
 };
@@ -40,6 +40,13 @@ type AsignDU = {
   nombreUbicacion?: string | null;
 };
 
+type MemberOpt = {
+  value: number;
+  label: string;
+  idCargo: number;
+  dispRestante: number; // int 0..100
+};
+
 const METADATAS_PATH = "/api/v1/admin/operations/metadatas";
 const TEAM_PATH = "/api/v1/admin/operations/team";
 const USERS_PATH = "/api/v1/admin/operations/users";
@@ -61,18 +68,32 @@ function useIsDark() {
   }, []);
   return isDark;
 }
+// --- Date helpers ---
+const d = (s?: string | null) => (s ? new Date(s) : null);
+const lt = (a?: string | null, b?: string | null) =>
+  d(a) && d(b) ? d(a)!.getTime() < d(b)!.getTime() : false;
+const lte = (a?: string | null, b?: string | null) =>
+  d(a) && d(b) ? d(a)!.getTime() <= d(b)!.getTime() : false;
+const gt = (a?: string | null, b?: string | null) =>
+  d(a) && d(b) ? d(a)!.getTime() > d(b)!.getTime() : false;
+const gte = (a?: string | null, b?: string | null) =>
+  d(a) && d(b) ? d(a)!.getTime() >= d(b)!.getTime() : false;
 
-const toPercent = (v: any) => {
-  const n = Number(v);
-  if (!isFinite(n)) return 100;
-  if (n <= 1) return Math.round(n * 100);
-  return Math.max(0, Math.min(100, Math.round(n)));
-};
-const toFraction = (p: any) => {
-  const n = Number(p);
-  if (!isFinite(n)) return 1;
-  const pct = n > 1 ? n / 100 : n;
-  return +Math.min(1, Math.max(0.01, pct)).toFixed(4);
+const validateMemberDates = (
+  teamStart: string,
+  teamEnd: string | null | undefined,
+  start?: string | null,
+  end?: string | null
+): string | null => {
+  // start must be >= teamStart
+  if (start && lt(start, teamStart)) return "La entrada debe ser posterior al inicio del equipo.";
+  // if teamEnd exists, start must be <= teamEnd
+  if (teamEnd && start && gt(start, teamEnd)) return "La entrada debe ser anterior o igual a la fecha límite del equipo.";
+  // end must be > start (if both present)
+  if (start && end && !gt(end, start)) return "La fecha de fin debe ser posterior a la de entrada.";
+  // if teamEnd exists, end must be <= teamEnd
+  if (teamEnd && end && gt(end, teamEnd)) return "La fecha de fin debe ser anterior o igual a la fecha límite del equipo.";
+  return null;
 };
 
 export default function EditarEquipoPage() {
@@ -126,17 +147,14 @@ export default function EditarEquipoPage() {
 
   // Miembros
   const [miembros, setMiembros] = useState<IMiembrosEquipo[]>([]);
-  const [memberOptions, setMemberOptions] = useState<
-    Array<{ value: number; label: string; idCargo: number }>
-  >([]);
-  const [selectedMember, setSelectedMember] = useState<{
-    value: number;
-    label: string;
-    idCargo: number;
-  } | null>(null);
+  const [memberOptions, setMemberOptions] = useState<MemberOpt[]>([]);
+  const [selectedMember, setSelectedMember] = useState<MemberOpt | null>(null);
+  const [newMemberMax, setNewMemberMax] = useState<number>(100);
   const [newMemberDisp, setNewMemberDisp] = useState<number>(100);
   const [newMemberStart, setNewMemberStart] = useState<string>("");
   const [newMemberEnd, setNewMemberEnd] = useState<string>("");
+  // idUsuario -> disponibilidad restante global (0..100)
+const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
 
   // Días / Ubicaciones / Asignaciones
   const [diasOptions, setDiasOptions] = useState<
@@ -321,15 +339,34 @@ export default function EditarEquipoPage() {
           ? t.usuariosNoEnEquipo
           : [];
         if (notIn.length) {
-          setMemberOptions(
-            notIn.map((u: any) => ({
-              value: u.idUsuario ?? u.id,
-              label: [u.nombre, u.apellido].filter(Boolean).join(" "),
-              idCargo: u.idCargo ?? 0,
-            })
-            )
-          );
-        } else {
+  setMemberOptions(
+    notIn.map((u: any) => ({
+      value: u.idUsuario ?? u.id,
+      label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
+      idCargo: u.idCargo ?? 0,
+      dispRestante: Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100)),
+    }))
+  );
+  // además: traer caps para todos los usuarios para poder limitar filas existentes
+  try {
+    const urAll = await fetch(USERS_PATH, {
+      headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      credentials: "include",
+      signal: ac.signal,
+    });
+    if (urAll.ok) {
+      const usersData = await urAll.json();
+      const usersArr = Array.isArray(usersData?.content) ? usersData.content : Array.isArray(usersData) ? usersData : [];
+      const m = new Map<number, number>();
+      usersArr.forEach((u: any) => {
+        const id = u.id ?? u.idUsuario ?? u.usuarioId;
+        const rest = Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100));
+        if (id != null) m.set(Number(id), rest);
+      });
+      setDispCaps(m);
+    }
+  } catch {}
+} else {
           const ur = await fetch(USERS_PATH, {
             headers: {
               Accept: "application/json",
@@ -339,23 +376,25 @@ export default function EditarEquipoPage() {
             signal: ac.signal,
           });
           if (ur.ok) {
-            const usersData = await ur.json();
-            const usersArr = Array.isArray(usersData?.content)
-              ? usersData.content
-              : Array.isArray(usersData)
-              ? usersData
-              : [];
-            setMemberOptions(
-              usersArr.map((u: any) => ({
-                value: u.id ?? u.idUsuario ?? u.usuarioId,
-                label:
-                  [u.nombre, u.apellido].filter(Boolean).join(" ") ||
-                  u.nombreCompleto ||
-                  "Sin nombre",
-                idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
-              }))
-            );
-          }
+  const usersData = await ur.json();
+  const usersArr = Array.isArray(usersData?.content) ? usersData.content : Array.isArray(usersData) ? usersData : [];
+  setMemberOptions(
+    usersArr.map((u: any) => ({
+      value: u.id ?? u.idUsuario ?? u.usuarioId,
+      label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
+      idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
+      dispRestante: Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100)),
+    }))
+  );
+  // llenar caps
+  const m = new Map<number, number>();
+  usersArr.forEach((u: any) => {
+    const id = u.id ?? u.idUsuario ?? u.usuarioId;
+    const rest = Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100));
+    if (id != null) m.set(Number(id), rest);
+  });
+  setDispCaps(m);
+}
         }
 
         const estadoBool =
@@ -370,21 +409,21 @@ export default function EditarEquipoPage() {
           t.integrantes,
           t.miembrosEquipo
         );
-        const miembrosInicial: IMiembrosEquipo[] = miembrosFuente.map(
-          (u: any) => ({
-            id: u.idUsuario ?? u.id ?? u.usuarioId,
-            nombre:
-              u.nombreCompleto ??
-              [u.nombre, u.apellido].filter(Boolean).join(" ") ??
-              String(u.nombre ?? u.apellido ?? "Sin nombre"),
-            idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
-            disponibilidad: toPercent(
-              u.disponibilidad ?? u.porcentajeTrabajo ?? 100
-            ),
-            fechaEntrada: u.fechaEntrada ?? "",
-            fechaFin: u.fechaFin ?? "",
-          })
-        );
+        const miembrosInicial: IMiembrosEquipo[] = miembrosFuente.map((u: any) => ({
+  id: u.idUsuario ?? u.id ?? u.usuarioId,
+  nombre:
+    u.nombreCompleto ??
+    [u.nombre, u.apellido].filter(Boolean).join(" ") ??
+    String(u.nombre ?? u.apellido ?? "Sin nombre"),
+  idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
+  disponibilidad: Math.max(
+    1,
+    Math.min(100, u.disponibilidad ?? u.porcentajeTrabajo ?? 100)
+  ),
+  fechaEntrada: u.fechaEntrada ?? "",
+  fechaFin: u.fechaFin ?? "",
+}));
+
 
         setTeam({
           idEquipo: t.idEquipo,
@@ -434,22 +473,28 @@ export default function EditarEquipoPage() {
             : null
         );
 
-        // DU inicial
-const duSrc = Array.isArray(t.equipoDiaUbicacion) ? t.equipoDiaUbicacion : [];
-const inicialDU: AsignDU[] = duSrc.map((e: any) => {
-  // Soporta esquema plano o anidado
-  const idDia = e.idDiaLaboral ?? e?.diaLaboral?.idDiaLaboral;
-  const nomDia = e.nombreDia ?? e?.diaLaboral?.nombreDia ?? "—";
-  const idUbi = e.idUbicacion ?? e?.ubicacion?.idUbicacion ?? null;
-  const nomUbi = e.nombreUbicacion ?? e?.ubicacion?.nombre ?? null;
-  return {
-    idDiaLaboral: idDia,
-    nombreDia: nomDia,
-    idUbicacion: idUbi,
-    nombreUbicacion: nomUbi,
-  };
-}).filter((x) => x.idDiaLaboral != null);
-setAsignaciones(inicialDU);
+        // DU inicial: soporta plano y anidado
+        const duSrc = Array.isArray(t.equipoDiaUbicacion)
+          ? t.equipoDiaUbicacion
+          : [];
+        const inicialDU: AsignDU[] = duSrc
+          .map((e: any) => {
+            const idDia = e.idDiaLaboral ?? e?.diaLaboral?.idDiaLaboral;
+            const nomDia = e.nombreDia ?? e?.diaLaboral?.nombreDia ?? "—";
+            const idUbi = e.idUbicacion ?? e?.ubicacion?.idUbicacion ?? null;
+            const nomUbi = e.nombreUbicacion ?? e?.ubicacion?.nombre ?? null;
+            return idDia != null
+              ? {
+                  idDiaLaboral: idDia,
+                  nombreDia: nomDia,
+                  idUbicacion: idUbi,
+                  nombreUbicacion: nomUbi,
+                }
+              : null;
+          })
+          .filter(Boolean) as AsignDU[];
+        setAsignaciones(inicialDU);
+
         // Días
         const dr = await fetch(DIAS_PATH, {
           headers: {
@@ -461,7 +506,9 @@ setAsignaciones(inicialDU);
         });
         if (dr.ok) {
           const dias: DiaLaboral[] = await dr.json();
-          setDiasOptions(dias.map((d) => ({ value: d.idDiaLaboral, label: d.nombreDia })));
+          setDiasOptions(
+            dias.map((d) => ({ value: d.idDiaLaboral, label: d.nombreDia }))
+          );
         }
 
         // Libres por día
@@ -523,7 +570,7 @@ setAsignaciones(inicialDU);
             name: "fechaFin",
             label: "Fecha límite",
             type: "date" as const,
-            required: true,
+            required: false,
           },
           {
             name: "estado",
@@ -537,7 +584,7 @@ setAsignaciones(inicialDU);
     []
   );
 
-  // Handler seguro para DynamicForm: difiere el setState al microtask
+  // Handler seguro para DynamicForm
   const handleFormChangeDeferred = useCallback((updated: Record<string, any>) => {
     Promise.resolve().then(() =>
       setFormData((prev) => ({ ...prev, ...updated }))
@@ -560,13 +607,24 @@ setAsignaciones(inicialDU);
     if (!selectedMember) return;
     if (miembros.some((m) => m.id === selectedMember.value)) return;
 
+    const d = Math.max(1, Math.min(newMemberMax, newMemberDisp));
+    const err = validateMemberDates(
+  formData.fechaInicio,
+  formData.fechaFin || null,
+  newMemberStart || null,
+  newMemberEnd || null
+);
+if (err) {
+  alert(err);
+  return;
+}
     setMiembros((ms) => [
       ...ms,
       {
         id: selectedMember.value,
         nombre: selectedMember.label,
         idCargo: selectedMember.idCargo,
-        disponibilidad: Math.max(1, Math.min(100, newMemberDisp)),
+        disponibilidad: d,
         fechaEntrada: newMemberStart || "",
         fechaFin: newMemberEnd || "",
       },
@@ -575,12 +633,14 @@ setAsignaciones(inicialDU);
       opts.filter((o) => o.value !== selectedMember.value)
     );
     setSelectedMember(null);
-    setNewMemberDisp(100);
     setNewMemberStart("");
     setNewMemberEnd("");
+    setNewMemberMax(100);
+    setNewMemberDisp(100);
   };
 
   const updateMemberDisp = (id: number, val: number) =>
+    
     setMiembros((ms) =>
       ms.map((m) =>
         m.id === id
@@ -609,33 +669,49 @@ setAsignaciones(inicialDU);
         </div>
       ),
     },
-    { key: "idCargo", label: "Cargo" },
     {
-      key: "disponibilidad",
-      label: "Disp. (%)",
-      render: (s: IMiembrosEquipo) => (
-        <input
-          type="number"
-          min={1}
-          max={100}
-          value={Number(s.disponibilidad ?? 100)}
-          onChange={(e) =>
-            updateMemberDisp(s.id, Number(e.target.value) || 1)
-          }
-          className="w-20 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-        />
-      ),
-    },
+  key: "disponibilidad",
+  label: "Disp. (%)",
+  render: (s: IMiembrosEquipo) => {
+    const restante = dispCaps.get(s.id) ?? 100;            // lo que le queda libre fuera de este equipo
+    const actual = Number(s.disponibilidad ?? 0);          // lo que ya tiene en este equipo
+    const cap = Math.max(1, Math.min(100, restante + actual)); // máximo permitido para esta celda
+
+    return (
+      <input
+        type="number"
+        min={1}
+        max={cap}
+        value={Number(s.disponibilidad ?? 100)}
+        onChange={(e) => {
+          const v = Number(e.target.value) || 1;
+          updateMemberDisp(s.id, Math.max(1, Math.min(cap, v)));
+        }}
+        className="w-20 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+        title={`Máximo permitido: ${cap}%`}
+      />
+    );
+  },
+},
+
+    
     {
       key: "fechaEntrada",
       label: "Entrada",
       render: (s: IMiembrosEquipo) => (
         <input
-          type="date"
-          value={s.fechaEntrada ?? ""}
-          onChange={(e) => updateMemberStart(s.id, e.target.value)}
-          className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-        />
+  type="date"
+  value={s.fechaEntrada ?? ""}
+  onChange={(e) => {
+    const v = e.target.value;
+    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, s.fechaFin || null);
+    if (err) return alert(err);
+    updateMemberStart(s.id, v);
+  }}
+  min={formData.fechaInicio || undefined}
+  max={(s.fechaFin || formData.fechaFin) || undefined}
+  className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+/>
       ),
     },
     {
@@ -643,11 +719,18 @@ setAsignaciones(inicialDU);
       label: "Fin",
       render: (s: IMiembrosEquipo) => (
         <input
-          type="date"
-          value={s.fechaFin ?? ""}
-          onChange={(e) => updateMemberEnd(s.id, e.target.value)}
-          className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-        />
+  type="date"
+  value={s.fechaFin ?? ""}
+  onChange={(e) => {
+    const v = e.target.value;
+    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, s.fechaEntrada || null, v);
+    if (err) return alert(err);
+    updateMemberEnd(s.id, v);
+  }}
+  min={(s.fechaEntrada || formData.fechaInicio) || undefined}
+  max={formData.fechaFin || undefined}
+  className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+/>
       ),
     },
     {
@@ -659,7 +742,12 @@ setAsignaciones(inicialDU);
             setMiembros((ms) => ms.filter((m) => m.id !== s.id));
             setMemberOptions((opts) => [
               ...opts,
-              { value: s.id, label: s.nombre, idCargo: s.idCargo },
+              {
+                value: s.id,
+                label: s.nombre,
+                idCargo: s.idCargo,
+                dispRestante: 100,
+              },
             ]);
           }}
           className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none"
@@ -776,38 +864,58 @@ setAsignaciones(inicialDU);
     },
   ];
 
-  // Submit
-  const onSubmit = async (_data: Record<string, any>) => {
+// Submit
+  const onSubmit = async (_data: Record<string, any>) => {if (formData.fechaFin && !lt(formData.fechaInicio, formData.fechaFin)) {
+  setError("La fecha de inicio del equipo debe ser anterior a la fecha límite.");
+  setSaving(false);
+  return;
+}
+
+// Validar fechas de todos los miembros
+for (const m of miembros) {
+  const err = validateMemberDates(
+    formData.fechaInicio,
+    formData.fechaFin || null,
+    m.fechaEntrada || null,
+    m.fechaFin || null
+  );
+  if (err) {
+    setError(`Miembro ${m.nombre}: ${err}`);
+    setSaving(false);
+    return;
+  }
+}
     try {
       if (!team) return;
-      if (!clienteSel) throw new Error("Seleccioná un cliente.");
       setSaving(true);
       setError(null);
       setExternalErrors({});
 
-      const duPayload = rowsDU.map((a) => ({
-  idDiaLaboral: a.idDiaLaboral,
-  idUbicacion: a.idUbicacion ?? null,
-}));
+      // DU plano
+      const duPayload = asignaciones.map((a) => ({
+        idDiaLaboral: a.idDiaLaboral,
+        idUbicacion: a.idUbicacion ?? null,
+      }));
 
-const payload: any = {
-  nombre: formData.nombre,
-  idCliente: Number(clienteSel.value),
-  fechaInicio: formData.fechaInicio,
-  fechaLimite: formData.fechaFin,
-  estado: formData.estado ? "A" : "I",
-  idLider: leadSel ? Number(leadSel.value) : null,
-  idTecnologias: tecnologiasSel.map((t) => Number(t.value)),
-  usuarios: miembros.map((m) => ({
-    idUsuario: m.id,
-    idCargo: m.idCargo,
-    porcentajeTrabajo: toFraction(m.disponibilidad ?? 100),
-    fechaEntrada: m.fechaEntrada || null,
-    fechaFin: m.fechaFin || null,
-    estado: "A",
-  })),
-  equipoDiaUbicacion: duPayload, // ← plano
-};
+      const payload: any = {
+        nombre: formData.nombre,
+        idCliente: clienteSel ? Number(clienteSel.value) : null,
+        fechaInicio: formData.fechaInicio,
+        fechaLimite: formData.fechaFin,
+        estado: formData.estado ? "A" : "I",
+        idLider: leadSel ? Number(leadSel.value) : null,
+        idTecnologias: tecnologiasSel.map((t) => Number(t.value)),
+        usuarios: miembros.map((m) => ({
+  idUsuario: m.id,
+  idCargo: m.idCargo,
+  porcentajeTrabajo: Math.max(1, Math.min(100, Number(m.disponibilidad) || 1)),
+  fechaEntrada: m.fechaEntrada || null,
+  fechaFin: m.fechaFin || null,
+  estado: "A",
+})),
+        equipoDiaUbicacion: duPayload,
+      };
+
       const r = await fetch(`${TEAM_PATH}/${team.idEquipo}`, {
         method: "PATCH",
         headers: {
@@ -835,6 +943,7 @@ const payload: any = {
       setSaving(false);
     }
   };
+
 
   if (loading) return <div className="p-4 text-sm">Cargando…</div>;
   if (error) return <div className="p-4 text-sm text-red-600">Error: {error}</div>;
@@ -868,7 +977,7 @@ const payload: any = {
               id="editar-equipo-form"
               sections={sections}
               initialData={formData}
-              onChange={handleFormChangeDeferred} // evita setState durante render de DynamicForm
+              onChange={handleFormChangeDeferred}
               onSubmit={onSubmit}
               externalErrors={externalErrors}
               onClearExternalError={onClearExternalError}
@@ -1035,7 +1144,16 @@ const payload: any = {
                 <Select
                   options={memberOptions}
                   value={selectedMember}
-                  onChange={(opt) => setSelectedMember(opt as any)}
+                  onChange={(opt) => {
+                    const m = opt as MemberOpt | null;
+                    setSelectedMember(m);
+                    const max = Math.max(
+                      0,
+                      Math.min(100, m?.dispRestante ?? 100)
+                    );
+                    setNewMemberMax(max);
+                    setNewMemberDisp(max);
+                  }}
                   isClearable
                   isSearchable
                   placeholder="Buscar miembro…"
@@ -1059,39 +1177,51 @@ const payload: any = {
               <div>
                 <label className="block text-sm mb-2">Entrada</label>
                 <input
-                  type="date"
-                  value={newMemberStart}
-                  onChange={(e) => setNewMemberStart(e.target.value)}
-                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-                />
+  type="date"
+  value={newMemberStart}
+  onChange={(e) => setNewMemberStart(e.target.value)}
+  min={formData.fechaInicio || undefined}
+  max={formData.fechaFin || undefined}
+  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+/>
               </div>
               <div>
                 <label className="block text-sm mb-2">Fin</label>
                 <input
-                  type="date"
-                  value={newMemberEnd}
-                  onChange={(e) => setNewMemberEnd(e.target.value)}
-                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-                />
+  type="date"
+  value={newMemberEnd}
+  onChange={(e) => setNewMemberEnd(e.target.value)}
+  min={(newMemberStart || formData.fechaInicio) || undefined}
+  max={formData.fechaFin || undefined}
+  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+/>
               </div>
               <div className="flex items-end gap-2">
                 <input
                   type="number"
                   min={1}
-                  max={100}
+                  max={newMemberMax}
                   value={newMemberDisp}
                   onChange={(e) =>
                     setNewMemberDisp(
-                      Math.max(1, Math.min(100, Number(e.target.value) || 1))
+                      Math.max(
+                        1,
+                        Math.min(newMemberMax, Number(e.target.value) || 1)
+                      )
                     )
                   }
                   className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
                   placeholder="Disp. %"
+                  title={
+                    selectedMember
+                      ? `Disponible máx: ${newMemberMax}%`
+                      : "Elegí un miembro primero"
+                  }
                 />
                 <button
                   type="button"
                   onClick={handleAddMember}
-                  disabled={!selectedMember}
+                  disabled={!selectedMember || newMemberMax <= 0}
                   className="px-4 h-10 rounded bg-blue-600 text-white text-sm disabled:opacity-60"
                 >
                   Agregar

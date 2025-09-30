@@ -12,7 +12,7 @@ type Miembro = {
   id: number;
   nombre: string;
   idCargo: number;
-  disponibilidad?: number;
+  disponibilidad?: number; // int 1..100
   fechaEntrada?: string;
   fechaFin?: string;
 };
@@ -38,20 +38,6 @@ function useIsDark() {
   }, []);
   return isDark;
 }
-
-// Helpers
-const toPercent = (v: any) => {
-  const n = Number(v);
-  if (!isFinite(n)) return 100;
-  if (n <= 1) return Math.round(n * 100);
-  return Math.max(1, Math.min(100, Math.round(n)));
-};
-const toFraction = (p: any) => {
-  const n = Number(p);
-  if (!isFinite(n)) return 1;
-  const pct = n > 1 ? n / 100 : n;
-  return +Math.min(1, Math.max(0.01, pct)).toFixed(4);
-};
 
 export default function EquipoFormPage() {
   const { token } = useAuth();
@@ -165,7 +151,7 @@ export default function EquipoFormPage() {
       value: number;
       label: string;
       idCargo: number;
-      dispRestante: number;
+      dispRestante: number; // 0..100
     }>
   >([]);
   const [selectedMember, setSelectedMember] = useState<{
@@ -299,7 +285,15 @@ export default function EquipoFormPage() {
               idCargo: u.idCargo ?? 0,
               dispRestante: Math.max(
                 0,
-                Math.min(100, toPercent(u.disponibilidad ?? 100))
+                Math.min(
+                  100,
+                  Number(
+                    u.disponibilidadRestante ??
+                      u.disponibilidad ??
+                      u.dispRestante ??
+                      100
+                  )
+                )
               ),
             }))
           );
@@ -385,7 +379,7 @@ export default function EquipoFormPage() {
     if (!selectedMember) return;
     if (miembros.some((m) => m.id === selectedMember.value)) return;
 
-    const d = Number(newMemberDisp) || 0;
+    const d = Math.max(1, Math.min(newMemberMax, Number(newMemberDisp) || 1));
     if (d <= 0) {
       alert("Este usuario no tiene disponibilidad para asignar.");
       return;
@@ -397,7 +391,7 @@ export default function EquipoFormPage() {
         id: selectedMember.value,
         nombre: selectedMember.label,
         idCargo: selectedMember.idCargo,
-        disponibilidad: Math.max(1, Math.min(newMemberMax, d)),
+        disponibilidad: d, // int 1..100
         fechaEntrada: newMemberStart || "",
         fechaFin: newMemberEnd || "",
       },
@@ -427,54 +421,49 @@ export default function EquipoFormPage() {
   };
 
   // ====== SUBMIT ======
-  // ====== SUBMIT ======
-const handleSubmit = async (data: Record<string, any>) => {
-  if (!clienteSel) throw new Error("Seleccioná un cliente.");
+  const handleSubmit = async (data: Record<string, any>) => {
+    const duPayload = rowsDU.map((a) => ({
+      idDiaLaboral: a.idDiaLaboral,
+      idUbicacion: a.idUbicacion ?? null,
+    }));
 
-  // 👇 antes armabas objetos anidados; ahora enviamos { idDiaLaboral, idUbicacion }
-  const duPayload = rowsDU.map((a) => ({
-    idDiaLaboral: a.idDiaLaboral,
-    idUbicacion: a.idUbicacion ?? null,
-  }));
+    const payload = {
+      nombre: data.nombre,
+      fechaInicio: data.fechaInicio,
+      idCliente: clienteSel ? Number(clienteSel.value) : null, // cliente opcional
+      estado: data.estado ? "A" : "I",
+      idTecnologias: tecSel.map((t) => Number(t.value)),
+      usuarios: miembros.map((m) => ({
+        idUsuario: m.id,
+        idCargo: m.idCargo,
+        disponibilidad: Math.max(1, Math.min(100, Number(m.disponibilidad) || 1)),
+        estado: "A",
+        ...(m.fechaEntrada ? { fechaEntrada: m.fechaEntrada } : {}),
+        ...(m.fechaFin ? { fechaFin: m.fechaFin } : {}),
+      })),
+      equipoDiaUbicacion: duPayload,
+      ...(leadSel ? { idLider: Number(leadSel.value) } : {}),
+      ...(data.fechaFin ? { fechaLimite: data.fechaFin } : {}),
+    };
 
-  const payload = {
-    nombre: data.nombre,
-    fechaInicio: data.fechaInicio,
-    idCliente: Number(clienteSel.value),
-    estado: data.estado ? "A" : "I",
-    idTecnologias: tecSel.map((t) => Number(t.value)),
-    usuarios: miembros.map((m) => ({
-      idUsuario: m.id,
-      idCargo: m.idCargo,
-      porcentajeTrabajo: toFraction(m.disponibilidad ?? 100),
-      estado: "A",
-      ...(m.fechaEntrada ? { fechaEntrada: m.fechaEntrada } : {}),
-      ...(m.fechaFin ? { fechaFin: m.fechaFin } : {}),
-    })),
-    equipoDiaUbicacion: duPayload, // 👈 ahora coincide con tu JSON de ejemplo
-    ...(leadSel ? { idLider: Number(leadSel.value) } : {}),
-    ...(data.fechaFin ? { fechaLimite: data.fechaFin } : {}),
+    const r = await fetch(CREATE_TEAM_PATH, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    console.log("✅ Equipo: ", payload);
+    if (!r.ok) {
+      const msg = await r.text();
+      throw new Error(`❌${r.status} ${r.statusText} — ${msg}`);
+    }
+
+    navigate("/operations");
   };
-
-  const r = await fetch(CREATE_TEAM_PATH, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
-  console.log("✅ Equipo: ", payload);
-  if (!r.ok) {
-    const msg = await r.text();
-    throw new Error(`❌${r.status} ${r.statusText} — ${msg}`);
-  }
-
-  navigate("/operations");
-};
-
 
   // secciones base
   const getSections = () => [
@@ -482,30 +471,10 @@ const handleSubmit = async (data: Record<string, any>) => {
       title: "Crear Equipo",
       icon: "📅",
       fields: [
-        {
-          name: "nombre",
-          label: "Nombre del equipo",
-          type: "text" as const,
-          required: true,
-        },
-        {
-          name: "fechaInicio",
-          label: "Fecha de inicio",
-          type: "date" as const,
-          required: true,
-        },
-        {
-          name: "fechaFin",
-          label: "Fecha límite",
-          type: "date" as const,
-          required: false,
-        }, // ahora opcional
-        {
-          name: "estado",
-          label: "Activo",
-          type: "checkbox" as const,
-          required: true,
-        },
+        { name: "nombre", label: "Nombre del equipo", type: "text" as const, required: true },
+        { name: "fechaInicio", label: "Fecha de inicio", type: "date" as const, required: true },
+        { name: "fechaFin", label: "Fecha límite", type: "date" as const, required: false },
+        { name: "estado", label: "Activo", type: "checkbox" as const, required: true },
       ],
     },
   ];
@@ -600,11 +569,12 @@ const handleSubmit = async (data: Record<string, any>) => {
             {/* Cliente y Team Lead */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm mb-2">Cliente</label>
+                <label className="block text-sm mb-2">Cliente (opcional)</label>
                 <Select
                   options={clienteOptions}
                   value={clienteSel}
                   onChange={(opt) => setClienteSel(opt as any)}
+                  isClearable
                   placeholder="Seleccionar cliente…"
                   theme={selectTheme}
                   styles={selectStyles}
@@ -767,7 +737,7 @@ const handleSubmit = async (data: Record<string, any>) => {
                           <td className="px-4 py-2">{m.nombre}</td>
                           <td className="px-4 py-2">{m.idCargo}</td>
                           <td className="px-4 py-2">
-                            {m.disponibilidad ?? 100}
+                            {Math.max(1, Math.min(100, Number(m.disponibilidad) || 1))}
                           </td>
                           <td className="px-4 py-2">
                             {m.fechaEntrada || "—"}
