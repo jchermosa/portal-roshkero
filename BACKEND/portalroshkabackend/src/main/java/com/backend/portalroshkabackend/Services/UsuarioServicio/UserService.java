@@ -9,6 +9,7 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateFoto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposBeneficiosDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposPermisosDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -623,6 +625,38 @@ public class UserService {
         usuario.setContrasena(encoder.encode(nuevaContrasena)); // Actualiza la contraseña con la nueva codificada
         usuarioRepository.save(usuario);
         return true;
+    }
+
+    public boolean actualizarFoto(UserUpdateFoto dto){
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        if (!esBase64(dto.getFoto())) { // Verifica si la cadena es una imagen en base64
+            return false;
+        }
+        usuario.setUrlPerfil(dto.getFoto());; // Actualiza la foto con la nueva codificada
+        usuarioRepository.save(usuario);
+        return true;
+    }
+
+    public boolean esBase64(String texto) {
+        try {
+            Base64.getDecoder().decode(texto);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     // Mapeo de Solicitud a SolicitudUserDto según el nuevo modelo
