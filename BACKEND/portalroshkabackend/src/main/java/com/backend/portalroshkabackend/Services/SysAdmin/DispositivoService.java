@@ -9,6 +9,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
+import com.backend.portalroshkabackend.tools.RepositoryService;
+import com.backend.portalroshkabackend.tools.errors.errorslist.DatabaseOperationException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.dispositivos.*;
+import com.backend.portalroshkabackend.tools.mapper.DispositivoMapper;
+import com.backend.portalroshkabackend.tools.mapper.TipoDispositivoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +32,8 @@ import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceRepository;
 import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceTypesRepository;
 import com.backend.portalroshkabackend.Services.UsuarioServicio.UserService;
 
+import static com.backend.portalroshkabackend.tools.MessagesConst.DATABASE_DEFAULT_ERROR;
+
 
 @Service
 public class DispositivoService {
@@ -41,6 +48,8 @@ public class DispositivoService {
     @Autowired
     private final  UbicacionService ubicacionService;
 
+    @Autowired
+    private final RepositoryService repositoryService;
 
     @Autowired
     private final DeviceRepository deviceRepository;
@@ -50,11 +59,12 @@ public class DispositivoService {
 
     public DispositivoService(DeviceTypesRepository deviceTypesRepository,
                              DeviceRepository deviceRepository,
-                             UbicacionService ubicacionService) {
+                             UbicacionService ubicacionService,
+                              RepositoryService repositoryService) {
         this.deviceTypesRepository = deviceTypesRepository;
         this.deviceRepository = deviceRepository;
         this.ubicacionService = ubicacionService;
-
+        this.repositoryService = repositoryService;
 
         sortingMapPage = new HashMap<>();
 
@@ -69,19 +79,19 @@ public class DispositivoService {
     @Transactional(readOnly = true)
     public DeviceDTO getDeviceById(Integer id) {
         Dispositivo dispositivo = deviceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dispositivo no encontrado con ID: " + id));
-        return convertToDto(dispositivo);
+                .orElseThrow(() -> new DeviceNotFoundException(id));
+        return DispositivoMapper.toDeviceDto(dispositivo);
     }
 
     @Transactional(readOnly = true)
     public Page<DeviceDTO> getAllDevices(Pageable pageable) {
         try {
             Page<Dispositivo> dispositivos = deviceRepository.findAll(pageable);
-            return dispositivos.map(this::convertToDto);
+            return dispositivos.map(DispositivoMapper::toDeviceDto);
         } catch (Exception e) {
             System.err.println("Error al obtener dispositivos: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Error al obtener dispositivos", e);
+            throw new DatabaseOperationException("Error al acceder a los datos",e);
         }
     }
 
@@ -90,7 +100,7 @@ public class DispositivoService {
     @Transactional
     public Page<DeviceTypeDTO> getAllTypes(Pageable pageable){
         Page<TipoDispositivo> tiposDispositivos = deviceTypesRepository.findAll(pageable);
-        return tiposDispositivos.map(this::convertToDto);
+        return tiposDispositivos.map(TipoDispositivoMapper::toDeviceTypeDto);
     }
 
 
@@ -120,12 +130,12 @@ public class DispositivoService {
                 dispositivos = sortingMapPage.get(sortBy).apply(filterValue, pageable);
                 
             } catch (NumberFormatException e) {
-                System.err.println("Error: filterValue no es un número válido: " + filterValue);
                 dispositivos = deviceRepository.findAllWithoutOwner(pageable);
+                throw new InvalidFilterValueException(filterValue);
             }
         }
         
-        return dispositivos.map(this::convertToDto);
+        return dispositivos.map(DispositivoMapper::toDeviceDto);
     }
     
 
@@ -136,34 +146,19 @@ public class DispositivoService {
 
         Dispositivo newDispositivo = new Dispositivo();
 
-
+        TipoDispositivo tipoDispositivo = repositoryService.findByIdOrThrow(
+                deviceTypesRepository,
+                dispositivo.getTipoDispositivo(),
+                () -> new DeviceTypeNotFoundException(dispositivo.getTipoDispositivo())
+        );
         // Asignar TipoDispositivo si se proporciona
-        if (dispositivo.getTipoDispositivo() != null) {
-            TipoDispositivo tipoDispositivo = deviceTypesRepository.findById(dispositivo.getTipoDispositivo())
-                    .orElseThrow(() -> new RuntimeException("Tipo de dispositivo no encontrado con ID: " + dispositivo.getTipoDispositivo()));
-            newDispositivo.setTipoDispositivo(tipoDispositivo);
-        }
- 
+        newDispositivo.setTipoDispositivo(tipoDispositivo);
+
         // Asignar la ubicacion si se proporciona
         UbicacionDto ubicacion = ubicacionService.findByIdUbicacion(dispositivo.getUbicacion())
-                .orElseThrow(() -> new RuntimeException("Ubicación no encontrada con ID: " + dispositivo.getUbicacion()));
-
+                .orElseThrow(() -> new LocationNotFoundException(dispositivo.getUbicacion()));
         Ubicacion newUbicacion = new Ubicacion();
-        newUbicacion.setIdUbicacion(ubicacion.getIdUbicacion());
-        newUbicacion.setNombre(ubicacion.getNombre());
-        newUbicacion.setEstado(ubicacion.getEstado());
-
-        // Asignar la nueva ubicacion al dispositivo
-        newDispositivo.setUbicacion(newUbicacion);
-
-
-
-        newDispositivo.setNroSerie(dispositivo.getNroSerie());
-        newDispositivo.setModelo(dispositivo.getModelo());
-        newDispositivo.setFechaFabricacion(dispositivo.getFechaFabricacion());
-        newDispositivo.setCategoria(dispositivo.getCategoria());
-        newDispositivo.setDetalles(dispositivo.getDetalle());
-        newDispositivo.setEstado(dispositivo.getEstado());
+        DispositivoMapper.toUbicacionFromUbicacionDto(newUbicacion, ubicacion);
 
         // Asignar Encargado si se proporciona
         if (dispositivo.getEncargado() != null) {
@@ -171,89 +166,92 @@ public class DispositivoService {
             newDispositivo.setEncargado(encargado.orElse(null));
         } else {
             newDispositivo.setEncargado(null);
-        }
-        
-         // Establecer la fecha de creación al momento de crear el dispositivo
+        };
+
+        // Asignar la nueva ubicacion al dispositivo
+        newDispositivo.setUbicacion(newUbicacion);
+        newDispositivo.setNroSerie(dispositivo.getNroSerie());
+        newDispositivo.setModelo(dispositivo.getModelo());
+        newDispositivo.setFechaFabricacion(dispositivo.getFechaFabricacion());
+        newDispositivo.setCategoria(dispositivo.getCategoria());
+        newDispositivo.setDetalles(dispositivo.getDetalle());
+        newDispositivo.setEstado(dispositivo.getEstado());
         newDispositivo.setFechaCreacion(LocalDateTime.now());
 
-        // Asignar TipoDispositivo si se proporciona
-        if (dispositivo.getTipoDispositivo() != null) {
-            TipoDispositivo tipoDispositivo = deviceTypesRepository.findById(dispositivo.getTipoDispositivo())
-                    .orElseThrow(() -> new RuntimeException("Tipo de dispositivo no encontrado con ID: " + dispositivo.getTipoDispositivo()));
-            newDispositivo.setTipoDispositivo(tipoDispositivo);
-        } else {
-            newDispositivo.setTipoDispositivo(null);
-        }
+        repositoryService.save(
+                deviceRepository,
+                newDispositivo,
+                DATABASE_DEFAULT_ERROR
+        );
 
-        // Aquí puedes asignar otros campos como Ubicacion y Encargado si es necesario
-        deviceRepository.save(newDispositivo);
-
-        return convertToDto(newDispositivo);
+        return DispositivoMapper.toDeviceDto(newDispositivo);
 
     }
 
     @Transactional
     public DeviceDTO updateDevice(Integer id, DeviceDTO dispositivoDto) {
        
-        Dispositivo existingDispositivo = deviceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dispositivo no encontrado con ID: " + id));
+        Dispositivo existingDispositivo = repositoryService.findByIdOrThrow(
+                deviceRepository,
+                id,
+                () -> new DeviceNotFoundException(id)
+        );
 
         existingDispositivo.setNroSerie(dispositivoDto.getNroSerie());
 
+
         // Asignar Tipo de Dispositivo si se proporciona
-        if (dispositivoDto.getTipoDispositivo() != null) {
-            TipoDispositivo tipoDispositivo = deviceTypesRepository.findById(dispositivoDto.getTipoDispositivo())
-                    .orElseThrow(() -> new RuntimeException("Tipo de dispositivo no encontrado con ID: " + dispositivoDto.getTipoDispositivo()));
-            existingDispositivo.setTipoDispositivo(tipoDispositivo);
-        } else {
+        if (dispositivoDto.getTipoDispositivo() == null)
             throw new RuntimeException("El tipo de dispositivo es obligatorio");
-        }
 
+        TipoDispositivo tipoDispositivo = repositoryService.findByIdOrThrow(
+                deviceTypesRepository,
+                dispositivoDto.getTipoDispositivo(),
+                () -> new DeviceTypeNotFoundException(dispositivoDto.getTipoDispositivo())
+        );
 
-        
+        existingDispositivo.setTipoDispositivo(tipoDispositivo);
+
         UbicacionDto ubicacionDto = ubicacionService.findByIdUbicacion(dispositivoDto.getUbicacion())
-                .orElseThrow(() -> new RuntimeException("Ubicación no encontrada con ID: " + dispositivoDto.getUbicacion()));
+                .orElseThrow(() -> new LocationNotFoundException(dispositivoDto.getUbicacion()));
         
 
         // Asignar la nueva ubicacion al dispositivo
         Ubicacion ubicacion = new Ubicacion();
-        ubicacion.setNombre(ubicacionDto.getNombre());
-        ubicacion.setEstado(ubicacionDto.getEstado());
-        ubicacion.setIdUbicacion(ubicacionDto.getIdUbicacion());
+        DispositivoMapper.toUbicacionFromUbicacionDto(ubicacion, ubicacionDto);
 
-        existingDispositivo.setUbicacion(ubicacion); 
 
-        existingDispositivo.setModelo(dispositivoDto.getModelo());
-        existingDispositivo.setFechaFabricacion(dispositivoDto.getFechaFabricacion());
-        existingDispositivo.setCategoria(dispositivoDto.getCategoria());
-        existingDispositivo.setDetalles(dispositivoDto.getDetalle());
-        existingDispositivo.setEstado(dispositivoDto.getEstado());
-        
-        // Actualizar TipoDispositivo si se proporciona
-        if (dispositivoDto.getTipoDispositivo() != null) {
-            TipoDispositivo tipoDispositivo = deviceTypesRepository.findById(dispositivoDto.getTipoDispositivo())
-                    .orElseThrow(() -> new RuntimeException("Tipo de dispositivo no encontrado con ID: " + dispositivoDto.getTipoDispositivo()));
-            existingDispositivo.setTipoDispositivo(tipoDispositivo);
-        } else {
-            existingDispositivo.setTipoDispositivo(null);
-        }
+        //Pasar del DTO a la entidad
+        DispositivoMapper.toDispositivoFromDto(existingDispositivo, dispositivoDto);
 
-        // Aquí puedes actualizar otros campos como Ubicacion y Encargado si es necesario
+        Dispositivo updatedDispositivo = repositoryService.save(
+                deviceRepository,
+                existingDispositivo,
+                DATABASE_DEFAULT_ERROR
+        );
 
-        Dispositivo updatedDispositivo = deviceRepository.save(existingDispositivo);
-        return convertToDto(updatedDispositivo);
+
+        return DispositivoMapper.toDeviceDto(updatedDispositivo);
     }
 
     @Transactional
     public void deleteDeviceById(Integer id) {
-        
 
         // Encontrar el dispositivo por ID
-        Dispositivo dispositivo = deviceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dispositivo no encontrado con ID: " + id));
-        
+        Dispositivo dispositivo = repositoryService.findByIdOrThrow(
+                deviceRepository,
+                id,
+                () -> new DeviceNotFoundException(id)
+        );
+
         dispositivo.setEstado(EstadoInventario.ND);
-        deviceRepository.save(dispositivo);
+
+        repositoryService.save(
+                deviceRepository,
+                dispositivo,
+                DATABASE_DEFAULT_ERROR
+        );
+
     }
     
 
@@ -308,7 +306,7 @@ public class DispositivoService {
         System.err.println("Error general al convertir Dispositivo a DTO: " + e.getMessage());
         e.printStackTrace(); // Agregar esto para ver el stack trace completo
         // En lugar de crear un DTO vacío, propagar la excepción o manejar específicamente
-        throw new RuntimeException("Error al convertir dispositivo a DTO", e);
+        throw new DeviceMappingException("Error al procesar los datos",e);
     }
     
     return dto;

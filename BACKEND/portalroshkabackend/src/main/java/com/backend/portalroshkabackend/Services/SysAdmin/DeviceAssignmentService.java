@@ -4,6 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.backend.portalroshkabackend.tools.RepositoryService;
+import com.backend.portalroshkabackend.tools.errors.errorslist.asignacionDispositivos.DeviceAssignmentNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.asignacionDispositivos.InvalidRequestTypeException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.dispositivos.DeviceNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.DeviceRequestNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.user.UserNotFoundException;
+import com.backend.portalroshkabackend.tools.mapper.DeviceAssignmentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +32,8 @@ import com.backend.portalroshkabackend.Services.UsuariosService;
 
 import jakarta.transaction.Transactional;
 
+import static com.backend.portalroshkabackend.tools.MessagesConst.DATABASE_DEFAULT_ERROR;
+
 @Service
 public class DeviceAssignmentService {
 
@@ -35,6 +44,8 @@ public class DeviceAssignmentService {
     private final DispositivoService dispositivoService;
 
     @Autowired
+    private final RepositoryService repositoryService;
+    @Autowired
     private final DeviceRepository deviceRepository;
 
     @Autowired
@@ -43,9 +54,10 @@ public class DeviceAssignmentService {
     @Autowired
     private final SolicitudRepository solicitudRepository;
 
-    public DeviceAssignmentService(DeviceAssignmentRepository deviceAssignment, DispositivoService dispositivoService, DeviceRepository deviceRepository, UsuariosService usuarioService, SolicitudRepository solicitudRepository) {
+    public DeviceAssignmentService(DeviceAssignmentRepository deviceAssignment, DispositivoService dispositivoService, RepositoryService repositoryService, DeviceRepository deviceRepository, UsuariosService usuarioService, SolicitudRepository solicitudRepository) {
         this.deviceAssignment = deviceAssignment;
         this.dispositivoService = dispositivoService;
+        this.repositoryService = repositoryService;
         this.deviceRepository = deviceRepository;
         this.usuarioService = usuarioService;
         this.solicitudRepository = solicitudRepository;
@@ -57,7 +69,7 @@ public class DeviceAssignmentService {
     public Page<DeviceAssignmentDTO> listarAsignaciones(Pageable pageable) {
         Page<DispositivoAsignado> dispositivosAsignados = deviceAssignment.findAll(pageable);
         
-        return dispositivosAsignados.map(this::convertToDTO);
+        return dispositivosAsignados.map(DeviceAssignmentMapper::toDeviceAssignmentDto);
     }
 
 
@@ -85,12 +97,12 @@ public class DeviceAssignmentService {
 
             // Verificamos que exista 
             if (checkSolicitud.isEmpty()) {
-                throw new RuntimeException("Solicitud no encontrada con ID: " + deviceAssignmentDTO.getIdSolicitud());
+                throw new DeviceRequestNotFoundException(deviceAssignmentDTO.getIdSolicitud());
             }
 
             // verificamos que sea del tipo Dispositivo
             if (checkSolicitud.get().getTipoSolicitud() != SolicitudesEnum.DISPOSITIVO) {
-                throw new RuntimeException("La solicitud no es del tipo Dispositivo.");
+                throw new InvalidRequestTypeException(checkSolicitud.get().getTipoSolicitud());
             }
 
             solicitud.setIdSolicitud(deviceAssignmentDTO.getIdSolicitud());
@@ -98,24 +110,20 @@ public class DeviceAssignmentService {
         }
 
 
-        dispositivoAsignado.setFechaEntrega(deviceAssignmentDTO.getFechaEntrega());
-        dispositivoAsignado.setFechaDevolucion(deviceAssignmentDTO.getFechaDevolucion());
-        dispositivoAsignado.setEstado(deviceAssignmentDTO.getEstadoAsignacion());
-        dispositivoAsignado.setObservaciones(deviceAssignmentDTO.getObservaciones());   
-        
+        DeviceAssignmentMapper.toDispositivoAsignadoFromDto(dispositivoAsignado,deviceAssignmentDTO);
         deviceAssignment.save(dispositivoAsignado);
 
         // Cambiando el estado del dispositivo a No Disponible
 
 
         Dispositivo dispositivo = deviceRepository.findById(deviceAssignmentDTO.getIdDispositivo())
-            .orElseThrow(() -> new RuntimeException("Dispositivo no encontrado con ID: " + deviceAssignmentDTO.getIdDispositivo()));
+            .orElseThrow(() -> new DeviceNotFoundException(deviceAssignmentDTO.getIdDispositivo()));
 
         dispositivo.setEstado(EstadoInventario.A);
 
         // Encontrar la solicitud para obtener el ID del usuario
         Solicitud solicitud = solicitudRepository.findById(deviceAssignmentDTO.getIdSolicitud())
-            .orElseThrow(() -> new RuntimeException("Solicitud no encontrada con ID: " + deviceAssignmentDTO.getIdSolicitud()));
+            .orElseThrow(() -> new DeviceRequestNotFoundException(deviceAssignmentDTO.getIdSolicitud()));
 
 
 
@@ -124,11 +132,15 @@ public class DeviceAssignmentService {
         if (encargadoOpt.isPresent()) {
             dispositivo.setEncargado(encargadoOpt.get());
         } else {
-            throw new RuntimeException("Usuario no encontrado con ID: " + solicitud.getUsuario().getIdUsuario());
+            throw new UserNotFoundException(solicitud.getUsuario().getIdUsuario());
         }
 
         // Cambiar estado a No Disponible
-        deviceRepository.save(dispositivo);
+        repositoryService.save(
+                deviceRepository,
+                dispositivo,
+                DATABASE_DEFAULT_ERROR
+        );
 
         deviceAssignmentDTO.setIdDispositivoAsignado(dispositivoAsignado.getIdDispositivoAsignado());
         return deviceAssignmentDTO;
@@ -139,7 +151,7 @@ public class DeviceAssignmentService {
     @Transactional
     public DeviceAssignmentDTO actualizarAsignacion(Integer idDispositivoAsignado, DeviceAssignmentDTO deviceAssignmentDTO) {
         DispositivoAsignado dispositivoAsignado = deviceAssignment.findById(idDispositivoAsignado)
-            .orElseThrow(() -> new RuntimeException("Asignación no encontrada con ID: " + idDispositivoAsignado));
+            .orElseThrow(() -> new DeviceAssignmentNotFoundException(idDispositivoAsignado));
 
         // Mapear campos del DTO al modelo existente
         if (deviceAssignmentDTO.getIdDispositivo() != null) {
@@ -154,14 +166,15 @@ public class DeviceAssignmentService {
             dispositivoAsignado.setSolicitud(solicitud);
         }
 
-        dispositivoAsignado.setFechaEntrega(deviceAssignmentDTO.getFechaEntrega());
-        dispositivoAsignado.setFechaDevolucion(deviceAssignmentDTO.getFechaDevolucion());
-        dispositivoAsignado.setEstado(deviceAssignmentDTO.getEstadoAsignacion());
-        dispositivoAsignado.setObservaciones(deviceAssignmentDTO.getObservaciones());
+        DeviceAssignmentMapper.toDispositivoAsignadoFromDto(dispositivoAsignado,deviceAssignmentDTO);
 
-        DispositivoAsignado savedAsignacion = deviceAssignment.save(dispositivoAsignado);
+        DispositivoAsignado savedAsignacion = repositoryService.save(
+                deviceAssignment,
+                dispositivoAsignado,
+                DATABASE_DEFAULT_ERROR
+        );
 
-        return convertToDTO(savedAsignacion);
+        return DeviceAssignmentMapper.toDeviceAssignmentDto(savedAsignacion);
     }
 
 
@@ -173,7 +186,11 @@ public class DeviceAssignmentService {
         if (dispositivoAsignado.isPresent()) {
             DispositivoAsignado asignado = dispositivoAsignado.get();
             asignado.setEstado(EstadoAsignacion.D);
-            deviceAssignment.save(asignado);
+            repositoryService.save(
+                    deviceAssignment,
+                    asignado,
+                    DATABASE_DEFAULT_ERROR
+            );
         }
 
 
@@ -197,30 +214,11 @@ public class DeviceAssignmentService {
 
 
 
-    private DeviceAssignmentDTO convertToDTO(DispositivoAsignado dispositivoAsignado) {
-    DeviceAssignmentDTO dto = new DeviceAssignmentDTO();
-    
-    dto.setIdDispositivoAsignado(dispositivoAsignado.getIdDispositivoAsignado());
-    dto.setFechaEntrega(dispositivoAsignado.getFechaEntrega());
-    dto.setFechaDevolucion(dispositivoAsignado.getFechaDevolucion());
-    dto.setEstadoAsignacion(dispositivoAsignado.getEstado());
-    dto.setObservaciones(dispositivoAsignado.getObservaciones());
-    
-    // Mapear el dispositivo si existe
-    if (dispositivoAsignado.getDispositivo() != null) {
-        dto.setIdDispositivo(dispositivoAsignado.getDispositivo().getIdDispositivo());
-    }
-    
-    // Mapear la solicitud si existe
-    if (dispositivoAsignado.getSolicitud() != null) {
-        dto.setIdSolicitud(dispositivoAsignado.getSolicitud().getIdSolicitud());
-    }
-
-    return dto;
-}
-
-
-
-
 
 }
+
+
+
+
+
+

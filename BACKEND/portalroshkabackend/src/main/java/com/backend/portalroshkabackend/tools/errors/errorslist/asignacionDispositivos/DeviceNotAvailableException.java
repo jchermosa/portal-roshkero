@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.tools.errors.errorslist.dispositivos;
+package com.backend.portalroshkabackend.tools.errors.errorslist.asignacionDispositivos;
 
 //Usar en caso de que el dispositivo ya este en uso o no se encuentre disponible
 public class DeviceNotAvailableException extends RuntimeException {

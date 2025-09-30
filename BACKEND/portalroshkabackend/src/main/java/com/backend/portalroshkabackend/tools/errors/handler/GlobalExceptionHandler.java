@@ -3,6 +3,8 @@ package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.common.ErrorResponseDto;
 import com.backend.portalroshkabackend.tools.errors.errorslist.*;
+import com.backend.portalroshkabackend.tools.errors.errorslist.dispositivos.DtoMappingException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.paginacion.InvalidPaginationParametersException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,18 @@ public class GlobalExceptionHandler extends BaseExceptionHandler{
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDto> handleIllegalArgument(IllegalArgumentException ex){
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    //--- PAGE ---
+    @ExceptionHandler(InvalidPaginationParametersException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidPaginationParameters(InvalidPaginationParametersException ex){
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    //--- DTO MAPPING ---
+    @ExceptionHandler(DtoMappingException.class)
+    public ResponseEntity<ErrorResponseDto> handleDtoMappingException(DtoMappingException ex){
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
 
