@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SolicitudesTHRepository extends JpaRepository<Solicitud, Integer> {
     List<Solicitud> findByUsuario(Usuario usuario);
+    List<Solicitud> findByLider(Usuario lider);
 }
 
 //Repositorio de las Solicitudes de los usuarios
