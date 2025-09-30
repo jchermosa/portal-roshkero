@@ -106,18 +106,27 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     public List<UsuarioAsignacionDto> calculateprocenteusuarios(List<UsuarioAsignacionDto> usuariosDto) {
+        if (usuariosDto == null || usuariosDto.isEmpty()) {
+            return null;
+        }
+
         List<UsuarioAsignacionDto> result = new ArrayList<>();
         for (UsuarioAsignacionDto uDto : usuariosDto) {
             Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
 
-            // Проверка и уменьшение доступност
+            if (uDto.getPorcentajeTrabajo() == null || uDto.getPorcentajeTrabajo() <= 0) {
+                throw new IllegalArgumentException(
+                        "Porcentaje de trabajo inválido para usuario " + uDto.getIdUsuario());
+            }
+
             int nuevaDisponibilidad = usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue();
             if (nuevaDisponibilidad < 0) {
                 throw new ProcenteExisits("Usuario " + usuario.getIdUsuario() +
                         " no tiene suficiente disponibilidad. Actual: " + usuario.getDisponibilidad() +
                         ", requerido: " + uDto.getPorcentajeTrabajo().intValue());
             }
+
             usuario.setDisponibilidad(nuevaDisponibilidad);
             usuarioRepository.save(usuario);
             result.add(uDto);
