@@ -1,12 +1,13 @@
 // src/hooks/deviceRequest/useSolicitudDispositivoForm.ts
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   acceptSolicitudDispositivo,
   rejectSolicitudDispositivo,
   createSolicitudDispositivo,
+  getSolicitudById,
 } from "../../services/DeviceRequestService";
 import type { SolicitudDispositivoUI, UserSolDispositivoDto } from "../../types";
-import { mapUserSolicitudToUI } from "../../mappers/solicitudDispositivoMapper";
+import { mapUserSolicitudToUI, mapAdminSolicitudToUI } from "../../mappers/solicitudDispositivoMapper";
 
 export function useSolicitudDispositivoForm(
   token: string | null,
@@ -18,6 +19,27 @@ export function useSolicitudDispositivoForm(
   const [data, setData] = useState<SolicitudDispositivoUI | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // 🔹 cargar detalle al editar
+  useEffect(() => {
+    if (!token || !isEditing || !id) return;
+    setLoading(true);
+    setError(null);
+    console.log("[Hook] fetch detalle id:", id);
+
+    getSolicitudById(token, id)
+      .then((raw: any) => {
+        // Usa el mapper que corresponda a tu DTO real
+        const mapped = isSysAdmin ? mapAdminSolicitudToUI(raw) : mapUserSolicitudToUI(raw);
+        console.log("[Hook] detalle mapeado:", mapped);
+        setData(mapped);
+      })
+      .catch((e: any) => {
+        console.error("[Hook] error detalle:", e);
+        setError(e?.message || "Error al cargar la solicitud");
+      })
+      .finally(() => setLoading(false));
+  }, [token, id, isEditing, isSysAdmin]);
 
   // Crear (usuario)
   const create = useCallback(async (formData: UserSolDispositivoDto) => {

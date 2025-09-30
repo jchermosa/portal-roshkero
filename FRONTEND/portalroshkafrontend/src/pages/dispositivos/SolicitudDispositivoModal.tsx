@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import BaseModal from "../../components/BaseModal";
@@ -14,7 +14,7 @@ interface SolicitudDispositivoModalProps {
   token: string | null;
   id?: number | string;
   readonly?: boolean;
-  gestion?: boolean;
+  gestion?: boolean;          // true = flujo de administración (aprobar/rechazar)
   onClose: () => void;
   onSaved?: () => void;
 }
@@ -29,54 +29,66 @@ export default function SolicitudDispositivoModal({
 }: SolicitudDispositivoModalProps) {
   const navigate = useNavigate();
 
-  // Hook principal
+  // Normalizar id
+  const numericId = useMemo(() => {
+    if (id === null || id === undefined) return undefined;
+    const n = Number(id);
+    return Number.isFinite(n) ? n : undefined;
+  }, [id]);
+
+  // Hook principal (carga/acciones de la solicitud)
   const {
-    data,            // detalle de la solicitud (o {} si es nueva)
+    data,          // detalle mapeado a UI desde el hook (si editing)
     create,
     accept,
     reject,
-    loading,         // carga del detalle / acción interna de hook si la tuviera
+    loading,       // loading del detalle / acciones del hook
     error,
     isEditing,
-  } = useSolicitudDispositivoForm(
-    token,
-    typeof id === "string" ? parseInt(id, 10) : id,
-    gestion
-  );
+  } = useSolicitudDispositivoForm(token, numericId, gestion);
 
   // Catálogo de tipos de dispositivo
   const { data: deviceTypes, loading: loadingTypes } = useGetDeviceTypes(token);
-
   const tipoDispositivoOptions = Array.isArray(deviceTypes)
-    ? deviceTypes.map((t) => ({
-        value: t.idTipoDispositivo,
-        label: t.nombre,
-      }))
+    ? deviceTypes.map((t) => ({ value: t.idTipoDispositivo, label: t.nombre }))
     : [];
 
-  const sections = buildSolicitudDispositivoSections(tipoDispositivoOptions);
+  // Secciones de formulario (select + comentario)
+  const sections = useMemo(
+    () => buildSolicitudDispositivoSections(tipoDispositivoOptions),
+    [tipoDispositivoOptions]
+  );
 
-  // Solo bloquea inputs mientras no hay datos todavía
-  const hasData = useMemo(() => !!data && Object.keys(data ?? {}).length > 0, [data]);
-  const formLoading = !readonly && (loading || loadingTypes) && !hasData;
+  // Si hay data, no bloquees inputs aunque aún esté “loading” algún fetch secundario
+  const hasData = !!data && Object.keys(data ?? {}).length > 0;
+  const formLoading = !readonly && (loading || (loadingTypes && isEditing)) && !hasData;
 
-  // initialData mapeada (si tu form requiere nombres específicos, mapealos aquí)
-  const initial = data ?? {};
+  // Mapear initialData a los nombres que el form espera
+  const initial = useMemo(() => {
+    // Ajusta estos paths según el DTO real de detalle (admin/usuario).
+    const idTipo =
+      (data as any)?.idTipoDispositivo ??
+      (data as any)?.tipoDispositivo?.idTipoDispositivo ??
+      "";
 
-  // submitting local para botones (evita re-clicks)
+    return {
+      idTipoDispositivo: idTipo,
+      comentario: (data as any)?.comentario ?? "",
+    };
+  }, [data]);
+
+  // submitting local para evitar dobles clics en botones
   const [submitting, setSubmitting] = useState(false);
+  const busy = formLoading || submitting;
 
-  // Gestión
+  // Gestión (admin)
   const handleAprobar = async () => {
-    const solicitudId =
-      typeof id === "string" ? parseInt(id, 10) : (id as number | undefined);
-    if (!solicitudId) return;
-
+    if (!numericId) return;
     try {
       setSubmitting(true);
       await accept();
       onSaved?.();
-      navigate(`/dispositivos-asignados/nuevo?solicitudId=${solicitudId}`);
+      navigate(`/dispositivos-asignados/nuevo?solicitudId=${numericId}`);
       onClose();
     } finally {
       setSubmitting(false);
@@ -84,7 +96,7 @@ export default function SolicitudDispositivoModal({
   };
 
   const handleRechazar = async () => {
-    if (!id) return;
+    if (!numericId) return;
     try {
       setSubmitting(true);
       await reject();
@@ -95,10 +107,11 @@ export default function SolicitudDispositivoModal({
     }
   };
 
+  // Crear (usuario)
   const handleCreate = async (formData: Record<string, any>) => {
     if (readonly || gestion) return;
-    setSubmitting(true);
     try {
+      setSubmitting(true);
       const dto = mapFormToUserSolicitudDto(formData);
       await create(dto);
       onSaved?.();
@@ -116,8 +129,6 @@ export default function SolicitudDispositivoModal({
       : "Editar solicitud de dispositivo"
     : "Nueva solicitud de dispositivo";
 
-  const busy = formLoading || submitting;
-
   return (
     <BaseModal show onClose={onClose}>
       <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
@@ -126,7 +137,7 @@ export default function SolicitudDispositivoModal({
 
       <DynamicModalForm
         id="solicitud-dispositivo-form"
-        key={isEditing ? `sol-${id}` : "sol-new"}
+        key={isEditing ? `sol-${numericId}` : "sol-new"}
         sections={sections}
         initialData={initial}
         readonly={readonly || gestion}
@@ -148,7 +159,7 @@ export default function SolicitudDispositivoModal({
             </button>
             <button
               onClick={handleAprobar}
-              disabled={busy || !id}
+              disabled={busy || !numericId}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
             >
               {busy ? "Procesando..." : "Aprobar y asignar"}
