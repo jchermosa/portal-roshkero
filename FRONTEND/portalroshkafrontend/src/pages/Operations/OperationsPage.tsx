@@ -384,26 +384,19 @@ function TeamDetailsModal({ id, token, onClose }: TeamDetailsModalProps) {
   const [det, setDet] = useState<any>(null);
   const [memberNamesNoLead, setMemberNamesNoLead] = useState<string[]>([]);
 
+  // miembros desde GET /team/{id} usando la clave usuariosAsignacion
   function extractMembersFromTeamDetail(d: any): string[] {
-    const sources = [
-      d?.miembros,
-      d?.asignacionesUsuarioEquipo,
-      d?.equipoUsuarios,
-      d?.usuarios,
-    ].filter(Array.isArray) as any[][];
-    const fullName = (x: any) => {
-      const u = x?.usuario ?? x;
-      const fn = u?.nombre ?? u?.nombres ?? "";
-      const ln = u?.apellido ?? u?.apellidos ?? "";
-      const n = `${fn} ${ln}`.trim() || u?.nombreCompleto || u?.fullName || u?.displayName || "";
-      return n.trim();
-    };
-    const set = new Set<string>();
-    for (const arr of sources) for (const it of arr) {
-      const n = fullName(it);
-      if (n) set.add(n);
+    const arr = Array.isArray(d?.usuariosAsignacion) ? d.usuariosAsignacion : [];
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const u of arr) {
+      const n = `${u?.nombre ?? ""} ${u?.apellido ?? ""}`.trim();
+      if (n && !seen.has(n.toLowerCase())) {
+        seen.add(n.toLowerCase());
+        out.push(n);
+      }
     }
-    return Array.from(set);
+    return out;
   }
 
   useEffect(() => {
@@ -423,12 +416,25 @@ function TeamDetailsModal({ id, token, onClose }: TeamDetailsModalProps) {
         if (!r.ok) throw new Error(`Error ${r.status}`);
         const data = await r.json();
 
-        const baseMembers = extractMembersFromTeamDetail(data);
-        const lead = [data?.lider?.nombre, data?.lider?.apellido].filter(Boolean).join(" ").trim().toLowerCase();
-        const noLead = lead ? baseMembers.filter((n) => n.toLowerCase() !== lead) : baseMembers;
-        setMemberNamesNoLead(noLead);
+        // después de: const data = await r.json();
 
-        setDet(data);
+const baseMembers = extractMembersFromTeamDetail(data);
+
+// nombre completo del líder (si existe)
+const leaderName = [data?.lider?.nombre, data?.lider?.apellido]
+  .filter(Boolean)
+  .join(" ")
+  .trim();
+
+// incluir líder como primer pill y evitar duplicados
+const items = leaderName
+  ? [`${leaderName} (Líder)`, ...baseMembers.filter(n => n.toLowerCase() !== leaderName.toLowerCase())]
+  : baseMembers;
+
+setMemberNamesNoLead(items);
+
+setDet(data);
+
       } catch (e: any) {
         if (e?.name !== "AbortError") setErr(e.message || "Error");
       } finally {
@@ -502,13 +508,23 @@ function TeamDetailsModal({ id, token, onClose }: TeamDetailsModalProps) {
                     <span>{det?.cliente?.nombre || "—"}</span>
                   </Section>
                   <Section label="Líder">
-                    <div className="flex flex-col">
-                      <span>{[det?.lider?.nombre, det?.lider?.apellido].filter(Boolean).join(" ") || "—"}</span>
-                      {det?.lider?.correo && (
-                        <span className="text-xs text-gray-600 dark:text-gray-300">{det.lider.correo}</span>
-                      )}
-                    </div>
-                  </Section>
+  {(() => {
+    const leaderName = [det?.lider?.nombre, det?.lider?.apellido]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    return leaderName ? (
+      <>
+        <PillsWithOverflow items={[leaderName]} maxToShow={1} color="blue" />
+        
+      </>
+    ) : (
+      <span className="text-gray-500 dark:text-gray-400">No asignado</span>
+    );
+  })()}
+</Section>
+
                   <Section label="Día / Ubicación">
                     <PairGridWithOverflow pairs={duPairs} maxRows={2} />
                   </Section>
@@ -600,41 +616,28 @@ function PillsWithOverflow({
   );
 }
 
-function PairGridWithOverflow({ pairs, maxRows = 2 }: { pairs: Pair[]; maxRows?: number }) {
+function PairGridWithOverflow({ pairs }: { pairs: Pair[] }) {
   if (!pairs.length) return <span className="text-gray-500 dark:text-gray-400">—</span>;
 
   const baseCell =
     "px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-100";
-  const visibles = pairs.slice(0, maxRows);
-  const extras = pairs.slice(maxRows);
-  const extraCount = Math.max(0, pairs.length - maxRows);
 
   return (
-    <div className="relative group">
+    <div>
       <div className="grid grid-cols-2 gap-1 mb-1">
         <span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Día</span>
         <span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Ubicación</span>
       </div>
 
-      <div className="grid grid-cols-2 gap-1 max-w=[340px]">
-        {visibles.map((p, i) => (
+      <div className="grid grid-cols-2 gap-1 auto-rows-min max-w-[340px]">
+        {pairs.map((p, i) => (
           <FragmentRow key={`${p.dia}-${p.ubicacion}-${i}`} p={p} baseCell={baseCell} />
         ))}
-        {extraCount > 0 && <span className={`${baseCell} col-span-2 w-min`}>+{extraCount}</span>}
       </div>
-
-      {extras.length > 0 && (
-        <div className="pointer-events-none absolute left-0 top-full mt-1 hidden w-max max-w-[420px] rounded-md border border-gray-200 bg-white p-2 text-xs text-gray-800 shadow-lg group-hover:block dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 z-10">
-          <div className="grid grid-cols-2 gap-1">
-            {pairs.map((p, i) => (
-              <FragmentRow key={`all-${p.dia}-${p.ubicacion}-${i}`} p={p} baseCell={baseCell} />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+
 
 function FragmentRow({ p, baseCell }: { p: Pair; baseCell: string }) {
   return (
