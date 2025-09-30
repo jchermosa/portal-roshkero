@@ -17,6 +17,8 @@ public interface AsignacionUbicacionDiaRepository extends JpaRepository<EquipoDi
 
     Optional<EquipoDiaUbicacion> findByEquipoAndDiaLaboral(Equipos equipo, DiaLaboral dia);
 
+    void deleteAllByEquipo_IdEquipo(Integer id);
+
     @Query("""
             SELECT new com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto(
                 u.idUbicacion,

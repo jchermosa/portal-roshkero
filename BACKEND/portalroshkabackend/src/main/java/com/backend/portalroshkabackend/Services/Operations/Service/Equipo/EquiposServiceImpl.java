@@ -147,8 +147,9 @@ public class EquiposServiceImpl implements IEquiposService {
                 Equipos savedEquipo = equiposRepository.save(equipo);
                 usuarioService.assignUsers(savedEquipo.getIdEquipo(), procentedUsuarios);
 
-                List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
-                asignacionServiceImpl.asignarDiasUbicacionesEquipo(savedEquipo.getIdEquipo(), diasUbicaciones);
+                // List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
+                // asignacionServiceImpl.asignarDiasUbicacionesEquipo(savedEquipo.getIdEquipo(),
+                // diasUbicaciones);
                 // --- 4. Сохранение технологий команды ---
                 tecnologiaEquiposService.updateTecnologiasEquipo(savedEquipo, requestDto.getIdTecnologias());
 
@@ -201,15 +202,11 @@ public class EquiposServiceImpl implements IEquiposService {
                 List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
                 asignacionServiceImpl.asignarDiasUbicacionesEquipo(id, diasUbicaciones);
                 equiposRepository.save(equipo);
-
         }
 
         @Override
-        public void deleteTeam(int id_equipo) {
-                Equipos equipo = equiposRepository.findById(id_equipo)
-                                .orElseThrow(() -> new RuntimeException("Team not found"));
-                equipo.setEstado(EstadoActivoInactivo.I); //
-                equiposRepository.save(equipo);
+        public void toggleEquipo(Integer idEquipo) {
+                asignacionServiceImpl.toggleEquipoEstado(idEquipo);
         }
 
 }

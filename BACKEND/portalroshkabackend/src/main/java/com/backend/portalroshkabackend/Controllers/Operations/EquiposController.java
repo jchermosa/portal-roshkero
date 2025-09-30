@@ -83,10 +83,10 @@ public class EquiposController {
         equiposService.postNewTeam(equipoRequest);
     }
 
-    // ----------------- DELETE -----------------
-    @DeleteMapping("/team/{id}")
-    public void deleteTeam(@PathVariable int id) {
-        equiposService.deleteTeam(id);
+    // ----------------- POST for Estado -----------------
+    @PostMapping("/team/{id}")
+    public void toggleTeam(@PathVariable int id) {
+        equiposService.toggleEquipo(id);
     }
 
     // ----------------- UPDATE -----------------

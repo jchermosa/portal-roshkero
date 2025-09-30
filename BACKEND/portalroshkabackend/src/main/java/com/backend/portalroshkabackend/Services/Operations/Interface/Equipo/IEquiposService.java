@@ -12,9 +12,9 @@ public interface IEquiposService {
 
     void postNewTeam(EquiposRequestDto equipo);
 
-    void deleteTeam(int id_equipo);
+    void toggleEquipo(Integer idEquipo);
 
-    void updateTeam(Integer id_equipo, EquiposRequestDto equipoDetails);
+    void updateTeam(Integer idEquipo, EquiposRequestDto equipoDetails);
 
     Page<EquiposResponseDto> getTeamsSorted(Pageable pageable, String sortBy);
 }

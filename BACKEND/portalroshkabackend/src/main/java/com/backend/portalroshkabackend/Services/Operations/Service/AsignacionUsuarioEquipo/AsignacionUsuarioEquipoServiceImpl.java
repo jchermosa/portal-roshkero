@@ -12,38 +12,39 @@ import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.AsignacionUsuarioEquipo.IAsignacionUsuarioEquipoService;
 
 @Service
-public class AsignacionUsuarioEquipoServiceImpl implements IAsignacionUsuarioEquipoService{
+public class AsignacionUsuarioEquipoServiceImpl implements IAsignacionUsuarioEquipoService {
 
-    @Autowired
-    private AsignacionUsuarioRepository asignacionUsuarioRepository;
-    @Autowired
-    private UsuarioisRepository usuarioisRepository;
+        @Autowired
+        private AsignacionUsuarioRepository asignacionUsuarioRepository;
+        @Autowired
+        private UsuarioisRepository usuarioisRepository;
 
-    @Override
-    public List<UsuarioAsignacionDto> getUsuariosAsignacion(Integer idEquipo) {
-        return asignacionUsuarioRepository.findAllByEquipo_IdEquipo(idEquipo)
-                .stream()
-                .map(asig -> new UsuarioAsignacionDto(
-                        asig.getUsuario().getIdUsuario(),
-                        asig.getUsuario().getNombre(),
-                        asig.getUsuario().getApellido(),
-                        asig.getUsuario().getCorreo(),
-                        asig.getPorcentajeTrabajo(),
-                        asig.getFechaEntrada(),
-                        asig.getFechaFin()))
-                .toList();
-    }
+        @Override
+        public List<UsuarioAsignacionDto> getUsuariosAsignacion(Integer idEquipo) {
+                return asignacionUsuarioRepository.findAllByEquipo_IdEquipo(idEquipo)
+                                .stream()
+                                .map(asig -> new UsuarioAsignacionDto(
+                                                asig.getUsuario().getIdUsuario(),
+                                                asig.getUsuario().getNombre(),
+                                                asig.getUsuario().getApellido(),
+                                                asig.getUsuario().getCorreo(),
+                                                asig.getPorcentajeTrabajo(),
+                                                asig.getFechaEntrada(),
+                                                asig.getFechaFin(),
+                                                asig.getEstado()))
+                                .toList();
+        }
 
-    @Override
-    public List<UsuarioisResponseDto> getUsuariosFueraEquipo(Integer idEquipo) {
-        return usuarioisRepository.findUsuariosNoEnEquipo(idEquipo)
-                .stream()
-                .map(u -> new UsuarioisResponseDto(
-                        u.getIdUsuario(),
-                        u.getNombre(),
-                        u.getApellido(),
-                        u.getCorreo(),
-                        u.getDisponibilidad()))
-                .toList();
-    }
+        @Override
+        public List<UsuarioisResponseDto> getUsuariosFueraEquipo(Integer idEquipo) {
+                return usuarioisRepository.findUsuariosNoEnEquipo(idEquipo)
+                                .stream()
+                                .map(u -> new UsuarioisResponseDto(
+                                                u.getIdUsuario(),
+                                                u.getNombre(),
+                                                u.getApellido(),
+                                                u.getCorreo(),
+                                                u.getDisponibilidad()))
+                                .toList();
+        }
 }

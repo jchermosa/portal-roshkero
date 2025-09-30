@@ -18,19 +18,28 @@ import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDiaDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UbicacionDto;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.DiaLaboral;
 import com.backend.portalroshkabackend.Models.EquipoDiaUbicacion;
 import com.backend.portalroshkabackend.Models.Ubicacion;
+import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IAsignacionService;
+
+import jakarta.transaction.Transactional;
+
 import com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository;
 import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
+import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
 import com.backend.portalroshkabackend.Repositories.AsignacionUbicacionDiaRepository;
 import com.backend.portalroshkabackend.Repositories.UbicacionRepository;
 import com.backend.portalroshkabackend.Repositories.DiasLaboralRepository;
 
 @Service("operationsAsignacionService")
 public class AsignacionServiceImpl implements IAsignacionService {
+
+    private final UsuarioisRepository usuarioisRepository;
     @Autowired
     private AsignacionUsuarioRepository asignacionUsuarioRepository;
     @Autowired
@@ -41,6 +50,10 @@ public class AsignacionServiceImpl implements IAsignacionService {
     private DiasLaboralRepository diasLaboralRepository;
     @Autowired
     private UbicacionRepository ubicacionRepository;
+
+    AsignacionServiceImpl(UsuarioisRepository usuarioisRepository) {
+        this.usuarioisRepository = usuarioisRepository;
+    }
 
     @Override
     public Page<AsignacionResponseDto> getAllAsignacion(Pageable pageable) {
@@ -139,41 +152,46 @@ public class AsignacionServiceImpl implements IAsignacionService {
         }
     }
 
-    // @Override
-    // public void asignarDiasUbicaciones(Integer idEquipo,
-    // EquipoAsignacionUpdateDiasUbicacionesDto request) {
-    // Equipos equipo = equiposRepository.findById(idEquipo)
-    // .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+    @Transactional
+    @Override
+    public void toggleEquipoEstado(Integer idEquipo) {
+        Equipos equipo = equiposRepository.findById(idEquipo)
+                .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
 
-    // for (EquipoAsignacionUpdateDiasUbicacionesDto.DiaUbicacionDto dto :
-    // request.getAsignaciones()) {
-    // DiaLaboral dia = diasLaboralRepository.findById(dto.getIdDiaLaboral())
-    // .orElseThrow(() -> new RuntimeException("Día no encontrado"));
+        boolean nuevoActivo = equipo.getEstado() == EstadoActivoInactivo.I;
+        equipo.setEstado(nuevoActivo ? EstadoActivoInactivo.A : EstadoActivoInactivo.I);
 
-    // Optional<EquipoDiaUbicacion> existing =
-    // asignacionUbicacionDiaRepository.findByEquipoAndDiaLaboral(equipo,
-    // dia);
+        equiposRepository.save(equipo);
 
-    // if (dto.getIdUbicacion() == null) {
-    // // Удаляем связь, если была
-    // existing.ifPresent(asignacionUbicacionDiaRepository::delete);
-    // continue;
-    // }
+        List<AsignacionUsuarioEquipo> asignaciones = asignacionUsuarioRepository.findAllByEquipo_IdEquipo(idEquipo);
 
-    // // Создаём или обновляем
-    // EquipoDiaUbicacion asignacion = existing.orElseGet(() -> {
-    // EquipoDiaUbicacion nuevo = new EquipoDiaUbicacion();
-    // nuevo.setEquipo(equipo);
-    // nuevo.setDiaLaboral(dia);
-    // return nuevo;
-    // });
+        asignacionUbicacionDiaRepository.deleteAllByEquipo_IdEquipo(idEquipo);
+        
+        for (AsignacionUsuarioEquipo asignacion : asignaciones) {
+            Usuario usuario = asignacion.getUsuario();
+            Integer porcentajeAsignacion = asignacion.getPorcentajeTrabajo() == null ? 0
+                    : asignacion.getPorcentajeTrabajo();
+            Integer disponibilidadUsuario = usuario.getDisponibilidad() == null ? 0 : usuario.getDisponibilidad();
 
-    // Ubicacion ubicacion = ubicacionRepository.findById(dto.getIdUbicacion())
-    // .orElseThrow(() -> new RuntimeException("Ubicación no encontrada"));
-    // asignacion.setUbicacion(ubicacion);
+            if (!nuevoActivo) { // Deactivate team
+                if (asignacion.getEstado() == EstadoActivoInactivo.A) {
+                    // Только если раньше было А
+                    usuario.setDisponibilidad(disponibilidadUsuario + porcentajeAsignacion);
+                }
+                asignacion.setEstado(EstadoActivoInactivo.I);
+            } else { // Activate team
+                if (disponibilidadUsuario >= porcentajeAsignacion) {
+                    usuario.setDisponibilidad(disponibilidadUsuario - porcentajeAsignacion);
+                    asignacion.setEstado(EstadoActivoInactivo.A);
+                } else {
+                    asignacion.setEstado(EstadoActivoInactivo.I);
+                }
+            }
+        }
 
-    // asignacionUbicacionDiaRepository.save(asignacion);
-    // }
-    // }
+        // Guardar cambios
+        asignacionUsuarioRepository.saveAll(asignaciones);
 
+        usuarioisRepository.saveAll(asignaciones.stream().map(AsignacionUsuarioEquipo::getUsuario).toList());
+    }
 }
