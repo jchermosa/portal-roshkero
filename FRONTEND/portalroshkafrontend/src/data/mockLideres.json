@@ -1,0 +1,12 @@
+[
+  { "id": 1, "nombre": "Ana Gómez" },
+  { "id": 2, "nombre": "Carlos Méndez" },
+  { "id": 3, "nombre": "Lucía Fernández" },
+  { "id": 4, "nombre": "Javier Duarte" },
+  { "id": 5, "nombre": "María López" },
+  { "id": 6, "nombre": "Fernando Ruiz" },
+  { "id": 7, "nombre": "Sofía Acosta" },
+  { "id": 8, "nombre": "Diego Benítez" },
+  { "id": 9, "nombre": "Valeria Rivas" },
+  { "id": 10, "nombre": "Martín Salinas" }
+]
