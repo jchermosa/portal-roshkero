@@ -52,11 +52,12 @@ public class RequestMapper {
         dto.setCantidadDias(solicitud.getCantDias());
 
         if (tipoPermiso == null){
-            dto.setTipoSolicitud(null);
+            dto.setSubTipo(null);
         } else {
-            dto.setTipoSolicitud(tipoPermiso.getNombre());
+            dto.setSubTipo(tipoPermiso.getNombre());
         }
 
+        dto.setTipoSolicitud(solicitud.getTipoSolicitud().name());
         dto.setEstado(solicitud.getEstado());
         dto.setFechaCreacion(solicitud.getFechaCreacion());
 
@@ -79,11 +80,12 @@ public class RequestMapper {
         dto.setCantidadDias(solicitud.getCantDias());
 
         if (tipoBeneficio == null){
-            dto.setTipoSolicitud(null);
+            dto.setSubTipo(null);
         } else {
-            dto.setTipoSolicitud(tipoBeneficio.getNombre());
+            dto.setSubTipo(tipoBeneficio.getNombre());
         }
 
+        dto.setTipoSolicitud(solicitud.getTipoSolicitud().name());
         dto.setEstado(solicitud.getEstado());
         dto.setFechaCreacion(solicitud.getFechaCreacion());
 
@@ -99,6 +101,7 @@ public class RequestMapper {
         dto.setUsuario(solicitud.getUsuario().getNombre() + " " + solicitud.getUsuario().getApellido());
         dto.setCantidadDias(solicitud.getCantDias());
         dto.setTipoSolicitud(solicitud.getTipoSolicitud().name());
+        dto.setSubTipo(solicitud.getTipoSolicitud().name());
         dto.setEstado(solicitud.getEstado());
         dto.setFechaCreacion(solicitud.getFechaCreacion());
 
