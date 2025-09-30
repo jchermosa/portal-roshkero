@@ -14,7 +14,7 @@ export const ubicacionColumns: TableColumn<UbicacionItem>[] = [
   {
     key: "estado",
     label: "Estado",
-    render: (u: UbicacionItem) => {
+    render: (u) => {
       const label = EstadoLabels[u.estado];
       const color =
         u.estado === "A"
@@ -30,6 +30,6 @@ export const ubicacionColumns: TableColumn<UbicacionItem>[] = [
   {
     key: "dispositivos",
     label: "Dispositivos",
-    render: (u: UbicacionItem) => u.dispositivos?.length ?? 0,
+    render: (u) => u.dispositivos?.length ?? 0,
   },
 ];

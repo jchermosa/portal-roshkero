@@ -1,17 +1,25 @@
-import type { UbicacionItem } from "../types";
+// services/UbicacionesService.ts
+import type { UbicacionItem, PageResponse } from "../types";
 
-
-// Listar todas
-async function getUbicaciones(token: string): Promise<UbicacionItem[]> {
-  const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/getAll`, {
+// Listar paginado (Page<UbicacionDto>)
+async function getUbicaciones(
+  token: string,
+  page: number = 0,
+  size: number = 10
+): Promise<PageResponse<UbicacionItem>> {
+  const url = `/api/v1/admin/sysadmin/ubicaciones/getAll?page=${page}&size=${size}`;
+  const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return res.json(); // { content, totalPages, totalElements, number, size, ... }
 }
 
 // Obtener por id
-async function getUbicacionById(token: string, id: number): Promise<UbicacionItem> {
+async function getUbicacionById(
+  token: string,
+  id: number
+): Promise<UbicacionItem> {
   const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -20,7 +28,10 @@ async function getUbicacionById(token: string, id: number): Promise<UbicacionIte
 }
 
 // Crear
-async function createUbicacion(token: string, data: Partial<UbicacionItem>) {
+async function createUbicacion(
+  token: string,
+  data: Partial<UbicacionItem>
+): Promise<UbicacionItem> {
   const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/create`, {
     method: "POST",
     headers: {
@@ -34,7 +45,11 @@ async function createUbicacion(token: string, data: Partial<UbicacionItem>) {
 }
 
 // Actualizar
-async function updateUbicacion(token: string, id: number, data: Partial<UbicacionItem>) {
+async function updateUbicacion(
+  token: string,
+  id: number,
+  data: Partial<UbicacionItem>
+): Promise<UbicacionItem> {
   const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/update/${id}`, {
     method: "PUT",
     headers: {
@@ -47,8 +62,8 @@ async function updateUbicacion(token: string, id: number, data: Partial<Ubicacio
   return res.json();
 }
 
-// Eliminar
-async function deleteUbicacion(token: string, id: number) {
+// Toggle estado (A <-> I)
+async function deleteUbicacion(token: string, id: number): Promise<true> {
   const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/delete/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
@@ -56,7 +71,6 @@ async function deleteUbicacion(token: string, id: number) {
   if (!res.ok) throw new Error(await res.text());
   return true;
 }
-
 
 export {
   getUbicaciones,
