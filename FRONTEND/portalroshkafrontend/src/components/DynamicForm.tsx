@@ -146,7 +146,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
     const baseProps = {
       name: field.name,
-      value: field.value !== undefined ? field.value : field.type === "checkbox" ? undefined : value,
+      value: field.type === "checkbox" ? undefined : (formData[field.name] ?? ""),
       onChange: field.onChange ?? handleChange,
       required: field.required,
       placeholder: field.placeholder,
