@@ -1,15 +1,24 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getSolicitudesPermisoUsuario, type PaginatedResponse } from "../../services/RequestService";
-import type { SolicitudPermiso } from "../../types";
+import { type PaginatedResponse, getSolicitudesUsuario } from "../../services/RequestService";
+import type { SolicitudItem } from "../../types";
 
-export function useSolicitudesPermiso(
-  page: number,
-  subtipo?: string
-) {
+interface UseSolicitudesParams {
+  page: number;
+  tipo?: "PERMISO" | "BENEFICIO" | "VACACIONES";
+  subtipo?: string;
+  estado?: string;
+}
+
+export function useSolicitudesUsuario({
+  page,
+  tipo,
+  subtipo,
+  estado,
+}: UseSolicitudesParams) {
   const { token, user } = useAuth();
   
-  const [data, setData] = useState<PaginatedResponse<SolicitudPermiso> | null>(null);
+  const [data, setData] = useState<PaginatedResponse<SolicitudItem> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,16 +36,16 @@ export function useSolicitudesPermiso(
       size: 10,
     };
     
-    if (subtipo) {
-      params.subtipo = subtipo;
-    }
+    if (tipo) params.tipo = tipo;
+    if (subtipo) params.subtipo = subtipo;
+    if (estado) params.estado = estado;
 
-    getSolicitudesPermisoUsuario(token, user.id, params)
+    getSolicitudesUsuario(token, user.id, params)
       .then((res) => setData(res))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [token, user?.id, page, subtipo]);
-
+  
   return {
     solicitudes: data?.content ?? [],
     totalPages: data?.totalPages ?? 1,

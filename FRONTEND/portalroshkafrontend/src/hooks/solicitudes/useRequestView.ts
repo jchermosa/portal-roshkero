@@ -89,5 +89,6 @@ export function useRequestView(token: string | null, id: string | null) {
     puedeEvaluar: solicitud?.estado === "P",
     esPermiso: solicitud?.tipoSolicitud === "PERMISO",
     esBeneficio: solicitud?.tipoSolicitud === "BENEFICIO",
+    esVacaciones: solicitud?.tipoSolicitud === "VACACIONES"
   };
 }

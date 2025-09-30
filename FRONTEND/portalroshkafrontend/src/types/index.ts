@@ -30,8 +30,9 @@ export interface UsuarioItem {
 
 export interface SolicitudItem {
   idSolicitud: number;
-  usuario: string;                  // nombre completo
-  tipoSolicitud: "PERMISO" | "BENEFICIO";
+  usuario: string;   
+  tipoSolicitud: "PERMISO" | "BENEFICIO" | "VACACIONES";
+  subtipo: string;
   fechaInicio: string;
   cantidadDias: number | null;
   fechaCreacion: string;
@@ -45,7 +46,7 @@ export interface EquipoItem {
   fechaLimite?: string | null;
   idCliente: number;
   fechaCreacion?: string;
-  estado: "ACTIVO" | "INACTIVO"; // enum real
+  estado: "ACTIVO" | "INACTIVO"; 
 }
 
 export interface RolItem {

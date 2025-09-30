@@ -19,7 +19,12 @@ export default function SolicitudesTHPage() {
   const location = useLocation();
 
   // Detectamos la URL para determinar la categoría
-  const tipoSolicitud = location.pathname.includes("permisos") ? "PERMISO" : "BENEFICIO";
+  let tipoSolicitud: "PERMISO" | "BENEFICIO" | "VACACIONES";
+
+  if (location.pathname.includes("permisos")) tipoSolicitud = "PERMISO";
+  else if (location.pathname.includes("beneficios")) tipoSolicitud = "BENEFICIO";
+  else if (location.pathname.includes("vacaciones")) tipoSolicitud = "VACACIONES";
+  else tipoSolicitud = "PERMISO";
 
   // Filtros
   const [tipoId, setTipoId] = useState("");
@@ -114,7 +119,7 @@ export default function SolicitudesTHPage() {
     }
   };
 
-  if (!puedeVerSolicitudes) return <p>No tenés permisos para ver esta página.</p>;
+  //if (!puedeVerSolicitudes) return <p>No tenés permisos para ver esta página.</p>;
   if (loading || loadingCatalogos) return <p>Cargando solicitudes...</p>;
   if (error) return <p>{error}</p>;
 

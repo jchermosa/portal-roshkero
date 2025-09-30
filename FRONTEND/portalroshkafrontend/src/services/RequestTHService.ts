@@ -1,7 +1,5 @@
 import type { SolicitudItem } from "../types";
-import mockSolicitudes from "../data/mockSolicitudes.json";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
 export interface PaginatedResponse<T> {
   content: T[];
@@ -16,20 +14,24 @@ export interface PaginatedResponse<T> {
 // ================================
 async function getSolicitudesApi(
   token: string,
-  params: Record<string, string | number | undefined> = {}
+  params: { tipoSolicitud?: "PERMISO" | "BENEFICIO" | "VACACIONES"; tipoId?: string; estado?: string } = {}
 ): Promise<PaginatedResponse<SolicitudItem>> {
   const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
+  if (params.tipoId) query.append("tipoId", params.tipoId);
+  if (params.estado) query.append("estado", params.estado);
 
-  const res = await fetch(`/api/solicitudes/todas?${query.toString()}`, {
+  // Ajustar endpoint según tipoSolicitud
+  let endpoint = "/api/v1/admin/th/users/requests/sortby";
+  if (params.tipoSolicitud) endpoint += `?type=${params.tipoSolicitud.toLowerCase()}`;
+
+  const res = await fetch(`${endpoint}&${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
 
 async function getSolicitudByIdApi(
   token: string,
@@ -79,91 +81,13 @@ async function rechazarSolicitudApi(
   return res.json();
 }
 
-async function getEstadisticasSolicitudesApi(
-  token: string
-): Promise<{
-  total: number;
-  pendientes: number;
-  aprobadas: number;
-  rechazadas: number;
-}> {
-  const res = await fetch(`/api/solicitudes/estadisticas`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
 
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-// ================================
-// Métodos MOCK
-// ================================
-async function getSolicitudesMock(): Promise<PaginatedResponse<SolicitudItem>> {
-  const data = [...(mockSolicitudes as SolicitudItem[])];
-
-  return {
-    content: data,
-    totalPages: 1,
-    totalElements: data.length,
-    size: data.length,
-    number: 0,
-  };
-}
-
-async function getSolicitudByIdMock(
-  _token: string,
-  id: string
-): Promise<SolicitudItem> {
-  const data = [...(mockSolicitudes as SolicitudItem[])];
-  const solicitud = data.find((s) => s.idSolicitud === Number(id));
-  if (!solicitud) throw new Error("Solicitud no encontrada");
-  return solicitud;
-}
-
-async function aprobarSolicitudMock(
-  _token: string,
-  id: string,
-  comentario?: string
-) {
-  return { success: true, id, comentario };
-}
-
-async function rechazarSolicitudMock(
-  _token: string,
-  id: string,
-  comentario: string
-) {
-  return { success: true, id, comentario };
-}
-
-async function getEstadisticasSolicitudesMock(): Promise<{
-  total: number;
-  pendientes: number;
-  aprobadas: number;
-  rechazadas: number;
-}> {
-  const data = [...(mockSolicitudes as SolicitudItem[])];
-  const total = data.length;
-  const pendientes = data.filter((s) => s.estado === "P").length;
-  const aprobadas = data.filter((s) => s.estado === "A").length;
-  const rechazadas = data.filter((s) => s.estado === "R").length;
-
-  return { total, pendientes, aprobadas, rechazadas };
-}
 
 // ================================
 // Export selector entre MOCK y API
 // ================================
-export const getSolicitudes = USE_MOCK ? getSolicitudesMock : getSolicitudesApi;
-export const getSolicitudById = USE_MOCK
-  ? getSolicitudByIdMock
-  : getSolicitudByIdApi;
-export const aprobarSolicitud = USE_MOCK
-  ? aprobarSolicitudMock
-  : aprobarSolicitudApi;
-export const rechazarSolicitud = USE_MOCK
-  ? rechazarSolicitudMock
-  : rechazarSolicitudApi;
-export const getEstadisticasSolicitudes = USE_MOCK
-  ? getEstadisticasSolicitudesMock
-  : getEstadisticasSolicitudesApi;
+export const getSolicitudes =  getSolicitudesApi;
+export const getSolicitudById = getSolicitudByIdApi;
+export const aprobarSolicitud =  aprobarSolicitudApi;
+export const rechazarSolicitud = rechazarSolicitudApi;
+
