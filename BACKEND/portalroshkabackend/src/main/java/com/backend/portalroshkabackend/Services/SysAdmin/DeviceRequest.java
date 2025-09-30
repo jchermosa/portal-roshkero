@@ -40,6 +40,17 @@ public class DeviceRequest {
     }
 
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public DeviceRequestDto getRequestById(Integer idRequest) {
+        Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
+        if (solicitudOp.isEmpty()) {
+            return null;
+        }
+
+        Solicitud solicitud = solicitudOp.get();
+        return convertToDto(solicitud);
+    }
+
     @Transactional
     public DeviceRequestDto acceptRequest(Integer idRequest){
 

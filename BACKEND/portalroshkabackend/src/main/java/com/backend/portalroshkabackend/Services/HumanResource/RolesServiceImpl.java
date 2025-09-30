@@ -1,13 +1,7 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
-import com.backend.portalroshkabackend.DTO.th.cargos.CargoByIdResponseDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargoInsertDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargosDefaultResponseDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargosResponseDto;
-import com.backend.portalroshkabackend.DTO.th.roles.RolByIdResponseDto;
-import com.backend.portalroshkabackend.DTO.th.roles.RolDefaultResponseDto;
-import com.backend.portalroshkabackend.DTO.th.roles.RolInsertDto;
-import com.backend.portalroshkabackend.DTO.th.roles.RolesResponseDto;
+import com.backend.portalroshkabackend.DTO.th.cargos.*;
+import com.backend.portalroshkabackend.DTO.th.roles.*;
 import com.backend.portalroshkabackend.Models.Roles;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.TH.RolesRepository;
@@ -15,7 +9,7 @@ import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.roles.RolesNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.RolesMapper;
-import com.backend.portalroshkabackend.tools.validator.RolValidator;
+import com.backend.portalroshkabackend.tools.validator.ValidatorStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,21 +21,28 @@ import java.util.List;
 import static com.backend.portalroshkabackend.tools.MessagesConst.*;
 
 @Service("rolesService") // Para hacer keyed dependency injection anashe
-public class RolesServiceImpl implements ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto, RolInsertDto, RolInsertDto>{
+public class RolesServiceImpl implements ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto, RolInsertDto, RolUpdateDto>{
     private final RolesRepository rolesRepository;
     private final UserRepository userRepository;
     private final RepositoryService repositoryService;
-    private final RolValidator rolValidator;
+    private final ValidatorStrategy<RolInsertDto> insertValidator;
+    private final ValidatorStrategy<RolUpdateDto> updateValidator;
+    private final ValidatorStrategy<Roles> deleteValidator;
 
     @Autowired
     public RolesServiceImpl(RolesRepository rolesRepository,
                             RepositoryService repositoryService,
                             UserRepository userRepository,
-                            RolValidator rolValidator){
+                            ValidatorStrategy<RolInsertDto> insertValidator,
+                            ValidatorStrategy<RolUpdateDto> updateValidator,
+                            ValidatorStrategy<Roles> deleteValidator){
         this.rolesRepository = rolesRepository;
         this.userRepository = userRepository;
         this.repositoryService = repositoryService;
-        this.rolValidator = rolValidator;
+        this.insertValidator = insertValidator;
+        this.updateValidator = updateValidator;
+        this.deleteValidator = deleteValidator;
+
     }
 
     @Transactional(readOnly = true)
@@ -71,7 +72,7 @@ public class RolesServiceImpl implements ICommonRolesCargosService<RolesResponse
     public RolDefaultResponseDto add(RolInsertDto insertDto) {
         Roles rol = new Roles();
 
-        rolValidator.validateRolUniqueName(insertDto.getNombre(), null);
+        insertValidator.validate(insertDto);
 
         RolesMapper.toRolesFromInsertDto(rol, insertDto);
 
@@ -86,14 +87,14 @@ public class RolesServiceImpl implements ICommonRolesCargosService<RolesResponse
 
     @Transactional
     @Override
-    public RolDefaultResponseDto update(int idRol, RolInsertDto updateDto) {
+    public RolDefaultResponseDto update(int idRol, RolUpdateDto updateDto) {
         Roles rol = repositoryService.findByIdOrThrow(
                 rolesRepository,
                 idRol,
                 () -> new RolesNotFoundException(idRol)
         );
 
-        rolValidator.validateRolUniqueName(updateDto.getNombre(), idRol);
+        updateValidator.validate(updateDto);
 
         rol.setNombre(updateDto.getNombre());
 
@@ -115,7 +116,7 @@ public class RolesServiceImpl implements ICommonRolesCargosService<RolesResponse
                 () -> new RolesNotFoundException(idRol)
         );
 
-        rolValidator.validateRolDontHaveUsersAssigned(idRol, rol.getNombre());
+        deleteValidator.validate(rol);
 
         repositoryService.delete(
                 rolesRepository,

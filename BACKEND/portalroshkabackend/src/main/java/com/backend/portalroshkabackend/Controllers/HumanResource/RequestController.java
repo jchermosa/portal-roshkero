@@ -28,7 +28,7 @@ public class RequestController {
     }
 
     @GetMapping("/th/users/requests/sortby")
-    public ResponseEntity<Page<SolicitudResponseDto>> getRequestSortByType(
+    public ResponseEntity<Page<SolicitudResponseDto>> getBenefitsOrPermissions(
             @RequestParam(value = "type", required = true) String estado,
             @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable,
             HttpServletRequest request
@@ -47,16 +47,32 @@ public class RequestController {
         Page<SolicitudResponseDto> requests;
 
         switch (estado) {
-            case "beneficio" -> requests = requestService.getByTipoSolicitud(SolicitudesEnum.BENEFICIO, pageable);
-            case "permiso" -> requests = requestService.getByTipoSolicitud(SolicitudesEnum.PERMISO, pageable);
-            case "vacaciones" -> requests = requestService.getByTipoSolicitud(SolicitudesEnum.VACACIONES, pageable);
+            case "beneficio" -> requests = requestService.getBenefitsOrPermissions(SolicitudesEnum.BENEFICIO, pageable);
+            case "permiso" -> requests = requestService.getBenefitsOrPermissions(SolicitudesEnum.PERMISO, pageable);
             default -> throw new IllegalArgumentException("Argumento del parametro invalido: " + estado);
         }
 
         return ResponseEntity.ok(requests);
     }
 
+    @GetMapping("th/users/requests/vacations")
+    public ResponseEntity<Page<SolicitudResponseDto>> getVacations(
+            @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
+    ){
+        Page<SolicitudResponseDto> requests = requestService.getVacations(SolicitudesEnum.VACACIONES, pageable);
+
+        return ResponseEntity.ok(requests);
+    }
+
     // TODO: getyByIdSolicitud?
+    @GetMapping("/th/users/requests/{idRequest}")
+    public ResponseEntity<SolicitudByIdResponseDto> getRequestById(
+            @PathVariable int idRequest
+    ){
+        SolicitudByIdResponseDto request = requestService.getRequestById(idRequest);
+
+        return ResponseEntity.ok(request);
+    }
 
     @PostMapping("/th/users/requests/{idRequest}/accept")
     public ResponseEntity<RequestResponseDto> acceptRequest(@PathVariable int idRequest){
@@ -82,20 +98,5 @@ public class RequestController {
         return ResponseEntity.ok("agregar nuevo tipo de request") ;
     }
 
-
-
-
-
-    //TODO: dias disponibles{id}, dias totales de vacaciones, historial de solicitudes
-
-
-    // ---------------------
-
-    // mis solicitudes.GET
-    // Listar por tipo de solicitud,
-    // GET-Tipos de BENEFICIO, DISPOSITIVOS, PERMISOS. - LISTO
-    // GET:Solicitudes aprobadas por lideres{PENDIENTES, FECHA} - LISTO
-    // GET: listar por estado de la solicitud (A,I,P)
-    // GET: Tipo de solicitudes
 
 }

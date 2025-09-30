@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.Services.UsuarioServicio;
 
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCambContrasDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
@@ -27,6 +28,7 @@ import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoDisp
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -376,7 +378,13 @@ public class UserService {
         nuevaSolicitud.setEstado(EstadoSolicitudEnum.P); // Estado inicial pendiente
         nuevaSolicitud.setFechaCreacion(java.time.LocalDateTime.now()); // Fecha y hora actual
         nuevaSolicitud.setFechaFin(solVacacionDto.getFecha_fin()); // Setea la fecha final
-        nuevaSolicitud.setCantDias((int) ChronoUnit.DAYS.between(solVacacionDto.getFecha_inicio(), solVacacionDto.getFecha_fin()) + 1 ); // Calcula la cantidad de dias entre las dos fechas inclusivo
+
+        //TODO: Calcular la cantidad de dias habiles laborales entre las dos fechas
+        //TODO:generar una lista de feriados y excluirlos del calculo de dias habiles
+        // nuevaSolicitud.setCantDias((int) ChronoUnit.DAYS.between(solVacacionDto.getFecha_inicio(), solVacacionDto.getFecha_fin()) + 1 ); // Calcula la cantidad de dias entre las dos fechas inclusivo
+        
+        nuevaSolicitud.setCantDias(calcularDiasHabiles(solVacacionDto.getFecha_inicio(), solVacacionDto.getFecha_fin()));
+
 
         if (nuevaSolicitud.getCantDias() > usuario.getDiasVacacionesRestante()) { // si la cantidad de dias solicitados es mayor a los dias de vacaciones restantes
             throw new IllegalArgumentException(" No tienes suficientes días de vacaciones restantes. Pides: "+ nuevaSolicitud.getCantDias() + " y tienes Días restantes: " + usuario.getDiasVacacionesRestante());
@@ -476,6 +484,100 @@ public class UserService {
         return solDispositivoDto;
     }
 
+    private Integer calcularDiasHabiles(LocalDate inicio, LocalDate fin) {
+        int diasHabiles = 0;
+        LocalDate fecha = inicio;
+        List<LocalDate> feriados = obtenerFeriados2025();
+
+        while (!fecha.isAfter(fin)) {// mientras la fecha no sea posterior a la fecha fin
+            boolean esFeriado = feriados.contains(fecha); // Verifica si la fecha es un feriado
+            boolean esDiaLaboral = fecha.getDayOfWeek().getValue() >= 1 && fecha.getDayOfWeek().getValue() <= 5; // 1 = Lunes, 5 = Viernes, 6 = Sabado, 7 = Domingo
+
+            if (esDiaLaboral && !esFeriado) {
+                diasHabiles++;
+            }
+            fecha = fecha.plusDays(1);// avanza al siguiente día
+        }
+
+        return diasHabiles;
+    }
+
+    public static List<LocalDate> obtenerFeriados2025() {
+        return List.of(
+            LocalDate.of(2025, 9, 29),  // Victoria de Boquerón
+            LocalDate.of(2025, 12, 8),  // Virgen de Caacupé
+            LocalDate.of(2025, 12, 25),  // Navidad
+
+            LocalDate.of(2026, 1, 1),   // Año Nuevo
+            LocalDate.of(2026, 3, 1),   // Día de los Héroes
+            LocalDate.of(2026, 4, 2),   // Jueves Santo
+            LocalDate.of(2026, 4, 3),   // Viernes Santo
+            LocalDate.of(2026, 5, 1),   // Día del Trabajador
+            LocalDate.of(2026, 5, 14),  // Independencia
+            LocalDate.of(2026, 5, 15),  // Día de la Madre
+            LocalDate.of(2026, 6, 12),  // Paz del Chaco
+            LocalDate.of(2026, 8, 15),  // Fundación de Asunción
+            LocalDate.of(2026, 9, 29),  // Victoria de Boquerón
+            LocalDate.of(2026, 12, 8),  // Virgen de Caacupé
+            LocalDate.of(2026, 12, 25),  // Navidad
+
+            LocalDate.of(2027, 1, 1),   // Año Nuevo
+            LocalDate.of(2027, 3, 1),   // Día de los Héroes
+            LocalDate.of(2027, 3, 25),  // Jueves Santo
+            LocalDate.of(2027, 3, 26),  // Viernes Santo
+            LocalDate.of(2027, 5, 1),   // Día del Trabajador
+            LocalDate.of(2027, 5, 14),  // Independencia
+            LocalDate.of(2027, 5, 15),  // Día de la Madre
+            LocalDate.of(2027, 6, 12),  // Paz del Chaco
+            LocalDate.of(2027, 8, 15),  // Fundación de Asunción
+            LocalDate.of(2027, 9, 29),  // Victoria de Boquerón
+            LocalDate.of(2027, 12, 8),  // Virgen de Caacupé
+            LocalDate.of(2027, 12, 25),  // Navidad
+
+            LocalDate.of(2028, 1, 1),   // Año Nuevo
+            LocalDate.of(2028, 3, 1),   // Día de los Héroes
+            LocalDate.of(2028, 4, 13),  // Jueves Santo
+            LocalDate.of(2028, 4, 14),  // Viernes Santo
+            LocalDate.of(2028, 5, 1),   // Día del Trabajador
+            LocalDate.of(2028, 5, 14),  // Independencia
+            LocalDate.of(2028, 5, 15),  // Día de la Madre
+            LocalDate.of(2028, 6, 12),  // Paz del Chaco
+            LocalDate.of(2028, 8, 15),  // Fundación de Asunción
+            LocalDate.of(2028, 9, 29),  // Victoria de Boquerón
+            LocalDate.of(2028, 12, 8),  // Virgen de Caacupé
+            LocalDate.of(2028, 12, 25)  // Navidad
+        );
+    }
+
+    //servicio para actualizar contraseña del usuario actual
+    public boolean actualizarContrasena(UserCambContrasDto dto) {
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();// Instancia del codificador
+        
+        String nuevaContrasena = dto.getNuevaContrasena(); // Nueva contraseña en texto plano
+        String contrasenaActual = dto.getContrasenaActual(); // Contraseña actual en texto plano
+
+        if (!encoder.matches(contrasenaActual, usuario.getContrasena())) { // Verifica si la contraseña actual coincide
+            return false;
+        }
+
+        usuario.setContrasena(encoder.encode(nuevaContrasena)); // Actualiza la contraseña con la nueva codificada
+        usuarioRepository.save(usuario);
+        return true;
+    }
 
     // Mapeo de Solicitud a SolicitudUserDto según el nuevo modelo
     private SolicitudUserDto mapSolicitudToDto(Solicitud solicitud) {

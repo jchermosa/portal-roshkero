@@ -1,9 +1,6 @@
 package com.backend.portalroshkabackend.Services.HumanResource;
 
-import com.backend.portalroshkabackend.DTO.th.cargos.CargoByIdResponseDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargoInsertDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargosDefaultResponseDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargosResponseDto;
+import com.backend.portalroshkabackend.DTO.th.cargos.*;
 import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.TH.CargosRepository;
@@ -11,7 +8,7 @@ import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.CargosMapper;
-import com.backend.portalroshkabackend.tools.validator.CargoValidator;
+import com.backend.portalroshkabackend.tools.validator.ValidatorStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,21 +20,28 @@ import java.util.List;
 import static com.backend.portalroshkabackend.tools.MessagesConst.*;
 
 @Service("cargosService") // Para hacer keyed dependency injection :D
-public class CargosServiceImpl implements ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoInsertDto> {
+public class CargosServiceImpl implements ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoUpdateDto> {
     private final CargosRepository cargosRepository;
     private final UserRepository userRepository;
-    private final CargoValidator cargoValidator;
+    private final ValidatorStrategy<CargoInsertDto> insertValidator;
+    private final ValidatorStrategy<CargoUpdateDto> updateValidator;
+    private final ValidatorStrategy<Cargos> deleteValidator;
+
     private final RepositoryService repositoryService;
 
 
     @Autowired
     public CargosServiceImpl(CargosRepository cargosRepository,
                              UserRepository userRepository,
-                             CargoValidator cargoValidator,
+                             ValidatorStrategy<CargoInsertDto> insertValidator,
+                             ValidatorStrategy<CargoUpdateDto> updateValidator,
+                             ValidatorStrategy<Cargos> deleteValidator,
                              RepositoryService repositoryService){
         this.cargosRepository = cargosRepository;
         this.userRepository = userRepository;
-        this.cargoValidator = cargoValidator;
+        this.insertValidator = insertValidator;
+        this.updateValidator = updateValidator;
+        this.deleteValidator = deleteValidator;
         this.repositoryService = repositoryService;
     }
 
@@ -68,7 +72,7 @@ public class CargosServiceImpl implements ICommonRolesCargosService<CargosRespon
     public CargosDefaultResponseDto add(CargoInsertDto insertDto) {
         Cargos cargo = new Cargos();
 
-        cargoValidator.validateCargoUniqueName(insertDto.getNombre(), null);
+        insertValidator.validate(insertDto);
 
         CargosMapper.toCargosFromInsertDto(cargo, insertDto);
 
@@ -83,14 +87,14 @@ public class CargosServiceImpl implements ICommonRolesCargosService<CargosRespon
 
     @Transactional
     @Override
-    public CargosDefaultResponseDto update(int idCargo, CargoInsertDto updateDto) {
+    public CargosDefaultResponseDto update(int idCargo, CargoUpdateDto updateDto) {
         Cargos cargo = repositoryService.findByIdOrThrow(
                 cargosRepository,
                 idCargo,
                 () -> new CargoNotFoundException(idCargo)
         );
 
-        cargoValidator.validateCargoUniqueName(updateDto.getNombre(), idCargo);
+        updateValidator.validate(updateDto);
 
         cargo.setNombre(updateDto.getNombre());
 
@@ -112,7 +116,7 @@ public class CargosServiceImpl implements ICommonRolesCargosService<CargosRespon
                 () -> new CargoNotFoundException(idCargo)
         );
 
-        cargoValidator.validateCargoDontHaveUsersAssigned(idCargo, cargo.getNombre());
+        deleteValidator.validate(cargo);
 
         repositoryService.delete(
                 cargosRepository,

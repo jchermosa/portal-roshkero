@@ -43,6 +43,16 @@ public class RequestDeviceController {
        return sysAdminService.findAllSolicitudes(pageable);
    }
 
+//    Create a controller to obtain a single request by its ID
+    @GetMapping("/request/{idRequest}")
+    public ResponseEntity<?> getRequestById(@PathVariable Integer idRequest) {
+        DeviceRequestDto requestDto = deviceRequest.getRequestById(idRequest);
+        if (requestDto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Solicitud no encontrada");
+        }
+        return ResponseEntity.ok(requestDto);
+    }
+
     //Aceptar
     @PostMapping("deviceRequest/{idRequest}/accept")
     public ResponseEntity<?> acceptRequest(@PathVariable Integer idRequest) {

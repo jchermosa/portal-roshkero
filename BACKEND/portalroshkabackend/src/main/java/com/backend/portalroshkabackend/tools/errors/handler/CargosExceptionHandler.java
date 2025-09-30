@@ -2,7 +2,7 @@ package com.backend.portalroshkabackend.tools.errors.handler;
 
 import com.backend.portalroshkabackend.DTO.common.ErrorResponseDto;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoAlreadyInactiveException;
-import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoAssignedToUsers;
+import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoAssignedToUsersException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoDuplicateNameException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.cargos.CargoNotFoundException;
 import org.springframework.core.annotation.Order;
@@ -25,8 +25,8 @@ public class CargosExceptionHandler extends BaseExceptionHandler{
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler(CargoAssignedToUsers.class)
-    public ResponseEntity<ErrorResponseDto> handleCargoAssignedToUsers(CargoAssignedToUsers ex){
+    @ExceptionHandler(CargoAssignedToUsersException.class)
+    public ResponseEntity<ErrorResponseDto> handleCargoAssignedToUsers(CargoAssignedToUsersException ex){
         return buildError(HttpStatus.CONFLICT, ex.getMessage());
     }
 

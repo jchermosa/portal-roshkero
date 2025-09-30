@@ -1,10 +1,7 @@
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
 
-import com.backend.portalroshkabackend.DTO.th.cargos.CargoByIdResponseDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargoInsertDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargosDefaultResponseDto;
-import com.backend.portalroshkabackend.DTO.th.cargos.CargosResponseDto;
+import com.backend.portalroshkabackend.DTO.th.cargos.*;
 import com.backend.portalroshkabackend.Services.HumanResource.ICommonRolesCargosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController()
 @RequestMapping("/api/v1/admin")
 public class CargosController {
-    private final ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoInsertDto> cargosService;
+    private final ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoUpdateDto> cargosService;
 
     @Autowired
-    public CargosController(@Qualifier("cargosService") ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoInsertDto> cargosService){
+    public CargosController(@Qualifier("cargosService") ICommonRolesCargosService<CargosResponseDto, CargoByIdResponseDto, CargosDefaultResponseDto, CargoInsertDto, CargoUpdateDto> cargosService){
         this.cargosService = cargosService;
     }
 
@@ -58,7 +55,7 @@ public class CargosController {
     @PutMapping("/th/cargos/{idCargo}")
     public ResponseEntity<CargosDefaultResponseDto> updateCargo(
             @PathVariable int idCargo,
-            @RequestBody CargoInsertDto updateDto
+            @RequestBody CargoUpdateDto updateDto
     ){
         CargosDefaultResponseDto cargoDto = cargosService.update(idCargo, updateDto);
 
