@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.backend.portalroshkabackend.tools.errors.errorslist.DatabaseOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +34,7 @@ public class SysAdminService {
             return solicitudesRechazadas.map(this::toDto);
         } catch (Exception e) {
             System.err.println("Error al obtener solicitudes rechazadas: " + e.getMessage());
-            throw new RuntimeException("Error al obtener las solicitudes rechazadas");
+            throw new DatabaseOperationException("Error al obtener las solicitudes rechazadas");
         }
     }
 
@@ -44,7 +45,7 @@ public class SysAdminService {
             return solicitudesAprobadas.map(this::toDto);
         } catch (Exception e) {
             System.err.println("Error al obtener solicitudes aprobadas: " + e.getMessage());
-            throw new RuntimeException("Error al obtener las solicitudes aprobadas");
+            throw new DatabaseOperationException("Error al obtener las solicitudes aprobadas");
         }
     }
 
@@ -55,7 +56,7 @@ public class SysAdminService {
             return solicitudesPendientes.map(this::toDto);
         } catch (Exception e) {
             System.err.println("Error al obtener solicitudes pendientes: " + e.getMessage());
-            throw new RuntimeException("Error al obtener las solicitudes pendientes");
+            throw new DatabaseOperationException("Error al obtener las solicitudes pendientes");
         }
     }
 
@@ -66,7 +67,7 @@ public class SysAdminService {
             return solicitudes.map(this::toDto);
         } catch (Exception e) {
             System.err.println("Error al obtener las solicitudes: " + e.getMessage());
-            throw new RuntimeException("Error al obtener las solicitudes");
+            throw new DatabaseOperationException("Error al obtener las solicitudes");
         }    }
 
 

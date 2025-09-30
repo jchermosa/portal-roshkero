@@ -17,6 +17,11 @@ public interface DeviceRepository extends JpaRepository<Dispositivo, Integer> {
     @Query("SELECT d FROM Dispositivo d WHERE d.encargado IS NULL AND d.estado = 'D'")
     List<Dispositivo> findAllWithoutOwner();
 
+    @Query("SELECT d FROM Dispositivo d WHERE d.ubicacion.idUbicacion = :ubicacionId")
+    List<Dispositivo> findAllInLocation(@Param("ubicacionId") Integer ubicacionId);
+
+    @Query("SELECT d FROM Dispositivo d WHERE d.ubicacion.idUbicacion = :ubicacionId")
+    Page<Dispositivo> findAllInLocation(@Param("ubicacionId") Integer ubicacionId, Pageable pageable);
 
     @Query("SELECT d FROM Dispositivo d WHERE d.encargado IS NULL AND d.estado = 'D'")
    Page<Dispositivo> findAllWithoutOwner(Pageable pageable);
