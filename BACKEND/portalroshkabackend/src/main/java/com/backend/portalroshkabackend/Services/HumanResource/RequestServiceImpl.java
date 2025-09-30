@@ -27,11 +27,13 @@ public class RequestServiceImpl implements IRequestService{
     private final IAcceptRequestService acceptVacationsService;
     private final IAcceptRequestService acceptBenefitService;
     private final IAcceptRequestService acceptPermissionsService;
+    private final RequestMapper requestMapper;
     ValidatorStrategy<Solicitud> requestValidator;
 
     @Autowired
     public RequestServiceImpl (SolicitudRepository solicitudRepository,
                                RepositoryService repositoryService,
+                               RequestMapper requestMapper,
                                @Qualifier("acceptVacationsService") IAcceptRequestService acceptVacationsService,
                                @Qualifier("acceptBenefitService") IAcceptRequestService acceptBenefitService,
                                @Qualifier("acceptPermissionsService") IAcceptRequestService acceptPermissionsService,
@@ -43,28 +45,35 @@ public class RequestServiceImpl implements IRequestService{
         this.acceptVacationsService = acceptVacationsService;
         this.acceptBenefitService = acceptBenefitService;
         this.acceptPermissionsService = acceptPermissionsService;
+        this.requestMapper = requestMapper;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<SolicitudResponseDto> getByTipoSolicitud(SolicitudesEnum tipoSolicitud, Pageable pageable) {
+    public Page<SolicitudResponseDto> getBenefitsOrPermissions(SolicitudesEnum tipoSolicitud, Pageable pageable) {
 
         Page<Solicitud> requestSorted;
 
         switch (tipoSolicitud) {
-            case VACACIONES -> {
-                requestSorted = solicitudRepository.findAllByTipoSolicitudAndEstado(SolicitudesEnum.VACACIONES, EstadoSolicitudEnum.A, pageable);
-            }
             case PERMISO -> {
                 requestSorted = solicitudRepository.findAllByTipoSolicitudAndEstadoOrTipoSolicitudAndLiderIsNull(SolicitudesEnum.PERMISO, EstadoSolicitudEnum.A, SolicitudesEnum.PERMISO, pageable);
+                return requestSorted.map(requestMapper::toPermissionResponseDto);
             }
             case BENEFICIO -> {
                 requestSorted = solicitudRepository.findAllByTipoSolicitud(tipoSolicitud, pageable);
+                return requestSorted.map(requestMapper::toBenefitsResponseDto);
             }
+
             default -> throw new IllegalArgumentException("Tipo de solicitud no soportado: " + tipoSolicitud);
         }
 
-        return requestSorted.map(RequestMapper::toSolicitudTHResponseDto);
+    }
+
+    @Override
+    public Page<SolicitudResponseDto> getVacations(SolicitudesEnum tipoSolicitud, Pageable pageable) {
+        Page<Solicitud> vacations = solicitudRepository.findAllByTipoSolicitudAndEstado(SolicitudesEnum.VACACIONES, EstadoSolicitudEnum.A, pageable);
+
+        return vacations.map(requestMapper::toVacationsResponseDto);
     }
 
     @Transactional
@@ -93,7 +102,7 @@ public class RequestServiceImpl implements IRequestService{
                 DATABASE_DEFAULT_ERROR
         );
 
-        return RequestMapper.toRequestResponseDto(acceptedRequest.getIdSolicitud(), REQUEST_ACCEPTED_MESSAGE);
+        return requestMapper.toRequestResponseDto(acceptedRequest.getIdSolicitud(), REQUEST_ACCEPTED_MESSAGE);
     }
 
     @Transactional
@@ -115,7 +124,7 @@ public class RequestServiceImpl implements IRequestService{
                 DATABASE_DEFAULT_ERROR
         );
 
-        return RequestMapper.toRequestResponseDto(rejectedRequest.getIdSolicitud(), REQUEST_REJECTED_MESSAGE);
+        return requestMapper.toRequestResponseDto(rejectedRequest.getIdSolicitud(), REQUEST_REJECTED_MESSAGE);
 
     }
 
