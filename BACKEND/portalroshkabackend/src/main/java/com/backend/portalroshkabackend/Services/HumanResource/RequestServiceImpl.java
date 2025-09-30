@@ -76,6 +76,17 @@ public class RequestServiceImpl implements IRequestService{
         return vacations.map(requestMapper::toVacationsResponseDto);
     }
 
+    @Override
+    public SolicitudByIdResponseDto getRequestById(int idSolicitud) {
+        Solicitud request = repositoryService.findByIdOrThrow(
+                solicitudRepository,
+                idSolicitud,
+                () -> new RequestNotFoundException(idSolicitud)
+        );
+
+        return requestMapper.toSolicitudByIdResponseDto(request);
+    }
+
     @Transactional
     @Override
     public RequestResponseDto acceptRequest(int idRequest) {

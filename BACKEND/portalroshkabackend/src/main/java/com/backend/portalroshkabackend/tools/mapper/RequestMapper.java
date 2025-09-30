@@ -1,5 +1,6 @@
 package com.backend.portalroshkabackend.tools.mapper;
 
+import com.backend.portalroshkabackend.DTO.th.SolicitudByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.SolicitudResponseDto;
 import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Solicitud;
@@ -110,6 +111,57 @@ public class RequestMapper {
     }
 
 
+    public SolicitudByIdResponseDto toSolicitudByIdResponseDto(Solicitud solicitud) {
+        SolicitudByIdResponseDto dto = new SolicitudByIdResponseDto();
+
+        dto.setIdSolicitud(solicitud.getIdSolicitud());
+        dto.setUsuario(solicitud.getUsuario().getNombre() + " " + solicitud.getUsuario().getApellido());
+
+        if (solicitud.getDocumentoAdjunto() != null){
+            dto.setDocumentoAdjunto(solicitud.getDocumentoAdjunto().getNombreArchivo());
+        } else {
+            dto.setDocumentoAdjunto(null);
+        }
+
+        if (solicitud.getLider() != null){
+            dto.setLider(solicitud.getLider().getNombre() + " " + solicitud.getLider().getApellido());
+        } else {
+            dto.setLider(null);
+        }
+
+        dto.setTipoSolicitud(solicitud.getTipoSolicitud());
+
+        if (solicitud.getComentario() != null){
+            dto.setComentario(limpiarComentario(solicitud.getComentario()));
+        } else {
+            dto.setComentario(null);
+        }
+
+        dto.setEstado(solicitud.getEstado());
+        dto.setFechaInicio(solicitud.getFechaInicio());
+
+        if (solicitud.getCantDias() != null){
+            dto.setCantDias(solicitud.getCantDias());
+        } else {
+            dto.setCantDias(0);
+        }
+
+        if (solicitud.getFechaFin() != null){
+            dto.setFechaFin(solicitud.getFechaFin());
+        } else {
+            dto.setFechaFin(null);
+        }
+
+        if (solicitud.getFechaCreacion() != null){
+            dto.setFechaCreacion(solicitud.getFechaCreacion());
+        } else {
+            dto.setFechaCreacion(null);
+        }
+
+
+        return dto;
+    }
+
     private  Integer extraerIdTipoPermiso(String comentario) {
         Pattern pattern = Pattern.compile("\\((\\d+)\\)");
         Matcher matcher = pattern.matcher(comentario);
@@ -118,6 +170,14 @@ public class RequestMapper {
             return Integer.parseInt(matcher.group(1));
         }
         return null;
+    }
+
+    private String limpiarComentario(String comentario) {
+        if (comentario == null) return null;
+
+        return comentario.replaceAll("\\(\\d+\\)", "")
+                .replaceAll("\\{\\d+}", "")
+                .trim();
     }
 
 }
