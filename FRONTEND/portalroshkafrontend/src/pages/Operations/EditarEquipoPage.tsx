@@ -1,5 +1,5 @@
 // src/pages/EditarEquipoPage.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import DynamicForm from "../../components/DynamicForm";
@@ -31,7 +31,7 @@ type ITeam = {
 };
 
 type DiaLaboral = { idDiaLaboral: number; nombreDia: string };
-type Ubicacion  = { idUbicacion: number; nombre: string };
+type Ubicacion = { idUbicacion: number; nombre: string };
 
 type AsignDU = {
   idDiaLaboral: number;
@@ -41,18 +41,21 @@ type AsignDU = {
 };
 
 const METADATAS_PATH = "/api/v1/admin/operations/metadatas";
-const TEAM_PATH      = "/api/v1/admin/operations/team";
-const USERS_PATH     = "/api/v1/admin/operations/users";
-const DIAS_PATH      = "/api/v1/admin/operations/diaslaborales";
-const LIBRES_PATH    = "/api/v1/admin/operations/asignacion/libres";
+const TEAM_PATH = "/api/v1/admin/operations/team";
+const USERS_PATH = "/api/v1/admin/operations/users";
+const DIAS_PATH = "/api/v1/admin/operations/diaslaborales";
+const LIBRES_PATH = "/api/v1/admin/operations/asignacion/libres";
 
 function useIsDark() {
   const [isDark, setIsDark] = useState(
-    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+    typeof document !== "undefined" &&
+      document.documentElement.classList.contains("dark")
   );
   useEffect(() => {
     const el = document.documentElement;
-    const obs = new MutationObserver(() => setIsDark(el.classList.contains("dark")));
+    const obs = new MutationObserver(() =>
+      setIsDark(el.classList.contains("dark"))
+    );
     obs.observe(el, { attributes: true, attributeFilter: ["class"] });
     return () => obs.disconnect();
   }, []);
@@ -68,11 +71,11 @@ const toPercent = (v: any) => {
 const toFraction = (p: any) => {
   const n = Number(p);
   if (!isFinite(n)) return 1;
-  return n > 1 ? +(n / 100).toFixed(4) : n;
+  const pct = n > 1 ? n / 100 : n;
+  return +Math.min(1, Math.max(0.01, pct)).toFixed(4);
 };
 
 export default function EditarEquipoPage() {
-  
   const { token } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -82,73 +85,115 @@ export default function EditarEquipoPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [externalErrors, setExternalErrors] = useState<Record<string, string>>({});
+  const [externalErrors, setExternalErrors] = useState<Record<string, string>>(
+    {}
+  );
   const [team, setTeam] = useState<ITeam | null>(null);
 
-  const [formData, setFormData] = useState<{ nombre: string; fechaInicio: string; fechaFin: string; estado: boolean; }>(
-    { nombre: "", fechaInicio: "", fechaFin: "", estado: true }
-  );
+  const [formData, setFormData] = useState<{
+    nombre: string;
+    fechaInicio: string;
+    fechaFin: string;
+    estado: boolean;
+  }>({ nombre: "", fechaInicio: "", fechaFin: "", estado: true });
 
   // Cliente / Lead / Tec
-  const [clienteOptions, setClienteOptions] = useState<Array<{ value: number; label: string }>>([]);
-  const [clienteSel, setClienteSel] = useState<{ value: number; label: string } | null>(null);
+  const [clienteOptions, setClienteOptions] = useState<
+    Array<{ value: number; label: string }>
+  >([]);
+  const [clienteSel, setClienteSel] = useState<{
+    value: number;
+    label: string;
+  } | null>(null);
 
-  const [leadOptions, setLeadOptions] = useState<Array<{ value: number; label: string }>>([]);
-  const [leadSel, setLeadSel] = useState<{ value: number; label: string } | null>(null);
+  const [leadOptions, setLeadOptions] = useState<
+    Array<{ value: number; label: string }>
+  >([]);
+  const [leadSel, setLeadSel] = useState<{
+    value: number;
+    label: string;
+  } | null>(null);
   const [leadId, setLeadId] = useState<number | null>(null);
   const [leadSaving, setLeadSaving] = useState(false);
 
-  const [tecnologiaOptions, setTecnologiaOptions] = useState<Array<{ value: number; label: string }>>([]);
-  const [tecnologiasSel, setTecnologiasSel] = useState<Array<{ value: number; label: string }>>([]);
+  const [tecnologiaOptions, setTecnologiaOptions] = useState<
+    Array<{ value: number; label: string }>
+  >([]);
+  const [tecnologiasSel, setTecnologiasSel] = useState<
+    Array<{ value: number; label: string }>
+  >([]);
   const [tecPick, setTecPick] = useState<number | "">("");
 
   // Miembros
   const [miembros, setMiembros] = useState<IMiembrosEquipo[]>([]);
-  const [memberOptions, setMemberOptions] = useState<Array<{ value: number; label: string; idCargo: number }>>([]);
-  const [selectedMember, setSelectedMember] = useState<{ value: number; label: string; idCargo: number } | null>(null);
+  const [memberOptions, setMemberOptions] = useState<
+    Array<{ value: number; label: string; idCargo: number }>
+  >([]);
+  const [selectedMember, setSelectedMember] = useState<{
+    value: number;
+    label: string;
+    idCargo: number;
+  } | null>(null);
   const [newMemberDisp, setNewMemberDisp] = useState<number>(100);
   const [newMemberStart, setNewMemberStart] = useState<string>("");
   const [newMemberEnd, setNewMemberEnd] = useState<string>("");
 
   // Días / Ubicaciones / Asignaciones
-  const [diasOptions, setDiasOptions] = useState<Array<{ value: number; label: string }>>([]);
-  const [libresByDay, setLibresByDay] = useState<Map<number, Ubicacion[]>>(new Map());
+  const [diasOptions, setDiasOptions] = useState<
+    Array<{ value: number; label: string }>
+  >([]);
+  const [libresByDay, setLibresByDay] = useState<Map<number, Ubicacion[]>>(
+    new Map()
+  );
   const [asignaciones, setAsignaciones] = useState<AsignDU[]>([]);
 
-  const firstArray = (...cands: any[][]) => cands.find(a => Array.isArray(a) && a.length) ?? [];
-  // Reemplazá tu selectStyles por este:
-const selectStyles = useMemo(
-  () => ({
-    control: (p: any, s: any) => ({
-      ...p,
-      backgroundColor: isDark ? "#111827" : "#ffffff",
-      borderColor: s.isFocused ? "#3b82f6" : isDark ? "#374151" : "#d1d5db",
-      boxShadow: s.isFocused ? "0 0 0 2px rgba(59,130,246,.2)" : "none",
-      ":hover": { borderColor: "#3b82f6" },
-      minHeight: 40,
-    }),
-    menuPortal: (b: any) => ({ ...b, zIndex: 9999 }),
-    menu: (p: any) => ({ ...p, zIndex: 9999, backgroundColor: isDark ? "#111827" : "#ffffff" }),
-    // --- Texto en dark mode ---
-    input: (p: any) => ({ ...p, color: isDark ? "#ffffff" : "#111827" }),
-    singleValue: (p: any) => ({ ...p, color: isDark ? "#ffffff" : "#111827" }),
-    placeholder: (p: any) => ({ ...p, color: isDark ? "#d1d5db" : "#6b7280" }),
-    multiValueLabel: (p: any) => ({ ...p, color: isDark ? "#0f172a" : "#1f2937" }),
-    option: (p: any, s: any) => ({
-      ...p,
-      backgroundColor: s.isSelected
-        ? (isDark ? "#1f2937" : "#dbeafe")
-        : s.isFocused
-        ? (isDark ? "#374151" : "#e5e7eb")
-        : "transparent",
-      color: isDark ? "#ffffff" : "#111827",
-    }),
-  }),
-  [isDark]
-);
+  const firstArray = (...cands: any[][]) =>
+    cands.find((a) => Array.isArray(a) && a.length) ?? [];
 
+  const selectStyles = useMemo(
+    () => ({
+      control: (p: any, s: any) => ({
+        ...p,
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+        borderColor: s.isFocused ? "#3b82f6" : isDark ? "#374151" : "#d1d5db",
+        boxShadow: s.isFocused ? "0 0 0 2px rgba(59,130,246,.2)" : "none",
+        ":hover": { borderColor: "#3b82f6" },
+        minHeight: 40,
+      }),
+      menuPortal: (b: any) => ({ ...b, zIndex: 9999 }),
+      menu: (p: any) => ({
+        ...p,
+        zIndex: 9999,
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+      }),
+      input: (p: any) => ({ ...p, color: isDark ? "#ffffff" : "#111827" }),
+      singleValue: (p: any) => ({ ...p, color: isDark ? "#ffffff" : "#111827" }),
+      placeholder: (p: any) => ({
+        ...p,
+        color: isDark ? "#d1d5db" : "#6b7280",
+      }),
+      multiValueLabel: (p: any) => ({
+        ...p,
+        color: isDark ? "#0f172a" : "#1f2937",
+      }),
+      option: (p: any, s: any) => ({
+        ...p,
+        backgroundColor: s.isSelected
+          ? isDark
+            ? "#1f2937"
+            : "#dbeafe"
+          : s.isFocused
+          ? isDark
+            ? "#374151"
+            : "#e5e7eb"
+          : "transparent",
+        color: isDark ? "#ffffff" : "#111827",
+      }),
+    }),
+    [isDark]
+  );
 
-  // ===== Validación de nombre en caliente (DEBOUNCE; hace PATCH real) =====
+  // Nombre: verificación en caliente con debounce
   const originalName = team?.nombre ?? "";
   useEffect(() => {
     if (!team) return;
@@ -159,7 +204,11 @@ const selectStyles = useMemo(
       return;
     }
     if (nombre === originalName) {
-      setExternalErrors((p) => { const n = { ...p }; delete n.nombre; return n; });
+      setExternalErrors((p) => {
+        const n = { ...p };
+        delete n.nombre;
+        return n;
+      });
       return;
     }
 
@@ -179,96 +228,163 @@ const selectStyles = useMemo(
         });
         if (!r.ok) {
           const txt = await r.text();
-          const msg = /existe|duplic/i.test(txt) || r.status === 409 ? "El nombre ya existe" : "No se pudo verificar el nombre";
+          const msg =
+            /existe|duplic/i.test(txt) || r.status === 409
+              ? "El nombre ya existe"
+              : "No se pudo verificar el nombre";
           setExternalErrors((p) => ({ ...p, nombre: msg }));
         } else {
-          setExternalErrors((p) => { const n = { ...p }; delete n.nombre; return n; });
+          setExternalErrors((p) => {
+            const n = { ...p };
+            delete n.nombre;
+            return n;
+          });
         }
       } catch {
-        if (!ac.signal.aborted) setExternalErrors((p) => ({ ...p, nombre: "No se pudo verificar el nombre" }));
+        if (!ac.signal.aborted)
+          setExternalErrors((p) => ({
+            ...p,
+            nombre: "No se pudo verificar el nombre",
+          }));
       }
     }, 500);
 
-    return () => { clearTimeout(t); ac.abort(); };
+    return () => {
+      clearTimeout(t);
+      ac.abort();
+    };
   }, [formData.nombre, team?.idEquipo, token, originalName]);
 
-  // ===== Carga inicial =====
+  // Carga inicial
   useEffect(() => {
     const ac = new AbortController();
     (async () => {
       try {
-        setLoading(true); setError(null);
+        setLoading(true);
+        setError(null);
 
         const md = await fetch(METADATAS_PATH, {
-          headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-          credentials: "include", signal: ac.signal,
+          headers: {
+            Accept: "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          credentials: "include",
+          signal: ac.signal,
         });
         if (!md.ok) throw new Error(`Metadatas ${md.status} ${md.statusText}`);
         const meta = await md.json();
 
-        setClienteOptions((meta.clientes ?? []).map((c: any) => ({ value: c.idCliente, label: c.nombre })));
+        setClienteOptions(
+          (meta.clientes ?? []).map((c: any) => ({
+            value: c.idCliente,
+            label: c.nombre,
+          }))
+        );
 
         const rawLeads = firstArray(
-          meta.teamleaders, meta.teamLeaders, meta.team_leaders,
-          meta.lideres, meta.leaders, meta.usuariosLideres, meta.usuarios
+          meta.teamleaders,
+          meta.teamLeaders,
+          meta.team_leaders,
+          meta.lideres,
+          meta.leaders,
+          meta.usuariosLideres,
+          meta.usuarios
         );
         setLeadOptions(
           rawLeads.map((u: any) => ({
             value: u.idUsuario ?? u.id ?? u.usuarioId,
-            label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
+            label:
+              [u.nombre, u.apellido].filter(Boolean).join(" ") ||
+              u.nombreCompleto ||
+              "Sin nombre",
           }))
         );
-        setTecnologiaOptions((meta.tecnologias ?? []).map((t: any) => ({ value: t.idTecnologia, label: t.nombre })));
+        setTecnologiaOptions(
+          (meta.tecnologias ?? []).map((t: any) => ({
+            value: t.idTecnologia,
+            label: t.nombre,
+          }))
+        );
 
         const tr = await fetch(`${TEAM_PATH}/${id}`, {
-          headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-          credentials: "include", signal: ac.signal,
+          headers: {
+            Accept: "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          credentials: "include",
+          signal: ac.signal,
         });
         if (!tr.ok) throw new Error(`Team ${tr.status} ${tr.statusText}`);
         const t = await tr.json();
 
-        const notIn = Array.isArray(t.usuariosNoEnEquipo) ? t.usuariosNoEnEquipo : [];
+        const notIn = Array.isArray(t.usuariosNoEnEquipo)
+          ? t.usuariosNoEnEquipo
+          : [];
         if (notIn.length) {
           setMemberOptions(
             notIn.map((u: any) => ({
               value: u.idUsuario ?? u.id,
               label: [u.nombre, u.apellido].filter(Boolean).join(" "),
               idCargo: u.idCargo ?? 0,
-            }))
+            })
+            )
           );
         } else {
           const ur = await fetch(USERS_PATH, {
-            headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-            credentials: "include", signal: ac.signal,
+            headers: {
+              Accept: "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            credentials: "include",
+            signal: ac.signal,
           });
           if (ur.ok) {
             const usersData = await ur.json();
-            const usersArr = Array.isArray(usersData?.content) ? usersData.content : (Array.isArray(usersData) ? usersData : []);
+            const usersArr = Array.isArray(usersData?.content)
+              ? usersData.content
+              : Array.isArray(usersData)
+              ? usersData
+              : [];
             setMemberOptions(
               usersArr.map((u: any) => ({
                 value: u.id ?? u.idUsuario ?? u.usuarioId,
-                label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
+                label:
+                  [u.nombre, u.apellido].filter(Boolean).join(" ") ||
+                  u.nombreCompleto ||
+                  "Sin nombre",
                 idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
               }))
             );
           }
         }
 
-        const estadoBool = typeof t.estado === "boolean" ? t.estado : t.estado === "A";
+        const estadoBool =
+          typeof t.estado === "boolean" ? t.estado : t.estado === "A";
         const fechaFin = t.fechaLimite ?? t.fechaFin ?? "";
 
         const miembrosFuente = firstArray(
-          t.usuariosAsignacion, t.usuariosEnEquipo, t.usuarios,
-          t.miembros, t.integrantes, t.miembrosEquipo
+          t.usuariosAsignacion,
+          t.usuariosEnEquipo,
+          t.usuarios,
+          t.miembros,
+          t.integrantes,
+          t.miembrosEquipo
         );
-        const miembrosInicial: IMiembrosEquipo[] = miembrosFuente.map((u: any) => ({
-          id: u.idUsuario ?? u.id ?? u.usuarioId,
-          nombre: u.nombreCompleto ?? [u.nombre, u.apellido].filter(Boolean).join(" ") ?? String(u.nombre ?? u.apellido ?? "Sin nombre"),
-          idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
-          disponibilidad: toPercent(u.disponibilidad ?? u.porcentajeTrabajo ?? 100),
-          fechaEntrada: u.fechaEntrada ?? "",
-          fechaFin: u.fechaFin ?? "",
-        }));
+        const miembrosInicial: IMiembrosEquipo[] = miembrosFuente.map(
+          (u: any) => ({
+            id: u.idUsuario ?? u.id ?? u.usuarioId,
+            nombre:
+              u.nombreCompleto ??
+              [u.nombre, u.apellido].filter(Boolean).join(" ") ??
+              String(u.nombre ?? u.apellido ?? "Sin nombre"),
+            idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
+            disponibilidad: toPercent(
+              u.disponibilidad ?? u.porcentajeTrabajo ?? 100
+            ),
+            fechaEntrada: u.fechaEntrada ?? "",
+            fechaFin: u.fechaFin ?? "",
+          })
+        );
 
         setTeam({
           idEquipo: t.idEquipo,
@@ -281,51 +397,90 @@ const selectStyles = useMemo(
           tecnologias: t.tecnologias ?? [],
           miembros: miembrosInicial,
           leadId: t.lider?.idUsuario ?? null,
-          leadNombre: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" ") || null,
+          leadNombre:
+            [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" ") ||
+            null,
         });
 
-        setFormData({ nombre: t.nombre ?? "", fechaInicio: t.fechaInicio ?? "", fechaFin, estado: estadoBool });
+        setFormData({
+          nombre: t.nombre ?? "",
+          fechaInicio: t.fechaInicio ?? "",
+          fechaFin,
+          estado: estadoBool,
+        });
         setMiembros(miembrosInicial);
-        setTecnologiasSel((t.tecnologias ?? []).map((x: any) => ({ value: x.idTecnologia, label: x.nombre })));
+        setTecnologiasSel(
+          (t.tecnologias ?? []).map((x: any) => ({
+            value: x.idTecnologia,
+            label: x.nombre,
+          }))
+        );
 
         const lId = t.lider?.idUsuario ?? null;
         setLeadId(lId);
-        setClienteSel(t.cliente?.idCliente ? { value: t.cliente.idCliente, label: t.cliente.nombre } : null);
-        setLeadSel(lId ? { value: lId, label: [t.lider?.nombre, t.lider?.apellido].filter(Boolean).join(" ") } : null);
+        setClienteSel(
+          t.cliente?.idCliente
+            ? { value: t.cliente.idCliente, label: t.cliente.nombre }
+            : null
+        );
+        setLeadSel(
+          lId
+            ? {
+                value: lId,
+                label: [t.lider?.nombre, t.lider?.apellido]
+                  .filter(Boolean)
+                  .join(" "),
+              }
+            : null
+        );
 
-        // DU inicial (acepta días sin ubicación)
-        const duSrc = Array.isArray(t.equipoDiaUbicacion) ? t.equipoDiaUbicacion : [];
-        const inicialDU: AsignDU[] = duSrc
-          .filter((e: any) => e?.diaLaboral?.idDiaLaboral)
-          .map((e: any) => ({
-            idDiaLaboral: e.diaLaboral.idDiaLaboral,
-            nombreDia: e.diaLaboral.nombreDia ?? "—",
-            idUbicacion: e.ubicacion?.idUbicacion ?? null,
-            nombreUbicacion: e.ubicacion?.nombre ?? null,
-          }));
-        setAsignaciones(inicialDU);
-
+        // DU inicial
+const duSrc = Array.isArray(t.equipoDiaUbicacion) ? t.equipoDiaUbicacion : [];
+const inicialDU: AsignDU[] = duSrc.map((e: any) => {
+  // Soporta esquema plano o anidado
+  const idDia = e.idDiaLaboral ?? e?.diaLaboral?.idDiaLaboral;
+  const nomDia = e.nombreDia ?? e?.diaLaboral?.nombreDia ?? "—";
+  const idUbi = e.idUbicacion ?? e?.ubicacion?.idUbicacion ?? null;
+  const nomUbi = e.nombreUbicacion ?? e?.ubicacion?.nombre ?? null;
+  return {
+    idDiaLaboral: idDia,
+    nombreDia: nomDia,
+    idUbicacion: idUbi,
+    nombreUbicacion: nomUbi,
+  };
+}).filter((x) => x.idDiaLaboral != null);
+setAsignaciones(inicialDU);
         // Días
         const dr = await fetch(DIAS_PATH, {
-          headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-          credentials: "include", signal: ac.signal,
+          headers: {
+            Accept: "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          credentials: "include",
+          signal: ac.signal,
         });
         if (dr.ok) {
           const dias: DiaLaboral[] = await dr.json();
-          setDiasOptions(dias.map(d => ({ value: d.idDiaLaboral, label: d.nombreDia })));
+          setDiasOptions(dias.map((d) => ({ value: d.idDiaLaboral, label: d.nombreDia })));
         }
 
         // Libres por día
         const lr = await fetch(LIBRES_PATH, {
-          headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-          credentials: "include", signal: ac.signal,
+          headers: {
+            Accept: "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          credentials: "include",
+          signal: ac.signal,
         });
         if (lr.ok) {
           const libres = await lr.json();
           const map = new Map<number, Ubicacion[]>();
           libres.forEach((entry: any) => {
             const idDia = entry.idDiaLaboral;
-            const arr: Ubicacion[] = Array.isArray(entry.ubicacionesLibres) ? entry.ubicacionesLibres : [];
+            const arr: Ubicacion[] = Array.isArray(entry.ubicacionesLibres)
+              ? entry.ubicacionesLibres
+              : [];
             map.set(idDia, arr);
           });
           setLibresByDay(map);
@@ -340,61 +495,103 @@ const selectStyles = useMemo(
   }, [id, token]);
 
   const onClearExternalError = (name: string) =>
-    setExternalErrors((prev) => { const next = { ...prev }; delete next[name]; return next; });
+    setExternalErrors((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
 
-  const getSections = () => [
-    {
-      title: "Editar Equipo",
-      icon: "🛠️",
-      fields: [
-        { name: "nombre", label: "Nombre del equipo", type: "text" as const, required: true },
-        { name: "fechaInicio", label: "Fecha de inicio", type: "date" as const, required: true },
-        { name: "fechaFin", label: "Fecha límite", type: "date" as const, required: true },
-        { name: "estado", label: "Activo", type: "checkbox" as const, required: true },
-      ],
-    },
-  ];
+  const sections = useMemo(
+    () => [
+      {
+        title: "Editar Equipo",
+        icon: "🛠️",
+        fields: [
+          {
+            name: "nombre",
+            label: "Nombre del equipo",
+            type: "text" as const,
+            required: true,
+          },
+          {
+            name: "fechaInicio",
+            label: "Fecha de inicio",
+            type: "date" as const,
+            required: true,
+          },
+          {
+            name: "fechaFin",
+            label: "Fecha límite",
+            type: "date" as const,
+            required: true,
+          },
+          {
+            name: "estado",
+            label: "Activo",
+            type: "checkbox" as const,
+            required: true,
+          },
+        ],
+      },
+    ],
+    []
+  );
 
-  const handleFormChange = (updated: Record<string, any>) =>
-    setFormData(prev => ({ ...prev, ...updated }));
+  // Handler seguro para DynamicForm: difiere el setState al microtask
+  const handleFormChangeDeferred = useCallback((updated: Record<string, any>) => {
+    Promise.resolve().then(() =>
+      setFormData((prev) => ({ ...prev, ...updated }))
+    );
+  }, []);
 
   // ====== TECNOLOGÍAS / MIEMBROS ======
   const handleAddTec = () => {
     if (tecPick === "") return;
-    const opt = tecnologiaOptions.find(o => o.value === Number(tecPick));
+    const opt = tecnologiaOptions.find((o) => o.value === Number(tecPick));
     if (!opt) return;
-    if (tecnologiasSel.some(t => t.value === opt.value)) return;
-    setTecnologiasSel(prev => [...prev, opt]);
+    if (tecnologiasSel.some((t) => t.value === opt.value)) return;
+    setTecnologiasSel((prev) => [...prev, opt]);
     setTecPick("");
   };
   const handleRemoveTec = (idTec: number) =>
-    setTecnologiasSel(prev => prev.filter(t => t.value !== idTec));
+    setTecnologiasSel((prev) => prev.filter((t) => t.value !== idTec));
 
   const handleAddMember = () => {
     if (!selectedMember) return;
-    if (miembros.some(m => m.id === selectedMember.value)) return;
+    if (miembros.some((m) => m.id === selectedMember.value)) return;
 
-    setMiembros(ms => [
+    setMiembros((ms) => [
       ...ms,
       {
         id: selectedMember.value,
         nombre: selectedMember.label,
         idCargo: selectedMember.idCargo,
-        disponibilidad: Math.max(0, Math.min(100, newMemberDisp)),
+        disponibilidad: Math.max(1, Math.min(100, newMemberDisp)),
         fechaEntrada: newMemberStart || "",
         fechaFin: newMemberEnd || "",
       },
     ]);
-    setMemberOptions(opts => opts.filter(o => o.value !== selectedMember.value));
+    setMemberOptions((opts) =>
+      opts.filter((o) => o.value !== selectedMember.value)
+    );
     setSelectedMember(null);
     setNewMemberDisp(100);
     setNewMemberStart("");
     setNewMemberEnd("");
   };
 
-  const updateMemberDisp  = (id: number, val: number) => setMiembros(ms => ms.map(m => (m.id === id ? { ...m, disponibilidad: Math.max(0, Math.min(100, val)) } : m)));
-  const updateMemberStart = (id: number, v: string)   => setMiembros(ms => ms.map(m => (m.id === id ? { ...m, fechaEntrada: v } : m)));
-  const updateMemberEnd   = (id: number, v: string)   => setMiembros(ms => ms.map(m => (m.id === id ? { ...m, fechaFin: v } : m)));
+  const updateMemberDisp = (id: number, val: number) =>
+    setMiembros((ms) =>
+      ms.map((m) =>
+        m.id === id
+          ? { ...m, disponibilidad: Math.max(1, Math.min(100, val)) }
+          : m
+      )
+    );
+  const updateMemberStart = (id: number, v: string) =>
+    setMiembros((ms) => ms.map((m) => (m.id === id ? { ...m, fechaEntrada: v } : m)));
+  const updateMemberEnd = (id: number, v: string) =>
+    setMiembros((ms) => ms.map((m) => (m.id === id ? { ...m, fechaFin: v } : m)));
 
   const columns = [
     { key: "id", label: "ID" },
@@ -405,7 +602,9 @@ const selectStyles = useMemo(
         <div className="flex items-center gap-2">
           <span className="text-gray-900 dark:text-gray-100">{s.nombre}</span>
           {leadId === s.id && (
-            <span className="px-2 py-0.5 text-[10px] rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100">Lead</span>
+            <span className="px-2 py-0.5 text-[10px] rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100">
+              Lead
+            </span>
           )}
         </div>
       ),
@@ -416,9 +615,13 @@ const selectStyles = useMemo(
       label: "Disp. (%)",
       render: (s: IMiembrosEquipo) => (
         <input
-          type="number" min={0} max={100}
-          value={s.disponibilidad ?? 100}
-          onChange={(e) => updateMemberDisp(s.id, Number.isNaN(+e.target.value) ? 0 : +e.target.value)}
+          type="number"
+          min={1}
+          max={100}
+          value={Number(s.disponibilidad ?? 100)}
+          onChange={(e) =>
+            updateMemberDisp(s.id, Number(e.target.value) || 1)
+          }
           className="w-20 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
         />
       ),
@@ -453,8 +656,11 @@ const selectStyles = useMemo(
       render: (s: IMiembrosEquipo) => (
         <button
           onClick={() => {
-            setMiembros(ms => ms.filter(m => m.id !== s.id));
-            setMemberOptions(opts => [...opts, { value: s.id, label: s.nombre, idCargo: s.idCargo }]);
+            setMiembros((ms) => ms.filter((m) => m.id !== s.id));
+            setMemberOptions((opts) => [
+              ...opts,
+              { value: s.id, label: s.nombre, idCargo: s.idCargo },
+            ]);
           }}
           className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none"
         >
@@ -464,19 +670,19 @@ const selectStyles = useMemo(
     },
   ];
 
-  // ======= DÍAS: filas & edición de ubicación por fila =======
-
-  // Mapeo rápido díaId -> nombre
+  // Días
   const dayName = useMemo(() => {
     const m = new Map<number, string>();
-    diasOptions.forEach(d => m.set(d.value, d.label));
+    diasOptions.forEach((d) => m.set(d.value, d.label));
     return m;
   }, [diasOptions]);
 
-  // Upsert de asignación para un día (setea/limpia ubicación)
-  const setUbicacionForDay = (dayId: number, opt: { value: number; label: string } | null) => {
-    setAsignaciones(prev => {
-      const others = prev.filter(a => a.idDiaLaboral !== dayId);
+  const setUbicacionForDay = (
+    dayId: number,
+    opt: { value: number; label: string } | null
+  ) => {
+    setAsignaciones((prev) => {
+      const others = prev.filter((a) => a.idDiaLaboral !== dayId);
       return [
         ...others,
         {
@@ -489,11 +695,10 @@ const selectStyles = useMemo(
     });
   };
 
-  // Filas a mostrar: todos los días conocidos, con la asignación (si existe)
   const rowsDU: AsignDU[] = useMemo(() => {
     const map = new Map<number, AsignDU>();
-    asignaciones.forEach(a => map.set(a.idDiaLaboral, a));
-    return diasOptions.map(d => {
+    asignaciones.forEach((a) => map.set(a.idDiaLaboral, a));
+    return diasOptions.map((d) => {
       const a = map.get(d.value);
       return {
         idDiaLaboral: d.value,
@@ -504,10 +709,16 @@ const selectStyles = useMemo(
     });
   }, [diasOptions, asignaciones]);
 
-  // Opciones por día (incluye la ubicación actual aunque no esté entre libres)
-  const optionsForDay = (dayId: number, currentId?: number | null, currentName?: string | null) => {
-    let opts = (libresByDay.get(dayId) ?? []).map(u => ({ value: u.idUbicacion, label: u.nombre }));
-    if (currentId != null && !opts.some(o => o.value === currentId)) {
+  const optionsForDay = (
+    dayId: number,
+    currentId?: number | null,
+    currentName?: string | null
+  ) => {
+    let opts = (libresByDay.get(dayId) ?? []).map((u) => ({
+      value: u.idUbicacion,
+      label: u.nombre,
+    }));
+    if (currentId != null && !opts.some((o) => o.value === currentId)) {
       opts = [{ value: currentId, label: currentName ?? "—" }, ...opts];
     }
     return opts;
@@ -520,8 +731,16 @@ const selectStyles = useMemo(
       label: "Ubicación",
       render: (r: AsignDU) => (
         <Select
-          options={optionsForDay(r.idDiaLaboral, r.idUbicacion ?? null, r.nombreUbicacion ?? null)}
-          value={r.idUbicacion != null ? { value: r.idUbicacion, label: r.nombreUbicacion ?? "—" } : null}
+          options={optionsForDay(
+            r.idDiaLaboral,
+            r.idUbicacion ?? null,
+            r.nombreUbicacion ?? null
+          )}
+          value={
+            r.idUbicacion != null
+              ? { value: r.idUbicacion, label: r.nombreUbicacion ?? "—" }
+              : null
+          }
           onChange={(opt) => setUbicacionForDay(r.idDiaLaboral, opt as any)}
           isClearable
           placeholder="Elegir ubicación…"
@@ -537,7 +756,7 @@ const selectStyles = useMemo(
               primary50: isDark ? "#1f2937" : "#dbeafe",
             },
           })}
-          styles={selectStyles}  
+          styles={selectStyles}
           menuPortalTarget={document.body}
           menuPosition="fixed"
         />
@@ -548,7 +767,7 @@ const selectStyles = useMemo(
       label: "Acciones",
       render: (r: AsignDU) => (
         <button
-          onClick={() => setUbicacionForDay(r.idDiaLaboral, null)} // limpia la ubicación del día
+          onClick={() => setUbicacionForDay(r.idDiaLaboral, null)}
           className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
         >
           Eliminar
@@ -557,38 +776,38 @@ const selectStyles = useMemo(
     },
   ];
 
-  // ===== SUBMIT (usa rowsDU para enviar todos los días) =====
+  // Submit
   const onSubmit = async (_data: Record<string, any>) => {
     try {
       if (!team) return;
       if (!clienteSel) throw new Error("Seleccioná un cliente.");
-      setSaving(true); setError(null); setExternalErrors({});
+      setSaving(true);
+      setError(null);
+      setExternalErrors({});
 
-      const duPayload = rowsDU.map((a) => {
-        const base: any = { diaLaboral: { idDiaLaboral: a.idDiaLaboral } };
-        if (a.idUbicacion != null) base.ubicacion = { idUbicacion: a.idUbicacion };
-        return base;
-      });
+      const duPayload = rowsDU.map((a) => ({
+  idDiaLaboral: a.idDiaLaboral,
+  idUbicacion: a.idUbicacion ?? null,
+}));
 
-      const payload: any = {
-        nombre: formData.nombre,
-        idCliente: Number(clienteSel.value),
-        fechaInicio: formData.fechaInicio,
-        fechaLimite: formData.fechaFin,
-        estado: formData.estado ? "A" : "I",
-        idLider: leadSel ? Number(leadSel.value) : null,
-        idTecnologias: tecnologiasSel.map(t => Number(t.value)),
-        usuarios: miembros.map(m => ({
-          idUsuario: m.id,
-          idCargo: m.idCargo,
-          porcentajeTrabajo: toFraction(m.disponibilidad ?? 100),
-          fechaEntrada: m.fechaEntrada || null,
-          fechaFin: m.fechaFin || null,
-          estado: "A",
-        })),
-        equipoDiaUbicacion: duPayload,
-      };
-
+const payload: any = {
+  nombre: formData.nombre,
+  idCliente: Number(clienteSel.value),
+  fechaInicio: formData.fechaInicio,
+  fechaLimite: formData.fechaFin,
+  estado: formData.estado ? "A" : "I",
+  idLider: leadSel ? Number(leadSel.value) : null,
+  idTecnologias: tecnologiasSel.map((t) => Number(t.value)),
+  usuarios: miembros.map((m) => ({
+    idUsuario: m.id,
+    idCargo: m.idCargo,
+    porcentajeTrabajo: toFraction(m.disponibilidad ?? 100),
+    fechaEntrada: m.fechaEntrada || null,
+    fechaFin: m.fechaFin || null,
+    estado: "A",
+  })),
+  equipoDiaUbicacion: duPayload, // ← plano
+};
       const r = await fetch(`${TEAM_PATH}/${team.idEquipo}`, {
         method: "PATCH",
         headers: {
@@ -606,7 +825,7 @@ const selectStyles = useMemo(
           setExternalErrors({ nombre: "El nombre ya existe" });
           throw new Error("Nombre duplicado");
         }
-        throw new Error(`${r.status} ${r.statusText} — ${txt.slice(0,160)}`);
+        throw new Error(`${r.status} ${r.statusText} — ${txt.slice(0, 160)}`);
       }
 
       navigate("/operations");
@@ -618,14 +837,19 @@ const selectStyles = useMemo(
   };
 
   if (loading) return <div className="p-4 text-sm">Cargando…</div>;
-  if (error)   return <div className="p-4 text-sm text-red-600">Error: {error}</div>;
-  if (!team)   return <div className="p-4 text-sm">No se encontró el equipo.</div>;
+  if (error) return <div className="p-4 text-sm text-red-600">Error: {error}</div>;
+  if (!team) return <div className="p-4 text-sm">No se encontró el equipo.</div>;
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <div
         className="absolute inset-0 bg-brand-blue"
-        style={{ backgroundImage: "url('/src/assets/ilustracion-herov3.svg')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}
+        style={{
+          backgroundImage: "url('/src/assets/ilustracion-herov3.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
       >
         <div className="absolute inset-0 bg-brand-blue/40" />
       </div>
@@ -634,23 +858,26 @@ const selectStyles = useMemo(
         <div className="mx-auto w-full max-w-5xl bg-white/45 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-lg flex flex-col max-h-[calc(100vh-2rem)] text-gray-900 dark:text-gray-100">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-bold">Editar Equipo: {team.nombre}</h2>
-            <p className="text-sm text-gray-700 dark:text-gray-300">Cliente actual: {team.clienteNombre ?? "—"}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              Cliente actual: {team.clienteNombre ?? "—"}
+            </p>
           </div>
 
           <div className="flex-1 overflow-auto p-6 space-y-6">
             <DynamicForm
               id="editar-equipo-form"
-              sections={getSections()}
+              sections={sections}
               initialData={formData}
-              onChange={setFormData}
+              onChange={handleFormChangeDeferred} // evita setState durante render de DynamicForm
               onSubmit={onSubmit}
               externalErrors={externalErrors}
               onClearExternalError={onClearExternalError}
             />
 
-            {/* Tabla Día–Ubicación con selector por fila */}
             <div>
-              <h3 className="text-sm font-semibold mb-2">Días y ubicaciones asignadas</h3>
+              <h3 className="text-sm font-semibold mb-2">
+                Días y ubicaciones asignadas
+              </h3>
               <DataTable
                 data={rowsDU}
                 columns={duColumns}
@@ -660,7 +887,6 @@ const selectStyles = useMemo(
               />
             </div>
 
-            {/* Cliente y Team Lead */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
               <div>
                 <label className="block text-sm mb-2">Cliente</label>
@@ -681,7 +907,7 @@ const selectStyles = useMemo(
                       primary50: isDark ? "#1f2937" : "#dbeafe",
                     },
                   })}
-                  styles={selectStyles}  
+                  styles={selectStyles}
                   menuPortalTarget={document.body}
                   menuPosition="fixed"
                 />
@@ -689,7 +915,9 @@ const selectStyles = useMemo(
 
               <div className="grid grid-cols-3 gap-2 items-end">
                 <div className="col-span-2">
-                  <label className="block text-sm mb-2">Team Lead (metadatas)</label>
+                  <label className="block text-sm mb-2">
+                    Team Lead (metadatas)
+                  </label>
                   <Select
                     options={leadOptions}
                     value={leadSel}
@@ -708,7 +936,7 @@ const selectStyles = useMemo(
                         primary50: isDark ? "#1f2937" : "#dbeafe",
                       },
                     })}
-                    styles={selectStyles}  
+                    styles={selectStyles}
                     menuPortalTarget={document.body}
                     menuPosition="fixed"
                   />
@@ -719,7 +947,9 @@ const selectStyles = useMemo(
                     if (!team) return;
                     try {
                       setLeadSaving(true);
-                      const payload: any = { idLider: leadSel ? Number(leadSel.value) : null };
+                      const payload: any = {
+                        idLider: leadSel ? Number(leadSel.value) : null,
+                      };
                       const r = await fetch(`${TEAM_PATH}/${team.idEquipo}`, {
                         method: "PATCH",
                         headers: {
@@ -738,7 +968,10 @@ const selectStyles = useMemo(
                       setLeadSaving(false);
                     }
                   }}
-                  disabled={leadSaving || (leadSel?.value ?? null) === (team.leadId ?? null)}
+                  disabled={
+                    leadSaving ||
+                    (leadSel?.value ?? null) === (team.leadId ?? null)
+                  }
                   className="h-10 px-3 rounded bg-green-600 text-white text-sm disabled:opacity-60"
                   title="Aplicar cambio de Team Lead ahora"
                 >
@@ -747,18 +980,23 @@ const selectStyles = useMemo(
               </div>
             </div>
 
-            {/* Tecnologías */}
             <div>
               <label className="block text-sm mb-2">Tecnologías</label>
               <div className="flex gap-2">
                 <select
                   className="w-full h-10 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3"
                   value={tecPick}
-                  onChange={(e) => setTecPick(e.target.value === "" ? "" : Number(e.target.value))}
+                  onChange={(e) =>
+                    setTecPick(
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
                 >
                   <option value="">Seleccionar tecnología…</option>
                   {tecnologiaOptions.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
                   ))}
                 </select>
                 <button
@@ -778,14 +1016,19 @@ const selectStyles = useMemo(
                       className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100"
                     >
                       {t.label}
-                      <button type="button" onClick={() => handleRemoveTec(t.value)} className="ml-1 hover:opacity-80">×</button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTec(t.value)}
+                        className="ml-1 hover:opacity-80"
+                      >
+                        ×
+                      </button>
                     </span>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Miembros */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
               <div className="md:col-span-2">
                 <label className="block text-sm mb-2">Agregar miembro</label>
@@ -808,7 +1051,7 @@ const selectStyles = useMemo(
                       primary50: isDark ? "#1f2937" : "#dbeafe",
                     },
                   })}
-                  styles={selectStyles}  
+                  styles={selectStyles}
                   menuPortalTarget={document.body}
                   menuPosition="fixed"
                 />
@@ -833,9 +1076,15 @@ const selectStyles = useMemo(
               </div>
               <div className="flex items-end gap-2">
                 <input
-                  type="number" min={0} max={100}
+                  type="number"
+                  min={1}
+                  max={100}
                   value={newMemberDisp}
-                  onChange={(e) => setNewMemberDisp(Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
+                  onChange={(e) =>
+                    setNewMemberDisp(
+                      Math.max(1, Math.min(100, Number(e.target.value) || 1))
+                    )
+                  }
                   className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
                   placeholder="Disp. %"
                 />
@@ -860,7 +1109,9 @@ const selectStyles = useMemo(
           </div>
 
           <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 flex items-center justify-between">
-            <p className="text-sm text-gray-700 dark:text-gray-300">Revisá y guardá los cambios.</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              Revisá y guardá los cambios.
+            </p>
             <div className="flex items-center gap-3">
               <button
                 type="button"
