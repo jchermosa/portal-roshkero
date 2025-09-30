@@ -42,7 +42,8 @@ import UbicacionPage from "../pages/varios/UbicacionPage";
 import ClientesPage from "../pages/varios/ClientesPage";
 import CargosPage from "../pages/varios/CargosPage";
 import RolesPage from "../pages/varios/RolesPage";
-import GestionTHPage from "../pages/varios/GestionTH";
+import GestionTHPage from "../pages/varios/CatalogoTH";
+import CatalogoOperacionesPage from "../pages/varios/CatalogoOperacionesPage";
 
 export default function AppRoutes() {
   return (
@@ -112,10 +113,13 @@ export default function AppRoutes() {
           <Route path="/roles" element={<RolesPage />} />
           
           {/* GestionTH */}
-          <Route path="/gestion-th" element={<GestionTHPage />} />
+          <Route path="/catalogo-th" element={<GestionTHPage />} />
 
           {/* Ubicación */}
           <Route path="/ubicacion" element={<UbicacionPage />} />
+
+          {/* CatalogoOperaciones */}
+          <Route path="/catalogo-operaciones" element={< CatalogoOperacionesPage />} />
 
           {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />
