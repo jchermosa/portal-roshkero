@@ -6,7 +6,7 @@ import RolesPage from "./RolesPage";
 
 type TabKey = "cargos" | "roles";
 
-export default function GestionTHPage() {
+export default function CatalogoTHPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const rawTab = (searchParams.get("tab") || "").toLowerCase();
