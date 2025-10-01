@@ -4,16 +4,7 @@ import React, { useEffect, useState } from "react";
 export interface FormField {
   name: string;
   label: string;
-  type:
-    | "text"
-    | "email"
-    | "password"
-    | "number"
-    | "date"
-    | "select"
-    | "checkbox"
-    | "textarea"
-    | "custom";
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "checkbox" | "textarea"| "custom" | "slider" | "file";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
@@ -25,6 +16,15 @@ export interface FormField {
   render?: () => React.ReactNode;
   className?: string;
   fullWidth?: boolean;
+
+   // Props opcionales para slider
+  min?: number;
+  max?: number;
+  step?: number;
+
+  // Props opcionales para file
+  accept?: string;
+  multiple?: boolean;
 }
 
 export interface FormSection {
@@ -45,12 +45,12 @@ export interface DynamicFormProps {
   cancelLabel?: string;
   loading?: boolean;
   className?: string;
-
   /** Errores externos (por ejemplo, venidos del backend o chequeos async). */
   externalErrors?: Record<string, string>;
   /** (Opcional) Se llama al escribir en un campo que tiene error externo para que el padre lo limpie. */
   onClearExternalError?: (name: string) => void;
-}
+  readonly?: boolean;
+
 
 export interface FormMessage {
   type: "success" | "error";
@@ -64,6 +64,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   onSubmit,
   onChange,
   loading = false,
+  readonly = false,
   className = "",
   externalErrors = {},
   onClearExternalError,
@@ -156,7 +157,8 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     const value = formData[field.name] ?? "";
     // Priorizar error externo si existe
     const mergedError = externalErrors[field.name] || errors[field.name];
-    const isFieldDisabled = field.disabled || loading;
+    const error = errors[field.name];
+    const isFieldDisabled = field.disabled || loading || readonly;
 
     const baseProps = {
       name: field.name,
@@ -242,15 +244,91 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         );
 
       case "custom":
-        return field.render ? (
-          <div
-            key={field.name}
-            className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}
-          >
-            {field.render()}
-          </div>
-        ) : null;
 
+        if (field.render) {
+          return (
+            <div key={field.name}className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
+              {field.render()}
+            </div>
+          );
+        }
+        return null;
+
+        case "slider":
+  return (
+    <div
+      key={field.name}
+      className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}
+    >
+      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        {field.label}
+        {field.required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <input
+          type="range"
+          name={field.name}
+          min={field.min ?? 0}
+          max={field.max ?? 100}
+          step={field.step ?? 1}
+          value={formData[field.name] ?? field.min ?? 0}
+          onInput={(e) => {
+            const target = e.target as HTMLInputElement;
+            handleChange({
+              ...e,
+              target: {
+                ...target,
+                name: field.name,
+                value: target.value,
+                type: "number", // 👈 forzamos que lo trate como number
+              },
+            } as React.ChangeEvent<HTMLInputElement>);
+          }}
+          disabled={isFieldDisabled}
+          className="w-full accent-blue-600"
+        />
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {formData[field.name] ?? 0}%
+        </span>
+              {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
+            </div>
+          );
+
+         case "file":
+  return (
+    <div key={field.name} className="space-y-2">
+      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        {field.label}
+        {field.required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <input
+        type="file"
+        name={field.name}
+        accept={field.accept}
+        multiple={field.multiple}
+        disabled={isFieldDisabled}
+        onChange={(e) => {
+          const files = e.target.files;
+          let value: File | File[] | null = null;
+          if (files) {
+            value = field.multiple ? Array.from(files) : files[0];
+          }
+          setFormData((prev) => {
+            const next = { ...prev, [field.name]: value };
+            if (onChange) onChange(next);
+            return next;
+          });
+        }}
+        className={`w-full text-sm text-gray-700 dark:text-gray-200
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100
+                    ${isFieldDisabled ? "cursor-not-allowed opacity-60" : ""}`}
+      />
+      {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
+    </div>
+  );
       default:
         return (
           <div

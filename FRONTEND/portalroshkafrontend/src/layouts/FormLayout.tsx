@@ -17,7 +17,7 @@ export default function FormLayout({
   icon,
   children,
   onCancel,
-  onSubmitLabel = "Guardar cambios",
+  onSubmitLabel,
   onCancelLabel = "Cancelar",
   loading = false,
 }: FormLayoutProps) {
@@ -61,18 +61,20 @@ export default function FormLayout({
 
             {/* Footer con botones */}
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row gap-4">
-              <button
-                type="submit"
-                form="dynamic-form" // <- asocia con el <form id="dynamic-form"> de DynamicForm
-                disabled={loading}
-                className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all duration-200
-                  ${loading
-                    ? "bg-gray-400 cursor-not-allowed text-white"
-                    : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 hover:scale-105 active:scale-95"
-                  }`}
-              >
-                💾 {onSubmitLabel}
-              </button>
+              {onSubmitLabel && (   // 👈 solo mostrar si está definido
+                <button
+                  type="submit"
+                  form="dynamic-form"
+                  disabled={loading}
+                  className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all duration-200
+                    ${loading
+                      ? "bg-gray-400 cursor-not-allowed text-white"
+                      : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 hover:scale-105 active:scale-95"
+                    }`}
+                >
+                  💾 {onSubmitLabel}
+                </button>
+              )}
 
               {onCancel && (
                 <button

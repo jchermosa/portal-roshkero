@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getRoles, getCargos, getEquipos } from "../../services/CatalogService";
 import type { RolItem, CargoItem, EquipoItem } from "../../types";
 
-export function useCatalogos(token: string | null) {
+export function useCatalogosUsuarios(token: string | null) {
   const [roles, setRoles] = useState<RolItem[]>([]);
   const [cargos, setCargos] = useState<CargoItem[]>([]);
   const [equipos, setEquipos] = useState<EquipoItem[]>([]);
@@ -15,9 +15,9 @@ export function useCatalogos(token: string | null) {
 
     Promise.all([getRoles(token), getCargos(token), getEquipos(token)])
       .then(([rolesRes, cargosRes, equiposRes]) => {
-        setRoles(rolesRes);
-        setCargos(cargosRes);
-        setEquipos(equiposRes);
+        setRoles(rolesRes ?? []);
+        setCargos(cargosRes ?? []);
+        setEquipos(equiposRes ?? []);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

@@ -11,19 +11,24 @@ export type User = {
   apellido: string;
   nroCedula: string;
   correo: string;
-  roles: Roles; // definir Roles como enum o type aparte
-  fechaIngreso: string; // LocalDate → string (ej: "2025-09-25")
+
   antiguedad: string;
-  diasVacaciones: number;
   estado: "ACTIVO" | "INACTIVO"; // si usas enum EstadoActivoInactivo mejor tiparlo
   contrasena: string;
-  telefono: string;
-  cargos: Cargos; // idem, definirlo aparte
   fechaNacimiento: string; // LocalDate → string
-  diasVacacionesRestante: number;
-  requiereCambioContrasena: boolean;
-  url: string;
   disponibilidad: number | null;
+
+  rol: Rol;
+  cargo?: Cargo;
+  equipo?: Equipo;
+  diasVacaciones?: number;
+  diasVacacionesRestante?: number;
+  telefono?: string;
+  fechaIngreso?: string;
+  nroCedula?: string;
+  estado?: boolean;
+  requiereCambioContrasena?: boolean;
+  fotoBase64?: string;
 };
 
 
@@ -33,6 +38,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
+  refreshUser: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,43 +71,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const decodeAndSetUser = (jwtToken: string) => {
-try {
-const base = jwtToken.split(".")[1];
-const json = decodeURIComponent(
-atob(base)
-.split("")
-.map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-.join("")
-);
-const payload = JSON.parse(json);
+  const decodeAndSetUser = async(jwtToken: string) => {
+    try {
+      const payload = parseJwt(jwtToken);
+
+      const basicUser: User = {
+        id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
+        nombre: payload.nombre ?? "",
+        apellido: payload.apellido ?? "",
+        correo: payload.email ?? payload.sub ?? "",
+        rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
+        cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
+        equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
+        telefono: payload.telefono ?? undefined,
+        fechaIngreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
+        diasVacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
+        diasVacacionesRestante:
+          payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante,
+        requiereCambioContrasena: payload.requiereCambioContrasena ?? false,
+
+      };
 
 
-const usuario: User = {
-id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
-nombre: payload.nombre ?? "",
-apellido: payload.apellido ?? "",
-correo: payload.email ?? payload.sub ?? "",
+      
+      setUser(basicUser);
 
+      const res = await fetch("/api/usuarios/me", {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
 
-rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
-cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
-equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
+      if (!res.ok) throw new Error("No se pudo obtener datos completos del usuario");
 
+      const fullUser: User = await res.json();
 
-telefono: payload.telefono ?? undefined,
-fecha_ingreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
+      setUser(fullUser);
 
-dias_vacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
-dias_vacaciones_restante:payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante
-};
-
-
-setUser(usuario);
-} catch (e) {
-  console.error("Error al decodificar el token:", e);
-}
-};
+    } catch (e) {
+      console.error("Error al decodificar el token:", e);
+    }
+  };
 
   const login = (jwtToken: string) => {
     localStorage.setItem("auth_token", jwtToken);
@@ -115,6 +123,10 @@ setUser(usuario);
     setToken(null);
   };
 
+  const refreshUser = () => {
+    if (token) decodeAndSetUser(token);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -123,12 +135,14 @@ setUser(usuario);
         isAuthenticated: !!token,
         login,
         logout,
+        refreshUser, 
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

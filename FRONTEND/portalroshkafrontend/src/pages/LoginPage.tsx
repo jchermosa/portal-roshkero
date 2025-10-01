@@ -92,7 +92,7 @@ export default function Login() {
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* --- SPLASH ANIMADO --- */}
       {showSplash && (
-        <div className="absolute inset-0 flex items-center justify-center absolute inset-0 bg-[radial-gradient(circle_at_center,_#1D75BD_0%,_#0a3d62_100%)] z-50">
+        <div className="flex items-center justify-center absolute inset-0 bg-[radial-gradient(circle_at_center,_#1D75BD_0%,_#0a3d62_100%)] z-50">
           <img
             src={logo_white_transparent}
             alt="Splash Logo"
