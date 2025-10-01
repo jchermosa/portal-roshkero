@@ -76,32 +76,41 @@ atob(base)
 );
 const payload = JSON.parse(json);
 
+      const basicUser: User = {
+        id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
+        nombre: payload.nombre ?? "",
+        apellido: payload.apellido ?? "",
+        correo: payload.email ?? payload.sub ?? "",
+        rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
+        cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
+        equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
+        telefono: payload.telefono ?? undefined,
+        fechaIngreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
+        diasVacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
+        diasVacacionesRestante:
+          payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante,
+        requiereCambioContrasena: payload.requiereCambioContrasena ?? false,
 
-const usuario: User = {
-id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
-nombre: payload.nombre ?? "",
-apellido: payload.apellido ?? "",
-correo: payload.email ?? payload.sub ?? "",
-
-
-rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
-cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
-equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
-
-
-telefono: payload.telefono ?? undefined,
-fecha_ingreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
-
-dias_vacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
-dias_vacaciones_restante:payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante
-};
+      };
 
 
-setUser(usuario);
-} catch (e) {
-  console.error("Error al decodificar el token:", e);
-}
-};
+      
+      setUser(basicUser);
+
+      const res = await fetch("/api/v1/usuarios/me", {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+
+      if (!res.ok) throw new Error("No se pudo obtener datos completos del usuario");
+
+      const fullUser: User = await res.json();
+
+      setUser(fullUser);
+
+    } catch (e) {
+      console.error("Error al decodificar el token:", e);
+    }
+  };
 
   const login = (jwtToken: string) => {
     localStorage.setItem("auth_token", jwtToken);

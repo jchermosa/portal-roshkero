@@ -1,61 +1,90 @@
-import type { UsuarioItem } from "../types";
-import mockUsuariosData from "../data/mockUsuarios.json";
+import type { UsuarioItem, FiltrosUsuarios, SolicitudUserItem } from "../types";
+import type { PaginatedResponse } from "../types";
+import { mapUserResponseToUsuarioItem } from "../mappers/userMapper";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+const BASE_URL = "http://localhost:8080/api/v1/admin/th/users";
 
-// Hacemos una copia mutable del mock
-let mockUsuarios: UsuarioItem[] = [...(mockUsuariosData as UsuarioItem[])];
-
-// ================================
-// Respuesta pageable estándar
-// ================================
-export interface PaginatedResponse<T> {
-  content: T[];
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number; // página actual
-}
-
-// ================================
-// Métodos reales
-// ================================
-async function getUsuariosApi(
+/**
+ * GET usuarios paginados con filtros
+ */
+export async function getUsuarios(
   token: string,
-  params: Record<string, string | number | undefined> = {}
+  filtros: FiltrosUsuarios = {},
+  page: number = 0,
+  size: number = 10
 ): Promise<PaginatedResponse<UsuarioItem>> {
-  const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
+  const params = new URLSearchParams();
 
-  const res = await fetch(`/api/usuarios?${query.toString()}`, {
+  if (filtros.sortBy) params.append("sortBy", filtros.sortBy);
+  if (filtros.idRol) params.append("rol_id", filtros.idRol.toString());
+  if (filtros.idCargo) params.append("cargo_id", filtros.idCargo.toString());
+  if (filtros.estado) params.append("estado", filtros.estado);
+
+  params.append("page", page.toString());
+  params.append("size", size.toString());
+
+  const res = await fetch(`${BASE_URL}?${params.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+
+  const json = await res.json();
+ 
+  console.log("getUsuarios response:", json);
+  return {
+    ...json,
+    content: (json.content || []).map(mapUserResponseToUsuarioItem),
+  };
 }
 
-async function getUsuarioByIdApi(token: string, id: string): Promise<UsuarioItem> {
-  const res = await fetch(`/api/usuarios/${id}`, {
+/**
+ * GET usuario por ID
+ * (usa UserByIdResponseDto en el backend)
+ */
+export async function getUsuarioById(
+  token: string,
+  id: number
+): Promise<UsuarioItem> {
+  const res = await fetch(`${BASE_URL}/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+
+  const json = await res.json();
+  return mapUserResponseToUsuarioItem(json);
 }
 
-async function getUsuarioByCedulaApi(token: string, cedula: string): Promise<UsuarioItem | null> {
-  const res = await fetch(`/api/usuarios/cedula/${cedula}`, {
+/**
+ * GET usuario por cédula
+ * (usa UserDto en el backend)
+ */
+export async function getUsuarioByCedula(
+  token: string,
+  cedula: string
+): Promise<UsuarioItem> {
+  const res = await fetch(`${BASE_URL}/cedula/${cedula}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+
+  if (!res.ok) {
+    if (res.status === 404) throw new Error("NOT_FOUND");
+    throw new Error(await res.text());
+  }
+
+  const json = await res.json();
+  return mapUserResponseToUsuarioItem(json);
 }
 
-async function createUsuarioApi(token: string, data: Partial<UsuarioItem>) {
-  const res = await fetch(`/api/usuarios`, {
+/**
+ * POST nuevo usuario
+ * (usa UserInsertDto en el backend)
+ */
+export async function createUsuario(
+  token: string,
+  data: Partial<UsuarioItem>
+) {
+  const res = await fetch(BASE_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -64,11 +93,19 @@ async function createUsuarioApi(token: string, data: Partial<UsuarioItem>) {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return res.json(); // DefaultResponseDto
 }
 
-async function updateUsuarioApi(token: string, id: string, data: Partial<UsuarioItem>) {
-  const res = await fetch(`/api/usuarios/${id}`, {
+/**
+ * PUT editar usuario
+ * (usa UserUpdateDto en el backend)
+ */
+export async function updateUsuario(
+  token: string,
+  id: number,
+  data: Partial<UsuarioItem>
+) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -77,53 +114,31 @@ async function updateUsuarioApi(token: string, id: string, data: Partial<Usuario
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return res.json(); // DefaultResponseDto
 }
 
-// ================================
-// Mocks
-// ================================
-async function getUsuariosMock(): Promise<PaginatedResponse<UsuarioItem>> {
-  return {
-    content: mockUsuarios,
-    totalPages: 1,
-    totalElements: mockUsuarios.length,
-    size: mockUsuarios.length,
-    number: 0,
-  };
+/**
+ * DELETE usuario
+ */
+export async function deleteUsuario(token: string, id: number) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json(); // DefaultResponseDto
 }
 
-async function getUsuarioByIdMock(_token: string, id: string): Promise<UsuarioItem> {
-  const user = mockUsuarios.find((u) => u.id === Number(id));
-  if (!user) throw new Error("Usuario no encontrado");
-  return user;
+/**
+ * POST reset contraseña de usuario
+ */
+export async function resetUsuarioPassword(token: string, id: number) {
+  const res = await fetch(`${BASE_URL}/${id}/resetpassword`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json(); // DefaultResponseDto
 }
 
-async function getUsuarioByCedulaMock(_token: string, cedula: string): Promise<UsuarioItem | null> {
-  return mockUsuarios.find((u) => u.nroCedula === Number(cedula)) || null;
-}
 
-async function createUsuarioMock(_token: string, data: Partial<UsuarioItem>) {
-  const newUser: UsuarioItem = {
-    ...(data as UsuarioItem),
-    id: mockUsuarios.length + 1,
-  };
-  mockUsuarios.push(newUser);
-  return newUser;
-}
-
-async function updateUsuarioMock(_token: string, id: string, data: Partial<UsuarioItem>) {
-  const index = mockUsuarios.findIndex((u) => u.id === Number(id));
-  if (index === -1) throw new Error("Usuario no encontrado");
-  mockUsuarios[index] = { ...mockUsuarios[index], ...(data as UsuarioItem) };
-  return mockUsuarios[index];
-}
-
-// ================================
-// Export condicional
-// ================================
-export const getUsuarios = USE_MOCK ? getUsuariosMock : getUsuariosApi;
-export const getUsuarioById = USE_MOCK ? getUsuarioByIdMock : getUsuarioByIdApi;
-export const getUsuarioByCedula = USE_MOCK ? getUsuarioByCedulaMock : getUsuarioByCedulaApi;
-export const createUsuario = USE_MOCK ? createUsuarioMock : createUsuarioApi;
-export const updateUsuario = USE_MOCK ? updateUsuarioMock : updateUsuarioApi;

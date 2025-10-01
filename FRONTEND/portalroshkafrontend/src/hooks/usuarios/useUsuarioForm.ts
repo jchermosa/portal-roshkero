@@ -1,4 +1,3 @@
-// src/hooks/useUsuarioForm.ts
 import { useEffect, useState } from "react";
 import type { UsuarioItem } from "../../types";
 import {
@@ -6,35 +5,36 @@ import {
   createUsuario,
   updateUsuario,
 } from "../../services/UserService";
+import { EstadoActivoInactivo } from "../../types";
 
 export function useUsuarioForm(
   token: string | null,
-  id?: string,
-  cedulaParam?: string
+  id?: string, // viene de useParams
+  cedulaParam?: number
 ) {
   const isEditing = !!id;
 
-  // Estado inicial (creación)
   const [data, setData] = useState<Partial<UsuarioItem>>({
-    nroCedula: cedulaParam || "",
-    estado: true,
+    nroCedula: cedulaParam ? String(cedulaParam) : undefined,
     requiereCambioContrasena: true,
-    contrasena: "usuario123", // Contraseña por defecto
+    estado: "A", // default = Activo
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar usuario si es edición
+  // Cargar usuario si estamos editando
   useEffect(() => {
     if (!token || !isEditing || !id) return;
 
     setLoading(true);
-    getUsuarioById(token, id)
+    getUsuarioById(token, Number(id))
       .then((res) => {
         setData({
           ...res,
-          estado: res.estado ?? true,
+          idRol: res.idRol,
+          idCargo: res.idCargo,
+          estado: res.estado ?? "A",
           requiereCambioContrasena: res.requiereCambioContrasena ?? false,
         });
       })
@@ -42,19 +42,40 @@ export function useUsuarioForm(
       .finally(() => setLoading(false));
   }, [token, id, isEditing]);
 
-  // Guardar (crear o actualizar)
-  const handleSubmit = async (formData: Partial<UsuarioItem>) => {
-    if (!token) return;
+  // 🔄 Crear o actualizar
+  const handleSubmit = async (
+    formData: Partial<UsuarioItem>
+  ): Promise<boolean> => {
+    if (!token) return false;
+
+    // Validaciones mínimas
+    if (
+      !formData.nroCedula?.trim() ||
+      !formData.nombre?.trim() ||
+      !formData.apellido?.trim() ||
+      formData.idRol == null ||
+      formData.idCargo == null
+    ) {
+      setError("Faltan datos obligatorios");
+      return false;
+    }
+
+    setLoading(true);
+    setError(null);
 
     try {
       if (isEditing && id) {
-        await updateUsuario(token, id, formData);
+        await updateUsuario(token, Number(id), formData);
       } else {
         await createUsuario(token, formData);
       }
+      return true;
     } catch (err: any) {
+      console.error("Error en handleSubmit:", err);
       setError(err.message || "Error al guardar el usuario");
-      throw err; // importante para que la Page pueda reaccionar
+      return false;
+    } finally {
+      setLoading(false);
     }
   };
 
