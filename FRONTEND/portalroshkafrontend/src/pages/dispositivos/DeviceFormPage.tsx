@@ -1,17 +1,15 @@
 // src/pages/dispositivos/DeviceFormPage.tsx
-import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import DynamicForm from "../../components/DynamicForm";
 import FormLayout from "../../layouts/FormLayout";
-
 import { buildDispositivoSections } from "../../config/forms/dispositivoFormFields";
 import { useDispositivoForm } from "../../hooks/dispositivos/useDispositivoForm";
-import { mapDeviceToForm } from "../../mappers/dispositivoMapper";
-
-// servicios para catálogos
 import { getDeviceTypesPaged } from "../../services/DeviceService";
 import { getUbicaciones } from "../../services/UbicacionService";
+import { useEffect, useMemo, useState } from "react";
+import type { DispositivoItem } from "../../types";
+import { EstadoInventarioEnum } from "../../types";
 
 export default function DeviceFormPage() {
   const { token } = useAuth();
@@ -21,42 +19,25 @@ export default function DeviceFormPage() {
 
   const idParam = id ? parseInt(id, 10) : undefined;
 
-  // ---------- Hook del formulario (detalle + create/update) ----------
-  const {
-    data,
-    setData,
-    loading,
-    error,
-    handleSubmit,
-    isEditing,
-  } = useDispositivoForm(token, idParam);
+  const { data, setData, loading, error, handleSubmit, isEditing } = useDispositivoForm(token, idParam);
 
-  // ---------- Catálogos (tipos de dispositivo / ubicaciones / usuarios?) ----------
   const [loadingCatalogs, setLoadingCatalogs] = useState(false);
   const [tipoOptions, setTipoOptions] = useState<{ value: number; label: string }[]>([]);
   const [ubicOptions, setUbicOptions] = useState<{ value: number; label: string }[]>([]);
-  // si más adelante quieres “usuarios”, agrega aquí:
   const userOptions: { value: number; label: string }[] = [];
 
   useEffect(() => {
     if (!token) return;
-
     let cancelled = false;
+
     const loadCatalogs = async () => {
       try {
         setLoadingCatalogs(true);
 
-        // Tipos de dispositivo (paginado)
         const tiposPage = await getDeviceTypesPaged<any>(token, 0, 200);
-        const tipos = Array.isArray((tiposPage as any)?.content)
-          ? (tiposPage as any).content
-          : Array.isArray(tiposPage) ? tiposPage : [];
-
-        // Ubicaciones (tu servicio puede devolver Page o Array; soportamos ambas)
+        const tipos = Array.isArray((tiposPage as any)?.content) ? (tiposPage as any).content : Array.isArray(tiposPage) ? tiposPage : [];
         const ubic = await getUbicaciones(token);
-        const ubicList = Array.isArray((ubic as any)?.content)
-          ? (ubic as any).content
-          : Array.isArray(ubic) ? ubic : [];
+        const ubicList = Array.isArray((ubic as any)?.content) ? (ubic as any).content : Array.isArray(ubic) ? ubic : [];
 
         if (cancelled) return;
 
@@ -79,56 +60,60 @@ export default function DeviceFormPage() {
     };
 
     loadCatalogs();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
-  // ---------- Secciones (como en User: se construyen con catálogos) ----------
-  const sections = useMemo(
-    () => buildDispositivoSections(tipoOptions, ubicOptions, userOptions),
-    [tipoOptions, ubicOptions, userOptions]
-  );
+  const sections = useMemo(() => buildDispositivoSections(tipoOptions, ubicOptions, userOptions), [tipoOptions, ubicOptions, userOptions]);
 
-  // ---------- Readonly + normalización + loading combinado ----------
   const readonly = new URLSearchParams(location.search).get("readonly") === "true";
 
-  // normalizamos lo que vino del back a lo que el form espera
-  const initial = useMemo(() => mapDeviceToForm(data), [data]);
-
-  // no bloquear inputs si ya hay datos
-  const hasData = initial && Object.keys(initial).length > 0;
+  const hasData = data && Object.keys(data).length > 0;
   const formLoading = !readonly && (loading || loadingCatalogs) && !hasData;
 
-  // ---------- Render ----------
+ const normalizeData = (formData: Record<string, any>) => {
+  return {
+    ...formData,
+    tipoDispositivo: formData.tipoDispositivo
+      ? Number(formData.tipoDispositivo)
+      : undefined,
+    ubicacion: formData.ubicacion
+      ? Number(formData.ubicacion)
+      : undefined,
+    encargado: formData.encargado
+      ? Number(formData.encargado)
+      : undefined,
+    estado: formData.estado ?? EstadoInventarioEnum.D,
+    categoria: formData.categoria ?? undefined,
+    fechaFabricacion: formData.fechaFabricacion || null,
+  };
+};
+
   return (
     <FormLayout
       title={isEditing ? (readonly ? "Detalle dispositivo" : "Editar dispositivo") : "Crear dispositivo"}
-      subtitle={
-        readonly
-          ? "Vista de solo lectura"
-          : isEditing
-          ? "Modificá los campos necesarios"
-          : "Completá la información del nuevo dispositivo"
-      }
+      subtitle={readonly ? "Vista de solo lectura" : isEditing ? "Modificá los campos necesarios" : "Completá la información del nuevo dispositivo"}
       icon={isEditing ? (readonly ? "👀" : "✏️") : "💻"}
       onCancel={() => navigate("/dispositivos")}
-      onSubmitLabel={readonly ? undefined : (isEditing ? "Guardar cambios" : "Crear dispositivo")}
+      onSubmitLabel={readonly ? undefined : isEditing ? "Guardar cambios" : "Crear dispositivo"}
       onCancelLabel={readonly ? "Volver" : "Cancelar"}
     >
-      <DynamicForm
-        id="dynamic-form-device"
-        // remount cuando el detalle está “loaded” para asegurar rehidratación
-        key={isEditing ? `device-${idParam}-${data?.idDispositivo ? "loaded" : "loading"}` : "device-new"}
+     <DynamicForm
+        id="dynamic-form"
         sections={sections}
-        initialData={initial}
-        // igual que en User: 2-vías hacia el hook
+        initialData={data} 
         onChange={setData}
         onSubmit={async (formData) => {
           if (!readonly) {
-            await handleSubmit(formData);
-            navigate("/dispositivos");
+            const normalized = normalizeData(formData); 
+            const ok = await handleSubmit(normalized);
+            if (ok) {
+              navigate(`/dispositivos?success=${isEditing ? "updated" : "created"}`);
+            }
           }
         }}
-        loading={formLoading}
+        loading={loading || loadingCatalogs} 
         readonly={readonly}
         className="flex-1 overflow-hidden"
       />
