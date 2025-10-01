@@ -39,6 +39,26 @@ function useIsDark() {
   return isDark;
 }
 
+function validateMemberDates(
+  teamStart: string,
+  teamEnd: string | null,
+  entrada: string | null,
+  fin: string | null
+): string | null {
+  const ts = teamStart ? Date.parse(teamStart) : NaN;
+  const te = teamEnd ? Date.parse(teamEnd) : NaN;
+  const es = entrada ? Date.parse(entrada) : NaN;
+  const fe = fin ? Date.parse(fin) : NaN;
+
+  if (entrada && ts && es < ts) return "La entrada no puede ser antes del inicio del equipo";
+  if (teamEnd && entrada && es > te) return "La entrada no puede ser después del fin del equipo";
+  if (fin && ts && fe < ts) return "La salida no puede ser antes del inicio del equipo";
+  if (fin && teamEnd && fe > te) return "La salida no puede ser después del fin del equipo";
+  if (entrada && fin && es > fe) return "La salida debe ser después de la entrada";
+  return null;
+}
+
+
 export default function EquipoFormPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -663,37 +683,53 @@ export default function EquipoFormPage() {
                   menuPosition="fixed"
                 />
                 <input
-                  type="date"
-                  value={newMemberStart}
-                  onChange={(e) => setNewMemberStart(e.target.value)}
-                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-                />
+  type="date"
+  value={newMemberStart}
+  onChange={(e) => {
+    const v = e.target.value;
+    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, newMemberEnd || null);
+    if (err) return alert(err);
+    setNewMemberStart(v);
+  }}
+  min={formData.fechaInicio || undefined}
+  max={newMemberEnd || formData.fechaFin || undefined}
+  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+/>
                 <input
-                  type="date"
-                  value={newMemberEnd}
-                  onChange={(e) => setNewMemberEnd(e.target.value)}
-                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-                />
+  type="date"
+  value={newMemberEnd}
+  onChange={(e) => {
+    const v = e.target.value;
+    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, newMemberStart || null, v);
+    if (err) return alert(err);
+    setNewMemberEnd(v);
+  }}
+  min={newMemberStart || formData.fechaInicio || undefined}
+  max={formData.fechaFin || undefined}
+  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+/>
+
                 <input
-                  type="number"
-                  min={1}
-                  max={newMemberMax || 1}
-                  value={Math.max(
-                    1,
-                    Math.min(newMemberMax || 1, Number(newMemberDisp) || 1)
-                  )}
-                  onChange={(e) => {
-                    const v = Number(e.target.value) || 1;
-                    setNewMemberDisp(Math.max(1, Math.min(newMemberMax || 1, v)));
-                  }}
-                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-                  placeholder="Disp. %"
-                  title={
-                    selectedMember
-                      ? `Disponible máx: ${newMemberMax}%`
-                      : "Elegí un miembro primero"
-                  }
-                />
+  type="number"
+  min={1}
+  max={newMemberMax || 1}
+  value={Math.max(
+    1,
+    Math.min(newMemberMax || 1, Number(newMemberDisp) || 1)
+  )}
+  onChange={(e) => {
+    const v = Number(e.target.value) || 1;
+    setNewMemberDisp(Math.max(1, Math.min(newMemberMax || 1, v)));
+  }}
+  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+  placeholder="Disp. %"
+  title={
+    selectedMember
+      ? `Disponible máx: ${newMemberMax}%`
+      : "Elegí un miembro primero"
+  }
+/>
+
                 <button
                   type="button"
                   onClick={handleAddMember}
