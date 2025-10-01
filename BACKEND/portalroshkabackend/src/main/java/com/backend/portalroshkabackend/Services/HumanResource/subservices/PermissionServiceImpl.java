@@ -7,6 +7,7 @@ import com.backend.portalroshkabackend.Repositories.PermisosRepository;
 import com.backend.portalroshkabackend.Repositories.TH.PermisosAsignadosRepository;
 import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.permisos.PermissionTypeNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestAlreadyAcceptedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
@@ -41,8 +42,10 @@ public class PermissionServiceImpl implements IAcceptRequestService {
 
         PermisosAsignados permisosAsignados;
 
+
         if (permisosAsignadosOptional.isPresent()) {
             permisosAsignados = permisosAsignadosOptional.get();
+            if (permisosAsignados.getConfirmacionTH() == true) throw new RequestAlreadyAcceptedException(permisosAsignados.getSolicitud().getIdSolicitud());
             permisosAsignados.setConfirmacionTH(true);
 
         } else {

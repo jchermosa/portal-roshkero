@@ -120,13 +120,18 @@ public class TeamLeaderService {
         
         SolicitudRespuestaDto respuesta = new SolicitudRespuestaDto();
         respuesta.setIdSolicitud(idSolicitud);
-        respuesta.setMessage( solicitud.getTipoSolicitud() + " aceptada correctamente");
+        respuesta.setMessage("La solicitud de "+ solicitud.getTipoSolicitud() + " fue aceptada correctamente");
 
         
         return respuesta; // Placeholder response
     }
 
     public void acceptSolicitudVacaciones(Solicitud solicitud) {
+        
+        if (solicitud.getEstado() == EstadoSolicitudEnum.A) {
+            throw new RuntimeException("La solicitud no está en estado pendiente y no puede ser aceptada.");
+        }
+        
         // Lógica para aceptar la solicitud de vacaciones
         solicitud.setEstado(EstadoSolicitudEnum.A); // Cambiar el estado a "Aprobada"
     

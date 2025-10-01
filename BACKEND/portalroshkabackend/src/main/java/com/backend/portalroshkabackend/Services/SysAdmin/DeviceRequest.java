@@ -5,6 +5,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.backend.portalroshkabackend.tools.RepositoryService;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.AlreadyCheckedRequestException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.CommentDRParsingException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.DeviceRequestNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.DeviceRequestProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,8 @@ import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceTypesReposito
 
 import jakarta.transaction.Transactional;
 
+import static com.backend.portalroshkabackend.tools.MessagesConst.DATABASE_DEFAULT_ERROR;
+
 @Service
 public class DeviceRequest {
 
@@ -30,12 +37,16 @@ public class DeviceRequest {
     @Autowired 
     private DeviceTypesRepository deviceTypesRepository;
 
+    @Autowired
+    private RepositoryService repositoryService;
+
     @Autowired 
     private DeviceRepository deviceRepository;
 
 
-    DeviceRequest(DeviceRequestRepository deviceRequestRepository, DeviceRepository deviceRepository) {
+    DeviceRequest(DeviceRequestRepository deviceRequestRepository, RepositoryService repositoryService, DeviceRepository deviceRepository) {
         this.deviceRequestRepository = deviceRequestRepository;
+        this.repositoryService = repositoryService;
         this.deviceRepository = deviceRepository;
     }
 
@@ -56,7 +67,7 @@ public class DeviceRequest {
 
         Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
         if (solicitudOp.isEmpty()) {
-            throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
+            throw new DeviceRequestNotFoundException(idRequest);
         }
 
         Solicitud solicitud = solicitudOp.get();
@@ -80,9 +91,13 @@ public class DeviceRequest {
         }
 
         solicitud.setEstado(EstadoSolicitudEnum.A);
-        deviceRequestRepository.save(solicitud);
-
+        repositoryService.save(
+                deviceRequestRepository,
+                solicitud,
+                DATABASE_DEFAULT_ERROR
+        );
         return convertToDto(solicitud);
+
     }
 
     @Transactional
@@ -90,19 +105,25 @@ public class DeviceRequest {
         Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
 
         if (solicitudOp.isEmpty()) {
-            throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
+            throw new DeviceRequestNotFoundException(idRequest);
         }
 
         Solicitud solicitud = solicitudOp.get();
 
 
         if(solicitud.getEstado() != EstadoSolicitudEnum.P) {
-            throw new RuntimeException("La solicitud ya fue procesada.");
+            throw new AlreadyCheckedRequestException(solicitud.getIdSolicitud());
         }
 
+
         solicitud.setEstado(EstadoSolicitudEnum.R);
-        deviceRequestRepository.save(solicitud);
+        repositoryService.save(
+                deviceRequestRepository,
+                solicitud,
+                DATABASE_DEFAULT_ERROR
+        );
         return convertToDto(solicitud);
+
     }
 
 
@@ -147,7 +168,7 @@ public class DeviceRequest {
             try {
                 return Integer.parseInt(matcher.group(1));
             } catch (NumberFormatException e) {
-                return null;
+                throw new CommentDRParsingException(comentario, "Número inválido: " + matcher.group(1));
             }
         }
         return null;
