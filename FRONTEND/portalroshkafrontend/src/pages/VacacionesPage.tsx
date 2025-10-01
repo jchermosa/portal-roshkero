@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import IconButton from "../../components/IconButton";
-import DataTable from "../../components/DataTable";
+import IconButton from "../components/IconButton";
+import DataTable from "../components/DataTable";
 
 interface SolicitudVacaciones {
   id: number;

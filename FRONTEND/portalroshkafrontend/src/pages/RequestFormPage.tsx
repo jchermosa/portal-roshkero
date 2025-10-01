@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import DynamicForm from "../../components/DynamicForm";
-import FormLayout from "../../layouts/FormLayout";
-import { AsignadorEntidad } from "../../components/Assigner";
-import mockTipos from "../../data/mockTipoSolicitudes.json";
-import mockLideres from "../../data/mockLideres.json";
-import mockSolicitudes from "../../data/mockSolicitudes.json";
-import type { CatalogItem } from "../../types";
+import { useAuth } from "../context/AuthContext";
+import DynamicForm from "../components/DynamicForm";
+import FormLayout from "../layouts/FormLayout";
+import { AsignadorEntidad } from "../components/Assigner";
+import mockTipos from "../data/mockTipoSolicitudes.json";
+import mockLideres from "../data/mockLideres.json";
+import mockSolicitudes from "../data/mockSolicitudes.json";
+import type { CatalogItem } from "../types";
 
 interface LiderItem extends CatalogItem {
   aprobado: boolean;

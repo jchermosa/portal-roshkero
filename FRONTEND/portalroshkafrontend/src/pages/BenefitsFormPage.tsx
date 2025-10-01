@@ -1,8 +1,8 @@
 // pages/BeneficioFormPage.tsx (conexión correcta)
 import { useNavigate } from "react-router-dom";
-import DynamicForm, { type FormSection } from "../../components/DynamicForm";
-import FormLayout from "../../layouts/FormLayout";
-import { useAuth } from "../../context/AuthContext";
+import DynamicForm, { type FormSection } from "../components/DynamicForm";
+import FormLayout from "../layouts/FormLayout";
+import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 
 export default function BeneficioFormPage() {

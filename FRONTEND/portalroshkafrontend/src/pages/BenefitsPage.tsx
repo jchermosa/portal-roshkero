@@ -1,8 +1,8 @@
 // src/pages/BeneficiosPage.tsx
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PaginationFooter from "../../components/PaginationFooter";
-import IconButton from "../../components/IconButton";
+import PaginationFooter from "../components/PaginationFooter";
+import IconButton from "../components/IconButton";
 // Carga masiva de imágenes desde src/assets/*.png
 const images = import.meta.glob("/src/assets/*.png", {
   eager: true,
