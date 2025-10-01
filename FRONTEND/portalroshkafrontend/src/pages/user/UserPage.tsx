@@ -8,13 +8,14 @@ import { Roles } from "../../types/roles";
 import { EstadoLabels } from "../../types";
 
 import type { UsuarioItem } from "../../types";
-import DataTable from "../../components/DataTable";
+import DataTable, { type RowAction } from "../../components/DataTable";
 import PaginationFooter from "../../components/PaginationFooter";
 import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
 import { usuariosColumns } from "../../config/tables/usuariosTableConfig";
 import Toast from "../../components/Toast";
 import SelectDropdown from "../../components/SelectDropdown";
+import { MsIcon } from "../../components/MsIcon";
 
 export default function UserPage() {
   const { token, user } = useAuth();
@@ -46,27 +47,31 @@ export default function UserPage() {
     setPage(0);
   };
 
-  const renderActions = (u: UsuarioItem) => {
-    if (tieneRol(user, Roles.OPERACIONES)) {
-      return (
-        <button
-          onClick={() => navigate(`/usuarios/${u.idUsuario}?readonly=true`)}
-          className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition"
-        >
-          Ver
-        </button>
-      );
-    }
+  // Acciones con íconos
+  const canEdit = !tieneRol(user, Roles.OPERACIONES);
 
-    return (
-      <button
-        onClick={() => navigate(`/usuarios/${u.idUsuario}`)}
-        className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-      >
-        Editar
-      </button>
-    );
-  };
+  const onEdit = (u: UsuarioItem) => navigate(`/usuarios/${u.idUsuario}`);
+  const onView = (u: UsuarioItem) => navigate(`/usuarios/${u.idUsuario}?readonly=true`);
+
+  const rowActions: RowAction<UsuarioItem>[] = canEdit
+    ? [
+        {
+          key: "edit",
+          label: "Editar",
+          icon: <MsIcon name="edit" />,
+          onClick: onEdit,
+          variant: "primary",
+        },
+      ]
+    : [
+        {
+          key: "view",
+          label: "Ver",
+          icon: <MsIcon name="visibility" />,
+          onClick: onView,
+          variant: "secondary",
+        },
+      ];
 
   // ✅ Mostrar toast en base a query param success
   useEffect(() => {
@@ -96,13 +101,15 @@ export default function UserPage() {
     <PageLayout
       title="Listado de usuarios"
       actions={
-        <IconButton
-          label="Crear Usuario"
-          icon={<span>➕</span>}
-          variant="primary"
-          onClick={() => navigate("/usuarios/buscar")}
-          className="h-10 text-sm px-4 flex items-center"
-        />
+        canEdit && (
+          <IconButton
+            label="Crear Usuario"
+            icon={<span>➕</span>}
+            variant="primary"
+            onClick={() => navigate("/usuarios/buscar")}
+            className="h-10 text-sm px-4 flex items-center"
+          />
+        )
       }
     >
       {/* 🔽 Filtros */}
@@ -119,6 +126,7 @@ export default function UserPage() {
           }
           options={roles.map((r) => ({ value: r.idRol, label: r.nombre }))}
           placeholder="Todos"
+          noMargin
         />
 
         <SelectDropdown
@@ -133,6 +141,7 @@ export default function UserPage() {
           }
           options={cargos.map((c) => ({ value: c.idCargo, label: c.nombre }))}
           placeholder="Todos"
+          noMargin
         />
 
         <SelectDropdown
@@ -150,25 +159,26 @@ export default function UserPage() {
             label,
           }))}
           placeholder="Todos"
+          noMargin
         />
 
-        <div className="flex items-end">
+       <div className="h-full flex items-end">
           <IconButton
             label="Limpiar filtros"
             icon={<span>🧹</span>}
             variant="secondary"
             onClick={limpiarFiltros}
-            className="h-10 text-sm px-4 flex items-center w-full"
+            className="h-10 text-sm px-4 flex items-center"
           />
         </div>
       </div>
 
       {/* 🔽 Tabla */}
-      <DataTable
+      <DataTable<UsuarioItem>
         data={usuarios}
         columns={usuariosColumns}
         rowKey={(u) => u.idUsuario}
-        actions={renderActions}
+        rowActions={rowActions}
         scrollable={false}
       />
 
@@ -177,7 +187,6 @@ export default function UserPage() {
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
-        onCancel={() => navigate("/home")}
       />
 
       {/* 🔽 Toast flotante */}

@@ -4,7 +4,7 @@ type ToastType = "success" | "error" | "info" | "warning";
 
 interface ToastProps {
   message: string;
-  type?: ToastType; // ✅ nuevo
+  type?: ToastType; 
   duration?: number;
   onClose: () => void;
 }

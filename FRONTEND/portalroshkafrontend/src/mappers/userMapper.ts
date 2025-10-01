@@ -21,7 +21,7 @@ export function mapUserResponseToUsuarioItem(res: any): UsuarioItem {
     fechaNacimiento: res.fechaNacimiento ?? null,
     telefono: res.telefono ?? "",
 
-    requiereCambioContrasena: res.requiereCambioContrasena ?? false,
+    requiereCambioContrasena: Boolean(res.requiereCambioContrasena),
     estado: (res.estado as EstadoActivoInactivo) ?? "A",
 
     antiguedad: res.antiguedad,

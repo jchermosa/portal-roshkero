@@ -79,7 +79,11 @@ export function buildUsuarioSections(
         {
           name: "requiereCambioContrasena",
           label: "Requiere cambio de contraseña",
-          type: "checkbox",
+          type: "select",
+          options: [
+            { value: "true", label: "Sí" },
+            { value: "false", label: "No" },
+          ],
         },
         {
           name: "disponibilidad",

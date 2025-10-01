@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { tieneRol } from "../../utils/permisos";
 import { Roles } from "../../types/roles";
@@ -9,6 +9,7 @@ import { MsIcon } from "../../components/MsIcon";
 import PaginationFooter from "../../components/PaginationFooter";
 import IconButton from "../../components/IconButton";
 import { Alert } from "../../components/Alert";
+import ConfirmModal from "../../components/ConfirmModal"; // 👈 import nuevo
 
 import { useClientesList } from "../../hooks/clientes/useClientesList";
 import { useClientesForm } from "../../hooks/clientes/useClienteForm";
@@ -27,6 +28,10 @@ export default function ClientesPage({ embedded = false }: Props) {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<ClienteResponse | null>(null);
   const [showModal, setShowModal] = useState(false);
+
+  // estados para confirmación
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState<ClienteResponse | null>(null);
 
   // Reglas de permisos básicas
   const canEdit = !tieneRol(user, Roles.OPERACIONES);
@@ -48,10 +53,17 @@ export default function ClientesPage({ embedded = false }: Props) {
     setShowModal(true);
   };
 
-  const onDelete = async (row: ClienteResponse) => {
-    const ok = window.confirm(`¿Eliminar el cliente "${row.nombre}"?`);
-    if (!ok) return;
-    await remove(row.idCliente);
+  const askDelete = (row: ClienteResponse) => {
+    setRowToDelete(row);
+    setConfirmOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (rowToDelete) {
+      await remove(rowToDelete.idCliente);
+      setRowToDelete(null);
+      setConfirmOpen(false);
+    }
   };
 
   const rowActions: RowAction<ClienteResponse>[] = canEdit
@@ -67,7 +79,7 @@ export default function ClientesPage({ embedded = false }: Props) {
           key: "delete",
           label: "Eliminar",
           icon: <MsIcon name="delete" />,
-          onClick: onDelete,
+          onClick: askDelete, 
           variant: "danger",
           disabled: deleting,
         },
@@ -114,6 +126,18 @@ export default function ClientesPage({ embedded = false }: Props) {
           onSaved={refresh}
         />
       )}
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        show={confirmOpen}
+        title="Eliminar Cliente"
+        message={`¿Estás seguro de eliminar el cliente "${rowToDelete?.nombre}"?`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+        loading={deleting}
+      />
 
       {loading && <Alert kind="info">Cargando clientes…</Alert>}
       {error && <Alert kind="error">{error}</Alert>}

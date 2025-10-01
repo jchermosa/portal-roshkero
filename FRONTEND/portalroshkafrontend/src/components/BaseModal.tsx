@@ -5,8 +5,8 @@ interface BaseModalProps {
   title?: string;
   onClose: () => void;
   children: React.ReactNode;
-  width?: string; // para controlar el tamaño (ej: "max-w-lg", "max-w-2xl")
-  footer?: React.ReactNode; // para pasar botones personalizados
+  width?: string;
+  footer?: React.ReactNode;
 }
 
 const BaseModal: React.FC<BaseModalProps> = ({
@@ -22,22 +22,23 @@ const BaseModal: React.FC<BaseModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div
-        className={`bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full ${width} p-6`}
+        className={`relative bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full ${width} p-6`}
       >
+        {/* Botón de cerrar flotante */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+          aria-label="Cerrar"
+        >
+          ✖
+        </button>
+
         {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          {title && (
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {title}
-            </h2>
-          )}
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            ✖
-          </button>
-        </div>
+        {title && (
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            {title}
+          </h2>
+        )}
 
         {/* Body */}
         <div className="overflow-y-auto max-h-[70vh]">{children}</div>

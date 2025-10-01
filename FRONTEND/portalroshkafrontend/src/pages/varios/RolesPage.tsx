@@ -4,12 +4,12 @@ import { tieneRol } from "../../utils/permisos";
 import { Roles as RolesEnum } from "../../types/roles";
 
 import PageLayout from "../../layouts/PageLayout";
-import DataTable from "../../components/DataTable";
-import type { RowAction } from "../../components/DataTable";
+import DataTable, { type RowAction } from "../../components/DataTable";
 import { MsIcon } from "../../components/MsIcon";
 import PaginationFooter from "../../components/PaginationFooter";
 import IconButton from "../../components/IconButton";
 import { Alert } from "../../components/Alert";
+import ConfirmModal from "../../components/ConfirmModal"; 
 
 import { useRolesList } from "../../hooks/roles/useRolesList";
 import { useRolForm } from "../../hooks/roles/useRolForm";
@@ -31,13 +31,12 @@ export default function RolesPage({ embedded = false }: Props) {
   const [selected, setSelected] = useState<RolListItem | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  // estados para confirmación
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState<RolListItem | null>(null);
+
   const params = useMemo(() => ({ page, size: 10 }), [page]);
   const { data, loading, error, refresh } = useRolesList(token, params);
-
-  const onEdit = (row: RolListItem) => { setSelected(row); setShowModal(true); };
-  const onDelete = (row: RolListItem) => handleDelete(row);
-
-
 
   const {
     remove,
@@ -47,41 +46,44 @@ export default function RolesPage({ embedded = false }: Props) {
     clearMessages,
   } = useRolForm(token, { onDeleted: () => refresh() });
 
-  const handleDelete = async (row: RolListItem) => {
-    const ok = window.confirm(`¿Eliminar el rol "${row.nombre}"?`);
-    if (!ok) return;
-    await remove(row.idRol);
+  const onEdit = (row: RolListItem) => {
+    setSelected(row);
+    setShowModal(true);
   };
 
-  const renderActions = (row: RolListItem) => {
-    if (!canEdit) return null;
-    return (
-      <div className="flex gap-2">
-        <button
-          onClick={() => {
-            setSelected(row);
-            setShowModal(true);
-          }}
-          className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-        >
-          Editar
-        </button>
-        <button
-          onClick={() => handleDelete(row)}
-          disabled={deleting}
-          className="px-3 py-1 bg-red-600 text-white rounded-lg text-xs hover:bg-red-700 transition disabled:opacity-50"
-        >
-          {deleting ? "Eliminando..." : "Eliminar"}
-        </button>
-      </div>
-    );
+  // en vez de window.confirm abrimos modal
+  const askDelete = (row: RolListItem) => {
+    setRowToDelete(row);
+    setConfirmOpen(true);
   };
 
-  
-    const rowActions: RowAction<RolListItem>[] = [
-    { key: "edit", label: "Editar", icon: <MsIcon name="edit" />, onClick: onEdit, variant: "primary" },
-    { key: "delete", label: "Eliminar", icon: <MsIcon name="delete" />, onClick: onDelete, variant: "danger", disabled: deleting },
-  ];
+  const handleDelete = async () => {
+    if (rowToDelete) {
+      await remove(rowToDelete.idRol);
+      setRowToDelete(null);
+      setConfirmOpen(false);
+    }
+  };
+
+  const rowActions: RowAction<RolListItem>[] = canEdit
+    ? [
+        {
+          key: "edit",
+          label: "Editar",
+          icon: <MsIcon name="edit" />,
+          onClick: onEdit,
+          variant: "primary",
+        },
+        {
+          key: "delete",
+          label: "Eliminar",
+          icon: <MsIcon name="delete" />,
+          onClick: askDelete, 
+          variant: "danger",
+          disabled: deleting,
+        },
+      ]
+    : [];
 
   const newRolButton = canEdit && (
     <IconButton
@@ -127,6 +129,18 @@ export default function RolesPage({ embedded = false }: Props) {
         />
       )}
 
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        show={confirmOpen}
+        title="Eliminar Rol"
+        message={`¿Estás seguro de eliminar el rol "${rowToDelete?.nombre}"?`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+        loading={deleting}
+      />
+
       {loading && <Alert kind="info">Cargando roles…</Alert>}
       {error && <Alert kind="error">{error}</Alert>}
     </>
@@ -141,9 +155,5 @@ export default function RolesPage({ embedded = false }: Props) {
     );
   }
 
-  return (
-    <PageLayout title="Roles" actions={newRolButton}>
-      {body}
-    </PageLayout>
-  );
+  return <PageLayout title="Roles" actions={newRolButton}>{body}</PageLayout>;
 }

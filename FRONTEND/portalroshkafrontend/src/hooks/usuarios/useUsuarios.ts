@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getUsuarios } from "../../services/UserService";
 import type { UsuarioItem, FiltrosUsuarios } from "../../types";
 
@@ -14,33 +14,35 @@ export function useUsuarios(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchUsuarios = useCallback(async () => {
     if (!token) return;
 
-    const fetchUsuarios = async () => {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
-        const response = await getUsuarios(token, filtros, page, size);
-        setData(response.content);
-        setTotalPages(response.totalPages);
-        setTotalElements(response.totalElements);
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message || "Error al cargar usuarios");
-      } finally {
-        setLoading(false);
-      }
-    };
+    try {
+      const response = await getUsuarios(token, filtros, page, size);
+      setData(response.content);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Error al cargar usuarios");
+    } finally {
+      setLoading(false);
+    }
+  }, [token, filtros, page, size]);
 
+  useEffect(() => {
     fetchUsuarios();
-  }, [token, JSON.stringify(filtros), page, size]); 
+  }, [fetchUsuarios]);
+
   return {
     data,
     totalPages,
     totalElements,
     loading,
     error,
+    refresh: fetchUsuarios, // 👈 ahora lo exponemos
   };
 }
