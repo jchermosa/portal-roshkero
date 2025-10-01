@@ -1,4 +1,3 @@
-// src/hooks/clientes/useClientesCrud.ts
 import { useCallback, useRef, useState } from "react";
 import {
   getClienteById,

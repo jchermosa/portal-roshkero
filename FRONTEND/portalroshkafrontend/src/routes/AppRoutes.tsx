@@ -44,6 +44,7 @@ import CargosPage from "../pages/varios/CargosPage";
 import RolesPage from "../pages/varios/RolesPage";
 import GestionTHPage from "../pages/varios/CatalogoTHPage";
 import CatalogoOperacionesPage from "../pages/varios/CatalogoSysPage";
+import CatalogoOpPage from "../pages/varios/CatalogoOp";
 
 export default function AppRoutes() {
   return (
@@ -118,8 +119,11 @@ export default function AppRoutes() {
           {/* Ubicación */}
           <Route path="/ubicacion" element={<UbicacionPage />} />
 
-          {/* CatalogoOperaciones */}
+          {/* CatalogoSysAdmin */}
           <Route path="/catalogo-sys" element={< CatalogoOperacionesPage />} />
+
+          {/* CatalogoOperaciones */}
+           <Route path="/catalogo-op" element={< CatalogoOpPage />} />
 
           {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />

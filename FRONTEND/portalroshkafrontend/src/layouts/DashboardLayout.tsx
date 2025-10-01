@@ -21,6 +21,7 @@ export default function DashboardLayout() {
     { id: "/usuarios", label: "Gestión TH", icon: "🧑‍💼", available: true },
     { id: "/catalogo-sys", label: "Catalogo SysAdmin", icon:"📚", available: true },
     { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: true },
+     { id: "/catalogo-op", label: "Catalogo Operaciones", icon: "🏢", available: true },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: true},
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: true },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
@@ -28,7 +29,7 @@ export default function DashboardLayout() {
     { id: "/solicitud-dispositivo", label: "Solicitud Dispositivo", icon: "📱", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
     { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
-    { id: "/clientes", label: "Clientes", icon: "🏢", available: true },
+   
    
   ].filter((o) => o.available);
 
