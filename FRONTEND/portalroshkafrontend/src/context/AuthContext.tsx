@@ -6,10 +6,18 @@ type Cargo = { id?: number; nombre: string };
 type Equipo = { id?: number; nombre: string };
 
 export type User = {
-  id?: number;
+  idUsuario: number;
   nombre: string;
   apellido: string;
+  nroCedula: string;
   correo: string;
+
+  antiguedad: string;
+  estado: "ACTIVO" | "INACTIVO"; // si usas enum EstadoActivoInactivo mejor tiparlo
+  contrasena: string;
+  fechaNacimiento: string; // LocalDate → string
+  disponibilidad: number | null;
+
   rol: Rol;
   cargo?: Cargo;
   equipo?: Equipo;
@@ -22,6 +30,7 @@ export type User = {
   requiereCambioContrasena?: boolean;
   fotoBase64?: string;
 };
+
 
 type AuthContextType = {
   user: User | null;
