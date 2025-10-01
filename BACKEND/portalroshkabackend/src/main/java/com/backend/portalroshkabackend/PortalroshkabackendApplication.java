@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class PortalroshkabackendApplication {
 
 	public static void main(String[] args) {
-		System.out.println("ENTRANDO A LA APLICACION");
 		SpringApplication.run(PortalroshkabackendApplication.class, args);
 	}
 

@@ -7,11 +7,13 @@ import "../styles/scrollbar.css";
 
 export default function DashboardLayout() {
   const { user, refreshUser, logout } = useAuth();
+
+
   // Permisos usando tieneRol
   const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
   const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
   const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN);
- 
+
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
@@ -25,7 +27,6 @@ export default function DashboardLayout() {
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/solicitud-dispositivo", label: "Solicitud Dispositivo", icon: "📱", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
-    { id: "/operations", label: "Gestion de Equipos", icon: "👥", available: true },
     { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
    
   ].filter((o) => o.available);
@@ -34,7 +35,6 @@ export default function DashboardLayout() {
 
   const initials =
     "👤";
-
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">

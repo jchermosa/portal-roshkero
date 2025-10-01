@@ -22,9 +22,6 @@ import RequestManagementPage from "../pages/solicitudes/RequestManagementPage.ts
 import RequestSearchPage from "../pages/solicitudes/RequestSearchPage.tsx";
 import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
 
-import OperationsPage from "../pages/Operations/OperationsPage";
-import EquipoFormPage from "../pages/Operations/EquipoFormPage.tsx";
-import EditarEquipoPage from "../pages/Operations/EditarEquipoPage.tsx";
 // Dispositivos
 import DevicePage from "../pages/dispositivos/DevicePage.tsx";
 import DeviceFormPage from "../pages/dispositivos/DeviceFormPage.tsx";
@@ -35,12 +32,11 @@ import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage.tsx";
 import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage.tsx";
 import UbicacionPage from "../pages/varios/UbicacionPage.tsx";
 
-
 export default function AppRoutes() {
   const { user } = useAuth();
 
   return (
-    <Routes>  
+    <Routes>
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/cambiar-contraseña" element={<ChangePasswordPage />} />
@@ -49,17 +45,6 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route index element={<HomePage />} />
-
-
-              
-              {/* Operations routes */}
-              <Route path="/operations" element={<OperationsPage />} />
-              <Route path="/equipo/nuevo" element={<EquipoFormPage />} />
-              <Route path="/equipo/:id/edit" element={<EditarEquipoPage />} />
-              {/* <Route path="/operations/manage-teams" element={<ManageTeams />} /> */}
-          {/*<Route path="/usuarios" element={<UsuariosPage />} />
-
-          < */}
 
           {/* Solicitudes generales */}
           <Route path="/requests" element={<RequestPage />} />
@@ -117,7 +102,6 @@ export default function AppRoutes() {
 
           {/* Perfil */}
           <Route path="/profile" element={<ProfilePage />} />
-
         </Route>
       </Route>
 

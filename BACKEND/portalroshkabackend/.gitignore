@@ -35,4 +35,3 @@ build/
 
 ### .gitignore de src/application.properties ###
 src/main/resources/application.properties
-BACKEND/portalroshkabackend/src/main/resources/application.properties

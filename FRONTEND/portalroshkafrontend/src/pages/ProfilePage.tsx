@@ -61,7 +61,6 @@ export default function ProfilePage() {
 
   const fullName = `${user?.nombre ?? ""} ${user?.apellido ?? ""}`.trim();
   const email = user?.correo;
-
   const joinedAt = (user as any)?.fechaIngreso ?? (user as any)?.fecha_ingreso;
   const diasVac =
     (user as any)?.diasVacaciones ?? (user as any)?.dias_vacaciones;
