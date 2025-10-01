@@ -14,7 +14,7 @@ export function buildDispositivoSections(
       fields: [
         { name: "nroSerie", label: "Número de serie", type: "text", required: true },
         { name: "modelo", label: "Modelo", type: "text", required: true },
-        { name: "detalle", label: "Detalles", type: "textarea" },
+        { name: "detalle", label: "Detalles", type: "text" },
         { name: "fechaFabricacion", label: "Fecha de fabricación", type: "date" },
       ],
     },
