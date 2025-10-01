@@ -175,7 +175,7 @@ public class AsignacionServiceImpl implements IAsignacionService {
 
             if (!nuevoActivo) { // Deactivate team
                 if (asignacion.getEstado() == EstadoActivoInactivo.A) {
-                    // Только если раньше было А
+                    // If was А
                     usuario.setDisponibilidad(disponibilidadUsuario + porcentajeAsignacion);
                 }
                 asignacion.setEstado(EstadoActivoInactivo.I);

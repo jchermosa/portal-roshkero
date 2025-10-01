@@ -63,8 +63,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
 
                 // Считаем дельту относительно старого процента
-                Integer viejoPorcentaje = actualesMap
-                        .getOrDefault(usuario.getIdUsuario(), new AsignacionUsuarioEquipo()).getPorcentajeTrabajo();
+                Integer viejoPorcentaje = Optional.ofNullable(
+                        actualesMap.get(usuario.getIdUsuario()))
+                        .map(AsignacionUsuarioEquipo::getPorcentajeTrabajo)
+                        .orElse(0);
+
                 Integer delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
 
                 // Проверка и применение
