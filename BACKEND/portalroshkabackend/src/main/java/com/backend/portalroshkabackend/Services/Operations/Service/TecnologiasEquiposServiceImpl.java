@@ -8,25 +8,21 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.backend.portalroshkabackend.DTO.Operationes.TecnologiasDto;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Tecnologias;
 import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
 import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
 import com.backend.portalroshkabackend.Repositories.OP.TecnologiasEquiposRepository;
-import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.ITecnologiaEquiposService;
 
 @Service
-public class TecnologiasEquiposServiceImpl implements ITecnologiaService {
-
-    private final TecnologiaRepository tecnologiaRepository;
-    private final TecnologiasEquiposRepository tecnologiasEquiposRepository;
+public class TecnologiasEquiposServiceImpl implements ITecnologiaEquiposService {
 
     @Autowired
-    public TecnologiasEquiposServiceImpl(TecnologiaRepository tecnologiaRepository,
-                                 TecnologiasEquiposRepository tecnologiasEquiposRepository) {
-        this.tecnologiaRepository = tecnologiaRepository;
-        this.tecnologiasEquiposRepository = tecnologiasEquiposRepository;
-    }
+    private TecnologiaRepository tecnologiaRepository;
+    @Autowired
+    private TecnologiasEquiposRepository tecnologiasEquiposRepository;
 
     @Override
     public Tecnologias getTecnologiaById(Integer id) {
@@ -35,7 +31,7 @@ public class TecnologiasEquiposServiceImpl implements ITecnologiaService {
     }
 
     @Override
-    public void updateTecnologiasEquipo(Equipos equipo, List<Integer> nuevasTecnologiasIds) {
+    public List<TecnologiasDto> updateTecnologiasEquipo(Equipos equipo, List<Integer> nuevasTecnologiasIds) {
         List<TecnologiasEquipos> actuales = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(equipo.getIdEquipo());
         Set<Integer> actualesIds = actuales.stream()
                 .map(te -> te.getTecnologia().getIdTecnologia())
@@ -59,6 +55,27 @@ public class TecnologiasEquiposServiceImpl implements ITecnologiaService {
                 tecnologiasEquiposRepository.save(tecEquipo);
             }
         }
+        return tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(equipo.getIdEquipo())
+                .stream()
+                .map(te -> {
+                    Tecnologias t = te.getTecnologia();
+                    return new TecnologiasDto(t.getIdTecnologia(), t.getNombre(), t.getDescripcion());
+                })
+                .toList();
+    }
+
+    @Override
+    public List<TecnologiasDto> getTecnologiasByEquipo(Integer equipoId) {
+        List<TecnologiasEquipos> tecs = tecnologiasEquiposRepository.findAllByEquipo_IdEquipo(equipoId);
+        List<TecnologiasDto> tecnologias = tecs.stream()
+                .map(te -> {
+                    Tecnologias t = te.getTecnologia();
+                    return new TecnologiasDto(
+                            t.getIdTecnologia(),
+                            t.getNombre(),
+                            t.getDescripcion());
+                })
+                .toList();
+        return tecnologias;
     }
 }
-
