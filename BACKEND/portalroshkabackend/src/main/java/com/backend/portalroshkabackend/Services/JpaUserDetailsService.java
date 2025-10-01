@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -46,10 +45,10 @@ public class JpaUserDetailsService implements UserDetailsService {
         
         // Si el usuario tiene un rol asignado, agregar la autoridad
         if (userRol != null) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + userRol.getNombre()));
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + userRol.getIdRol()));
         }
         
-        // Si no se encontró ningún rol, asignar una lista vacía
+        // Si no se encontró ningún cargo, asignar una lista vacía
         if (authorities.isEmpty()) {
             authorities = Collections.emptyList();
         }
@@ -58,7 +57,7 @@ public class JpaUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getCorreo(),      // username
                 user.getContrasena(),  // contraseña
-                authorities            // roles/autoridades
+                authorities            // roles/autoridades basadas en cargo
         );
     }
 }

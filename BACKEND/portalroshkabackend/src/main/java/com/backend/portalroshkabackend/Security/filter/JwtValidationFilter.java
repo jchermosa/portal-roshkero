@@ -4,9 +4,9 @@ import static com.backend.portalroshkabackend.Security.TokenJwtConfig.HEADER_AUT
 import static com.backend.portalroshkabackend.Security.TokenJwtConfig.PREFIX_TOKEN;
 import static com.backend.portalroshkabackend.Security.TokenJwtConfig.SECRET_KEY;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -32,42 +33,61 @@ public class JwtValidationFilter extends BasicAuthenticationFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+
+        String header = request.getHeader(HEADER_AUTHORIZATION);
         
+        if (header == null || !header.startsWith(PREFIX_TOKEN)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-                String header = request.getHeader(HEADER_AUTHORIZATION);
-                if(header == null || !header.startsWith(PREFIX_TOKEN)){
-                    chain.doFilter(request, response);
-                    return;
+        String token = header.replace(PREFIX_TOKEN, "");
+
+        try {
+            Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
+            String correo = claims.getSubject();
+            Object roleClaim = claims.get("rol");
+
+            // Debug: Agregar logs para verificar el contenido del token
+            System.out.println("Token validado - Username: " + correo);
+            System.out.println("Token validado - Rol claim: " + roleClaim);
+
+            if (correo != null && roleClaim != null) {
+                // Convertir el rol a entero
+                Integer rolId = null;
+                if (roleClaim instanceof Integer) {
+                    rolId = (Integer) roleClaim;
+                } else if (roleClaim instanceof Number) {
+                    rolId = ((Number) roleClaim).intValue();
+                } else {
+                    rolId = Integer.valueOf(roleClaim.toString());
                 }
 
-                
-                String token = header.replace(PREFIX_TOKEN, "");
-                
-                // comenzamos a validar los claims  
-                
-                try {
-                    Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
-                    String correo = claims.getSubject();
-                    Integer rol = claims.get("rol", Integer.class);
+                // Crear la autoridad con el formato correcto
+                String authority = "ROLE_" + rolId;
+                Collection<GrantedAuthority> authorities = Arrays.asList(
+                    new SimpleGrantedAuthority(authority)
+                );
 
-                    if (rol != null) {
-                        Collection<? extends GrantedAuthority> authorities = 
-                        List.of(new SimpleGrantedAuthority("ROLE_" + rol));
+                // Debug: Verificar las autoridades creadas
+                System.out.println("Autoridad creada: " + authority);
+                System.out.println("Todas las autoridades: " + authorities);
 
-                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(correo, null, authorities);
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-                    }
-                    
-                    chain.doFilter(request, response);
+                UsernamePasswordAuthenticationToken auth = 
+                    new UsernamePasswordAuthenticationToken(correo, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
 
-                } catch (JwtException e) {
-                    Map<String, String> error = new HashMap<>();
-                    error.put("error", "Token inválido");
-                    error.put("message", e.getMessage());
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
+            chain.doFilter(request, response);
 
-                    response.getWriter().write(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(error));
-                }
+        } catch (JwtException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Token inválido");
+            error.put("message", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+
+            response.getWriter().write(new ObjectMapper().writeValueAsString(error));
+        }
     }
 }
