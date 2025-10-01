@@ -1,147 +1,69 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
 
-// Pages públicas
+// Pages
 import LoginPage from "../pages/LoginPage";
-// import ChangePasswordPage from "../pages/ChangePasswordPage";
-
-// Pages privadas (home, perfil, etc.)
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
-import Configuration from "../pages/Configuration";
+import BeneficiosPage from "../pages/BenefitsPage";
+import UsuariosPage from "../pages/UserPage.tsx";
+import VacacionesPage from "../pages/VacacionesPage";
+import RequestPage from "../pages/RequestPage";
+import Configuration from "../pages/Configuration.tsx";
+import UserFormPage from "../pages/UserFormPage";
+import UserSearchPage from "../pages/UserSearchPage.tsx";
+import RequestFormPage from "../pages/RequestFormPage"
+import SolicitudVacacionesPage from "../pages/SolicitudVacacionesPage";
+import BeneficioFormPage from "../pages/BenefitsFormPage.tsx";
+import RequestManagementPage from "../pages/RequestManagementPage.tsx";
 
-// Solicitudes (genéricas)
-import RequestPage from "../pages/solicitudes/RequestPage";
-import RequestFormPage from "../pages/solicitudes/RequestFormPage";
-import RequestManagementPage from "../pages/solicitudes/RequestManagementPage";
-import RequestSearchPage from "../pages/solicitudes/RequestSearchPage";
-
-// Usuarios
-import UsuariosPage from "../pages/user/UserPage";
-import UserFormPage from "../pages/user/UserFormPage";
-import UserSearchPage from "../pages/user/UserSearchPage";
-
-// Vacaciones
-import VacacionesPage from "../pages/solicitudes/VacacionesPage";
-import SolicitudVacacionesPage from "../pages/solicitudes/SolicitudVacacionesPage";
-
-// Beneficios
-import BeneficiosPage from "../pages/solicitudes/BenefitsPage";
-import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage"; 
-
-// Dispositivos
-import DevicePage from "../pages/dispositivos/DevicePage";
-import DeviceFormPage from "../pages/dispositivos/DeviceFormPage";
-import DeviceAssignmentFormPage from "../pages/dispositivos/DeviceAssignmentFormPage";
-import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage";
-import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage";
-import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage";
-import UbicacionPage from "../pages/varios/UbicacionPage";
-import ClientesPage from "../pages/varios/ClientesPage";
-import CargosPage from "../pages/varios/CargosPage";
-import RolesPage from "../pages/varios/RolesPage";
-import GestionTHPage from "../pages/varios/CatalogoTHPage";
-import CatalogoOperacionesPage from "../pages/varios/CatalogoSysPage";
-import CatalogoOpPage from "../pages/varios/CatalogoOp";
 import OperationsPage from "../pages/Operations/OperationsPage";
 import EquipoFormPage from "../pages/Operations/EquipoFormPage.tsx";
 import EditarEquipoPage from "../pages/Operations/EditarEquipoPage.tsx";
 
-
 export default function AppRoutes() {
+  const { user } = useAuth();
+
   return (
     <Routes>  
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginPage />} />
-      {/* <Route path="/cambiar-contraseña" element={<ChangePasswordPage />} /> */}
 
       {/* Rutas privadas dentro del DashboardLayout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
 
-          {/* Solicitudes generales */}
-          <Route path="/requests" element={<RequestPage />} />
-          <Route path="/requests/nuevo" element={<RequestFormPage />} />
-          <Route path="/requests/:id" element={<RequestFormPage />} />
-          <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage />} />
-          <Route
-            path="/solicitudesTH/permisos"
-            element={<RequestManagementPage tipoVista="permisos" />}
-          />
-          <Route
-            path="/solicitudesTH/beneficios"
-            element={<RequestManagementPage tipoVista="beneficios" />}
-          /> 
-          {/* operaciones */}
-          <Route path="/operations" element={<OperationsPage />} />
+              <Route path="/requests" element={<RequestPage />} />
+              <Route index element={<HomePage />} />
+              <Route path="/profile" element={<ProfilePage />} /> 
+              <Route path="/usuarios" element={<UsuariosPage />} />
+              <Route path="/usuarios/buscar" element={<UserSearchPage />} />
+              <Route path="/usuarios/nuevo" element={<UserFormPage />} />
+              <Route path="/usuarios/:id" element={<UserFormPage />} />
+              <Route path="/vacaciones" element={<VacacionesPage />} />
+              <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
+              <Route path="/benefits" element={<BeneficiosPage />} />
+              <Route path="/configuracion" element={<Configuration />} />
+              <Route path="/requests/nuevo" element={<RequestFormPage />} />
+              <Route path="/requests/:id" element={<RequestFormPage />} />
+              <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
+              <Route path="/gestion-solicitudes" element={<RequestManagementPage />} />
+              
+              {/* Operations routes */}
+              <Route path="/operations" element={<OperationsPage />} />
               <Route path="/equipo/nuevo" element={<EquipoFormPage />} />
               <Route path="/equipo/:id/edit" element={<EditarEquipoPage />} />
+              {/* <Route path="/operations/manage-teams" element={<ManageTeams />} /> */}
+          {/*<Route path="/usuarios" element={<UsuariosPage />} />
 
-          {/* Usuarios */}
-          <Route path="/usuarios" element={<UsuariosPage />} />
-          <Route path="/usuarios/buscar" element={<UserSearchPage />} />
-          <Route path="/usuarios/nuevo" element={<UserFormPage />} />
-          <Route path="/usuarios/:id" element={<UserFormPage />} />
-
-          {/* Vacaciones */}
-          <Route path="/vacaciones" element={<VacacionesPage />} />
-          <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
-
-          {/* Beneficios */}
-          <Route path="/benefits" element={<BeneficiosPage />} />
-          <Route path="/beneficios/nuevo" element={<BeneficioFormPage />} />
-
-          {/* Dispositivos */}
-          <Route path="/dispositivos" element={<DevicePage />} />
-          <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
-          <Route path="/dispositivos/:id" element={<DeviceFormPage />} />
-
-          {/* Solicitud de Dispositivos (usuarios) */}
-          <Route path="/solicitud-dispositivo" element={<SolicitudDispositivoPage />} />
-
-          {/* Gestión de Dispositivos (SYSADMIN) */}
-          <Route path="/gestion-dispositivos" element={<GestionDispositivosPage />} />
-
-          {/* Asignaciones de Dispositivos */}
-          <Route path="/dispositivos-asignados/nuevo" element={<DeviceAssignmentFormPage />} />
-          <Route path="/dispositivos-asignados/:id" element={<DeviceAssignmentFormPage />} />
-
-          {/* Tipos de Dispositivo */}
-          <Route path="/tipo-dispositivo" element={<TipoDispositivoPage />} />
-
-          {/* Clientes */}
-          <Route path="/clientes" element={<ClientesPage />} />
-
-          {/* Cargos */}
-          <Route path="/cargos" element={<CargosPage />} />
-
-          {/* Roles */}
-          <Route path="/roles" element={<RolesPage />} />
-          
-          {/* GestionTH */}
-          <Route path="/catalogo-th" element={<GestionTHPage />} />
-
-          {/* Ubicación */}
-          <Route path="/ubicacion" element={<UbicacionPage />} />
-
-          {/* CatalogoSysAdmin */}
-          <Route path="/catalogo-sys" element={< CatalogoOperacionesPage />} />
-
-          {/* CatalogoOperaciones */}
-           <Route path="/catalogo-op" element={< CatalogoOpPage />} />
-
-          {/* Configuración */}
-          <Route path="/configuracion" element={<Configuration />} />
-
-          {/* Perfil */}
-          <Route path="/profile" element={<ProfilePage />} />
-
+          < */}
         </Route>
       </Route>
 
-      {/* Fallback simple para evitar loops */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Fallback */}
+      <Route path="*" element={user ? <Navigate to="/" /> : <LoginPage />} /> 
     </Routes>
   );
 }

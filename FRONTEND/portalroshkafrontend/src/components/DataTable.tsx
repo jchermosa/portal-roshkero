@@ -7,40 +7,14 @@ interface Column<T> {
   className?: string;
 }
 
-type Variant = "primary" | "secondary" | "danger" | "neutral";
-
-export interface RowAction<T> {
-  key: string;
-  label: string;
-  icon?: React.ReactNode; 
-  onClick: (row: T, e: React.MouseEvent<HTMLButtonElement>) => void;
-  disabled?: boolean | ((row: T) => boolean);
-  show?: (row: T) => boolean;
-  variant?: Variant;
-}
-
 interface DataTableProps<T> {
   data: T[];
   columns: Column<T>[];
   rowKey: (row: T) => string | number;
   onRowClick?: (row: T) => void;
-  rowActions?: RowAction<T>[];
   actions?: (row: T) => React.ReactNode;
   scrollable?: boolean;
   enableSearch?: boolean;
-}
-
-function classesFor(variant: Variant = "neutral") {
-  switch (variant) {
-    case "primary":
-      return "text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30";
-    case "secondary":
-      return "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600/40";
-    case "danger":
-      return "text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30";
-    default:
-      return "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600/40";
-  }
 }
 
 function DataTable<T>({
@@ -48,8 +22,7 @@ function DataTable<T>({
   columns,
   rowKey,
   onRowClick,
-  rowActions,
-  actions, 
+  actions,
   scrollable = true,
   enableSearch = true,
 }: DataTableProps<T>) {
@@ -95,7 +68,7 @@ function DataTable<T>({
                 {col.label}
               </th>
             ))}
-            {(rowActions?.length || actions) && (
+            {actions && (
               <th className="px-4 py-3 text-left text-sm font-semibold border-b border-gray-200 dark:border-gray-700">
                 Acciones
               </th>
@@ -107,7 +80,7 @@ function DataTable<T>({
           {filteredData.length === 0 ? (
             <tr>
               <td
-                colSpan={columns.length + ((rowActions?.length || actions) ? 1 : 0)}
+                colSpan={columns.length + (actions ? 1 : 0)}
                 className="px-4 py-6 text-center text-gray-400 dark:text-gray-500"
               >
                 No hay resultados.
@@ -128,40 +101,7 @@ function DataTable<T>({
                     {col.render ? col.render(row) : String((row as any)[col.key])}
                   </td>
                 ))}
-                {(rowActions?.length || actions) && (
-                  <td className="px-4 py-2">
-                    {/* Preferimos rowActions; si no, usamos actions legacy */}
-                    {rowActions?.length ? (
-                      <div className="flex items-center gap-1">
-                        {rowActions
-                          .filter((a) => (a.show ? a.show(row) : true))
-                          .map((a) => {
-                            const disabled =
-                              typeof a.disabled === "function" ? a.disabled(row) : !!a.disabled;
-                            return (
-                              <button
-                                key={a.key}
-                                type="button"
-                                className={`p-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-1 ${classesFor(a.variant)} ${
-                                  disabled ? "opacity-50 pointer-events-none" : ""
-                                }`}
-                                title={a.label}
-                                aria-label={a.label}
-                                onClick={(e) => {
-                                  e.stopPropagation(); // no dispares onRowClick
-                                  a.onClick(row, e);
-                                }}
-                              >
-                                {a.icon ?? <span className="sr-only">{a.label}</span>}
-                              </button>
-                            );
-                          })}
-                      </div>
-                    ) : (
-                      actions?.(row)
-                    )}
-                  </td>
-                )}
+                {actions && <td className="px-4 py-3 text-sm">{actions(row)}</td>}
               </tr>
             ))
           )}

@@ -13,9 +13,7 @@ export interface FormField {
     | "select"
     | "checkbox"
     | "textarea"
-    | "custom"
-    | "slider"
-    | "file";
+    | "custom";
   required?: boolean;
   placeholder?: string;
   options?: Array<{ value: string | number; label: string }>;
@@ -27,11 +25,6 @@ export interface FormField {
   render?: () => React.ReactNode;
   className?: string;
   fullWidth?: boolean;
-  min?: number;
-  max?: number;
-  step?: number;
-  accept?: string;
-  multiple?: boolean;
 }
 
 export interface FormSection {
@@ -65,7 +58,7 @@ export interface FormMessage {
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
-  id,
+  id = "dynamic-form",
   sections,
   initialData = {},
   onSubmit,
@@ -85,9 +78,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, type, value } = e.target as HTMLInputElement;
+    const { name, type, value } = e.target;
     let processedValue: any = value;
 
     if (type === "checkbox")
@@ -150,7 +143,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       await onSubmit(formData);
       setMessage({ type: "success", text: "Datos guardados correctamente" });
     } catch (error: any) {
-      setMessage({ type: "error", text: error?.message || "Error al guardar los datos" });
+      setMessage({
+        type: "error",
+        text: error?.message || "Error al guardar los datos",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -158,12 +154,18 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
   const renderField = (field: FormField) => {
     const value = formData[field.name] ?? "";
-    const error = errors[field.name];
-    const isFieldDisabled = field.disabled || loading || readonly || submitting;
+    // Priorizar error externo si existe
+    const mergedError = externalErrors[field.name] || errors[field.name];
+    const isFieldDisabled = field.disabled || loading;
 
     const baseProps = {
       name: field.name,
-      value: field.type === "checkbox" ? undefined : (formData[field.name] ?? ""),
+      value:
+        field.value !== undefined
+          ? field.value
+          : field.type === "checkbox"
+          ? undefined
+          : value,
       onChange: field.onChange ?? handleChange,
       required: field.required,
       placeholder: field.placeholder,
@@ -194,7 +196,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                 {field.placeholder ?? "Seleccionar..."}
               </option>
               {field.options?.map((opt) => (
-                <option key={String(opt.value)} value={opt.value}>
+                <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
               ))}
@@ -223,7 +225,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             <input
               type="checkbox"
               name={field.name}
-              checked={!!formData[field.name]}
+              checked={formData[field.name] || false}
               onChange={handleChange}
               disabled={isFieldDisabled}
               className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600"
@@ -249,109 +251,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
           </div>
         ) : null;
 
-      case "slider":
-        return (
-          <div
-            key={field.name}
-            className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}
-          >
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <input
-              type="range"
-              name={field.name}
-              min={field.min ?? 0}
-              max={field.max ?? 100}
-              step={field.step ?? 1}
-              value={formData[field.name] ?? field.min ?? 0}
-              onInput={(e) => {
-                const target = e.target as HTMLInputElement;
-                handleChange({
-                  ...e,
-                  target: {
-                    ...target,
-                    name: field.name,
-                    value: target.value,
-                    type: "number",
-                  },
-                } as React.ChangeEvent<HTMLInputElement>);
-              }}
-              disabled={isFieldDisabled}
-              className="w-full accent-blue-600"
-            />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {formData[field.name] ?? 0}%
-            </span>
-            {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
-          </div>
-        );
-
-      case "file":
-        return (
-          <div key={field.name} className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <input
-              type="file"
-              name={field.name}
-              accept={field.accept}
-              multiple={field.multiple}
-              disabled={isFieldDisabled}
-              onChange={(e) => {
-                const files = e.target.files;
-                let newValue: File | File[] | null = null;
-                if (files) {
-                  newValue = field.multiple ? Array.from(files) : files[0];
-                }
-                setFormData((prev) => {
-                  const next = { ...prev, [field.name]: newValue };
-                  onChange?.(next);
-                  return next;
-                });
-              }}
-              className={`w-full text-sm text-gray-700 dark:text-gray-200
-                          file:mr-4 file:py-2 file:px-4
-                          file:rounded-full file:border-0
-                          file:text-sm file:font-semibold
-                          file:bg-blue-50 file:text-blue-700
-                          hover:file:bg-blue-100
-                          ${isFieldDisabled ? "cursor-not-allowed opacity-60" : ""}`}
-            />
-            {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
-          </div>
-        );
-
-      case "textarea":
-        return (
-          <div key={field.name} className={`space-y-2 ${field.fullWidth ? "w-full col-span-full" : ""}`}>
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {field.label}
-              {field.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <textarea
-              name={field.name}
-              value={String(value)}
-              onChange={handleChange}
-              placeholder={field.placeholder}
-              disabled={isFieldDisabled}
-              className={`w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                          bg-white text-gray-800 border
-                          border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
-                          ${error ? "border-red-500 focus:ring-red-500" : ""}
-                          ${isFieldDisabled ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" : ""}`}
-              rows={4}
-            />
-            {field.helperText && (
-              <p className="text-gray-500 dark:text-gray-400 text-xs">{field.helperText}</p>
-            )}
-            {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
-          </div>
-        );
-
       default:
         return (
           <div
@@ -368,24 +267,30 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
               className={`w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
                           bg-white text-gray-800 border
                           border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
-                          ${error ? "border-red-500 focus:ring-red-500" : ""}
-                          ${isFieldDisabled ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" : ""}`}
+                          ${mergedError ? "border-red-500 focus:ring-red-500" : ""}
+                          ${
+                            isFieldDisabled
+                              ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                              : ""
+                          }`}
             />
             {field.helperText && (
-              <p className="text-gray-500 dark:text-gray-400 text-xs">{field.helperText}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs">
+                {field.helperText}
+              </p>
             )}
-            {error && <p className="text-red-500 dark:text-red-400 text-xs">⚠️ {error}</p>}
+            {mergedError && (
+              <p className="text-red-500 dark:text-red-400 text-xs">
+                ⚠️ {mergedError}
+              </p>
+            )}
           </div>
         );
     }
   };
 
   return (
-    <form
-      id={id ?? "dynamic-form"}
-      onSubmit={handleSubmit}
-      className={`flex flex-col h-full ${className}`}
-    >
+    <form id={id} onSubmit={handleSubmit} className={`flex flex-col h-full ${className}`}>
       {message && (
         <div
           className={`p-4 rounded-lg text-sm border ${
