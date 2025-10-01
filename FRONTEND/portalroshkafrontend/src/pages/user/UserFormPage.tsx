@@ -37,21 +37,26 @@ export default function UserFormPage() {
   // Render
   const readonly = new URLSearchParams(location.search).get("readonly") === "true";
 
-  const normalizeData = (formData: Record<string, any>) => {
-    return {
-      ...formData,
-      nroCedula: formData.nroCedula ?? "",
-      rol: { idRol: Number(formData.idRol) },
-      cargo: { idCargo: Number(formData.idCargo) },
-      estado: formData.estado ?? EstadoActivoInactivo.A, 
-      fechaIngreso: formData.fechaIngreso || null,
-      fechaNacimiento: formData.fechaNacimiento || null,
-      requiereCambioContrasena: formData.requiereCambioContrasena ?? true,
-      urlPerfil: formData.urlPerfil || null,
-      disponibilidad: formData.disponibilidad ?? 0,
-    };
+ const normalizeData = (formData: Record<string, any>) => {
+  return {
+    idUsuario: formData.idUsuario,
+    nombre: formData.nombre ?? "",
+    apellido: formData.apellido ?? "",
+    nroCedula: formData.nroCedula ?? "",
+    correo: formData.correo ?? "",
+    roles: { idRol: Number(formData.idRol) },   
+    cargos: { idCargo: Number(formData.idCargo) }, 
+    estado: formData.estado ?? EstadoActivoInactivo.A,
+    fechaIngreso: formData.fechaIngreso || null,
+    fechaNacimiento: formData.fechaNacimiento || null,
+    requiereCambioContrasena: formData.requiereCambioContrasena ?? true,
+    urlPerfil: formData.urlPerfil || null,
+    disponibilidad: formData.disponibilidad ?? 0,
+    telefono: formData.telefono ?? "",
+    seniority: formData.seniority ?? null,
+    foco: formData.foco ?? null,
   };
-
+};
   return (
     <FormLayout
       title={isEditing ? (readonly ? "Detalle usuario" : "Editar usuario") : "Crear usuario"}
