@@ -2,6 +2,7 @@ package com.backend.portalroshkabackend.tools.mapper;
 
 import com.backend.portalroshkabackend.DTO.*;
 import com.backend.portalroshkabackend.DTO.th.*;
+<<<<<<< HEAD
 import com.backend.portalroshkabackend.DTO.th.self.*;
 import com.backend.portalroshkabackend.Models.*;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
@@ -41,20 +42,38 @@ public class AutoMap {
     }
 
     public static RequestDto toRequestDto(Solicitudes request){
+=======
+import com.backend.portalroshkabackend.DTO.th.request.RequestDto;
+import com.backend.portalroshkabackend.Models.*;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+
+import java.time.LocalDateTime;
+
+public class AutoMap {
+
+
+    public static RequestDto toRequestDto(Solicitud request){
+>>>>>>> parent of dca61a3 (se elimino backend)
         RequestDto requestDto = new RequestDto();
 
         requestDto.setIdSolicitud(request.getIdSolicitud());
         requestDto.setFechaInicio(request.getFechaInicio());
         requestDto.setFechaFin(request.getFechaFin());
         requestDto.setEstado(request.getEstado());
+<<<<<<< HEAD
         requestDto.setIdUsuario(request.getIdUsuario());
         requestDto.setCantidadDias(request.getCantidadDias());
         requestDto.setNumeroAprobaciones(request.getNumeroAprobaciones());
+=======
+        requestDto.setIdUsuario(request.getUsuario().getIdUsuario());
+        requestDto.setCantidadDias(request.getCantDias());
+>>>>>>> parent of dca61a3 (se elimino backend)
         requestDto.setComentario(request.getComentario());
 
         return requestDto;
     }
 
+<<<<<<< HEAD
     public static SolicitudTHResponseDto toSolicitudTHResponseDto(SolicitudesTH solicitudesTH){
         SolicitudTHResponseDto dto = new SolicitudTHResponseDto();
 
@@ -225,4 +244,7 @@ public class AutoMap {
         return dto;
 
     }
+=======
+
+>>>>>>> parent of dca61a3 (se elimino backend)
 }

@@ -5,7 +5,11 @@ import java.util.Optional;
 import java.util.ArrayList;
 
 import com.backend.portalroshkabackend.Models.Usuario;
+<<<<<<< HEAD
 import com.backend.portalroshkabackend.Repositories.UserRepository;
+=======
+import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
+>>>>>>> parent of dca61a3 (se elimino backend)
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -38,17 +42,28 @@ public class JpaUserDetailsService implements UserDetailsService {
         Usuario user = optionalUser.get();
         
         // Obtener el rol del usuario directamente del objeto
+<<<<<<< HEAD
         Roles userRol = user.getRoles();
+=======
+        Roles userRol = user.getRol();
+>>>>>>> parent of dca61a3 (se elimino backend)
         
         // Buscar el rol del usuario directamente
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         
         // Si el usuario tiene un rol asignado, agregar la autoridad
         if (userRol != null) {
+<<<<<<< HEAD
             authorities.add(new SimpleGrantedAuthority("ROLE_" + userRol.getNombre()));
         }
         
         // Si no se encontró ningún rol, asignar una lista vacía
+=======
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + userRol.getIdRol()));
+        }
+        
+        // Si no se encontró ningún cargo, asignar una lista vacía
+>>>>>>> parent of dca61a3 (se elimino backend)
         if (authorities.isEmpty()) {
             authorities = Collections.emptyList();
         }
@@ -57,7 +72,11 @@ public class JpaUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getCorreo(),      // username
                 user.getContrasena(),  // contraseña
+<<<<<<< HEAD
                 authorities            // roles/autoridades
+=======
+                authorities            // roles/autoridades basadas en cargo
+>>>>>>> parent of dca61a3 (se elimino backend)
         );
     }
 }
