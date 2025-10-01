@@ -8,7 +8,7 @@ async function getDispositivosAsignados(
   size: number = 10
 ): Promise<PaginatedResponse<DispositivoAsignadoItem>> {
   const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceAssignments/listAssignments?page=${page}&size=${size}`,
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/listAssignments?page=${page}&size=${size}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -23,7 +23,7 @@ async function createDispositivoAsignado(
   data: Partial<DispositivoAsignadoItem>
 ): Promise<DispositivoAsignadoItem> {
   const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceAssignments/createAssignment`,
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/createAssignment`,
     {
       method: "POST",
       headers: {
@@ -44,7 +44,7 @@ async function updateDispositivoAsignado(
   data: Partial<DispositivoAsignadoItem>
 ): Promise<DispositivoAsignadoItem> {
   const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceAssignments/updateAssignment/${id}`,
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/updateAssignment/${id}`,
     {
       method: "PUT",
       headers: {
@@ -64,7 +64,7 @@ async function deleteDispositivoAsignado(
   id: number
 ): Promise<void> {
   const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceAssignments/deleteAssignment/${id}`,
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/deleteAssignment/${id}`,
     {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },

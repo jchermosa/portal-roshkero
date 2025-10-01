@@ -13,7 +13,7 @@ async function getSolicitudesDispositivoAdmin(
   page: number = 0,
   size: number = 10
 ): Promise<PageResponse<SolicitudDispositivoItem>> {
-  const url = `/api/v1/admin/sysadmin/allRequests?page=${page}&size=${size}`;
+  const url = `http://localhost:8080/api/v1/admin/sysadmin/allRequests?page=${page}&size=${size}`;
 
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
