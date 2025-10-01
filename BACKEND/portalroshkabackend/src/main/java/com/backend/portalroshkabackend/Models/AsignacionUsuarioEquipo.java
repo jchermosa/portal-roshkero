@@ -42,7 +42,7 @@ public class AsignacionUsuarioEquipo {
     private LocalDate fechaFin;
 
     @Column(name ="porcentaje_trabajo")
-    private int porcentajeTrabajo;
+    private Integer porcentajeTrabajo;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")

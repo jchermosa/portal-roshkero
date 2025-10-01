@@ -36,6 +36,12 @@ public class AsignacionDispositivoController {
         return deviceAssignmentService.listarAsignaciones(pageable);
 
     }
+
+    // Listar una sola asignacion 
+    @GetMapping("/getAssignment/{id}")
+    public DeviceAssignmentDTO obtenerAsignacion(@PathVariable Integer id) {
+        return deviceAssignmentService.obtenerAsignacion(id);
+    }
     
 
 
