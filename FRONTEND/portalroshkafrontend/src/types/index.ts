@@ -436,3 +436,26 @@ export interface RolActionResponse {
   message: string;
 }
 
+
+// Tecnologias
+// Request DTO (crear/editar)
+export interface TecnologiaRequest {
+  nombre: string;
+  descripcion: string;
+}
+
+// Response DTO (uno solo)
+export interface TecnologiaResponse {
+  idTecnologia: number;
+  nombre: string;
+  descripcion: string;
+  fechaCreacion: string; // ISO (LocalDateTime)
+}
+
+// Respuesta paginada
+export interface TecnologiasPageResponse {
+  content: TecnologiaResponse[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
+}
