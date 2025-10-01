@@ -28,17 +28,6 @@ public class DispositivoMapper {
         dispositivo.setEstado(dto.getEstado());
     }
 
-    // Entidad a DTO
-    public static UbicacionDto toUbicacionDto(Ubicacion ubicacion) {
-        if (ubicacion == null) return null;
-
-        UbicacionDto dto = new UbicacionDto();
-        dto.setIdUbicacion(ubicacion.getIdUbicacion());
-        dto.setNombre(ubicacion.getNombre());
-        dto.setEstado(ubicacion.getEstado());
-        return dto;
-    }
-
     //Entidad a DTO
     public static DeviceDTO toDeviceDto(Dispositivo dispositivo) {
         if (dispositivo == null) return null;
