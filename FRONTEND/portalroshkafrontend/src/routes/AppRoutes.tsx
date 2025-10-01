@@ -42,8 +42,8 @@ import UbicacionPage from "../pages/varios/UbicacionPage";
 import ClientesPage from "../pages/varios/ClientesPage";
 import CargosPage from "../pages/varios/CargosPage";
 import RolesPage from "../pages/varios/RolesPage";
-import GestionTHPage from "../pages/varios/CatalogoTH";
-import CatalogoOperacionesPage from "../pages/varios/CatalogoOperacionesPage";
+import GestionTHPage from "../pages/varios/CatalogoTHPage";
+import CatalogoOperacionesPage from "../pages/varios/CatalogoSysPage";
 
 export default function AppRoutes() {
   return (
@@ -119,7 +119,7 @@ export default function AppRoutes() {
           <Route path="/ubicacion" element={<UbicacionPage />} />
 
           {/* CatalogoOperaciones */}
-          <Route path="/catalogo-operaciones" element={< CatalogoOperacionesPage />} />
+          <Route path="/catalogo-sys" element={< CatalogoOperacionesPage />} />
 
           {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />

@@ -159,7 +159,7 @@ export interface SolicitudBase {
   id_solicitud_tipo: number;
   tipo: { id: number; nombre: string };
   comentario?: string;
-  estado: "P" | "A" | "R"; // Pendiente, Aprobada, Rechazada
+  estado: "P" | "A" | "R"; 
 }
 
 // Solicitud de permisos
@@ -181,7 +181,7 @@ export type SolicitudItem = SolicitudPermiso | SolicitudBeneficio;
 export interface TipoPermisoItem {
   id: number;
   nombre: string;
-  cantidadDias: number | null; // null si es ajustable
+  cantidadDias: number | null; 
 }
 
 export interface TipoBeneficioItem {
@@ -194,16 +194,16 @@ export interface TipoBeneficioItem {
 
 
 export interface DispositivoItem {
-  idDispositivo?: number; // Opcional, puede no estar en respuestas del backend
+  idDispositivo?: number; 
   tipoDispositivo: number;
   ubicacion: number;
   nroSerie: string;
   modelo: string;
   detalle: string;
-  fechaFabricacion: string; // YYYY-MM-DD
+  fechaFabricacion: string; 
   estado: EstadoInventarioEnum;
   categoria: CategoriaEnum;
-  encargado: number; // idUsuario encargado
+  encargado: number; 
 }
 
 export interface DispositivoAsignadoItem {
@@ -353,7 +353,7 @@ export type ClienteResponse = {
   nroTelefono: string;
   correo: string;
   ruc: string;
-  fechaCreacion: string; // ISO string; el backend envía LocalDateTime
+  fechaCreacion: string; 
 };
 
 export type ClientesPageResponse = {

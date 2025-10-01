@@ -2,11 +2,11 @@ import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageLayout from "../../layouts/PageLayout";
 import TipoDispositivoPage from "../dispositivos/TipoDispositivoPage";
-import UbicacionPage from "../varios/UbicacionPage";
+import UbicacionPage from "./UbicacionPage";
 
 type TabKey = "tipos" | "ubicaciones";
 
-export default function CatalogoOperacionesPage() {
+export default function CatalogoSysPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const rawTab = searchParams.get("tab");
