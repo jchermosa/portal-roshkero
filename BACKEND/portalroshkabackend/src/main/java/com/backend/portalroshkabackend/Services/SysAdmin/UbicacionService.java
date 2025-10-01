@@ -1,5 +1,6 @@
 package com.backend.portalroshkabackend.Services.SysAdmin;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import com.backend.portalroshkabackend.tools.RepositoryService;
 import com.backend.portalroshkabackend.tools.errors.errorslist.dispositivos.DtoMappingException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.dispositivos.LocationNotFoundException;
 import com.backend.portalroshkabackend.tools.mapper.DispositivoMapper;
+import com.backend.portalroshkabackend.tools.mapper.UbicacionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,41 +51,27 @@ public class UbicacionService {
         return ubicacionRepository.findByIdUbicacion(idUbicacion)
                 .map(ubicacion -> {
                     try {
-                        // Obtener dispositivos de esta ubicación
-                        List<Dispositivo> dispositivos = deviceRepository.findAllInLocation(idUbicacion);
-
-                        UbicacionDto dto = new UbicacionDto();
-                        dto.setIdUbicacion(ubicacion.getIdUbicacion());
-                        dto.setNombre(ubicacion.getNombre());
-                        dto.setEstado(ubicacion.getEstado());
-                        dto.setDispositivos(dispositivos.stream()
-                                .map(DispositivoMapper::toDeviceDto)
-                                .toList());
-
-                        return dto;
+                        return UbicacionMapper.toDTO(ubicacion);
                     } catch (Exception e) {
                         throw new DtoMappingException("Error al procesar los datos", e);
                     }
                 });
     }
 
-
+    public Page<DeviceDTO> getDevicesByUbicacion(Integer idUbicacion, Pageable pageable) {
+        ubicacionRepository.findByIdUbicacion(idUbicacion)
+                .orElseThrow(() -> new LocationNotFoundException(idUbicacion));
+        Page<Dispositivo> dispositivos = deviceRepository.findAllInLocation(idUbicacion, pageable);
+        return dispositivos.map(DispositivoMapper::toDeviceDto);
+    }
 
     @Transactional
     // Encontrar todas las ubicaciones
     public Page<UbicacionDto> getAllUbicaciones(Pageable pageable){
         Page<Ubicacion> ubicaciones = ubicacionRepository.findAll(pageable);
         return ubicaciones.map(ubicacion -> {
-        List<Dispositivo> dispositivos = deviceRepository.findAllInLocation(ubicacion.getIdUbicacion());
             try {
-                UbicacionDto dto = new UbicacionDto();
-                dto.setIdUbicacion(ubicacion.getIdUbicacion());
-                dto.setNombre(ubicacion.getNombre());
-                dto.setEstado(ubicacion.getEstado());
-                dto.setDispositivos(dispositivos.stream()
-                        .map(DispositivoMapper::toDeviceDto)
-                        .toList());
-                return dto;
+                return UbicacionMapper.toDTO(ubicacion);
             } catch (Exception e) {
                 throw new DtoMappingException("Error al procesar los datos",e);
             }

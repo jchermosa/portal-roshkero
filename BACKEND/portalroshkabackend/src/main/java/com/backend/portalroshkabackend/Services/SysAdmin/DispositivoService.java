@@ -14,6 +14,7 @@ import com.backend.portalroshkabackend.tools.errors.errorslist.DatabaseOperation
 import com.backend.portalroshkabackend.tools.errors.errorslist.dispositivos.*;
 import com.backend.portalroshkabackend.tools.mapper.DispositivoMapper;
 import com.backend.portalroshkabackend.tools.mapper.TipoDispositivoMapper;
+import com.backend.portalroshkabackend.tools.mapper.UbicacionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -158,7 +159,7 @@ public class DispositivoService {
         UbicacionDto ubicacion = ubicacionService.findByIdUbicacion(dispositivo.getUbicacion())
                 .orElseThrow(() -> new LocationNotFoundException(dispositivo.getUbicacion()));
         Ubicacion newUbicacion = new Ubicacion();
-        DispositivoMapper.toUbicacionFromUbicacionDto(newUbicacion, ubicacion);
+        UbicacionMapper.toUbicacionFromUbicacionDto(newUbicacion, ubicacion);
 
         // Asignar Encargado si se proporciona
         if (dispositivo.getEncargado() != null) {
@@ -218,8 +219,8 @@ public class DispositivoService {
 
         // Asignar la nueva ubicacion al dispositivo
         Ubicacion ubicacion = new Ubicacion();
-        DispositivoMapper.toUbicacionFromUbicacionDto(ubicacion, ubicacionDto);
-
+        UbicacionMapper.toUbicacionFromUbicacionDto(ubicacion, ubicacionDto);
+        existingDispositivo.setUbicacion(ubicacion);
 
         //Pasar del DTO a la entidad
         DispositivoMapper.toDispositivoFromDto(existingDispositivo, dispositivoDto);
@@ -253,62 +254,4 @@ public class DispositivoService {
         );
 
     }
-    
-
-
-    // CONVERTIR A LOS DTO
-    private DeviceTypeDTO convertToDto(TipoDispositivo tipoDispositivo) {
-        DeviceTypeDTO dto = new DeviceTypeDTO();
-        dto.setIdTipoDispositivo(tipoDispositivo.getIdTipoDispositivo());
-        dto.setNombre(tipoDispositivo.getNombre());
-        dto.setDetalle(tipoDispositivo.getDetalle());
-        return dto;
-    }
-
-    private DeviceDTO convertToDto(Dispositivo dispositivo) {
-    DeviceDTO dto = new DeviceDTO();
-    try {
-        dto.setIdDispositivo(dispositivo.getIdDispositivo());
-        dto.setNroSerie(dispositivo.getNroSerie());
-        dto.setModelo(dispositivo.getModelo());
-        dto.setFechaFabricacion(dispositivo.getFechaFabricacion());
-        dto.setCategoria(dispositivo.getCategoria());
-        dto.setDetalle(dispositivo.getDetalles());
-        dto.setEstado(dispositivo.getEstado());
-        
-        // Verificar si el encargado existe antes de acceder a su ID
-        if (dispositivo.getEncargado() != null) {
-            dto.setEncargado(dispositivo.getEncargado().getIdUsuario());
-        } else {
-            dto.setEncargado(null); // o puedes omitir esta línea si el DTO ya inicializa como null
-        }
-        
-        // Manejo seguro de relaciones lazy
-        try {
-            if (dispositivo.getTipoDispositivo() != null) {
-                dto.setTipoDispositivo(dispositivo.getTipoDispositivo().getIdTipoDispositivo());
-            }
-        } catch (Exception lazyException) {
-            System.err.println("Error cargando tipo dispositivo: " + lazyException.getMessage());
-            dto.setTipoDispositivo(null);
-        }
-        
-        try {
-            if (dispositivo.getUbicacion() != null) {
-                dto.setUbicacion(dispositivo.getUbicacion().getIdUbicacion());
-            }
-        } catch (Exception lazyException) {
-            System.err.println("Error cargando ubicación: " + lazyException.getMessage());
-            dto.setUbicacion(null);
-        }
-        
-    } catch (Exception e) {
-        System.err.println("Error general al convertir Dispositivo a DTO: " + e.getMessage());
-        e.printStackTrace(); // Agregar esto para ver el stack trace completo
-        // En lugar de crear un DTO vacío, propagar la excepción o manejar específicamente
-        throw new DeviceMappingException("Error al procesar los datos",e);
-    }
-    
-    return dto;
-}
 }
