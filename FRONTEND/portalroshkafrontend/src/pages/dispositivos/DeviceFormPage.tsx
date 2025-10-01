@@ -8,7 +8,6 @@ import { useDispositivoForm } from "../../hooks/dispositivos/useDispositivoForm"
 import { getDeviceTypesPaged } from "../../services/DeviceService";
 import { getUbicaciones } from "../../services/UbicacionService";
 import { useEffect, useMemo, useState } from "react";
-import type { DispositivoItem } from "../../types";
 import { EstadoInventarioEnum } from "../../types";
 
 export default function DeviceFormPage() {
