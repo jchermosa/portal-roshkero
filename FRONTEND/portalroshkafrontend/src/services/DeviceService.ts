@@ -10,17 +10,27 @@ async function ensureOk(res: Response) {
   }
 }
 
-// === GET by ID (para edición) ===
 export async function getDispositivoById(
   token: string,
   id: number | string
 ): Promise<DispositivoItem> {
-  const res = await fetch(`${BASE}/getDevice/${id}`, {
+  const url = `${BASE}/getDevice/${id}`;
+  console.log("➡️ getDispositivoById fetch:", url);
+  const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  await ensureOk(res);
-  return res.json();
+  console.log("⬅️ status:", res.status);
+
+  const text = await res.text();
+  console.log("⬅️ raw response:", text);
+
+  if (!res.ok) {
+    throw new Error(text || `HTTP ${res.status}`);
+  }
+
+  return JSON.parse(text);
 }
+
 
 // === LISTADO paginado de dispositivos ===
 export async function getDispositivos(
