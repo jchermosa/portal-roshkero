@@ -48,9 +48,6 @@ public class JwtValidationFilter extends BasicAuthenticationFilter{
             String correo = claims.getSubject();
             Object roleClaim = claims.get("rol");
 
-            // Debug: Agregar logs para verificar el contenido del token
-            System.out.println("Token validado - Username: " + correo);
-            System.out.println("Token validado - Rol claim: " + roleClaim);
 
             if (correo != null && roleClaim != null) {
                 // Convertir el rol a entero
@@ -68,10 +65,7 @@ public class JwtValidationFilter extends BasicAuthenticationFilter{
                 Collection<GrantedAuthority> authorities = Arrays.asList(
                     new SimpleGrantedAuthority(authority)
                 );
-
-                // Debug: Verificar las autoridades creadas
-                System.out.println("Autoridad creada: " + authority);
-                System.out.println("Todas las autoridades: " + authorities);
+ 
 
                 UsernamePasswordAuthenticationToken auth = 
                     new UsernamePasswordAuthenticationToken(correo, null, authorities);
