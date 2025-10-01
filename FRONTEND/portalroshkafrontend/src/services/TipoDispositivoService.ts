@@ -1,3 +1,5 @@
+import type { PageResponse } from "../types";
+
 export interface TipoDispositivoItem {
   idTipoDispositivo: number;
   nombre: string;
@@ -7,11 +9,13 @@ export interface TipoDispositivoItem {
 
 // Listar todos los tipos de dispositivos
 async function getTiposDispositivo(token: string): Promise<TipoDispositivoItem[]> {
-  const res = await fetch(`/api/v1/admin/sysadmin/deviceTypes/allTypes`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/deviceTypes/allTypes`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  
+  const pageResponse: PageResponse<TipoDispositivoItem> = await res.json();
+  return pageResponse.content; // Extraer solo el array content
 }
 
 // Obtener tipo de dispositivo por ID

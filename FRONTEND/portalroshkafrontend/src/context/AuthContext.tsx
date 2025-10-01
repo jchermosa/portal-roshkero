@@ -71,8 +71,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         nombre: payload.nombre ?? "",
         apellido: payload.apellido ?? "",
         correo: payload.email ?? payload.sub ?? "",
-        rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
-        cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
+        // El JWT solo contiene el ID del rol, no el nombre ni el cargo
+        rol: payload.rol ? { id: payload.rol, nombre: "" } : { id: undefined, nombre: "" },
+        cargo: { id: undefined, nombre: "" }, // El cargo no viene en el JWT
         equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
         telefono: payload.telefono ?? undefined,
         fechaIngreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,

@@ -7,7 +7,7 @@ async function getUbicaciones(
   page: number = 0,
   size: number = 10
 ): Promise<PageResponse<UbicacionItem>> {
-  const url = `/api/v1/admin/sysadmin/ubicaciones/getAll?page=${page}&size=${size}`;
+  const url = `http://localhost:8080/api/v1/admin/sysadmin/ubicaciones/getAll?page=${page}&size=${size}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -20,7 +20,7 @@ async function getUbicacionById(
   token: string,
   id: number
 ): Promise<UbicacionItem> {
-  const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/${id}`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/ubicaciones/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
@@ -32,7 +32,7 @@ async function createUbicacion(
   token: string,
   data: Partial<UbicacionItem>
 ): Promise<UbicacionItem> {
-  const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/create`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/ubicaciones/create`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ async function updateUbicacion(
   id: number,
   data: Partial<UbicacionItem>
 ): Promise<UbicacionItem> {
-  const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/update/${id}`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/ubicaciones/update/${id}`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ async function updateUbicacion(
 
 // Toggle estado (A <-> I)
 async function deleteUbicacion(token: string, id: number): Promise<true> {
-  const res = await fetch(`/api/v1/admin/sysadmin/ubicaciones/delete/${id}`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/sysadmin/ubicaciones/delete/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });

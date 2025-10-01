@@ -26,10 +26,5 @@ export const ubicacionColumns: TableColumn<UbicacionItem>[] = [
         </span>
       );
     },
-  },
-  {
-    key: "dispositivos",
-    label: "Dispositivos",
-    render: (u) => u.dispositivos?.length ?? 0,
-  },
+  }
 ];
