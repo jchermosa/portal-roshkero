@@ -72,6 +72,13 @@ public class DeviceAssignmentService {
         return dispositivosAsignados.map(DeviceAssignmentMapper::toDeviceAssignmentDto);
     }
 
+    @Transactional
+    public DeviceAssignmentDTO obtenerAsignacion(Integer idDispositivoAsignado) {
+        DispositivoAsignado dispositivoAsignado = deviceAssignment.findById(idDispositivoAsignado)
+            .orElseThrow(() -> new DeviceAssignmentNotFoundException(idDispositivoAsignado));
+
+        return DeviceAssignmentMapper.toDeviceAssignmentDto(dispositivoAsignado);
+    }
 
     @Transactional
     public DeviceAssignmentDTO crearAsignacion(DeviceAssignmentDTO deviceAssignmentDTO) {
