@@ -1,4 +1,3 @@
-// src/pages/dispositivos/DeviceAssignmentsPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -23,7 +22,7 @@ export default function DeviceAssignmentsPage({ embedded = false }: Props) {
 
   const [page, setPage] = useState(0);
 
-  // const puedeVerAsignaciones = tieneRol(user, Roles.SYSADMIN, Roles.OPERACIONES);
+   const puedeVerAsignaciones = tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA, Roles.OPERACIONES);
 
   // ✅ Hook especializado con paginación real
   const { data: asignaciones, totalPages, loading, error } =
@@ -52,7 +51,7 @@ export default function DeviceAssignmentsPage({ embedded = false }: Props) {
     );
   };
 
-  // if (!puedeVerAsignaciones) return <p>No tenés permisos para ver esta página.</p>;
+  if (!puedeVerAsignaciones) return <p>No tenés permisos para ver esta página.</p>;
   if (loading) return <p>Cargando asignaciones...</p>;
   if (error) return <p>{error}</p>;
 

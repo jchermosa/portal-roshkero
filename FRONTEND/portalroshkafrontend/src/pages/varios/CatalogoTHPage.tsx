@@ -3,11 +3,18 @@ import { useSearchParams } from "react-router-dom";
 import PageLayout from "../../layouts/PageLayout";
 import CargosPage from "./CargosPage";
 import RolesPage from "./RolesPage";
+import { useAuth } from "../../context/AuthContext";
+import { tieneRol } from "../../utils/permisos";
+import { Roles } from "../../types/roles";
 
 type TabKey = "cargos" | "roles";
 
 export default function CatalogoTHPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
+
+  // permisos 
+  const puedeVer = tieneRol(user, Roles.TALENTO_HUMANO);
 
   const rawTab = (searchParams.get("tab") || "").toLowerCase();
   const activeTab: TabKey = useMemo<TabKey>(() => {
@@ -17,6 +24,11 @@ export default function CatalogoTHPage() {
   const switchTab = (next: TabKey) => {
     setSearchParams({ tab: next }, { replace: true });
   };
+
+  // sin permisos
+  if (!puedeVer) {
+    return <p>No tenés permisos para ver esta página.</p>;
+  }
 
   return (
     <PageLayout

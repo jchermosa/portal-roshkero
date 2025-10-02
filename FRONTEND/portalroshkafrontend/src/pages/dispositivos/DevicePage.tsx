@@ -13,13 +13,20 @@ import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
 import { dispositivosColumns } from "../../config/tables/dispositivoTableConfig";
 import { MsIcon } from "../../components/MsIcon";
-import { CategoriaEnum, CategoriaLabels, EstadoInventarioEnum, EstadoInventarioLabels } from "../../types";
+import {
+  CategoriaEnum,
+  CategoriaLabels,
+  EstadoInventarioEnum,
+  EstadoInventarioLabels,
+} from "../../types";
 
 export default function DevicePage() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
 
-  const canEdit = !tieneRol(user, Roles.OPERACIONES);
+  // 🔒 permisos
+  const puedeVer = tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA, Roles.OPERACIONES);
+  const puedeEditar = tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
 
   // Filtros
   const [categoria, setCategoria] = useState("");
@@ -49,15 +56,16 @@ export default function DevicePage() {
 
   const columns = dispositivosColumns;
 
-  // Acciones por fila (con íconos, como en Roles)
+  //  Acciones por fila
   const rowActions: RowAction<DispositivoItem>[] = useMemo(() => {
-    if (!canEdit) {
+    if (!puedeEditar) {
       return [
         {
           key: "view",
           label: "Ver",
           icon: <MsIcon name="visibility" />,
-          onClick: (d) => navigate(`/dispositivos/${d.idDispositivo}?readonly=true`),
+          onClick: (d) =>
+            navigate(`/dispositivos/${d.idDispositivo}?readonly=true`),
           variant: "secondary",
         },
       ];
@@ -70,15 +78,19 @@ export default function DevicePage() {
         onClick: (d) => navigate(`/dispositivos/${d.idDispositivo}`),
         variant: "primary",
       },
-      // Si luego habilitas eliminar, puedes agregar aquí un action "delete"
     ];
-  }, [canEdit, navigate]);
+  }, [puedeEditar, navigate]);
+
+  //  acceso total
+  if (!puedeVer) {
+    return <p>No tenés permisos para ver esta página.</p>;
+  }
 
   return (
     <PageLayout
       title="Listado de dispositivos"
       actions={
-        canEdit && (
+        puedeEditar && (
           <IconButton
             label="Registrar Dispositivo"
             icon={<span>➕</span>}
@@ -100,6 +112,7 @@ export default function DevicePage() {
             label: CategoriaLabels[value],
           }))}
           placeholder="Filtrar por Categoría"
+          noMargin
         />
         <SelectDropdown
           name="estado"
@@ -111,17 +124,7 @@ export default function DevicePage() {
             label: EstadoInventarioLabels[value],
           }))}
           placeholder="Filtrar por Estado"
-        />
-        <SelectDropdown
-          name="encargado"
-          label="Encargado"
-          value={encargado}
-          onChange={(e) => setEncargado(e.target.value)}
-          options={[
-            { value: "1", label: "Juan Pérez" },
-            { value: "2", label: "María López" },
-          ]}
-          placeholder="Filtrar por Encargado"
+          noMargin
         />
         <IconButton
           label="Limpiar filtros"
@@ -139,7 +142,7 @@ export default function DevicePage() {
         data={dispositivos}
         columns={columns}
         rowKey={(d) => d.idDispositivo!}
-        rowActions={rowActions}          
+        rowActions={rowActions}
         scrollable={false}
       />
 

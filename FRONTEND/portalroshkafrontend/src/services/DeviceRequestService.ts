@@ -85,8 +85,7 @@ async function createSolicitudDispositivo(
   token: string,
   data: UserSolDispositivoDto
 ): Promise<SolicitudUserItem> {
-  const url = `/api/v1/usuarios/pedir_dispositivo`;
-  console.log("[Service] POST /api/v1/usuarios/pedir_dispositivo", { data });
+  const url = `http://localhost:8080/api/v1/usuarios/pedirdispositivo`;
   const res = await fetch(url, {
     method: "POST",
     headers: {
