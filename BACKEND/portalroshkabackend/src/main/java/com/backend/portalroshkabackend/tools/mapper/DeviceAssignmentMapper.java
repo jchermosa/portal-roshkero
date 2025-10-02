@@ -18,6 +18,7 @@ public class DeviceAssignmentMapper {
 
         if (dispositivoAsignado.getDispositivo() != null) {
             dto.setIdDispositivo(dispositivoAsignado.getDispositivo().getIdDispositivo());
+            dto.setNombreDispositivo(dispositivoAsignado.getDispositivo().getTipoDispositivo().getNombre());
         }
 
         if (dispositivoAsignado.getSolicitud() != null) {
