@@ -18,8 +18,10 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateFoto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposBeneficiosDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposDispositivosDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposPermisosDto;
 import com.backend.portalroshkabackend.Services.UsuarioServicio.UserService;
+
 
 
 
@@ -60,35 +62,35 @@ public class UsuariosController {
         return ResponseEntity.ok(solicitudes);
     }
 
-    @PostMapping("/crear_permiso") // Endpoint para solcitar un Permiso para el usuario actual
+    @PostMapping("/crearpermiso") // Endpoint para solcitar un Permiso para el usuario actual
     public ResponseEntity<UserSolPermisoDto> crearPermisoUsuarioActual(@RequestBody UserSolPermisoDto solPermisoDto) {
         System.out.println("\n \n Solicitud DTO Recibida en el Controller: \n\n" + solPermisoDto + "\n \n");
         solPermisoDto = userService.crearPermisoUsuarioActual(solPermisoDto);
         return ResponseEntity.ok(solPermisoDto);
     }
 
-    @PostMapping("/crear_beneficio") // Endpoint para solicitar un Beneficio para el usuario actual
+    @PostMapping("/crearbeneficio") // Endpoint para solicitar un Beneficio para el usuario actual
     public ResponseEntity<UserSolBeneficioDto> crearBeneficioUsuarioActual(@RequestBody UserSolBeneficioDto solBeneficioDto) {
         // process POST request
         solBeneficioDto = userService.crearBeneficioUsuarioActual(solBeneficioDto);
         return ResponseEntity.ok(solBeneficioDto);
     }
 
-    @PostMapping("/crear_vacacion") // Endpoint para solicitar Vacaciones para el usuario actual
+    @PostMapping("/crearvacacion") // Endpoint para solicitar Vacaciones para el usuario actual
     public ResponseEntity<UserSolVacacionDto> crearVacacionUsuarioActual(@RequestBody UserSolVacacionDto solVacacionDto) {
         //TODO: process POST request
         solVacacionDto = userService.crearVacacionUsuarioActual(solVacacionDto);
         return ResponseEntity.ok(solVacacionDto);
     }
     
-    @PostMapping("/pedir_dispositivo")
+    @PostMapping("/pedirdispositivo")
     public ResponseEntity<UserSolDispositivoDto> pedirDispositivoUsuarioActual(@RequestBody UserSolDispositivoDto solDispositivoDto) {
         //TODO: process POST request
         solDispositivoDto = userService.pedirDispositivoUsuarioActual(solDispositivoDto);
         return ResponseEntity.ok(solDispositivoDto);
     }
     
-    @PostMapping("/cambiar_contrasena")
+    @PostMapping("/cambiarcontrasena")
     public ResponseEntity<?> cambiarContrasena(@RequestBody UserCambContrasDto dto) {
         boolean actualizado = userService.actualizarContrasena(dto);
 
@@ -99,19 +101,19 @@ public class UsuariosController {
         }
     }
 
-    @GetMapping("/tipos_permisos") // Endpoint para obtener las solicitudes del usuario actual 
+    @GetMapping("/tipospermisos") // Endpoint para obtener las solicitudes del usuario actual 
     public ResponseEntity<List<tiposPermisosDto>> getTiposPermisos() {
         List<tiposPermisosDto> permisos = userService.getTiposPermisos();
         return ResponseEntity.ok(permisos);
     }
 
-    @GetMapping("/tipos_beneficios") // Endpoint para obtener las solicitudes del usuario actual 
+    @GetMapping("/tiposbeneficios") // Endpoint para obtener las solicitudes del usuario actual 
     public ResponseEntity<List<tiposBeneficiosDto>> getTiposBeneficios() {
         List<tiposBeneficiosDto> beneficios = userService.getTiposBeneficios();
         return ResponseEntity.ok(beneficios);
     }
 
-    @PostMapping("/actualizar_foto")
+    @PostMapping("/actualizarfoto")
     public ResponseEntity<?> actualizarFoto(@RequestBody UserUpdateFoto dto) {
         
         boolean actualizado = userService.actualizarFoto(dto);
@@ -122,7 +124,21 @@ public class UsuariosController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No se pudo actualizar la foto");
         }
     }
+    // Get de las solicitudes por ID
+    @GetMapping("/solicitud/{id}")
+    public ResponseEntity<SolicitudUserDto> getSolicitudById(@PathVariable Integer id) {
+        SolicitudUserDto solicitud = userService.getSolicitudById(id);
+        if (solicitud != null) {
+            return ResponseEntity.ok(solicitud);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     
-
+    @GetMapping("/tiposdispositivos") // Endpoint para obtener los tipos de dispositivos
+    public ResponseEntity<List<tiposDispositivosDto>> getTiposDispositivos() {
+        List<tiposDispositivosDto> dispositivos = userService.getTiposDispositivos();
+        return ResponseEntity.ok(dispositivos);
+    }
 
 }
