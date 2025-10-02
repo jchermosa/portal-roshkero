@@ -94,14 +94,14 @@ public class EmployeeMapper {
         dto.setApellido(user.getApellido());
         dto.setNroCedula(user.getNroCedula());
         dto.setCorreo(user.getCorreo());
-        dto.setIdRol(user.getRol().getIdRol());
-        dto.setNombreRol(user.getRol().getNombre());
+        // dto.setIdRol(user.getRol().getIdRol());
+        // dto.setNombreRol(user.getRol().getNombre());
         dto.setFechaIngreso(user.getFechaIngreso());
         dto.setAntiguedad(user.getAntiguedad());
         dto.setDiasVacaciones(user.getDiasVacaciones());
         dto.setEstado(user.getEstado());
         dto.setTelefono(user.getTelefono());
-        dto.setIdCargo(user.getCargo().getIdCargo());
+        // dto.setIdCargo(user.getCargo().getIdCargo());
         dto.setFechaNacimiento(user.getFechaNacimiento());
         dto.setDiasVacacionesRestante(user.getDiasVacacionesRestante());
         dto.setRequiereCambioContrasena(user.getRequiereCambioContrasena());
