@@ -34,6 +34,12 @@ public class DispositivoMapper {
 
         DeviceDTO dto = new DeviceDTO();
         dto.setIdDispositivo(dispositivo.getIdDispositivo());
+
+        // Setear el nombre del dispositivo si existe
+        if (dispositivo.getTipoDispositivo() != null && dispositivo.getTipoDispositivo().getNombre() != null) {
+            dto.setNombreDispositivo(dispositivo.getTipoDispositivo().getNombre());
+        }
+
         dto.setNroSerie(dispositivo.getNroSerie());
         dto.setModelo(dispositivo.getModelo());
         dto.setFechaFabricacion(dispositivo.getFechaFabricacion());
@@ -44,7 +50,10 @@ public class DispositivoMapper {
         // Mapeo seguro de relaciones
         if (dispositivo.getEncargado() != null) {
             dto.setEncargado(dispositivo.getEncargado().getIdUsuario());
+            dto.setNombreEncargado(dispositivo.getEncargado().getNombre());
         }
+
+
 
         if (dispositivo.getTipoDispositivo() != null) {
             dto.setTipoDispositivo(dispositivo.getTipoDispositivo().getIdTipoDispositivo());
