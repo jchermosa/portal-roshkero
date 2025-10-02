@@ -9,27 +9,26 @@ import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.ClientesResponseDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.MetaDatasDto;
 import com.backend.portalroshkabackend.DTO.Operationes.Tecnologias.TecnologiasResponseDto;
-import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Cargos;
 import com.backend.portalroshkabackend.Repositories.OP.ClientesRepository;
 import com.backend.portalroshkabackend.Repositories.OP.TecnologiaRepository;
+import com.backend.portalroshkabackend.Repositories.TH.CargosRepository;
 import com.backend.portalroshkabackend.Repositories.TH.UserRepository;
 import com.backend.portalroshkabackend.Services.Operations.Interface.IMetaDatasService;
+import com.backend.portalroshkabackend.tools.mapper.MetaDatasMapper;
 
 @Service
 public class MetaDatasServiceImpl implements IMetaDatasService {
-        private final TecnologiaRepository tecnologiaRepository;
-        private final ClientesRepository clientesRepository;
-        private final UserRepository userRepository;
-
-        private Integer idTeamLeader = 10;
-
         @Autowired
-        public MetaDatasServiceImpl(TecnologiaRepository tecnologiaRepository, ClientesRepository clientesRepository,
-                        UserRepository userRepository) {
-                this.tecnologiaRepository = tecnologiaRepository;
-                this.clientesRepository = clientesRepository;
-                this.userRepository = userRepository;
-        }
+        private TecnologiaRepository tecnologiaRepository;
+        @Autowired
+        private ClientesRepository clientesRepository;
+        @Autowired
+        private UserRepository userRepository;
+        @Autowired
+        private CargosRepository cargoRepository;
+        @Autowired
+        private MetaDatasMapper metaDatasMapper;
 
         @Override
         public MetaDatasDto getMetaDatas() {
@@ -37,27 +36,19 @@ public class MetaDatasServiceImpl implements IMetaDatasService {
 
                 List<ClientesResponseDto> clientes = clientesRepository.findAll()
                                 .stream()
-                                .map(c -> new ClientesResponseDto(
-                                                c.getIdCliente(),
-                                                c.getNombre()))
+                                .map(metaDatasMapper::toClienteDto)
                                 .toList();
 
                 List<TecnologiasResponseDto> tecnologias = tecnologiaRepository.findAll()
                                 .stream()
-                                .map(t -> new TecnologiasResponseDto(
-                                                t.getIdTecnologia(),
-                                                t.getNombre(),
-                                                t.getDescripcion(), null))
+                                .map(metaDatasMapper::toTecnologiaDto)
                                 .toList();
-
-                List<UsuarioisResponseDto> teamLeaders = userRepository.findAllByCargo_IdCargo(idTeamLeader)
+                Integer idTechLead = cargoRepository.findByNombre("Tech Lead")
+                                .map(Cargos::getIdCargo)
+                                .orElseThrow(() -> new RuntimeException("Cargo 'Tech Lead' not found"));
+                List<UsuarioisResponseDto> teamLeaders = userRepository.findAllByCargo_IdCargo(idTechLead)
                                 .stream()
-                                .map(u -> new UsuarioisResponseDto(
-                                                u.getIdUsuario(),
-                                                u.getNombre(),
-                                                u.getApellido(),
-                                                u.getCorreo(),
-                                                u.getDisponibilidad()))
+                                .map(metaDatasMapper::toUsuarioDto)
                                 .toList();
 
                 metaDatas.setTecnologias(tecnologias);
@@ -68,15 +59,9 @@ public class MetaDatasServiceImpl implements IMetaDatasService {
 
         @Override
         public List<UsuarioisResponseDto> getAllUsers() {
-                List<Usuario> usuarios = userRepository.findAllUsuariosByRol4();
-
-                return usuarios.stream()
-                                .map(u -> new UsuarioisResponseDto(
-                                                u.getIdUsuario(),
-                                                u.getNombre(),
-                                                u.getApellido(),
-                                                u.getCorreo(),
-                                                u.getDisponibilidad()))
+                return userRepository.findAllUsuariosByRol4()
+                                .stream()
+                                .map(metaDatasMapper::toUsuarioDto)
                                 .toList();
         }
 }

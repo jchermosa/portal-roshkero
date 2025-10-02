@@ -108,5 +108,6 @@ public class EquiposRequestDto {
     private String estado;
 
     private List<UsuarioAsignacionDto> usuarios;
->>>>>>> parent of dca61a3 (se elimino backend)
+
+    private List<DiaUbicacionDto> equipoDiaUbicacion;
 }
