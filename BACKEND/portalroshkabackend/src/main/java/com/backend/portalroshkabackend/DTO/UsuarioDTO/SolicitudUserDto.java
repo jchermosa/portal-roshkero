@@ -49,6 +49,10 @@ public class SolicitudUserDto {
 
     private LocalDateTime fechaCreacion;
 
+    private String nombreLider;
+
+    private String nombreSubTipoSolicitud;
+
     // Relaciones con asignaciones
     // private PermisosAsignados permisoAsignado;
     // private VacacionesAsignadas vacacionesAsignadas;
