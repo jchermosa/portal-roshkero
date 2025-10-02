@@ -12,8 +12,13 @@ import com.backend.portalroshkabackend.Models.Usuario;
 @Repository
 public interface UsuarioisRepository extends JpaRepository<Usuario, Integer> {
 
-        // If the property is named "rol" and has an "id" field:
-    @Query("SELECT u FROM Usuario u WHERE u.rol.idRol = 4 AND u.idUsuario NOT IN " +
-       "(SELECT a.usuario.idUsuario FROM AsignacionUsuarioEquipo a WHERE a.equipo.idEquipo = :idEquipo)")
+    // If the property is named "rol" and has an "id" field:
+    @Query("SELECT u FROM Usuario u " +
+            "WHERE u.rol.idRol = 4 " +
+            "AND u.disponibilidad > 0 " +
+            "AND u.idUsuario NOT IN (" +
+            "    SELECT a.usuario.idUsuario FROM AsignacionUsuarioEquipo a WHERE a.equipo.idEquipo = :idEquipo" +
+            ")")
     List<Usuario> findUsuariosNoEnEquipo(@Param("idEquipo") Integer idEquipo);
+
 }
