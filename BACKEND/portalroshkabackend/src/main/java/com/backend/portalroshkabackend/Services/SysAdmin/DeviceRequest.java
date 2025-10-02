@@ -5,7 +5,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.backend.portalroshkabackend.tools.RepositoryService;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.AlreadyCheckedRequestException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.CommentDRParsingException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.DeviceRequestNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudDispositivos.DeviceRequestProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceRequestDto;
@@ -20,6 +26,8 @@ import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceTypesReposito
 
 import jakarta.transaction.Transactional;
 
+import static com.backend.portalroshkabackend.tools.MessagesConst.DATABASE_DEFAULT_ERROR;
+
 @Service
 public class DeviceRequest {
 
@@ -29,22 +37,37 @@ public class DeviceRequest {
     @Autowired 
     private DeviceTypesRepository deviceTypesRepository;
 
+    @Autowired
+    private RepositoryService repositoryService;
+
     @Autowired 
     private DeviceRepository deviceRepository;
 
 
-    DeviceRequest(DeviceRequestRepository deviceRequestRepository, DeviceRepository deviceRepository) {
+    DeviceRequest(DeviceRequestRepository deviceRequestRepository, RepositoryService repositoryService, DeviceRepository deviceRepository) {
         this.deviceRequestRepository = deviceRequestRepository;
+        this.repositoryService = repositoryService;
         this.deviceRepository = deviceRepository;
     }
 
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public DeviceRequestDto getRequestById(Integer idRequest) {
+        Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
+        if (solicitudOp.isEmpty()) {
+            return null;
+        }
+
+        Solicitud solicitud = solicitudOp.get();
+        return convertToDto(solicitud);
+    }
 
     @Transactional
     public DeviceRequestDto acceptRequest(Integer idRequest){
 
         Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
         if (solicitudOp.isEmpty()) {
-            throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
+            throw new DeviceRequestNotFoundException(idRequest);
         }
 
         Solicitud solicitud = solicitudOp.get();
@@ -68,9 +91,13 @@ public class DeviceRequest {
         }
 
         solicitud.setEstado(EstadoSolicitudEnum.A);
-        deviceRequestRepository.save(solicitud);
-
+        repositoryService.save(
+                deviceRequestRepository,
+                solicitud,
+                DATABASE_DEFAULT_ERROR
+        );
         return convertToDto(solicitud);
+
     }
 
     @Transactional
@@ -78,28 +105,45 @@ public class DeviceRequest {
         Optional<Solicitud> solicitudOp = deviceRequestRepository.findById(idRequest);
 
         if (solicitudOp.isEmpty()) {
-            throw new RuntimeException("Solicitud no encontrada con ID: " + idRequest);
+            throw new DeviceRequestNotFoundException(idRequest);
         }
 
         Solicitud solicitud = solicitudOp.get();
 
 
         if(solicitud.getEstado() != EstadoSolicitudEnum.P) {
-            throw new RuntimeException("La solicitud ya fue procesada.");
+            throw new AlreadyCheckedRequestException(solicitud.getIdSolicitud());
         }
 
+
         solicitud.setEstado(EstadoSolicitudEnum.R);
-        deviceRequestRepository.save(solicitud);
+        repositoryService.save(
+                deviceRequestRepository,
+                solicitud,
+                DATABASE_DEFAULT_ERROR
+        );
         return convertToDto(solicitud);
+
     }
 
 
     private DeviceRequestDto convertToDto(Solicitud solicitud) {
         DeviceRequestDto dto = new DeviceRequestDto();
-        dto.setFechaInicio(solicitud.getFechaInicio());
-        // dto.setCantDias(solicitud.getCantDias());
-        dto.setEstado(solicitud.getEstado());
-        dto.setComentario(solicitud.getComentario());
+
+        // Mapear el nombre del usuario que solicito 
+        if (solicitud.getUsuario() != null) {
+            dto.setNombreUsuario(solicitud.getUsuario().getNombre());
+        }
+
+        dto.setNombreUsuario(solicitud.getUsuario().getNombre());
+
+        // Remover el ID del tipo de dispositivo del comentario (contenido entre paréntesis)
+        String comentarioLimpio = solicitud.getComentario();
+        if (comentarioLimpio != null) {
+            comentarioLimpio = comentarioLimpio.replaceFirst("^[\\(\\{]\\d+[\\)\\}]\\s*", "").trim();
+        }
+        dto.setComentario(comentarioLimpio);
+
         dto.setIdUsuario(solicitud.getUsuario().getIdUsuario());
         dto.setIdTipoDispositivo(solicitud.getIdSolicitud());
         return dto;
@@ -119,15 +163,16 @@ public class DeviceRequest {
             return null;
         }
 
-        // Patrón regex para encontrar números entre paréntesis al inicio del string
-        Pattern pattern = Pattern.compile("^\\((\\d+)\\)");
+        // Patrón regex para encontrar números entre paréntesis o llaves al inicio del string
+        
+        Pattern pattern = Pattern.compile("^[\\(\\{](\\d+)[\\)\\}]");
         Matcher matcher = pattern.matcher(comentario.trim());
 
         if (matcher.find()) {
             try {
                 return Integer.parseInt(matcher.group(1));
             } catch (NumberFormatException e) {
-                return null;
+                throw new CommentDRParsingException(comentario, "Número inválido: " + matcher.group(1));
             }
         }
         return null;

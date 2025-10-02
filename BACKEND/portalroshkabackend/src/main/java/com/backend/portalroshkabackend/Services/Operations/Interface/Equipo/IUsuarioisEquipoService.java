@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services.Operations.Interface;
+package com.backend.portalroshkabackend.Services.Operations.Interface.Equipo;
 
 import org.springframework.data.domain.Pageable;
 

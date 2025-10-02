@@ -10,6 +10,7 @@ import com.backend.portalroshkabackend.Models.TecnologiasEquipos;
 @Repository
 public interface TecnologiasEquiposRepository extends JpaRepository<TecnologiasEquipos, Integer> {
     List<TecnologiasEquipos> findAllByEquipo_IdEquipo(Integer idEquipo);
+    
     // Если нужно получить все технологии для конкретной команды
     // List<TecnologiasEquipos> findAllByEquipo_Id(Integer idEquipo);
 

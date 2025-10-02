@@ -1,5 +1,8 @@
 package com.backend.portalroshkabackend.Controllers.SYSADMIN;
 
+import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -7,8 +10,6 @@ import com.backend.portalroshkabackend.DTO.SYSADMIN.UbicacionDto;
 import com.backend.portalroshkabackend.Services.SysAdmin.UbicacionService;
 
 import jakarta.validation.Valid;
-
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,8 +38,8 @@ public class UbicacionesController {
 
     // Get todas las ubicaciones 
     @GetMapping("/getAll")
-    public List<UbicacionDto> getAllUbicaciones() {
-        return ubicacionService.getAllUbicaciones();
+    public Page<UbicacionDto> getAllUbicaciones(Pageable pageable) {
+        return ubicacionService.getAllUbicaciones(pageable);
     }
 
     // Get ubicacion por id 
@@ -48,7 +49,12 @@ public class UbicacionesController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
-    
+
+    @GetMapping("/{id}/devices")
+    public ResponseEntity<Page<DeviceDTO>> getDevicesByUbicacion(@PathVariable Integer id, Pageable pageable) {
+        Page<DeviceDTO> dispositivos = ubicacionService.getDevicesByUbicacion(id, pageable);
+        return ResponseEntity.ok(dispositivos);
+    }
 
     // CRUD UBICACIONES
 

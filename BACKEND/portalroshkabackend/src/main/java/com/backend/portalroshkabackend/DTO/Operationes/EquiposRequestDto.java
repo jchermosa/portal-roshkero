@@ -39,4 +39,6 @@ public class EquiposRequestDto {
     private String estado;
 
     private List<UsuarioAsignacionDto> usuarios;
+
+    private List<DiaUbicacionDto> equipoDiaUbicacion;
 }

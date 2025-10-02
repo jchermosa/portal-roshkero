@@ -18,6 +18,8 @@ public class SolicitudResponseDto {
 
     private String tipoSolicitud;
 
+    private String subTipo;
+
     private LocalDate fechaInicio;
 
     private Integer cantidadDias;

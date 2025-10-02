@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<Usuario, Integer>, JpaSpec
 
     ;// Por Vladimir
 
-    @Query("SELECT u FROM Usuario u WHERE u.rol.idRol = 4")
+    @Query("SELECT u FROM Usuario u WHERE u.rol.idRol = 4  AND u.disponibilidad > 0")
     List<Usuario> findAllUsuariosByRol4();
 
     @Query("""
@@ -48,7 +48,9 @@ public interface UserRepository extends JpaRepository<Usuario, Integer>, JpaSpec
     boolean existsByCorreoAndIdUsuarioNot(String correo, Integer idUsuario); // Si el correo / cedula ya existe// excluyendo al propio usuario
     boolean existsByNroCedulaAndIdUsuarioNot(String nroCedula, Integer idUsuario);
     boolean existsByTelefonoAndIdUsuarioNot(String telefono, Integer idUsuario);
+
     boolean existsByCargo_IdCargo(int idCargo);
+
     boolean existsByRol_IdRol(int idRol);
 
     Optional<Usuario> findByNroCedula(String nroCedula);
@@ -56,6 +58,8 @@ public interface UserRepository extends JpaRepository<Usuario, Integer>, JpaSpec
     Optional<Usuario> findByCorreo(String correo);
 
     List<Usuario> findByIdUsuarioNotIn(List<Integer> list);//
+
     List<Usuario> findAllByCargo_IdCargo(int idCargo);
+
     List<Usuario> findAllByRol_IdRol(int idRol);
 }

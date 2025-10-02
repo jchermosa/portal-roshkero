@@ -2,6 +2,8 @@ package com.backend.portalroshkabackend.DTO.Operationes;
 
 import java.time.LocalDate;
 
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +19,5 @@ public class UsuarioAsignacionDto {
     private Integer porcentajeTrabajo;
     private LocalDate fechaEntrada;
     private LocalDate fechaFin;
+    private EstadoActivoInactivo estado;
 }

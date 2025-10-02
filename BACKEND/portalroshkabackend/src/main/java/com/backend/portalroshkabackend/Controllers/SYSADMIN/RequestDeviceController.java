@@ -3,6 +3,8 @@ package com.backend.portalroshkabackend.Controllers.SYSADMIN;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,9 +39,19 @@ public class RequestDeviceController {
 
     //Obtener todas las solicitudes   
    @GetMapping("/allRequests")
-   public List<RequestDTO> getAllRequests() {
-       return sysAdminService.findAllSolicitudes();
+   public Page<RequestDTO> getAllRequests(Pageable pageable) {
+       return sysAdminService.findAllSolicitudes(pageable);
    }
+
+//    Create a controller to obtain a single request by its ID
+    @GetMapping("/request/{idRequest}")
+    public ResponseEntity<?> getRequestById(@PathVariable Integer idRequest) {
+        DeviceRequestDto requestDto = deviceRequest.getRequestById(idRequest);
+        if (requestDto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Solicitud no encontrada");
+        }
+        return ResponseEntity.ok(requestDto);
+    }
 
     //Aceptar
     @PostMapping("deviceRequest/{idRequest}/accept")

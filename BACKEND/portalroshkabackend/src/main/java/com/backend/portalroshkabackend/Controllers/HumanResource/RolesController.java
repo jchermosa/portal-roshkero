@@ -4,10 +4,7 @@ import com.backend.portalroshkabackend.DTO.th.cargos.CargoByIdResponseDto;
 import com.backend.portalroshkabackend.DTO.th.cargos.CargoInsertDto;
 import com.backend.portalroshkabackend.DTO.th.cargos.CargosDefaultResponseDto;
 import com.backend.portalroshkabackend.DTO.th.cargos.CargosResponseDto;
-import com.backend.portalroshkabackend.DTO.th.roles.RolByIdResponseDto;
-import com.backend.portalroshkabackend.DTO.th.roles.RolDefaultResponseDto;
-import com.backend.portalroshkabackend.DTO.th.roles.RolInsertDto;
-import com.backend.portalroshkabackend.DTO.th.roles.RolesResponseDto;
+import com.backend.portalroshkabackend.DTO.th.roles.*;
 import com.backend.portalroshkabackend.Services.HumanResource.ICommonRolesCargosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,10 +18,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/admin")
 public class RolesController {
-    private final ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto, RolInsertDto, RolInsertDto> rolesService;
+    private final ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto, RolInsertDto, RolUpdateDto> rolesService;
 
     @Autowired
-    public RolesController(@Qualifier("rolesService") ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto, RolInsertDto, RolInsertDto> rolesService){
+    public RolesController(@Qualifier("rolesService") ICommonRolesCargosService<RolesResponseDto, RolByIdResponseDto, RolDefaultResponseDto, RolInsertDto, RolUpdateDto> rolesService){
         this.rolesService = rolesService;
     }
 
@@ -61,7 +58,7 @@ public class RolesController {
     @PutMapping("/th/roles/{idRol}")
     public ResponseEntity<RolDefaultResponseDto> updateCargo(
             @PathVariable int idRol,
-            @RequestBody RolInsertDto updateDto
+            @RequestBody RolUpdateDto updateDto
     ){
         RolDefaultResponseDto rolDto = rolesService.update(idRol, updateDto);
 

@@ -1,4 +1,4 @@
-package com.backend.portalroshkabackend.Services.Operations.Interface;
+package com.backend.portalroshkabackend.Services.Operations.Interface.Equipo;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,11 +10,11 @@ public interface IEquiposService {
 
     EquiposResponseDto getTeamById(Integer idEquipo);
 
-    EquiposResponseDto postNewTeam(EquiposRequestDto equipo);
+    void postNewTeam(EquiposRequestDto equipo);
 
-    void deleteTeam(int id_equipo);
+    void toggleEquipo(Integer idEquipo);
 
-    EquiposResponseDto updateTeam(Integer id_equipo, EquiposRequestDto equipoDetails);
+    void updateTeam(Integer idEquipo, EquiposRequestDto equipoDetails);
 
     Page<EquiposResponseDto> getTeamsSorted(Pageable pageable, String sortBy);
 }
