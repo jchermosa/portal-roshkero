@@ -43,7 +43,7 @@ public class MetaDatasServiceImpl implements IMetaDatasService {
                                 .stream()
                                 .map(metaDatasMapper::toTecnologiaDto)
                                 .toList();
-                Integer idTechLead = cargoRepository.findByNombre("Tech Lead")
+                Integer idTechLead = cargoRepository.findByNombre("TEAM LEADER")
                                 .map(Cargos::getIdCargo)
                                 .orElseThrow(() -> new RuntimeException("Cargo 'Tech Lead' not found"));
                 List<UsuarioisResponseDto> teamLeaders = userRepository.findAllByCargo_IdCargo(idTechLead)
