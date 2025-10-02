@@ -6,20 +6,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  if (!user) return <p>Cargando...</p>;
-
-  // Ahora usamos user.nombreRol para verificar permisos
-  const isThOrGth =
-    ["TALENTO HUMANO", "GTH", "OPERACIONES"].includes(user.nombreRol);
-
-  const isManu = user.nombreRol === "MANU";
-
-  const isFuncionario = [
-    "FUNCIONARIO_FABRICA",
-    "FUNCIONARIO_TERCERIZADO",
-    "LIDER",
-    "DIRECTORIO",
-  ].includes(user.nombreRol);
+  if (!user) return <p>Cargando...</p>; 
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -58,7 +45,7 @@ export default function HomePage() {
               <ProfileCard
                 title="Mi Perfil"
                 icon="👤"
-                description={`Rol: ${user?.nombreRol || user?.rol}`}
+                // description={`Rol: ${user?.nombreRol || user?.rol}`}
                 onClick={() => navigate("/profile")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
@@ -75,7 +62,7 @@ export default function HomePage() {
                 color=""
               />
 
-              {isThOrGth && (
+              {/* {isThOrGth && ( */}
                 <>
                   <ProfileCard
                     title="Gestión de Usuarios"
@@ -96,9 +83,9 @@ export default function HomePage() {
                     color=""
                   />
                 </>
-              )}
+              {/* )} */}
 
-              {isManu && (
+              {/* {isManu && ( */}
                 <ProfileCard
                   title="Gestión de dispositivos"
                   icon="💻"
@@ -108,7 +95,7 @@ export default function HomePage() {
                   buttonClass="bg-blue-600 hover:bg-blue-700"
                   color=""
                 />
-              )}
+              {/* )} */}
 
               <ProfileCard
                 title="Beneficios"

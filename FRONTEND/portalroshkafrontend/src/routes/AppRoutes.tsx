@@ -20,7 +20,6 @@ import RequestFormPage from "../pages/solicitudes/RequestFormPage";
 import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage.tsx";
 import RequestManagementPage from "../pages/solicitudes/RequestManagementPage.tsx";
 import RequestSearchPage from "../pages/solicitudes/RequestSearchPage.tsx";
-import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
 import DevicePage from "../pages/dispositivos/DevicePage.tsx";
 import DeviceFormPage from "../pages/dispositivos/DeviceFormPage.tsx";
 import DeviceAssignmentsPage from "../pages/dispositivos/DeviceAssignmentsPage.tsx";

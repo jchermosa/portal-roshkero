@@ -19,7 +19,7 @@ export type User = {
   nroCedula?: string;
   estado?: string;
   requiereCambioContrasena?: boolean;
-  fotoBase64?: string | null;
+  urlPerfil?: string;
 };
 
 type AuthContextType = {

@@ -3,8 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { tieneRol } from "../utils/permisos";
 import { Roles } from "../types/roles";
 import "../styles/scrollbar.css";
-import { Roles } from "../types/roles";
-import { tieneRol } from "../utils/permisos";
+
 
 export default function DashboardLayout() {
   const { user, refreshUser, logout } = useAuth();
@@ -37,10 +36,6 @@ export default function DashboardLayout() {
   ].filter((o) => o.available);
 
 
-
-  const initials =
-    "👤";
-
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">
       {/* Sidebar */}
@@ -49,9 +44,9 @@ export default function DashboardLayout() {
         <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
-              {user?.fotoBase64 ? (
+              {user?.urlPerfil ? (
                 <img
-                  src={`data:image/png;base64,${user.fotoBase64}`}
+                  src={`data:image/png;base64,${user.urlPerfil}`}
                   alt={user?.nombre}
                   className="w-full h-full object-cover"
                 />
