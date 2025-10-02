@@ -6,21 +6,25 @@ type Cargo = { id?: number; nombre: string };
 type Equipo = { id?: number; nombre: string };
 
 export type User = {
-  id?: number;
+  idUsuario?: number;
   nombre: string;
   apellido: string;
   correo: string;
-  rol: Rol;
+  rol?: Rol;
   cargo?: Cargo;
-  equipo?: Equipo;
+  fechaIngreso?: string;
+  antiguedad?: string;
   diasVacaciones?: number;
   diasVacacionesRestante?: number;
   telefono?: string;
-  fechaIngreso?: string;
   nroCedula?: string;
-  estado?: boolean;
+  fechaNacimiento?: string;
+  estado?: string;
   requiereCambioContrasena?: boolean;
-  fotoBase64?: string;
+  seniority?: string;
+  foco?: string;
+  urlPerfil?: string;
+  disponibilidad?: number;
 };
 
 type AuthContextType = {
@@ -67,27 +71,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const payload = parseJwt(jwtToken);
 
       const basicUser: User = {
-        id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
+        idUsuario: payload.idUsuario ?? payload.id ?? payload.userId ?? undefined,
         nombre: payload.nombre ?? "",
         apellido: payload.apellido ?? "",
         correo: payload.email ?? payload.sub ?? "",
-        rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
-        cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
-        equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
+        nombreRol: payload.rol ?? payload.nombreRol ?? "",
+        idCargo: payload.idCargo,
+        nombreCargo: payload.cargo ?? payload.nombreCargo,
         telefono: payload.telefono ?? undefined,
-        fechaIngreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
-        diasVacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
-        diasVacacionesRestante:
-          payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante,
+        fechaIngreso: payload.fechaIngreso ?? undefined,
+        diasVacaciones: payload.diasVacaciones,
+        diasVacacionesRestante: payload.diasVacacionesRestante,
         requiereCambioContrasena: payload.requiereCambioContrasena ?? false,
-
       };
 
-
-      
       setUser(basicUser);
 
-      const res = await fetch("/api/usuarios/me", {
+      const res = await fetch("/api/v1/usuarios/me", {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
 
@@ -96,6 +96,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const fullUser: User = await res.json();
 
       setUser(fullUser);
+
+      console.log("Full user recibido del backend:", fullUser);
+
 
     } catch (e) {
       console.error("Error al decodificar el token:", e);
@@ -133,7 +136,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     </AuthContext.Provider>
   );
 };
-
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

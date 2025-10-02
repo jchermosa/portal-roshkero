@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import heroBg from "../assets/ilustracion-herov3.svg";
 // o mock
-import { updatePasswordMock as updatePassword } from "../services/AuthService";
+import { updatePassword as updatePassword } from "../services/AuthService";
 export default function ChangePasswordPage() {
   const { token, logout, login } = useAuth();
   const navigate = useNavigate();

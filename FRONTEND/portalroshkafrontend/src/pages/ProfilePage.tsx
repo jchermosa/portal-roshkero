@@ -21,8 +21,8 @@ function namesFrom(input: any, key = "nombre"): string[] {
         typeof x === "string"
           ? x
           : x && typeof x === "object" && x[key]
-          ? String(x[key])
-          : ""
+            ? String(x[key])
+            : ""
       )
       .filter(Boolean);
   }
@@ -61,16 +61,12 @@ export default function ProfilePage() {
 
   const fullName = `${user?.nombre ?? ""} ${user?.apellido ?? ""}`.trim();
   const email = user?.correo;
-  const joinedAt = (user as any)?.fechaIngreso ?? (user as any)?.fecha_ingreso;
-  const diasVac =
-    (user as any)?.diasVacaciones ?? (user as any)?.dias_vacaciones;
-  const diasVacRest =
-    (user as any)?.diasVacacionesRestante ??
-    (user as any)?.dias_vacaciones_restante;
-  const roles = namesFrom((user as any)?.rol ?? (user as any)?.roles);
-  const equipos = namesFrom((user as any)?.equipo ?? (user as any)?.equipos);
-  const cargos = namesFrom((user as any)?.cargo ?? (user as any)?.cargos);
   const avatarSeed = fullName || email || "usuario";
+  const rolNombre = user?.rol?.nombre;
+  const cargoNombre = user?.cargo?.nombre;
+  const joinedAt = user?.fechaIngreso;
+  const diasVac = user?.diasVacaciones;
+  const diasVacRest = user?.diasVacacionesRestante;
 
   const handleImageChange = async (file: File) => {
     try {
@@ -91,21 +87,21 @@ export default function ProfilePage() {
       console.log("Usuario actual:", user);
 
       if (!user) {
-          throw new Error("Usuario no está cargado");
+        throw new Error("Usuario no está cargado");
       }
 
-      
 
-      const res = await fetch(`/api/usuarios/${user.id}/foto`, {
-        method: "PUT",
+
+      const res = await fetch(`http://localhost:8080/api/v1/usuarios/actualizar_foto`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`, // 🔑 token de auth
         },
-        body: JSON.stringify({ fotoBase64: cleanBase64 }),
+        body: JSON.stringify({ foto: cleanBase64 }),
       });
 
-      
+
       if (!res.ok) {
         throw new Error("Error al actualizar la imagen");
       }
@@ -157,13 +153,21 @@ export default function ProfilePage() {
               <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex items-center gap-4 min-w-0">
                   {/* {user.fotoBase64 } */}
-                  
+
+                  {user.urlPerfil ? (
                     <img
-                      src={`data:image/png;base64,${user.fotoBase64}`}
+                      src={`data:image/png;base64,${user.urlPerfil}`}
                       alt={fullName}
                       className="h-16 w-16 md:h-20 md:w-20 rounded-2xl object-cover shrink-0 shadow"
                     />
-                 
+                  ) : (
+                    <div className="h-16 w-16 md:h-20 md:w-20 rounded-2xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shrink-0 shadow">
+                      {fullName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+
+
+
                   <div className="min-w-0">
                     <div className="text-xl md:text-2xl font-semibold leading-tight text-gray-900 dark:text-gray-100 truncate">
                       {fullName || "Usuario"}
@@ -171,14 +175,11 @@ export default function ProfilePage() {
 
                     {/* Pills: rol + email */}
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                      {roles.map((r) => (
-                        <span
-                          key={r}
-                          className="inline-flex items-center rounded-full border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/70 px-2 py-0.5 text-gray-700 dark:text-gray-200"
-                        >
-                          {r}
+                      {rolNombre && (
+                        <span className="inline-flex items-center rounded-full border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/70 px-2 py-0.5 text-gray-700 dark:text-gray-200">
+                          {rolNombre}
                         </span>
-                      ))}
+                      )}
                       {email && (
                         <a
                           href={`mailto:${email}`}
@@ -214,50 +215,15 @@ export default function ProfilePage() {
                   </h2>
                   <div className="grid gap-3 sm:grid-cols-1">
                     {/* Cargos */}
-                    {cargos.length > 0 && (
+                    {cargoNombre && (
                       <div className="flex items-center justify-between rounded-xl border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/70 backdrop-blur-sm p-3 min-w-0">
                         <div className="flex items-center gap-3 shrink-0">
-                          <span className="text-gray-600 dark:text-gray-400">
-                            🧩
-                          </span>
-                          <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                            Cargos
-                          </span>
+                          <span className="text-gray-600 dark:text-gray-400">🧩</span>
+                          <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Cargo</span>
                         </div>
-                        <div className="flex flex-wrap gap-2 justify-end min-w-0">
-                          {cargos.map((c) => (
-                            <span
-                              key={c}
-                              className="inline-flex items-center rounded-full border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-800/80 px-2 py-0.5 text-xs text-gray-700 dark:text-gray-200"
-                            >
-                              {c}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Equipos */}
-                    {equipos.length > 0 && (
-                      <div className="flex items-center justify-between rounded-xl border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/70 backdrop-blur-sm p-3 min-w-0">
-                        <div className="flex items-center gap-3 shrink-0">
-                          <span className="text-gray-600 dark:text-gray-400">
-                            👥
-                          </span>
-                          <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                            Equipos
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-2 justify-end min-w-0">
-                          {equipos.map((e) => (
-                            <span
-                              key={e}
-                              className="inline-flex items-center rounded-full border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-800/80 px-2 py-0.5 text-xs text-gray-700 dark:text-gray-200"
-                            >
-                              {e}
-                            </span>
-                          ))}
-                        </div>
+                        <span className="inline-flex items-center rounded-full border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-800/80 px-2 py-0.5 text-xs text-gray-700 dark:text-gray-200">
+                          {cargoNombre}
+                        </span>
                       </div>
                     )}
 
@@ -268,7 +234,7 @@ export default function ProfilePage() {
                       placeholder="No definido"
                       onSave={async (newPhone) => {
                         try {
-                          const res = await fetch(`/api/usuarios/${user.id}`, {
+                          const res = await fetch(`/api/v1/usuarios/me`, {
                             method: "PUT",
                             headers: {
                               "Content-Type": "application/json",
@@ -309,6 +275,9 @@ export default function ProfilePage() {
                         </span>
                       </div>
                     )}
+
+
+
                   </div>
                 </div>
 

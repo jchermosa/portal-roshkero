@@ -11,7 +11,7 @@ export type AuthResponse = {
 
 // 🔑 Login normal
 export async function login(req: AuthRequest): Promise<string> {
-  const res = await fetch(`${BASE}/api/auth/login`, {
+  const res = await fetch(`${BASE}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),
@@ -42,13 +42,13 @@ export async function register(req: any): Promise<string> {
 
 // 🔄 Cambio de contraseña (real)
 export async function updatePassword(token: string, newPassword: string): Promise<string> {
-  const res = await fetch(`${BASE}/api/auth/update-password`, {
+  const res = await fetch(`${BASE}/api/v1/usuarios/cambiar_contrasena`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ contrasena: newPassword }),
+    body: JSON.stringify({ nuevaContrasena: newPassword}),
   });
   if (!res.ok) {
     const txt = await res.text();
@@ -58,16 +58,3 @@ export async function updatePassword(token: string, newPassword: string): Promis
   return data.token; // 📌 nuevo token sin `requiereCambioContrasena`
 }
 
-// 🔄 Cambio de contraseña (mock)
-export async function updatePasswordMock(token: string, newPassword: string): Promise<string> {
-  console.log("Mock updatePassword:", { token, newPassword });
-
-  // Simula un nuevo token válido sin `requiereCambioContrasena`
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(
-        "mock.jwt.token.sin_requiereCambioContrasena"
-      );
-    }, 1000);
-  });
-}

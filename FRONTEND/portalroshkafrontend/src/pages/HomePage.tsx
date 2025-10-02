@@ -8,14 +8,14 @@ export default function HomePage() {
 
   if (!user) return <p>Cargando...</p>;
 
-  const isThOrGth = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH" || user?.rol?.nombre === "OPERACIONES";
-  const isManu = user?.rol?.nombre === "MANU";
+  const isThOrGth = user?.nombreRol === "TH" || user?.nombreRol === "GTH" || user?.nombreRol === "OPERACIONES";
+  const isManu = user?.nombreRol === "MANU";
   const isFuncionario = [
     "FUNCIONARIO_FABRICA",
     "FUNCIONARIO_TERCERIZADO",
     "LIDER",
     "DIRECTORIO",
-  ].includes(user?.rol?.nombre || "");
+  ].includes(user?.nombreRol || "");
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -54,7 +54,7 @@ export default function HomePage() {
               <ProfileCard
                 title="Mi Perfil"
                 icon="👤"
-                description={`Rol: ${user?.rol?.nombre}`}
+                description={`Rol: ${user?.nombreRol}`}
                 onClick={() => navigate("/profile")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
