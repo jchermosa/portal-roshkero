@@ -71,7 +71,7 @@ public class RequestServiceImpl implements IRequestService{
 
     @Override
     public Page<SolicitudResponseDto> getVacations(SolicitudesEnum tipoSolicitud, Pageable pageable) {
-        Page<Solicitud> vacations = solicitudRepository.findAllByTipoSolicitudAndEstado(SolicitudesEnum.VACACIONES, EstadoSolicitudEnum.A, pageable);
+        Page<Solicitud> vacations = solicitudRepository.findAllByTipoSolicitudAndEstadoOrTipoSolicitudAndEstadoAndLiderIsNull(SolicitudesEnum.VACACIONES, EstadoSolicitudEnum.A, SolicitudesEnum.VACACIONES, EstadoSolicitudEnum.P, pageable);
 
         return vacations.map(requestMapper::toVacationsResponseDto);
     }

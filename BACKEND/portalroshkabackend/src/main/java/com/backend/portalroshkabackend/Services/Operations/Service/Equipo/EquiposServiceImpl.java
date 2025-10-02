@@ -135,7 +135,7 @@ public class EquiposServiceImpl implements IEquiposService {
                                 .orElse(null));
                 equipo.setFechaInicio(requestDto.getFechaInicio());
                 equipo.setFechaLimite(requestDto.getFechaLimite());
-                equipo.setEstado(EstadoActivoInactivo.valueOf(requestDto.getEstado()));
+                equipo.setEstado(requestDto.getEstado());
                 equipo.setFechaCreacion(LocalDateTime.now());
 
                 if (requestDto.getUsuarios() != null && !requestDto.getUsuarios().isEmpty()) {
@@ -147,9 +147,9 @@ public class EquiposServiceImpl implements IEquiposService {
                 Equipos savedEquipo = equiposRepository.save(equipo);
                 usuarioService.assignUsers(savedEquipo.getIdEquipo(), procentedUsuarios);
 
-                // List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
-                // asignacionServiceImpl.asignarDiasUbicacionesEquipo(savedEquipo.getIdEquipo(),
-                // diasUbicaciones);
+                List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
+                asignacionServiceImpl.asignarDiasUbicacionesEquipo(savedEquipo.getIdEquipo(),
+                diasUbicaciones);
                 // --- 4. Сохранение технологий команды ---
                 tecnologiaEquiposService.updateTecnologiasEquipo(savedEquipo, requestDto.getIdTecnologias());
 
@@ -185,8 +185,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 // Обновление дат и статуса
                 Optional.ofNullable(requestDto.getFechaInicio()).ifPresent(equipo::setFechaInicio);
                 equipo.setFechaLimite(requestDto.getFechaLimite());
-                Optional.ofNullable(requestDto.getEstado())
-                                .ifPresent(e -> equipo.setEstado(EstadoActivoInactivo.valueOf(e)));
+                equipo.setEstado(requestDto.getEstado());
 
                 // Технологии
                 if (requestDto.getIdTecnologias() != null) {
@@ -198,7 +197,7 @@ public class EquiposServiceImpl implements IEquiposService {
                 if (requestDto.getUsuarios() != null && !requestDto.getUsuarios().isEmpty()) {
                         teamValidator.validateFechasUsuarios(requestDto.getUsuarios());
                 }
-                usuarioService.updateUsers(equipo, requestDto.getUsuarios());
+                usuarioService.updateUsers(requestDto.getEstado(),equipo, requestDto.getUsuarios());
                 List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
                 asignacionServiceImpl.asignarDiasUbicacionesEquipo(id, diasUbicaciones);
                 equiposRepository.save(equipo);

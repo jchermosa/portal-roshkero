@@ -14,18 +14,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static com.backend.portalroshkabackend.tools.MessagesConst.DATABASE_DEFAULT_ERROR;
 
 @Service("acceptVacationsService")
 public class VacationsServiceImpl implements IAcceptRequestService {
+    private final UserRepository userRepository;
     private final VacacionesAsignadasRepository vacacionesAsignadasRepository;
     private final RepositoryService repositoryService;
 
     @Autowired
     public VacationsServiceImpl(VacacionesAsignadasRepository vacacionesAsignadasRepository,
+                                UserRepository userRepository,
                                 RepositoryService repositoryService
                                 ){
+        this.userRepository = userRepository;
         this.vacacionesAsignadasRepository = vacacionesAsignadasRepository;
         this.repositoryService = repositoryService;
     }
@@ -33,17 +37,44 @@ public class VacationsServiceImpl implements IAcceptRequestService {
     @Transactional
     @Override
     public void acceptRequest(Solicitud request) {
-        VacacionesAsignadas vacacionesAsignadas = vacacionesAsignadasRepository.findBySolicitud_idSolicitud(request.getIdSolicitud()).orElseThrow(() -> new RequestNotFoundException(request.getIdSolicitud()));
+        Optional<VacacionesAsignadas> vacacionesAsignadasOptional = vacacionesAsignadasRepository.findBySolicitud_idSolicitud(request.getIdSolicitud());
 
-        if (vacacionesAsignadas.getConfirmacionTH() == true) throw new RequestAlreadyAcceptedException(request.getIdSolicitud());
+        VacacionesAsignadas vacacionesAsignadas;
 
-        vacacionesAsignadas.setConfirmacionTH(true);
+        if (vacacionesAsignadasOptional.isPresent()){
+            vacacionesAsignadas = vacacionesAsignadasOptional.get();
+
+            if (vacacionesAsignadas.getConfirmacionTH() == true) throw new RequestAlreadyAcceptedException(request.getIdSolicitud());
+
+            vacacionesAsignadas.setConfirmacionTH(true);
+
+        } else {
+            vacacionesAsignadas = new VacacionesAsignadas();
+
+            vacacionesAsignadas.setSolicitud(request);
+            vacacionesAsignadas.setDiasUtilizados(request.getCantDias());
+            vacacionesAsignadas.setFechaCreacion(LocalDateTime.now());
+            vacacionesAsignadas.setConfirmacionTH(true);
+
+            Usuario user = request.getUsuario();
+
+            user.setDiasVacacionesRestante(user.getDiasVacacionesRestante() - request.getCantDias());
+
+            repositoryService.save(
+                    userRepository,
+                    user,
+                    DATABASE_DEFAULT_ERROR
+            );
+
+        }
+
 
         repositoryService.save(
                 vacacionesAsignadasRepository,
                 vacacionesAsignadas,
                 DATABASE_DEFAULT_ERROR
         );
+
 
     }
 }

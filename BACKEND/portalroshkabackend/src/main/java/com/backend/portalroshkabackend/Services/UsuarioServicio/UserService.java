@@ -4,6 +4,7 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCambContrasDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCargoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserEquiposDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserRolDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
@@ -124,7 +125,7 @@ public class UserService {
 
         return dto;
     }
-
+    //TODO: Equipos en /me
     public UserDto getUsuarioActual() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String correo;
@@ -795,7 +796,21 @@ public class UserService {
     // Mapeo de Usuario a UserDto según el nuevo modelo
     private UserDto mapUsuarioToDto(Usuario usuario) {
         if (usuario == null) return null;
-        
+
+        List<AsignacionUsuarioEquipo> asignaciones = asignacionUsuarioRepository.findByUsuario(usuario);
+
+        List<UserEquiposDto> equiposDto = asignaciones.stream()
+            .map(asignacion -> {
+                UserEquiposDto unicoEquipoDto = new UserEquiposDto();
+                unicoEquipoDto.setIdEquipo(asignacion.getEquipo().getIdEquipo());
+                unicoEquipoDto.setLider(asignacion.getEquipo().getLider().getNombre() + " " + asignacion.getEquipo().getLider().getApellido());
+                unicoEquipoDto.setNombre(asignacion.getEquipo().getNombre());
+                unicoEquipoDto.setPorcentajeTrabajo(asignacion.getPorcentajeTrabajo());
+                return unicoEquipoDto;
+            })
+            .collect(Collectors.toList());
+
+
         UserDto dto = new UserDto();
         UserRolDto rolDto = new UserRolDto();
         UserCargoDto cargoDto = new UserCargoDto();
@@ -829,6 +844,7 @@ public class UserService {
         //nuevos campos dto ROL y CARGO
         dto.setRol(rolDto);
         dto.setCargo(cargoDto);
+        dto.setEquipos(equiposDto);
 
         return dto;
     }
