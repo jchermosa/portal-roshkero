@@ -54,7 +54,7 @@ export default function HomePage() {
               <ProfileCard
                 title="Mi Perfil"
                 icon="👤"
-                description={`Rol: ${user?.rol?.nombre}`}
+                description={`Rol: ${user?.rol?.nombre || "N/A"}`}
                 onClick={() => navigate("/profile")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"

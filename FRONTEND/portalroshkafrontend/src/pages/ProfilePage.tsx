@@ -83,15 +83,10 @@ export default function ProfilePage() {
         throw new Error("Usuario no está cargado");
       }
 
-<<<<<<< HEAD
 
 
       const res = await fetch(`http://localhost:8080/api/v1/usuarios/actualizarfoto`, {
         method: "POST",
-=======
-      const res = await fetch(`/api/usuarios/${user.id}/foto`, {
-        method: "PUT",
->>>>>>> origin/merge-estable
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`, // 🔑 token de auth
