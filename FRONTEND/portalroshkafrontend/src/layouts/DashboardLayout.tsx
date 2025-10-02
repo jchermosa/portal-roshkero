@@ -10,16 +10,16 @@ export default function DashboardLayout() {
 
 
   // Permisos usando tieneRol
-   const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-   const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-   const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN, Roles.ADMINISTRADOR_DEL_SISTEMA);
+   //const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+   //const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+   //const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN, Roles.ADMINISTRADOR_DEL_SISTEMA);
 
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
     { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: true },
-    { id: "/dispositivos-asignados", label: "Gestión de Dispositivos", icon: "💻", available: puedeGestionarDispositivos},
-    { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: puedeGestionarDispositivos},
+    { id: "/dispositivos-asignados", label: "Gestión de Dispositivos", icon: "💻", available: true},
+    { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: true},
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: true },
     { id: "/solicitudesTL", label: "Gestionar Solicitudes", icon: "📤", available: true },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },

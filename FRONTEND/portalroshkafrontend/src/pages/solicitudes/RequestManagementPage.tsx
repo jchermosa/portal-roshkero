@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useSolicitudesTH } from "../../hooks/solicitudes/useSolicitudesTH";
 import { useCatalogosSolicitudes } from "../../hooks/catalogos/useCatalogosSolicitudes";
+import { confirmarSolicitudVacaciones } from "../../services/RequestTHService";
 import { tieneRol } from "../../utils/permisos";
 import { Roles } from "../../types/roles";
 
@@ -28,6 +29,7 @@ export default function SolicitudesTHPage() {
   const [subTipo, setSubTipo] = useState("");
   const [estado, setEstado] = useState("");
   const [page, setPage] = useState(0);
+  const [procesando, setProcesando] = useState<number | null>(null);
 
   const puedeVerSolicitudes = tieneRol(user, Roles.TH, Roles.GTH);
 
@@ -40,11 +42,30 @@ export default function SolicitudesTHPage() {
       ? tiposBeneficio.map((t) => ({ value: t.nombre, label: t.nombre }))
       : [];
 
-  const { data: solicitudes, totalPages, loading, error } = useSolicitudesTH(
+  const { data: solicitudes, totalPages, loading, error, refetch } = useSolicitudesTH(
     token,
     { tipoSolicitud, subTipo, estado },
     page
   );
+
+  const handleConfirmarVacacion = async (idSolicitud: number, confirmado: boolean) => {
+    if (!token || confirmado) return;
+
+    const confirmacion = window.confirm("¿Confirmar esta solicitud de vacaciones?");
+    if (!confirmacion) return;
+
+    setProcesando(idSolicitud);
+    try {
+      await confirmarSolicitudVacaciones(token, idSolicitud.toString());
+      // Recargar la lista
+      if (refetch) refetch();
+    } catch (err) {
+      console.error("Error al confirmar:", err);
+      alert("Error al confirmar la solicitud");
+    } finally {
+      setProcesando(null);
+    }
+  };
 
   const limpiarFiltros = () => {
     setSubTipo("");
@@ -64,7 +85,6 @@ export default function SolicitudesTHPage() {
       label: "Tipo",
       render: (s: SolicitudItem) => s.tipoSolicitud,
     },
-    // Mostrar subTipo solo para PERMISO y BENEFICIO
     ...(tipoSolicitud === "PERMISO" || tipoSolicitud === "BENEFICIO"
       ? [
           {
@@ -96,10 +116,30 @@ export default function SolicitudesTHPage() {
         );
       },
     },
+    // Columna de confirmación TH solo para VACACIONES
+    ...(tipoSolicitud === "VACACIONES"
+      ? [
+          {
+            key: "confirmacionTh",
+            label: "Confirmado TH",
+            render: (s: SolicitudItem) => (
+              <input
+                type="checkbox"
+                checked={s.confirmacionTh || false}
+                onChange={() => handleConfirmarVacacion(s.idSolicitud, s.confirmacionTh || false)}
+                disabled={s.estado !== "A" || s.confirmacionTh || procesando === s.idSolicitud}
+                className="w-5 h-5 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            ),
+          },
+        ]
+      : []),
   ];
 
   const renderActions = (s: SolicitudItem) => {
-    if (s.estado === "P" || tipoSolicitud === "VACACIONES" && s.confirmacionTh === false) {
+    
+    // Para solicitudes pendientes
+    if (s.estado === "P") {
       return (
         <button
           onClick={() => navigate(`/solicitudesTH/${s.idSolicitud}/evaluar`)}
@@ -120,7 +160,6 @@ export default function SolicitudesTHPage() {
     }
   };
 
-  //if (!puedeVerSolicitudes) return <p>No tenés permisos para ver esta página.</p>;
   if (loading || loadingCatalogos) return <p>Cargando solicitudes...</p>;
   if (error) return <p>{error}</p>;
 
@@ -130,7 +169,6 @@ export default function SolicitudesTHPage() {
     { value: "R", label: "Rechazada" },
     { value: "RC", label: "Recalendarizada"}
   ];
-  console.log("Solicitudes cargadas:", solicitudes);
 
   return (
     <PageLayout title="Gestión de Solicitudes">
@@ -187,4 +225,3 @@ export default function SolicitudesTHPage() {
     </PageLayout>
   );
 }
-

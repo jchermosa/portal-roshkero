@@ -19,10 +19,9 @@ export function useSolicitudesTH(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Extraer valores primitivos para evitar recreación del objeto
   const { tipoSolicitud, estado, subTipo } = filters;
 
-  useEffect(() => {
+  const fetchData = () => {
     if (!token) return;
 
     setLoading(true);
@@ -32,17 +31,20 @@ export function useSolicitudesTH(
       .then((res) => {
         let solicitudes = res.content;
 
-        // Filtrar subtipo solo en frontend usando nombreSubTipoSolicitud
-       if (subTipo) {
-          solicitudes = solicitudes.filter((s) => s.nombreSubTipoSolicitud === subTipo);
-       }
+        if (subTipo) {
+          solicitudes = solicitudes.filter((s: any) => s.subTipo === subTipo);
+        }
 
         setTotalPages(Math.ceil(solicitudes.length / pageSize));
         setData(solicitudes.slice(page * pageSize, (page + 1) * pageSize));
       })
       .catch((err: any) => setError(err.message))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, [token, tipoSolicitud, estado, subTipo, page, pageSize]);
 
-  return { data, totalPages, loading, error };
+  return { data, totalPages, loading, error, refetch: fetchData };
 }

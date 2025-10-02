@@ -11,7 +11,7 @@ export interface PaginatedResponse<T> {
 export async function getSolicitudesTL(
   token: string
 ): Promise<SolicitudItem[]> {
-  const res = await fetch(`/api/v1/teamleader/users/requests/getall`, {
+  const res = await fetch(`http://localhost:8080/api/v1/teamleader/users/requests/getall`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -23,7 +23,7 @@ export async function getSolicitudByIdTL(
   token: string,
   id: string
 ): Promise<SolicitudItem> {
-  const res = await fetch(`/api/v1/teamleader/users/requests/${id}`, {
+  const res = await fetch(`http://localhost:8080/api/v1/teamleader/users/requests/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -35,7 +35,7 @@ export async function aprobarSolicitudTL(
   token: string,
   id: string
 ) {
-  const res = await fetch(`/api/v1/teamleader/users/requests/${id}/accept`, {
+  const res = await fetch(`http://localhost:8080/api/v1/teamleader/users/requests/${id}/accept`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -52,7 +52,7 @@ export async function rechazarSolicitudTL(
   token: string,
   id: string
 ) {
-  const res = await fetch(`/api/v1/teamleader/users/requests/${id}/reject`, {
+  const res = await fetch(`http://localhost:8080/api/v1/teamleader/users/requests/${id}/reject`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,

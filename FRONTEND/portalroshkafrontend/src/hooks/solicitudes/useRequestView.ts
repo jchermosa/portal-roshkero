@@ -37,6 +37,15 @@ export function useRequestView(token: string | null, id: string | null) {
     fetchSolicitud();
   }, [token, id]);
 
+  useEffect(() => {
+  if (solicitud) {
+    console.log("Solicitud completa:", solicitud);
+    console.log("confirmacionTh:", solicitud.confirmacionTh);
+    console.log("confirmadoTh:", solicitud.confirmacionTh);
+    console.log("Todas las keys:", Object.keys(solicitud));
+  }
+}, [solicitud]);
+
   const aprobar = async (): Promise<boolean> => {
   if (!token || !id || !solicitud) {
     setError("Datos insuficientes para aprobar la solicitud");
@@ -80,7 +89,7 @@ const rechazar = async (): Promise<boolean> => {
 };
 const confirmar = async (): Promise<boolean> => {
   if (!token || !id || !solicitud) {
-    setError("Datos insuficientes para aprobar la solicitud");
+    setError("Datos insuficientes para confirmar la solicitud");
     return false;
   }
 
@@ -88,11 +97,11 @@ const confirmar = async (): Promise<boolean> => {
   setError(null);
 
   try {
-    await aprobarSolicitud(token, id);   
-    setSolicitud((prev) => (prev ? { ...prev, estado: "A" } : null));
+    await confirmarSolicitudVacaciones(token, id);   
+    setSolicitud((prev) => (prev ? { ...prev, confirmacionTh: true } : null));
     return true;
   } catch (err) {
-    setError(err instanceof Error ? err.message : "Error al aprobar la solicitud");
+    setError(err instanceof Error ? err.message : "Error al confirmar la solicitud");
     return false;
   } finally {
     setProcesando(false);
