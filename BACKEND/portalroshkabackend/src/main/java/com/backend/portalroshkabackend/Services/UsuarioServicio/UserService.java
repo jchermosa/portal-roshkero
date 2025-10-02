@@ -2,8 +2,10 @@ package com.backend.portalroshkabackend.Services.UsuarioServicio;
 
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCambContrasDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCargoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserRolDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
@@ -32,6 +34,7 @@ import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.UsuarioR
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoDispositivosRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -792,20 +795,29 @@ public class UserService {
     // Mapeo de Usuario a UserDto según el nuevo modelo
     private UserDto mapUsuarioToDto(Usuario usuario) {
         if (usuario == null) return null;
+        
         UserDto dto = new UserDto();
+        UserRolDto rolDto = new UserRolDto();
+        UserCargoDto cargoDto = new UserCargoDto();
+
+        rolDto.setIdRol(usuario.getRol() != null ? usuario.getRol().getIdRol() : null);
+        rolDto.setNombre(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
+        cargoDto.setIdCargo(usuario.getCargo() != null ? usuario.getCargo().getIdCargo() : null);
+        cargoDto.setNombre(usuario.getCargo() != null ? usuario.getCargo().getNombre() : null);
+
         dto.setIdUsuario(usuario.getIdUsuario());
         dto.setNombre(usuario.getNombre());
         dto.setApellido(usuario.getApellido());
         dto.setNroCedula(usuario.getNroCedula());
         dto.setCorreo(usuario.getCorreo());
-        dto.setIdRol(usuario.getRol() != null ? usuario.getRol().getIdRol() : null);
-        dto.setNombreRol(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
+        // dto.setIdRol(usuario.getRol() != null ? usuario.getRol().getIdRol() : null);
+        // dto.setNombreRol(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
         dto.setFechaIngreso(usuario.getFechaIngreso());
         dto.setAntiguedad(usuario.getAntiguedad());
         dto.setDiasVacaciones(usuario.getDiasVacaciones());
         dto.setEstado(usuario.getEstado());
         dto.setTelefono(usuario.getTelefono());
-        dto.setIdCargo(usuario.getCargo() != null ? usuario.getCargo().getIdCargo() : null);
+        // dto.setIdCargo(usuario.getCargo() != null ? usuario.getCargo().getIdCargo() : null);
         dto.setFechaNacimiento(usuario.getFechaNacimiento());
         dto.setDiasVacacionesRestante(usuario.getDiasVacacionesRestante());
         dto.setRequiereCambioContrasena(usuario.getRequiereCambioContrasena());
@@ -813,6 +825,11 @@ public class UserService {
         dto.setFoco(usuario.getFoco());
         dto.setUrlPerfil(usuario.getUrlPerfil());
         dto.setDisponibilidad(usuario.getDisponibilidad());
+
+        //nuevos campos dto ROL y CARGO
+        dto.setRol(rolDto);
+        dto.setCargo(cargoDto);
+
         return dto;
     }
 
