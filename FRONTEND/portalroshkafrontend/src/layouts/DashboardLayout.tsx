@@ -10,9 +10,10 @@ export default function DashboardLayout() {
 
 
   // Permisos usando tieneRol
-  // const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-  // const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-  // const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN, Roles.ADMINISTRADOR_DEL_SISTEMA);
+   const talentoHumano = tieneRol(user, Roles.TALENTO_HUMANO);
+   const operaciones = tieneRol(user, Roles.OPERACIONES);
+   const sysadmin= tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
+   const verTodo= tieneRol(user, Roles.DIRECTIVO)
 
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
