@@ -93,6 +93,7 @@ export interface UsuarioItem {
   foco?: FocoEnum;
   disponibilidad?: number;
   urlPerfil?: string;
+  
 }
 
 
@@ -109,12 +110,15 @@ export interface RolItem {
   idRol: number;          
   nombre: string;
   fechaCreacion: string;
+
 }
 
 export interface CargoItem {
   idCargo: number;
   nombre: string;
   fechaCreacion: string;
+
+
 }
 
 export interface EquipoItem {
@@ -126,6 +130,7 @@ export interface EquipoItem {
   fechaLimite: string;
   fechaCreacion: string;
   estado: string;
+
 }
 
 export const EstadoAsignacionEnum = {
@@ -144,52 +149,68 @@ export const EstadoAsignacionLabels: Record<EstadoAsignacionEnum, string> = {
 
 export type SolicitudEstado = "P" | "A" | "R";
 
-export interface LiderItem {
-  id: number;
-  nombre: string;
-  aprobado: boolean;
+
+export interface SolicitudItem {
+  idSolicitud: number;
+  usuario: string;   
+  nombreUsuario: string
+  tipoSolicitud: "PERMISO" | "BENEFICIO" | "VACACIONES";
+  nombreSubTipoSolicitud: string;
+  subTipo: string;
+  fechaInicio: string;
+  cantDias: number | null;
+  monto?: number;   
+  fechaCreacion: string;
+  nombreLider: string;
+  estado: "P" | "A" | "R" | "RC";
+  confirmacionTh: boolean;
 }
 
-
-export interface SolicitudBase {
-  id: number;
-  id_usuario: number;
-  nombre: string;
-  apellido: string;
-  id_solicitud_tipo: number;
-  tipo: { id: number; nombre: string };
-  comentario?: string;
-  estado: "P" | "A" | "R"; 
+export interface SolicitudFormData {
+  idSubtipo?: number;
+  fechaInicio: string;
+  cantDias?: number;
+  comentario: string;
+  monto?: number;      
+  fechaFin?: string;     
 }
 
-// Solicitud de permisos
-export interface SolicitudPermiso extends SolicitudBase {
-  cantidad_dias: number;
-  fecha_inicio: string;
-  fecha_fin: string;
-  numero_aprobaciones: number;
-}
+export type SolicitudPayload =
+  | {
+      id_tipo_permiso: number | undefined;
+      fecha_inicio: string;
+      cant_dias: number | null;
+      comentario: string;
+    }
+  | {
+      id_tipo_beneficio: number | undefined;
+      fecha_inicio: string;
+      cant_dias: number | null;
+      comentario: string;
+      monto: number | null;
+    }
+  | {
+      fecha_inicio: string;
+      fecha_fin: string;
+    };
 
-// Solicitud de beneficios (solo tiene lo de base, sin extras)
-export interface SolicitudBeneficio extends SolicitudBase {}
-
-// Unión
-export type SolicitudItem = SolicitudPermiso | SolicitudBeneficio;
 
 
 
 export interface TipoPermisoItem {
-  id: number;
+  idTipoPermiso: number;
   nombre: string;
-  cantidadDias: number | null; 
+  cantDias: number;
+  observaciones: string;
+  remunerado: boolean;
+  fuerzaMenor: boolean;
 }
 
 export interface TipoBeneficioItem {
-  id: number;
+  idTipoBeneficio: number;
   nombre: string;
   descripcion: string;
-  estado: "A" | "I";
-  requiereAprobacionLider: boolean;
+  montoMaximo: number;
 }
 
 

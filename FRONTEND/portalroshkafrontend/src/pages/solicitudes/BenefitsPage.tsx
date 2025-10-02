@@ -122,12 +122,6 @@ export default function BeneficiosPage() {
                   <h2 className="text-2xl font-bold text-brand-blue dark:text-white">
                     Beneficios
                   </h2>
-                  <IconButton
-                    label="Solicitar Beneficio"
-                    icon={<span>➕</span>}
-                    variant="primary"
-                    onClick={handleSolicitudClick}
-                  />
                 </div>
 
 

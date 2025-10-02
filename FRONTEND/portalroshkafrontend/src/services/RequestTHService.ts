@@ -1,35 +1,33 @@
 import type { SolicitudItem } from "../types";
-import mockPermisos from "../data/mockSolicitudes.json";
-import mockBeneficios from "../data/mockBeneficios.json";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
-// ================================
-// Respuesta pageable estándar de Spring
-// ================================
 export interface PaginatedResponse<T> {
   content: T[];
   totalPages: number;
   totalElements: number;
   size: number;
-  number: number; // página actual
+  number: number;
 }
 
-// ================================
-// Métodos reales (API)
-// ================================
-
-// ✅ Listado paginado de todas las solicitudes (para TH)
 async function getSolicitudesApi(
   token: string,
-  params: Record<string, string | number | undefined> = {}
+  params: { tipoSolicitud?: "PERMISO" | "BENEFICIO" | "VACACIONES"; estado?: string } = {}
 ): Promise<PaginatedResponse<SolicitudItem>> {
-  const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
+  let endpoint = "";
 
-  const res = await fetch(`/api/solicitudes/todas?${query.toString()}`, {
+  if (params.tipoSolicitud === "VACACIONES") {
+    endpoint = "http://localhost:8080/api/v1/admin/th/users/requests/vacations";
+  } else {
+    endpoint = "http://localhost:8080/api/v1/admin/th/users/requests/sortby";
+    if (params.tipoSolicitud) {
+      endpoint += `?type=${params.tipoSolicitud.toLowerCase()}`;
+    }
+  }
+
+  const query = new URLSearchParams();
+  if (params.estado) query.append("estado", params.estado);
+
+  const res = await fetch(`${endpoint}${endpoint.includes("?") ? "&" : "?"}${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -37,12 +35,12 @@ async function getSolicitudesApi(
   return res.json();
 }
 
-// ✅ Obtener una solicitud por ID
+
 async function getSolicitudByIdApi(
   token: string,
   id: string
 ): Promise<SolicitudItem> {
-  const res = await fetch(`/api/solicitudes/${id}`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/th/users/requests/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -50,113 +48,60 @@ async function getSolicitudByIdApi(
   return res.json();
 }
 
-// ✅ Aprobar solicitud
 async function aprobarSolicitudApi(
   token: string,
-  id: string,
-  comentario?: string
+  id: string
 ) {
-  const res = await fetch(`/api/solicitudes/${id}/aprobar`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/th/users/requests/${id}/accept`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ comentario }),
+    body: JSON.stringify({}), 
   });
 
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-// ✅ Rechazar solicitud
+export async function confirmarSolicitudVacaciones(
+  token: string,
+  id: string
+) {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/th/users/requests/${id}/accept`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}), 
+  });
+
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 async function rechazarSolicitudApi(
   token: string,
-  id: string,
-  comentario: string
+  id: string
 ) {
-  const res = await fetch(`/api/solicitudes/${id}/rechazar`, {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/th/users/requests/${id}/reject`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ comentario }),
+    body: JSON.stringify({}), 
   });
 
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-// ✅ Obtener estadísticas de solicitudes
-async function getEstadisticasSolicitudesApi(
-  token: string
-): Promise<{
-  total: number;
-  pendientes: number;
-  aprobadas: number;
-  rechazadas: number;
-}> {
-  const res = await fetch(`/api/solicitudes/estadisticas`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
 
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
+export const getSolicitudes =  getSolicitudesApi;
+export const getSolicitudById = getSolicitudByIdApi;
+export const aprobarSolicitud =  aprobarSolicitudApi;
+export const rechazarSolicitud = rechazarSolicitudApi;
 
-// ================================
-// Métodos MOCK
-// ================================
-async function getSolicitudesMock(): Promise<PaginatedResponse<SolicitudItem>> {
-  const data = [...(mockPermisos as SolicitudItem[]), ...(mockBeneficios as SolicitudItem[])];
-
-  return {
-    content: data,
-    totalPages: 1,
-    totalElements: data.length,
-    size: data.length,
-    number: 0,
-  };
-}
-
-async function getSolicitudByIdMock(_token: string, id: string): Promise<SolicitudItem> {
-  const data = [...(mockPermisos as SolicitudItem[]), ...(mockBeneficios as SolicitudItem[])];
-  const solicitud = data.find((s) => s.id === Number(id));
-  if (!solicitud) throw new Error("Solicitud no encontrada");
-  return solicitud;
-}
-
-async function aprobarSolicitudMock(_token: string, id: string, comentario?: string) {
-  return { success: true, id, comentario };
-}
-
-async function rechazarSolicitudMock(_token: string, id: string, comentario: string) {
-  return { success: true, id, comentario };
-}
-
-async function getEstadisticasSolicitudesMock(): Promise<{
-  total: number;
-  pendientes: number;
-  aprobadas: number;
-  rechazadas: number;
-}> {
-  const data = [...(mockPermisos as SolicitudItem[]), ...(mockBeneficios as SolicitudItem[])];
-  return {
-    total: data.length,
-    pendientes: data.filter((s) => s.estado === "P").length,
-    aprobadas: data.filter((s) => s.estado === "A").length,
-    rechazadas: data.filter((s) => s.estado === "R").length,
-  };
-}
-
-// ================================
-// Export condicional
-// ================================
-export const getSolicitudesTH = USE_MOCK ? getSolicitudesMock : getSolicitudesApi;
-export const getSolicitudById = USE_MOCK ? getSolicitudByIdMock : getSolicitudByIdApi;
-export const aprobarSolicitud = USE_MOCK ? aprobarSolicitudMock : aprobarSolicitudApi;
-export const rechazarSolicitud = USE_MOCK ? rechazarSolicitudMock : rechazarSolicitudApi;
-export const getEstadisticasSolicitudes = USE_MOCK
-  ? getEstadisticasSolicitudesMock
-  : getEstadisticasSolicitudesApi;

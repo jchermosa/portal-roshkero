@@ -28,16 +28,23 @@ export default function RequestSearchPage() {
         <div className="flex flex-col gap-4">
           <button
             onClick={() => navigate("/solicitudesTH/permisos")}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
+            className="w-full bg-blue-700 text-white py-3 rounded-lg hover:bg-blue-800 transition"
           >
             Ver Permisos
           </button>
 
           <button
             onClick={() => navigate("/solicitudesTH/beneficios")}
-            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
+            className="w-full bg-sky-500 text-white py-3 rounded-lg hover:bg-sky-600 transition"
           >
             Ver Beneficios
+          </button>
+
+          <button
+            onClick={() => navigate("/solicitudesTH/vacaciones")}
+            className="w-full bg-amber-500 text-white py-3 rounded-lg hover:bg-amber-600 transition"
+          >
+            Ver Vacaciones
           </button>
         </div>
       </div>

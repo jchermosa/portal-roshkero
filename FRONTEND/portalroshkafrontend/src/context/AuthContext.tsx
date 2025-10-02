@@ -64,7 +64,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const decodeAndSetUser = async (jwtToken: string) => {
     try {
       const payload = parseJwt(jwtToken);
-
+      // tolerante a diferentes estructuras de rol
+      let rol = null;
+      if (payload.rol) {
+        if (typeof payload.rol === "object") {
+          rol = {
+            idRol: payload.rol.idRol ?? 0,
+            nombre: payload.rol.nombre ?? "",
+          };
+        } else if (typeof payload.rol === "string") {
+          rol = { idRol: 0, nombre: payload.rol };
+        } else if (typeof payload.rol === "number") {
+          rol = { idRol: payload.rol, nombre: "" };
+        }
+      }
       const basicUser: User = {
         id: payload.id ?? 0,
         nombre: payload.nombre ?? "",
@@ -83,9 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const res = await fetch("http://localhost:8080/api/v1/usuarios/me", {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
-
       if (!res.ok) throw new Error("No se pudo obtener datos completos del usuario");
-
       const fullUser: User = await res.json();
       setUser(fullUser);
     } catch (e) {

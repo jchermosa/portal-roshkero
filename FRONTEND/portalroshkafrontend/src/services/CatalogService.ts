@@ -1,9 +1,10 @@
-import type { RolItem, CargoItem } from "../types";
+import type {RolItem, CargoItem } from "../types";
 
 export const EstadoActivoInactivoOptions = [
   { label: "Activo", value: "A" },
   { label: "Inactivo", value: "I" },
 ];
+
 
 
 export async function getRoles(token: string): Promise<RolItem[]> {
@@ -25,18 +26,26 @@ export async function getCargos(token: string): Promise<CargoItem[]> {
   const json = await res.json();
   return json.content;
 }
-export async function getTiposPermiso(token: string) {
-  const res = await fetch(`/api/catalogos/tipos-permiso`, {
+
+async function getTiposPermisoApi(token: string) {
+  const res = await fetch(`/api/v1/usuarios/tipospermisos`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-export async function getTiposBeneficio(token: string) {
-  const res = await fetch(`/api/catalogos/tipos-beneficio`, {
+async function getTiposBeneficioApi(token: string) {
+  const res = await fetch(`/api/v1/usuarios/tiposbeneficios`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
+
+
+
+export const getTiposPermiso =  getTiposPermisoApi;
+export const getTiposBeneficio = getTiposBeneficioApi;
+

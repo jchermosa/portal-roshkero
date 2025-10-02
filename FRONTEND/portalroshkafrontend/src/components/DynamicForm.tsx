@@ -78,7 +78,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     setFormData(initialData);
   }, [initialData]);
 
+
   const handleChange = (
+    
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, type, value } = e.target as HTMLInputElement;
@@ -86,6 +88,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
     if (type === "checkbox") processedValue = (e.target as HTMLInputElement).checked;
     else if (type === "number") processedValue = value === "" ? "" : Number(value);
+    else if (type === "select-one") processedValue = isNaN(Number(value)) ? value : Number(value);
 
     setFormData((prev) => {
       const next = { ...prev, [name]: processedValue };
@@ -352,6 +355,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       className={`flex flex-col h-full ${className}`}
     >
       {/* {message && (
+    <form id="dynamic-form" onSubmit={handleSubmit} className={`flex flex-col h-full ${className}`}>
+      {/* Mensajes */}
+      {/* /*{message && (
         <div
           className={`p-4 rounded-lg text-sm border ${
             message.type === "error"

@@ -10,32 +10,28 @@ import LoginPage from "../pages/LoginPage";
 // Pages privadas (home, perfil, etc.)
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
+import BeneficiosPage from "../pages/solicitudes/BenefitsPage";
+import UsuariosPage from "../pages/user/UserPage.tsx";
 import Configuration from "../pages/Configuration";
 
 // Solicitudes (genéricas)
 import RequestPage from "../pages/solicitudes/RequestPage";
 import RequestFormPage from "../pages/solicitudes/RequestFormPage";
-import RequestManagementPage from "../pages/solicitudes/RequestManagementPage";
-import RequestSearchPage from "../pages/solicitudes/RequestSearchPage";
+import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage.tsx";
+import RequestManagementPage from "../pages/solicitudes/RequestManagementPage.tsx";
+import RequestSearchPage from "../pages/solicitudes/RequestSearchPage.tsx";
+import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
+import DevicePage from "../pages/dispositivos/DevicePage.tsx";
+import DeviceFormPage from "../pages/dispositivos/DeviceFormPage.tsx";
+import DeviceAssignmentsPage from "../pages/dispositivos/DeviceAssignmentsPage.tsx";
+import DeviceAssignmentsFormPage from "../pages/dispositivos/DeviceAssignmentFormPage.tsx";
+import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
+//import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
 
-// Usuarios
-import UsuariosPage from "../pages/user/UserPage";
 import UserFormPage from "../pages/user/UserFormPage";
 import UserSearchPage from "../pages/user/UserSearchPage";
 
-// Vacaciones
-import VacacionesPage from "../pages/solicitudes/VacacionesPage";
-import SolicitudVacacionesPage from "../pages/solicitudes/SolicitudVacacionesPage";
-
-// Beneficios
-import BeneficiosPage from "../pages/solicitudes/BenefitsPage";
-import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage"; 
-
-// Dispositivos
-import DevicePage from "../pages/dispositivos/DevicePage";
-import DeviceFormPage from "../pages/dispositivos/DeviceFormPage";
 import DeviceAssignmentFormPage from "../pages/dispositivos/DeviceAssignmentFormPage";
-import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage";
 import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage";
 import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage";
 import UbicacionPage from "../pages/varios/UbicacionPage";
@@ -48,6 +44,10 @@ import CatalogoOpPage from "../pages/varios/CatalogoOp";
 import EquipoFormPage from "../pages/operations/EquipoFormPage";
 import OperationsPage from "../pages/operations/OperationsPage";
 import EditarEquipoPage from "../pages/operations/EditarEquipoPage";
+import RequestViewPageUsuario from "../pages/solicitudes/RequestViewPageUsuario.tsx";
+import RequestViewTL from "../pages/solicitudes/RequestViewTL.tsx";
+import RequestViewPage from "../pages/solicitudes/RequestViewPage.tsx";
+import RequestTLPage from "../pages/solicitudes/RequestTLPage.tsx";
 
 export default function AppRoutes() {
   return (
@@ -61,19 +61,27 @@ export default function AppRoutes() {
         <Route element={<DashboardLayout />}>
           <Route index element={<HomePage />} />
 
-          {/* Solicitudes generales */}
-          <Route path="/requests" element={<RequestPage />} />
-          <Route path="/requests/nuevo" element={<RequestFormPage />} />
-          <Route path="/requests/:id" element={<RequestFormPage />} />
-          <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage />} />
-          <Route
-            path="/solicitudesTH/permisos"
-            element={<RequestManagementPage tipoVista="permisos" />}
-          />
-          <Route
-            path="/solicitudesTH/beneficios"
-            element={<RequestManagementPage tipoVista="beneficios" />}
-          />
+          {/* Solicitudes */}
+            {/*Solicitudes-Usuario*/}
+              <Route path="/requests" element={<RequestPage />} />
+              <Route path="/requests/beneficio" element={<RequestFormPage />} />
+              <Route path="/requests/permiso" element={<RequestFormPage />} />
+              <Route path="/request/vacaciones" element={<RequestFormPage />} />
+              <Route path="/requests/:id" element={<RequestViewPageUsuario />} />
+              
+            {/*Solicitudes-Team Leader*/}
+              <Route path="/solicitudesTL" element={<RequestTLPage/>}/> 
+              <Route path="/solicitudesTL/:id/ver" element={<RequestViewTL/>}/>
+              <Route path="/solicitudesTL/:id/evaluar" element={<RequestViewTL/>}/>
+
+            {/*Solicitudes-Talento Humano*/}
+              <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage />} />
+              <Route path="/solicitudesTH/permisos" element={<RequestManagementPage/>} />
+              <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage/>} />
+              <Route path="/solicitudesTH/vacaciones" element={<RequestManagementPage/>} />
+              <Route path="/solicitudesTH/:id/ver" element={<RequestViewPage/>}/>
+              <Route path="/solicitudesTH/:id/evaluar" element={<RequestViewPage/>}/>
+
 
           {/* Usuarios */}
           <Route path="/usuarios" element={<UsuariosPage />} />
@@ -81,14 +89,13 @@ export default function AppRoutes() {
           <Route path="/usuarios/nuevo" element={<UserFormPage />} />
           <Route path="/usuarios/:id" element={<UserFormPage />} />
 
+
           {/* Operations */}
           <Route path="/operations" element={<OperationsPage />} />
           <Route path="/equipo/nuevo" element={<EquipoFormPage />} />
           <Route path="/equipo/:id/edit" element={<EditarEquipoPage />} />
 
-          {/* Vacaciones */}
-          <Route path="/vacaciones" element={<VacacionesPage />} />
-          <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
+
 
           {/* Beneficios */}
           <Route path="/benefits" element={<BeneficiosPage />} />

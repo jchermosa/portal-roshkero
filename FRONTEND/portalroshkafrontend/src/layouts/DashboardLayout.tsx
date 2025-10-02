@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import { tieneRol } from "../utils/permisos";
 import { Roles } from "../types/roles";
 import "../styles/scrollbar.css";
+import { Roles } from "../types/roles";
+import { tieneRol } from "../utils/permisos";
 
 export default function DashboardLayout() {
   const { user, refreshUser, logout } = useAuth();
