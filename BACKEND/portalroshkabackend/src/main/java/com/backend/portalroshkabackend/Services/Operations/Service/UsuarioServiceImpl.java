@@ -15,6 +15,7 @@ import com.backend.portalroshkabackend.Exception.ProcenteExisits;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Repositories.OP.AsignacionUsuarioRepository;
 import com.backend.portalroshkabackend.Repositories.OP.EquiposRepository;
 import com.backend.portalroshkabackend.Repositories.OP.UsuarioisRepository;
@@ -118,20 +119,26 @@ public class UsuarioServiceImpl implements IUsuarioService {
             Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
 
-            if (uDto.getPorcentajeTrabajo() == null || uDto.getPorcentajeTrabajo() <= 0) {
-                throw new IllegalArgumentException(
-                        "Porcentaje de trabajo inválido para usuario " + uDto.getIdUsuario());
+            // Если пользователь активный, проверяем и вычитаем проценты
+            if (uDto.getEstado() == EstadoActivoInactivo.A) {
+
+                if (uDto.getPorcentajeTrabajo() == null || uDto.getPorcentajeTrabajo() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Porcentaje de trabajo inválido para usuario " + uDto.getIdUsuario());
+                }
+
+                int nuevaDisponibilidad = usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo();
+                if (nuevaDisponibilidad < 0) {
+                    throw new ProcenteExisits("Usuario " + usuario.getIdUsuario() +
+                            " no tiene suficiente disponibilidad. Actual: " + usuario.getDisponibilidad() +
+                            ", requerido: " + uDto.getPorcentajeTrabajo());
+                }
+
+                usuario.setDisponibilidad(nuevaDisponibilidad);
+                usuarioRepository.save(usuario);
             }
 
-            int nuevaDisponibilidad = usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue();
-            if (nuevaDisponibilidad < 0) {
-                throw new ProcenteExisits("Usuario " + usuario.getIdUsuario() +
-                        " no tiene suficiente disponibilidad. Actual: " + usuario.getDisponibilidad() +
-                        ", requerido: " + uDto.getPorcentajeTrabajo().intValue());
-            }
-
-            usuario.setDisponibilidad(nuevaDisponibilidad);
-            usuarioRepository.save(usuario);
+            // Если пользователь inactivo – ничего не делаем с disponibilidad
             result.add(uDto);
         }
         return result;
