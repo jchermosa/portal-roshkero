@@ -58,6 +58,6 @@ public class AsignacionUsuarioEquipo {
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "estado_ac_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private EstadoActivoInactivo estado = EstadoActivoInactivo.A;
+    private EstadoActivoInactivo estado;
 
 }

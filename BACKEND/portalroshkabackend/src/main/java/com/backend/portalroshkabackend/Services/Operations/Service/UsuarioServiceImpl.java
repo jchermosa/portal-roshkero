@@ -2,9 +2,11 @@ package com.backend.portalroshkabackend.Services.Operations.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,78 +33,94 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Autowired
     private EquiposRepository equiposRepository;
 
-    public void ajustarDisponibilidadConDelta(Usuario usuario, float delta) {
+    public void ajustarDisponibilidadConDelta(Usuario usuario, Integer delta) {
         if (delta > 0) {
-            // Увеличиваем нагрузку → вычитаем из disponibilidad
+            // уменьшаем доступность
             if (usuario.getDisponibilidad() == null || usuario.getDisponibilidad() < delta) {
-                // !
                 throw new ProcenteExisits(
                         "Usuario " + usuario.getIdUsuario() +
                                 " no tiene suficiente disponibilidad. Actual: " + usuario.getDisponibilidad() +
                                 ", requerido: " + delta);
             }
-            usuario.setDisponibilidad(usuario.getDisponibilidad() - (int) delta);
+            usuario.setDisponibilidad(usuario.getDisponibilidad() - delta);
         } else if (delta < 0) {
-            // Уменьшение нагрузки → возвращаем обратно
-            usuario.setDisponibilidad(usuario.getDisponibilidad() + (int) (-delta));
+            // возвращаем (увеличиваем) доступность
+            usuario.setDisponibilidad(usuario.getDisponibilidad() + Math.abs(delta));
         }
-        // if delta == 0 → save
+        // сохраняем пользователя (внутри этого метода — единственное место, меняющее
+        // disponibilidad)
         usuarioRepository.save(usuario);
     }
 
-    public List<UsuarioAsignacionDto> updateUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto) {
+    public List<UsuarioAsignacionDto> updateUsers(EstadoActivoInactivo estadoEquipo, Equipos equipo,
+            List<UsuarioAsignacionDto> usuariosDto) {
         Map<Integer, AsignacionUsuarioEquipo> actualesMap = asignacionUsuarioRepository
                 .findAllByEquipo_IdEquipo(equipo.getIdEquipo())
                 .stream()
                 .collect(Collectors.toMap(a -> a.getUsuario().getIdUsuario(), a -> a));
-
+        Set<Integer> incomingUserIds = usuariosDto != null
+                ? usuariosDto.stream().map(UsuarioAsignacionDto::getIdUsuario).collect(Collectors.toSet())
+                : Collections.emptySet();
         List<UsuarioAsignacionDto> result = new ArrayList<>();
-
+        for (AsignacionUsuarioEquipo asignacion : actualesMap.values()) {
+            if (!incomingUserIds.contains(asignacion.getUsuario().getIdUsuario())) {
+                if (asignacion.getEstado() == EstadoActivoInactivo.A) {
+                    // вернуть проценты только если был активен
+                    Usuario usuario = asignacion.getUsuario();
+                    usuario.setDisponibilidad(usuario.getDisponibilidad() + asignacion.getPorcentajeTrabajo());
+                    usuarioRepository.save(usuario);
+                }
+                asignacionUsuarioRepository.delete(asignacion);
+            }
+        }
         if (usuariosDto != null) {
             for (UsuarioAsignacionDto uDto : usuariosDto) {
                 Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
 
-                // Считаем дельту относительно старого процента
-                Integer viejoPorcentaje = Optional.ofNullable(
-                        actualesMap.get(usuario.getIdUsuario()))
-                        .map(AsignacionUsuarioEquipo::getPorcentajeTrabajo)
-                        .orElse(0);
-
-                Integer delta = uDto.getPorcentajeTrabajo() - viejoPorcentaje;
-
-                // Проверка и применение
-                ajustarDisponibilidadConDelta(usuario, delta);
-
-                // Обновляем или создаём запись
                 AsignacionUsuarioEquipo asignacion = actualesMap.get(usuario.getIdUsuario());
+                EstadoActivoInactivo estadoAnterior = asignacion != null ? asignacion.getEstado() : null;
+
+                // --- если назначение уже есть ---
                 if (asignacion != null) {
-                    asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
                     asignacion.setFechaEntrada(uDto.getFechaEntrada());
                     asignacion.setFechaFin(uDto.getFechaFin());
+
+                    // меняем статус
+                    if (estadoAnterior == EstadoActivoInactivo.A && uDto.getEstado() == EstadoActivoInactivo.I) {
+                        // A → I : вернуть проценты
+                        usuario.setDisponibilidad(usuario.getDisponibilidad() + asignacion.getPorcentajeTrabajo());
+                    } else if (estadoAnterior == EstadoActivoInactivo.I && uDto.getEstado() == EstadoActivoInactivo.A) {
+                        // I → A : списать новые проценты
+                        ajustarDisponibilidadConDelta(usuario, uDto.getPorcentajeTrabajo());
+                    } else if (estadoAnterior == EstadoActivoInactivo.A && uDto.getEstado() == EstadoActivoInactivo.A) {
+                        // A → A : пересчитать дельту
+                        Integer viejo = asignacion.getPorcentajeTrabajo();
+                        Integer delta = uDto.getPorcentajeTrabajo() - viejo;
+                        ajustarDisponibilidadConDelta(usuario, delta);
+                    }
+
+                    asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
+                    asignacion.setEstado(uDto.getEstado());
+
                 } else {
                     asignacion = new AsignacionUsuarioEquipo();
                     asignacion.setEquipo(equipo);
                     asignacion.setUsuario(usuario);
-                    asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
                     asignacion.setFechaEntrada(uDto.getFechaEntrada());
                     asignacion.setFechaFin(uDto.getFechaFin());
                     asignacion.setFechaCreacion(LocalDateTime.now());
+                    asignacion.setEstado(uDto.getEstado());
+                    asignacion.setPorcentajeTrabajo(uDto.getPorcentajeTrabajo());
+
+                    if (uDto.getEstado() == EstadoActivoInactivo.A) {
+                        ajustarDisponibilidadConDelta(usuario, uDto.getPorcentajeTrabajo());
+                    }
                 }
+
                 asignacionUsuarioRepository.save(asignacion);
-
+                usuarioRepository.save(usuario);
                 result.add(uDto);
-            }
-
-            // Удаляем пользователей, которых больше нет в списке
-            for (AsignacionUsuarioEquipo asignacion : new ArrayList<>(actualesMap.values())) {
-                if (usuariosDto.stream()
-                        .noneMatch(u -> u.getIdUsuario().equals(asignacion.getUsuario().getIdUsuario()))) {
-                    Usuario usuario = asignacion.getUsuario();
-                    // Возвращаем процент доступности
-                    ajustarDisponibilidadConDelta(usuario, -asignacion.getPorcentajeTrabajo());
-                    asignacionUsuarioRepository.delete(asignacion);
-                }
             }
         }
 
@@ -148,7 +166,6 @@ public class UsuarioServiceImpl implements IUsuarioService {
         List<UsuarioAsignacionDto> result = new ArrayList<>();
         if (usuariosDto != null) {
             for (UsuarioAsignacionDto uDto : usuariosDto) {
-                // Проверка и уменьшение доступности
                 Equipos equipo = equiposRepository.findByIdEquipo(equipoId);
                 Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
@@ -159,8 +176,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 asignacion.setFechaEntrada(uDto.getFechaEntrada());
                 asignacion.setFechaFin(uDto.getFechaFin());
                 asignacion.setFechaCreacion(LocalDateTime.now());
-                asignacionUsuarioRepository.save(asignacion);
+                asignacion.setEstado(uDto.getEstado());
 
+                asignacionUsuarioRepository.save(asignacion);
                 result.add(uDto);
             }
         }
