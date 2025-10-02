@@ -210,6 +210,7 @@ export interface DispositivoItem {
 export interface DispositivoAsignadoItem {
   idDispositivoAsignado: number;
   idDispositivo: number;
+  nombreDispositivo?: string;
   idSolicitud: number;
   fechaEntrega: string;
   fechaDevolucion?: string | null;

@@ -11,7 +11,7 @@ export interface TableColumn<T> {
 
 export const dispositivosAsignadosColumns: TableColumn<DispositivoAsignadoItem>[] = [
   { key: "idDispositivoAsignado", label: "ID" },
-  { key: "idDispositivo", label: "Dispositivo" },
+  { key: "nombreDispositivo", label: "Dispositivo" },
   { key: "idSolicitud", label: "Solicitud" },
   {
     key: "fechaEntrega",
