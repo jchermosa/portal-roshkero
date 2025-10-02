@@ -76,26 +76,22 @@ export default function ProfilePage() {
       setUploadError(null);
       setSuccessMessage(null);
 
-      console.log("=== FRONTEND DEBUG ===");
-      console.log("Archivo:", file.name, file.size, file.type);
-
       const base64Image = await toBase64(file);
-      const cleanBase64 = base64Image.split(",")[1]; // solo el puro contenido
-
-      console.log("Base64 longitud:", base64Image.length);
-      console.log("Base64 inicia con:", base64Image.substring(0, 30));
-      console.log("Contiene data:image:", base64Image.startsWith("data:image"));
-
-      console.log("Usuario actual:", user);
+      const cleanBase64 = base64Image.split(",")[1]; // solo el puro contenido  
 
       if (!user) {
         throw new Error("Usuario no está cargado");
       }
 
+<<<<<<< HEAD
 
 
       const res = await fetch(`http://localhost:8080/api/v1/usuarios/actualizarfoto`, {
         method: "POST",
+=======
+      const res = await fetch(`/api/usuarios/${user.id}/foto`, {
+        method: "PUT",
+>>>>>>> origin/merge-estable
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`, // 🔑 token de auth

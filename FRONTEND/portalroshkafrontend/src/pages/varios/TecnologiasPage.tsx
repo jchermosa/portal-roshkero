@@ -24,7 +24,7 @@ interface Props {
 
 export default function TecnologiasPage({ embedded = false }: Props) {
   const { token, user } = useAuth();
-  const canEdit = !tieneRol(user, RolesEnum.OPERACIONES);
+  const canEdit = tieneRol(user, RolesEnum.OPERACIONES);
 
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<TecnologiaResponse | null>(null);

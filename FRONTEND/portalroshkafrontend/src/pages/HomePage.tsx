@@ -8,14 +8,27 @@ export default function HomePage() {
 
   if (!user) return <p>Cargando...</p>;
 
+<<<<<<< HEAD
   const isThOrGth = user?.nombreRol === "TH" || user?.nombreRol === "GTH" || user?.nombreRol === "OPERACIONES";
   const isManu = user?.nombreRol === "MANU";
+=======
+  // Ahora usamos user.nombreRol para verificar permisos
+  const isThOrGth =
+    ["TALENTO HUMANO", "GTH", "OPERACIONES"].includes(user.nombreRol);
+
+  const isManu = user.nombreRol === "MANU";
+
+>>>>>>> origin/merge-estable
   const isFuncionario = [
     "FUNCIONARIO_FABRICA",
     "FUNCIONARIO_TERCERIZADO",
     "LIDER",
     "DIRECTORIO",
+<<<<<<< HEAD
   ].includes(user?.nombreRol || "");
+=======
+  ].includes(user.nombreRol);
+>>>>>>> origin/merge-estable
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -54,7 +67,11 @@ export default function HomePage() {
               <ProfileCard
                 title="Mi Perfil"
                 icon="👤"
+<<<<<<< HEAD
                 description={`Rol: ${user?.nombreRol}`}
+=======
+                description={`Rol: ${user?.nombreRol || user?.rol}`}
+>>>>>>> origin/merge-estable
                 onClick={() => navigate("/profile")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
@@ -70,38 +87,42 @@ export default function HomePage() {
                 buttonClass="bg-blue-600 hover:bg-blue-700"
                 color=""
               />
+
               {isThOrGth && (
-                <><ProfileCard
-                  title="Gestión de Usuarios"
-                  icon="👥"
-                  description="Administra perfiles y usuarios del sistema"
-                  onClick={() => navigate("/usuarios")}
-                  borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700"
-                  color=""
-                /><ProfileCard
-                  title="Gestión de Solicitudes"
-                  icon="📤"
-                  description="Administra las solicitudes de los usuarios"
-                  onClick={() => navigate("/gestion-solicitudes")}
-                  borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700"
-                  color=""
-                />
-                
+                <>
+                  <ProfileCard
+                    title="Gestión de Usuarios"
+                    icon="👥"
+                    description="Administra perfiles y usuarios del sistema"
+                    onClick={() => navigate("/usuarios")}
+                    borderClass="border-blue-600"
+                    buttonClass="bg-blue-600 hover:bg-blue-700"
+                    color=""
+                  />
+                  <ProfileCard
+                    title="Gestión de Solicitudes"
+                    icon="📤"
+                    description="Administra las solicitudes de los usuarios"
+                    onClick={() => navigate("/gestion-solicitudes")}
+                    borderClass="border-blue-600"
+                    buttonClass="bg-blue-600 hover:bg-blue-700"
+                    color=""
+                  />
                 </>
               )}
+
               {isManu && (
                 <ProfileCard
-                  title="Gestion de dispositivos"
+                  title="Gestión de dispositivos"
                   icon="💻"
                   description="Administra los dispositivos asignados a los usuarios"
                   onClick={() => navigate("/dispositivos")}
                   borderClass="border-blue-600"
                   buttonClass="bg-blue-600 hover:bg-blue-700"
                   color=""
-                />)}
-                
+                />
+              )}
+
               <ProfileCard
                 title="Beneficios"
                 icon="🎁"
@@ -110,7 +131,8 @@ export default function HomePage() {
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
                 color=""
-                />
+              />
+
               <ProfileCard
                 title="Solicitudes"
                 icon="📝"
