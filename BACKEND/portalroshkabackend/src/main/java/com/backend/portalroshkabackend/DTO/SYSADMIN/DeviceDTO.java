@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class DeviceDTO {
 
     private Integer idDispositivo;
+    private String nombreDispositivo;
     private Integer tipoDispositivo;
     private String nroSerie;
     private String modelo;
@@ -24,6 +25,7 @@ public class DeviceDTO {
     private EstadoInventario estado;
     private CategoriaEnum categoria;
     private Integer encargado;
+    private String nombreEncargado;
     private Integer ubicacion;
     
 

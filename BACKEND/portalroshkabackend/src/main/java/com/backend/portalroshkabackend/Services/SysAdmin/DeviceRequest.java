@@ -129,9 +129,13 @@ public class DeviceRequest {
 
     private DeviceRequestDto convertToDto(Solicitud solicitud) {
         DeviceRequestDto dto = new DeviceRequestDto();
-        dto.setFechaInicio(solicitud.getFechaInicio());
-        // dto.setCantDias(solicitud.getCantDias());
-        dto.setEstado(solicitud.getEstado());
+
+        // Mapear el nombre del usuario que solicito 
+        if (solicitud.getUsuario() != null) {
+            dto.setNombreUsuario(solicitud.getUsuario().getNombre());
+        }
+
+        dto.setNombreUsuario(solicitud.getUsuario().getNombre());
 
         // Remover el ID del tipo de dispositivo del comentario (contenido entre paréntesis)
         String comentarioLimpio = solicitud.getComentario();

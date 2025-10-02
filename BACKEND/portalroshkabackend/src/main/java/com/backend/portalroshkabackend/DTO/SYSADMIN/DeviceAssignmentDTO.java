@@ -16,6 +16,7 @@ public class DeviceAssignmentDTO {
 
     private Integer idDispositivoAsignado;
     private Integer idDispositivo;
+    private String nombreDispositivo;
     private Integer idSolicitud;
     private LocalDate fechaEntrega;
     private LocalDate fechaDevolucion;

@@ -15,13 +15,14 @@ public class RequestDTO {
     
     private Integer idSolicitud;
     private Integer idUsuario;
-    private Integer idDocumentoAdjunto;
-    private Integer idLider;
+    private String nombreUsuario;
+    // private Integer idDocumentoAdjunto;
+    // private Integer idLider;
     private String tipoSolicitud;
     private String comentario;
     private EstadoSolicitudEnum estado;
     private LocalDate fechaInicio;
-    private int cantDias;
+    // private int cantDias;
     private LocalDate fechaFin;
 
 }
