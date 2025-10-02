@@ -204,6 +204,7 @@ export interface DispositivoItem {
   estado: EstadoInventarioEnum;
   categoria: CategoriaEnum;
   encargado: number; 
+  nombreEncargado?: string;
 }
 
 export interface DispositivoAsignadoItem {
