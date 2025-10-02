@@ -31,13 +31,45 @@ export interface UsuarioItem {
 export interface SolicitudItem {
   idSolicitud: number;
   usuario: string;   
+  nombreUsuario: string
   tipoSolicitud: "PERMISO" | "BENEFICIO" | "VACACIONES";
-  subtipo: string;
+  nombreSubTipoSolicitud: string;
+  subTipo: string;
   fechaInicio: string;
-  cantidadDias: number | null;
+  cantDias: number | null;
+  monto?: number;   
   fechaCreacion: string;
-  estado: "P" | "A" | "R";
+  nombreLider: string;
+  estado: "P" | "A" | "R" | "RC";
 }
+
+export interface SolicitudFormData {
+  idSubtipo?: number;
+  fechaInicio: string;
+  cantDias?: number;
+  comentario: string;
+  monto?: number;      
+  fechaFin?: string;     
+}
+
+export type SolicitudPayload =
+  | {
+      id_tipo_permiso: number | undefined;
+      fecha_inicio: string;
+      cant_dias: number | null;
+      comentario: string;
+    }
+  | {
+      id_tipo_beneficio: number | undefined;
+      fecha_inicio: string;
+      cant_dias: number | null;
+      comentario: string;
+      monto: number | null;
+    }
+  | {
+      fecha_inicio: string;
+      fecha_fin: string;
+    };
 
 export interface EquipoItem {
   id: number;
@@ -62,17 +94,19 @@ export interface CargoItem {
 }
 
 export interface TipoPermisoItem {
-  id: number;
+  idTipoPermiso: number;
   nombre: string;
-  cantidadDias: number | null; 
+  cantDias: number;
+  observaciones: string;
+  remunerado: boolean;
+  fuerzaMenor: boolean;
 }
 
 export interface TipoBeneficioItem {
-  id: number;
+  idTipoBeneficio: number;
   nombre: string;
   descripcion: string;
-  estado: "A" | "I";
-  requiereAprobacionLider: boolean;
+  montoMaximo: number;
 }
 
 

@@ -1,6 +1,5 @@
 import type { SolicitudItem} from "../types";
-
-
+import type { SolicitudPayload } from "../types";
 
 export interface PaginatedResponse<T> {
   content: T[];
@@ -10,16 +9,27 @@ export interface PaginatedResponse<T> {
   number: number;
 }
 
-// ================================
-// API Methods
-// ================================
-async function getSolicitudesUsuarioApi(
+export async function getSolicitudesPermisoBeneficio(
+  token: string
+): Promise<SolicitudItem[]> {
+  const res = await fetch(`/api/v1/usuarios/solicitudes`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+
+
+export async function getSolicitudesVacaciones(
   token: string,
-  usuarioId: number,
   params: Record<string, string | number | undefined> = {}
 ): Promise<PaginatedResponse<SolicitudItem>> {
   const query = new URLSearchParams();
-  query.append("usuarioId", usuarioId.toString());
+  
+  // IMPORTANTE: Agregar el filtro de tipo VACACIONES
+  query.append("tipoSolicitud", "VACACIONES");
   
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== "") query.append(k, String(v));
@@ -39,7 +49,7 @@ async function getSolicitudByIdApi(
   token: string,
   id: string
 ): Promise<SolicitudItem> {
-  const res = await fetch(`/api/solicitudes/${id}`, {
+  const res = await fetch(`/api/v1/usuarios/solicitud/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -47,11 +57,11 @@ async function getSolicitudByIdApi(
   return res.json();
 }
 
-async function createSolicitudApi(
+export async function createSolicitudPermiso(
   token: string,
-  solicitud: Partial<SolicitudItem>
+  solicitud: SolicitudPayload
 ): Promise<SolicitudItem> {
-  const res = await fetch(`/api/solicitudes`, {
+  const res = await fetch(`/api/v1/usuarios/crearpermiso`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -64,7 +74,50 @@ async function createSolicitudApi(
   return res.json();
 }
 
-async function updateSolicitudApi(
+export async function createSolicitudBeneficio(
+  token: string,
+  solicitud: SolicitudPayload
+): Promise<SolicitudItem> {
+  const res = await fetch(`/api/v1/usuarios/crearbeneficio`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(solicitud),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || data.error || "Error al crear beneficio");
+  }
+
+  if (data.success === false || data.error) {
+    throw new Error(data.message || data.error || "No se pudo crear la solicitud");
+  }
+
+  return data as SolicitudItem;
+}
+
+export async function createSolicitudVacaciones(
+  token: string,
+  solicitud: SolicitudPayload
+): Promise<SolicitudItem> {
+  const res = await fetch(`/api/v1/usuarios/crearvacacion`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(solicitud),
+  });
+
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function updateSolicitud(
   token: string,
   id: string,
   solicitud: Partial<SolicitudItem>
@@ -84,13 +137,10 @@ async function updateSolicitudApi(
 
 
 
-
 // Exports 
 
-export const getSolicitudesUsuario = getSolicitudesUsuarioApi;
+export const getSolicitudesUsuario = getSolicitudesPermisoBeneficio;
 
 export const getSolicitudById = getSolicitudByIdApi;
 
-export const createSolicitud = createSolicitudApi;
 
-export const updateSolicitud = updateSolicitudApi;

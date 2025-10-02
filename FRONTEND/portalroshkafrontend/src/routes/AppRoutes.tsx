@@ -9,13 +9,11 @@ import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
 import BeneficiosPage from "../pages/solicitudes/BenefitsPage";
 import UsuariosPage from "../pages/user/UserPage.tsx";
-import VacacionesPage from "../pages/solicitudes/VacacionesPage";
 import RequestPage from "../pages/solicitudes/RequestPage";
 import Configuration from "../pages/Configuration.tsx";
 import UserFormPage from "../pages/user/UserFormPage.tsx";
 import UserSearchPage from "../pages/user/UserSearchPage.tsx";
 import RequestFormPage from "../pages/solicitudes/RequestFormPage";
-import SolicitudVacacionesPage from "../pages/solicitudes/SolicitudVacacionesPage";
 import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage.tsx";
 import RequestManagementPage from "../pages/solicitudes/RequestManagementPage.tsx";
 import RequestSearchPage from "../pages/solicitudes/RequestSearchPage.tsx";
@@ -27,6 +25,9 @@ import DeviceAssignmentsFormPage from "../pages/dispositivos/DeviceAssignmentFor
 import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
 import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
 import RequestViewPage from "../pages/solicitudes/RequestViewPage.tsx";
+import RequestViewPageUsuario from "../pages/solicitudes/RequestViewPageUsuario.tsx";
+import RequestTLPage from "../pages/solicitudes/RequestTLPage.tsx";
+import RequestViewTL from "../pages/solicitudes/RequestViewTL.tsx";
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -43,14 +44,25 @@ export default function AppRoutes() {
           <Route index element={<HomePage />} />
 
           {/* Solicitudes */}
-          <Route path="/requests" element={<RequestPage />} />
-          <Route path="/requests/nuevo" element={<RequestFormPage />} />
-          <Route path="/requests/:id" element={<RequestFormPage />} />
-          <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage />} />
-          <Route path="/solicitudesTH/permisos" element={<RequestManagementPage/>} />
-          <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage/>} />
-          <Route path="/solicitudesTH/:id/ver" element={<RequestViewPage/>}/>
-      <Route path="/solicitudesTH/:id/evaluar" element={<RequestViewPage/>}/>
+            {/*Solicitudes-Usuario*/}
+              <Route path="/requests" element={<RequestPage />} />
+              <Route path="/requests/beneficio" element={<RequestFormPage />} />
+              <Route path="/requests/permiso" element={<RequestFormPage />} />
+              <Route path="/request/vacaciones" element={<RequestFormPage />} />
+              <Route path="/requests/:id" element={<RequestViewPageUsuario />} />
+              
+            {/*Solicitudes-Team Leader*/}
+              <Route path="/solicitudesTL" element={<RequestTLPage/>}/> 
+              <Route path="/solicitudesTL/:id/ver" element={<RequestViewTL/>}/>
+              <Route path="/solicitudesTL/:id/evaluar" element={<RequestViewTL/>}/>
+
+            {/*Solicitudes-Talento Humano*/}
+              <Route path="/seleccion-solicitudesTH" element={<RequestSearchPage />} />
+              <Route path="/solicitudesTH/permisos" element={<RequestManagementPage/>} />
+              <Route path="/solicitudesTH/beneficios" element={<RequestManagementPage/>} />
+              <Route path="/solicitudesTH/vacaciones" element={<RequestManagementPage/>} />
+              <Route path="/solicitudesTH/:id/ver" element={<RequestViewPage/>}/>
+              <Route path="/solicitudesTH/:id/evaluar" element={<RequestViewPage/>}/>
 
           {/* Usuarios */}
           <Route path="/usuarios" element={<UsuariosPage />} />
@@ -58,9 +70,6 @@ export default function AppRoutes() {
           <Route path="/usuarios/nuevo" element={<UserFormPage />} />
           <Route path="/usuarios/:id" element={<UserFormPage />} />
 
-          {/* Vacaciones */}
-          <Route path="/vacaciones" element={<VacacionesPage />} />
-          <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
 
           {/* Beneficios */}
           <Route path="/benefits" element={<BeneficiosPage />} />

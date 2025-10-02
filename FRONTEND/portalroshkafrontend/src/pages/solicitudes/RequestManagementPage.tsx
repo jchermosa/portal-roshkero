@@ -18,7 +18,6 @@ export default function SolicitudesTHPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Detectamos la URL para determinar la categoría
   let tipoSolicitud: "PERMISO" | "BENEFICIO" | "VACACIONES";
 
   if (location.pathname.includes("permisos")) tipoSolicitud = "PERMISO";
@@ -26,63 +25,65 @@ export default function SolicitudesTHPage() {
   else if (location.pathname.includes("vacaciones")) tipoSolicitud = "VACACIONES";
   else tipoSolicitud = "PERMISO";
 
-  // Filtros
-  const [tipoId, setTipoId] = useState("");
+  const [subTipo, setSubTipo] = useState("");
   const [estado, setEstado] = useState("");
   const [page, setPage] = useState(0);
 
-  // Permisos
   const puedeVerSolicitudes = tieneRol(user, Roles.TH, Roles.GTH);
 
-  // Catálogos
   const { tiposPermiso, tiposBeneficio, loading: loadingCatalogos } = useCatalogosSolicitudes(token);
 
   const opcionesTipoEspecifico =
     tipoSolicitud === "PERMISO"
-      ? tiposPermiso.map((t) => ({ value: t.id, label: t.nombre }))
+      ? tiposPermiso.map((t) => ({ value: t.nombre, label: t.nombre }))
       : tipoSolicitud === "BENEFICIO"
-      ? tiposBeneficio.map((t) => ({ value: t.id, label: t.nombre }))
+      ? tiposBeneficio.map((t) => ({ value: t.nombre, label: t.nombre }))
       : [];
 
-  // Hook de solicitudes
   const { data: solicitudes, totalPages, loading, error } = useSolicitudesTH(
     token,
-    { tipoSolicitud, tipoId, estado },
+    { tipoSolicitud, subTipo, estado },
     page
   );
 
   const limpiarFiltros = () => {
-    setTipoId("");
+    setSubTipo("");
     setEstado("");
     setPage(0);
   };
 
-  // Columnas
   const columns = [
     { key: "idSolicitud", label: "ID" },
     {
       key: "usuario",
       label: "Usuario",
-      render: (s: SolicitudItem) => {
-        const [nombre, ...apellidoArr] = s.usuario.split(" ");
-        const apellido = apellidoArr.join(" ");
-        return `${nombre} ${apellido}`.trim();
-      },
+      render: (s: SolicitudItem) => s.nombreUsuario || s.usuario || "-",
     },
     {
       key: "tipoSolicitud",
       label: "Tipo",
       render: (s: SolicitudItem) => s.tipoSolicitud,
     },
+    // Mostrar subTipo solo para PERMISO y BENEFICIO
+    ...(tipoSolicitud === "PERMISO" || tipoSolicitud === "BENEFICIO"
+      ? [
+          {
+            key: "subTipo",
+            label: "Subtipo",
+            render: (s: SolicitudItem) => s.nombreSubTipoSolicitud || s.subTipo || "-",
+          },
+        ]
+      : []),
     {
       key: "estado",
       label: "Estado",
       render: (s: SolicitudItem) => {
-        const estados = { P: "Pendiente", A: "Aprobada", R: "Rechazada" };
+        const estados = { P: "Pendiente", A: "Aprobada", R: "Rechazada", RC: "Recalendarizada"};
         const colores = {
           P: "bg-yellow-100 text-yellow-700",
           A: "bg-green-100 text-green-700",
           R: "bg-red-100 text-red-700",
+          RC: "bg-orange-100 text-red-700"
         };
         return (
           <span
@@ -128,16 +129,20 @@ export default function SolicitudesTHPage() {
     { value: "A", label: "Aprobada" },
     { value: "R", label: "Rechazada" },
   ];
+  console.log("Solicitudes cargadas:", solicitudes);
 
   return (
     <PageLayout title="Gestión de Solicitudes">
       <div className="flex items-center gap-4 mb-4">
         {tipoSolicitud && opcionesTipoEspecifico.length > 0 && (
           <SelectDropdown
-            name="tipoEspecifico"
+            name="subTipo"
             label="Tipo"
-            value={tipoId}
-            onChange={(e) => setTipoId(e.target.value)}
+            value={subTipo}
+            onChange={(e) => {
+              setSubTipo(e.target.value);
+              setPage(0);
+            }}
             options={opcionesTipoEspecifico}
             placeholder={`Filtrar ${tipoSolicitud.toLowerCase()}`}
           />
@@ -147,7 +152,10 @@ export default function SolicitudesTHPage() {
           name="estado"
           label="Estado"
           value={estado}
-          onChange={(e) => setEstado(e.target.value)}
+          onChange={(e) => {
+            setEstado(e.target.value);
+            setPage(0);
+          }}
           options={estadosOptions}
           placeholder="Filtrar por Estado"
         />
@@ -178,3 +186,4 @@ export default function SolicitudesTHPage() {
     </PageLayout>
   );
 }
+

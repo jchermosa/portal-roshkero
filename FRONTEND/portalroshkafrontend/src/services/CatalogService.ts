@@ -1,4 +1,4 @@
-import type { EquipoItem, RolItem, CargoItem, TipoBeneficioItem, TipoPermisoItem, LiderItem } from "../types";
+import type { EquipoItem, RolItem, CargoItem, TipoBeneficioItem, TipoPermisoItem } from "../types";
 import mockEquipos from "../data/mockEquipos.json";
 import mockRoles from "../data/mockRoles.json";
 import mockCargos from "../data/mockCargos.json";
@@ -36,7 +36,7 @@ async function getCargosApi(token: string): Promise<CargoItem[]> {
 }
 
 async function getTiposPermisoApi(token: string) {
-  const res = await fetch(`/api/catalogos/tipos-permiso`, {
+  const res = await fetch(`/api/v1/usuarios/tipospermisos`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
@@ -44,14 +44,7 @@ async function getTiposPermisoApi(token: string) {
 }
 
 async function getTiposBeneficioApi(token: string) {
-  const res = await fetch(`/api/catalogos/tipos-beneficio`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-async function getLideresApi(token: string): Promise<LiderItem[]> {
-  const res = await fetch(`/api/catalogos/lideres`, {
+  const res = await fetch(`/api/v1/usuarios/tiposbeneficios`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
@@ -75,16 +68,6 @@ async function getCargosMock(_: string): Promise<CargoItem[]> {
   return mockCargos as CargoItem[];
 }
 
-async function getTiposPermisoMock(_: string): Promise<TipoPermisoItem[]> {
-  return mockTiposPermiso as TipoPermisoItem[];
-}
-
-async function getTiposBeneficioMock(_: string): Promise<TipoBeneficioItem[]> {
-  return mockTiposBeneficio as TipoBeneficioItem[];
-}
-async function getLideresMock(): Promise<LiderItem[]> {
-  return mockLideres as LiderItem[];
-}
 
 
 // ================================
@@ -93,6 +76,6 @@ async function getLideresMock(): Promise<LiderItem[]> {
 export const getEquipos = USE_MOCK ? getEquiposMock : getEquiposApi;
 export const getRoles = USE_MOCK ? getRolesMock : getRolesApi;
 export const getCargos = USE_MOCK ? getCargosMock : getCargosApi;
-export const getTiposPermiso = USE_MOCK ? getTiposPermisoMock : getTiposPermisoApi;
-export const getTiposBeneficio = USE_MOCK ? getTiposBeneficioMock : getTiposBeneficioApi;
-export const getLideres = USE_MOCK ? getLideresMock : getLideresApi;
+export const getTiposPermiso =  getTiposPermisoApi;
+export const getTiposBeneficio = getTiposBeneficioApi;
+

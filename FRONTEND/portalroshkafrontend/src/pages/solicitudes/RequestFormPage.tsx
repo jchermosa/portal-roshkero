@@ -1,106 +1,230 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import DynamicForm, { type FormSection } from "../../components/DynamicForm";
 import FormLayout from "../../layouts/FormLayout";
 import { useCatalogosSolicitudes } from "../../hooks/catalogos/useCatalogosSolicitudes";
 import { useRequestForm } from "../../hooks/solicitudes/useRequestForm";
-import type { SolicitudItem } from "../../types";
+import type { SolicitudFormData } from "../../types";
 
 export default function RequestFormPage() {
-  const { token } = useAuth();
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const { token } = useAuth();
 
-  // Catalogo de tipos de permiso
-  const { tiposPermiso: tipos, loading: loadingCatalogos } = useCatalogosSolicitudes(token);
-
-  // Hook del formulario
-  const { data, setData, loading: loadingSolicitud, error, handleSubmit, isEditing, editable } = useRequestForm(id);
-
-  const loading = loadingCatalogos || loadingSolicitud;
-
-  // Manejar cambios en formulario
-  const handleFormChange = (newData: Partial<SolicitudItem>) => {
-    if (newData.id_subtipo && newData.id_subtipo !== data.id_subtipo) {
-      const tipo = tipos.find(t => t.id === newData.id_subtipo);
-      const dias = tipo?.cantidadDias ?? 0;
-      setData({ ...data, ...newData, cant_dias: dias });
-    } else {
-      setData(prev => ({ ...prev, ...newData }));
-    }
+  const getTipo = (): "PERMISO" | "BENEFICIO" | "VACACIONES" => {
+    if (location.pathname.includes("permiso")) return "PERMISO";
+    if (location.pathname.includes("beneficio")) return "BENEFICIO";
+    return "VACACIONES";
   };
 
-  // Generar secciones del formulario
-  const getSections = (): FormSection[] => [
-    {
-      title: "Información de la Solicitud",
-      icon: "📅",
-      fields: [
-        {
-          name: "id_subtipo",
+  const tipo = getTipo();
+
+  const { 
+    tiposPermiso, 
+    tiposBeneficio, 
+    loading: loadingCatalogos 
+  } = useCatalogosSolicitudes(token);
+
+  const { 
+    data, 
+    setData, 
+    handleSubmit, 
+    isEditing,
+    loading: loadingForm,
+    error,
+    editable
+  } = useRequestForm(tipo, id);
+
+  const [beneficioError, setBeneficioError] = useState<string | null>(null);
+
+  const loading = loadingCatalogos || loadingForm;
+
+  // Auto-calcular días para permisos
+  useEffect(() => {
+    if (tipo === "PERMISO" && data.idSubtipo != null) {
+      const tipoPermiso = tiposPermiso.find((t) => t.idTipoPermiso === data.idSubtipo);
+      if (tipoPermiso) {
+        setData((prev) => ({
+          ...prev,
+          cantDias: tipoPermiso.cantDias ?? 0 // asigna siempre el valor del tipo, incluso 0
+        }));
+      }
+    }
+  }, [data.idSubtipo, tipo, tiposPermiso, setData]);
+
+
+
+
+  // Si es beneficio, asegurar monto en 0 por defecto
+  useEffect(() => {
+    if (tipo === "BENEFICIO" && (data.monto == null || isNaN(Number(data.monto)))) {
+      setData((prev) => ({ ...prev, monto: 0 }));
+    }
+  }, [tipo, data.monto, setData]);
+
+  // Validar monto contra monto máximo del beneficio
+  useEffect(() => {
+    if (tipo === "BENEFICIO" && data.idSubtipo) {
+      const beneficio = tiposBeneficio.find((b) => b.idTipoBeneficio === data.idSubtipo);
+      if (beneficio && data.monto != null) {
+        if (data.monto > beneficio.montoMaximo) {
+          setBeneficioError(
+            `El monto ingresado (${data.monto}) excede el máximo permitido (${beneficio.montoMaximo}) para este beneficio.`
+          );
+        } else {
+          setBeneficioError(null);
+        }
+      }
+    } else {
+      setBeneficioError(null);
+    }
+  }, [tipo, data.idSubtipo, data.monto, tiposBeneficio]);
+
+  const getSections = (): FormSection[] => {
+      const fields: any[] = [];
+
+      if (tipo === "PERMISO") {
+        fields.push({
+          name: "idSubtipo",
           label: "Tipo de permiso",
           type: "select",
           required: true,
-          options: tipos.map(t => ({ value: t.id, label: t.nombre })),
-          value: data.id_subtipo,
+          options: tiposPermiso.map(t => ({ value: t.idTipoPermiso, label: t.nombre })),
+          value: data.idSubtipo,
           disabled: !editable,
-        },
-        {
-          name: "cant_dias",
+        });
+      }
+
+      if (tipo === "BENEFICIO") {
+        fields.push({
+          name: "idSubtipo",
+          label: "Tipo de beneficio",
+          type: "select",
+          required: true,
+          options: tiposBeneficio.map((t) => ({
+            value: t.idTipoBeneficio,
+            label: t.nombre,
+          })),
+          value: data.idSubtipo,
+          disabled: !editable,
+        });
+
+        const beneficioSeleccionado = tiposBeneficio.find(
+          (b) => b.idTipoBeneficio === data.idSubtipo
+        );
+        const montoMax = beneficioSeleccionado?.montoMaximo;
+
+        fields.push({
+          name: "monto",
+          label: `Monto ${montoMax ? `(máx. ${montoMax})` : ""}`,
+          type: "number",
+          required: true,
+          value: data.monto ?? 0,
+          disabled: !editable,
+          error: beneficioError || undefined,
+        });
+      }
+
+      // Campos para todas las solicitudes
+      fields.push({
+        name: "fechaInicio",
+        label: "Fecha de inicio",
+        type: "date",
+        required: true,
+        value: data.fechaInicio,
+        disabled: !editable,
+      });
+
+      // Solo VACACIONES tiene fechaFin
+      if (tipo === "VACACIONES") {
+        fields.push({
+          name: "fechaFin",
+          label: "Fecha de fin",
+          type: "date",
+          required: true,
+          value: data.fechaFin,
+          disabled: !editable,
+        });
+      }
+
+      // Campos solo para PERMISO
+      if (tipo === "PERMISO") {
+        fields.push({
+          name: "cantidadDias",
           label: "Cantidad de días",
           type: "number",
           required: true,
-          value: data.cant_dias,
-          disabled: true, // readonly
-        },
-        {
-          name: "fecha_inicio",
-          label: "Fecha de inicio",
-          type: "date",
-          required: true,
-          value: data.fecha_inicio,
+          value: data.cantDias ?? 0,
           disabled: !editable,
-        },
-        {
+        });
+      }
+
+      // Comentario solo para PERMISO y BENEFICIO
+      if (tipo !== "VACACIONES") {
+        fields.push({
           name: "comentario",
           label: "Comentario",
           type: "textarea",
-          required: true,
+          required: tipo === "BENEFICIO",
           value: data.comentario,
           disabled: !editable,
+        });
+      }
+
+      const iconMap = {
+        PERMISO: "📋",
+        BENEFICIO: "🎁",
+        VACACIONES: "🌴",
+      };
+
+      return [
+        {
+          title: `Información de ${tipo === "PERMISO" ? "Permiso" : tipo === "BENEFICIO" ? "Beneficio" : "Vacaciones"}`,
+          icon: iconMap[tipo],
+          fields,
         },
-      ],
-    },
-  ];
+      ];
+    };
+
 
   if (loading) return <p>Cargando...</p>;
 
+  const titleMap = {
+    PERMISO: "Permiso",
+    BENEFICIO: "Beneficio",
+    VACACIONES: "Vacaciones"
+  };
+
+  const handleFormSubmit = async () => {
+    if (beneficioError) return; 
+
+    const payload = { ...data, ...(tipo === "BENEFICIO" ? { monto: data.monto ?? 0 } : {}) };
+
+    const success = await handleSubmit(payload);
+    if (success) {
+      navigate(-1);
+    }
+  };
+
   return (
-    <FormLayout
-      title={isEditing ? "Editar Solicitud de Permiso" : "Nueva Solicitud de Permiso"}
-      subtitle={isEditing ? "Modifica los campos necesarios" : "Completa la información de tu solicitud de permiso"}
-      icon={isEditing ? "✏️" : "🧑‍💻"}
-      onCancel={() => navigate("/requests")}
+    <FormLayout 
+      title={`${isEditing ? "Editar" : "Nueva"} Solicitud de ${titleMap[tipo]}`}
+      subtitle={`Completa la información de tu solicitud de ${titleMap[tipo].toLowerCase()}`}
+      icon={tipo === "PERMISO" ? "📋" : tipo === "BENEFICIO" ? "🎁" : "🌴"}
+      onCancel={() => navigate(-1)}
       onSubmitLabel={isEditing ? "Guardar cambios" : "Enviar solicitud"}
     >
       <DynamicForm
-        id="solicitud-form"
+        id={`${tipo.toLowerCase()}-form`}
         sections={getSections()}
         initialData={data}
-        onChange={handleFormChange}
-        onSubmit={async () => {
-          const payload: SolicitudItem = {
-            ...data,
-            tipo_solicitud: "PERMISO",
-            estado: "P",
-          };
-          await handleSubmit(payload);
-          navigate("/requests");
-        }}
+        onChange={(newData) => setData(prev => ({ ...prev, ...newData }))}
+        onSubmit={handleFormSubmit}
         loading={loading}
-        className="flex-1 overflow-hidden"
       />
+      {beneficioError && <p className="text-red-500 text-sm mt-2">{beneficioError}</p>}
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </FormLayout>
   );

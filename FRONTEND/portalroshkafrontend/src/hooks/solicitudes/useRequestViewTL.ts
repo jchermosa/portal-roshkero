@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-  getSolicitudById,
-  aprobarSolicitud,
-  rechazarSolicitud,
-} from "../../services/RequestTHService";
+  getSolicitudByIdTL,
+  aprobarSolicitudTL,
+  rechazarSolicitudTL,
+} from "../../services/RequestTLService";
 import type { SolicitudItem } from "../../types";
 
-export function useRequestView(token: string | null, id: string | null) {
+export function useRequestViewTL(token: string | null, id: string | null) {
   const [solicitud, setSolicitud] = useState<SolicitudItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export function useRequestView(token: string | null, id: string | null) {
       setError(null);
 
       try {
-        const result = await getSolicitudById(token, id);
+        const result = await getSolicitudByIdTL(token, id);
         setSolicitud(result);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -46,7 +46,7 @@ export function useRequestView(token: string | null, id: string | null) {
   setError(null);
 
   try {
-    await aprobarSolicitud(token, id);   
+    await aprobarSolicitudTL(token, id);   
     setSolicitud((prev) => (prev ? { ...prev, estado: "A" } : null));
     return true;
   } catch (err) {
@@ -67,7 +67,7 @@ const rechazar = async (): Promise<boolean> => {
   setError(null);
 
   try {
-    await rechazarSolicitud(token, id);  // Comentario vacío
+    await rechazarSolicitudTL(token, id);  // Comentario vacío
     setSolicitud((prev) => (prev ? { ...prev, estado: "R" } : null));
     return true;
   } catch (err) {

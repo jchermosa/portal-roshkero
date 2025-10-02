@@ -5,7 +5,7 @@ import SelectDropdown from "../../components/SelectDropdown";
 import DataTable from "../../components/DataTable";
 import PaginationFooter from "../../components/PaginationFooter";
 import IconButton from "../../components/IconButton";
-import { useSolicitudesUsuario } from "../../hooks/solicitudes/useRequestPage";
+import { useRequestTL } from "../../hooks/solicitudes/useRequestTL";
 import type { SolicitudItem } from "../../types";
 
 export default function RequestPage() {
@@ -17,7 +17,7 @@ export default function RequestPage() {
   const [estadoFiltro, setEstadoFiltro] = useState<string>("");
   const [tipoFiltro, setTipoFiltro] = useState<string>("");
 
-  const { solicitudes, totalPages, loading, error } = useSolicitudesUsuario(
+  const { solicitudes, totalPages, loading, error } = useRequestTL(
     page,
     subtipo || undefined
   );
@@ -82,17 +82,28 @@ export default function RequestPage() {
     },
   ];
 
+    const renderActions = (s: SolicitudItem) => {
+        if (s.estado === "P") {
+        return (
+            <button
+            onClick={() => navigate(`/solicitudesTL/${s.idSolicitud}/evaluar`)}
+            className="w-16 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition-colors duration-200"
+            >
+            Evaluar
+            </button>
+        );
+        } else {
+        return (
+            <button
+            onClick={() => navigate(`/solicitudesTL/${s.idSolicitud}/ver`)}
+            className="w-16 px-3 py-1 bg-gray-400 text-white rounded-lg text-xs hover:bg-gray-500 transition-colors duration-200"
+            >
+            Ver
+            </button>
+        );
+        }
+    };
 
-
-  const renderActions = (s: SolicitudItem) => (
-    <button
-      onClick={() => navigate(`/requests/${s.idSolicitud}`)}
-      className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
-      disabled={loading}
-    >
-      {"Ver"}
-    </button>
-  );
 
   if (loading) return <p>Cargando solicitudes...</p>;
   if (error) return <p className="text-red-500">Error: {error}</p>;
@@ -120,30 +131,7 @@ export default function RequestPage() {
           <div className="flex flex-col flex-shrink-0 p-6 border-b border-gray-200 gap-4">
             {/* Botones */}
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-brand-blue">Mis Solicitudes</h2>
-              <div className="flex gap-2">
-                <IconButton
-                  label="Solicitar Permiso"
-                  icon={<span>➕</span>}
-                  variant="primary"
-                  onClick={() => navigate("/requests/permiso")}
-                  className="h-10 text-sm px-4"
-                />
-                <IconButton
-                  label="Solicitar Beneficio"
-                  icon={<span>➕</span>}
-                  variant="primary"
-                  onClick={() => navigate("/requests/beneficio")}
-                  className="h-10 text-sm px-4"
-                />
-                <IconButton
-                  label="Solicitar Vacaciones"
-                  icon={<span>➕</span>}
-                  variant="primary"
-                  onClick={() => navigate("/request/vacaciones")}
-                  className="h-10 text-sm px-4 flex items-center"
-                />
-              </div>
+              <h2 className="text-2xl font-bold text-brand-blue">Gestiona Solicitudes</h2>
             </div>
 
             {/* Filtros */}

@@ -19,7 +19,7 @@ export default function DashboardLayout() {
     { id: "/dispositivos-asignados", label: "Gestión de Dispositivos", icon: "💻", available: true},
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: puedeGestionarDispositivos},
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: true },
-    { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
+    { id: "/solicitudesTL", label: "Gestionar Solicitudes", icon: "📤", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/solicitud-dispositivo", label: "Solicitud Dispositivo", icon: "📱", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },

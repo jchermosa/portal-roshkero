@@ -1,15 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useRequestView } from "../../hooks/solicitudes/useRequestView";
+import { useRequestViewTL } from "../../hooks/solicitudes/useRequestViewTL";
 import { useAuth } from "../../context/AuthContext";
 import PageLayout from "../../layouts/PageLayout";
 import type { SolicitudItem } from "../../types";
 
-export default function RequestViewPage() {
+export default function RequestViewTL() {
   const { token } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { solicitud, loading, error, aprobar, rechazar, procesando } = useRequestView(
+  const { solicitud, loading, error, aprobar, rechazar, procesando } = useRequestViewTL(
     token,
     id ?? null
   );

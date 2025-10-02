@@ -1,72 +1,48 @@
-// src/hooks/solicitudes/useSolicitudesTH.ts
-import { useState, useEffect } from "react";
-import { getSolicitudes } from "../../services/RequestTHService";
+import { useEffect, useState } from "react";
 import type { SolicitudItem } from "../../types";
+import { getSolicitudes } from "../../services/RequestTHService";
 
-interface FiltrosTH {
+interface Filters {
   tipoSolicitud?: "PERMISO" | "BENEFICIO" | "VACACIONES";
-  tipoId?: string;
   estado?: string;
-  usuarioNombre?: string;
+  subTipo?: string;
 }
 
 export function useSolicitudesTH(
   token: string | null,
-  filtros: FiltrosTH,
+  filters: Filters,
   page: number,
-  size: number = 10
+  pageSize = 10
 ) {
   const [data, setData] = useState<SolicitudItem[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const modoDesarrollo = true; // cambiar a false en producción
+  // Extraer valores primitivos para evitar recreación del objeto
+  const { tipoSolicitud, estado, subTipo } = filters;
 
   useEffect(() => {
-    if (!token) {
-      setData([]);
-      setLoading(false);
-      return;
-    }
+    if (!token) return;
 
     setLoading(true);
     setError(null);
 
-    // -----------------------
-    // PRODUCCIÓN (API REAL)
-    // -----------------------
-    const fetchData = async () => {
-      try {
-        const params = {
-          ...filtros,
-          page,
-          size,
-        };
+    getSolicitudes(token, { tipoSolicitud, estado })
+      .then((res) => {
+        let solicitudes = res.content;
 
-        const response = await getSolicitudes(token, params);
-        
-        const normalizedData: SolicitudItem[] = response.content.map((s: any) => ({
-          idSolicitud: s.idSolicitud ?? s.id,
-          usuario: s.usuario ?? `${s.nombre ?? ""} ${s.apellido ?? ""}`.trim(),
-          tipoSolicitud: s.tipoSolicitud ?? s.tipo_solicitud,
-          fechaInicio: s.fechaInicio ?? s.fecha_inicio,
-          cantidadDias: s.cantidadDias ?? s.cantidad_dias ?? 0,
-          fechaCreacion: s.fechaCreacion ?? s.fecha_creacion ?? new Date().toISOString(),
-          estado: s.estado,
-        }));
+        // Filtrar subtipo solo en frontend usando nombreSubTipoSolicitud
+       if (subTipo) {
+          solicitudes = solicitudes.filter((s) => s.nombreSubTipoSolicitud === subTipo);
+       }
 
-        setData(normalizedData);
-        setTotalPages(response.totalPages);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Error desconocido");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [token, JSON.stringify(filtros), page, size, modoDesarrollo]);
+        setTotalPages(Math.ceil(solicitudes.length / pageSize));
+        setData(solicitudes.slice(page * pageSize, (page + 1) * pageSize));
+      })
+      .catch((err: any) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [token, tipoSolicitud, estado, subTipo, page, pageSize]);
 
   return { data, totalPages, loading, error };
 }

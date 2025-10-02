@@ -14,17 +14,23 @@ export interface PaginatedResponse<T> {
 // ================================
 async function getSolicitudesApi(
   token: string,
-  params: { tipoSolicitud?: "PERMISO" | "BENEFICIO" | "VACACIONES"; tipoId?: string; estado?: string } = {}
+  params: { tipoSolicitud?: "PERMISO" | "BENEFICIO" | "VACACIONES"; estado?: string } = {}
 ): Promise<PaginatedResponse<SolicitudItem>> {
+  let endpoint = "";
+
+  if (params.tipoSolicitud === "VACACIONES") {
+    endpoint = "/api/v1/admin/th/users/requests/vacations";
+  } else {
+    endpoint = "/api/v1/admin/th/users/requests/sortby";
+    if (params.tipoSolicitud) {
+      endpoint += `?type=${params.tipoSolicitud.toLowerCase()}`;
+    }
+  }
+
   const query = new URLSearchParams();
-  if (params.tipoId) query.append("tipoId", params.tipoId);
   if (params.estado) query.append("estado", params.estado);
 
-  // Ajustar endpoint según tipoSolicitud
-  let endpoint = "/api/v1/admin/th/users/requests/sortby";
-  if (params.tipoSolicitud) endpoint += `?type=${params.tipoSolicitud.toLowerCase()}`;
-
-  const res = await fetch(`${endpoint}&${query.toString()}`, {
+  const res = await fetch(`${endpoint}${endpoint.includes("?") ? "&" : "?"}${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -37,7 +43,7 @@ async function getSolicitudByIdApi(
   token: string,
   id: string
 ): Promise<SolicitudItem> {
-  const res = await fetch(`/api/solicitudes/${id}`, {
+  const res = await fetch(`/api/v1/admin/th/users/requests/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -47,16 +53,15 @@ async function getSolicitudByIdApi(
 
 async function aprobarSolicitudApi(
   token: string,
-  id: string,
-  comentario?: string
+  id: string
 ) {
-  const res = await fetch(`/api/solicitudes/${id}/aprobar`, {
+  const res = await fetch(`/api/v1/admin/th/users/requests/${id}/accept`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ comentario }),
+    body: JSON.stringify({}), 
   });
 
   if (!res.ok) throw new Error(await res.text());
@@ -65,16 +70,15 @@ async function aprobarSolicitudApi(
 
 async function rechazarSolicitudApi(
   token: string,
-  id: string,
-  comentario: string
+  id: string
 ) {
-  const res = await fetch(`/api/solicitudes/${id}/rechazar`, {
+  const res = await fetch(`/api/v1/admin/th/users/requests/${id}/reject`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ comentario }),
+    body: JSON.stringify({}), 
   });
 
   if (!res.ok) throw new Error(await res.text());

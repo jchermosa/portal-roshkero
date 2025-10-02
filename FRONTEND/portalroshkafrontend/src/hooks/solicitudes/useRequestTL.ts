@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getSolicitudesPermisoBeneficio } from "../../services/RequestService";
+import { getSolicitudesTL } from "../../services/RequestTLService";
 import type { SolicitudItem } from "../../types";
 
-export function useSolicitudesUsuario(
+export function useRequestTL(
   page: number,
   subTipo?: string,
   size: number = 10
@@ -23,7 +23,7 @@ export function useSolicitudesUsuario(
     setLoading(true);
     setError(null);
 
-    getSolicitudesPermisoBeneficio(token)
+    getSolicitudesTL(token)
       .then((res) => {
         const filtradas = subTipo
           ? res.filter((s) => s.subTipo === subTipo)
