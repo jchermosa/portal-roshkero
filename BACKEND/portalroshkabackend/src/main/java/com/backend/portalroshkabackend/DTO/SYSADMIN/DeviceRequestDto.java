@@ -14,26 +14,21 @@ import jakarta.validation.constraints.Positive;
 @Data
 @NoArgsConstructor
 public class DeviceRequestDto {
-    @NotNull ( message = "La fecha de inicio es Obligatoria")
-    @FutureOrPresent (message = "La fecha de inicio no puede ser en el pasado")
-    private LocalDate fechaInicio;
-
-    @NotNull ( message = "Se debe indicar la cantidad de dias solicitados")
-    private Integer cantDias;
-
-    private boolean aprobacionAdmin;
-
-    private String comentario;
-
-    private EstadoSolicitudEnum estado;
-
+   
+ 
     @NotNull ( message = "El tipo de dispositivo es Obligatorio")
     @Positive ( message = "El id debe ser positivo")
     private int idTipoDispositivo;
 
+    private String comentario;
+
+    
     @NotNull ( message = "El usuario que realiza la solicitud es Obligatorio")
     @Positive ( message = "El id debe ser positivo")
     private int idUsuario;
+
+    @NotNull ( message = "El nombre del usuario es obligatorio")
+    private String nombreUsuario;
 
 
 
