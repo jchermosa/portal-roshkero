@@ -3,31 +3,36 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getUsuarioByCedula } from "../../services/UserService";
 import heroBg from "../../assets/ilustracion-herov3.svg";
+import Toast from "../../components/Toast";
 
 export default function UserSearchPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
   const [cedula, setCedula] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<"success" | "error" | "info" | "warning">("info");
 
   const handleSearch = async () => {
-    if (!cedula.trim() || !token) return;
-    setError(null);
+    const trimmedCedula = cedula.trim();
+
+    if (!trimmedCedula || !token) return;
+    setToastMessage(null);
     setLoading(true);
 
     try {
-      const data = await getUsuarioByCedula(token, cedula);
+      const data = await getUsuarioByCedula(token, trimmedCedula);
 
-      if (data && data.id_usuario) {
-        // Usuario ya existe → ir a editar
-        navigate(`/usuarios/${data.id_usuario}`);
-      } else {
-        // Usuario no existe o no tiene ID → crear con cédula precargada
-        navigate(`/usuarios/nuevo?cedula=${cedula}`);
-      }
+      // Si encuentra ir a editar
+      navigate(`/usuarios/${data.idUsuario}`);
     } catch (err: any) {
-      setError(err.message || "Error al buscar usuario");
+      if (err instanceof Error && err.message === "NOT_FOUND") {
+        // Si no encuentra → ir a crear con la cédula precargada
+        navigate(`/usuarios/nuevo?cedula=${trimmedCedula}`);
+      } else {
+        setToastMessage(err instanceof Error ? err.message : "Error al buscar usuario");
+        setToastType("error"); 
+      }
     } finally {
       setLoading(false);
     }
@@ -45,7 +50,7 @@ export default function UserSearchPage() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="absolute inset-0 bg-brand-blue/40"></div>
+        <div className="absolute inset-0 bg-brand-blue/40" />
       </div>
 
       {/* Card central */}
@@ -58,13 +63,10 @@ export default function UserSearchPage() {
           type="text"
           value={cedula}
           onChange={(e) => setCedula(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           placeholder="Ingrese número de cédula"
           className="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
         />
-
-        {error && (
-          <p className="text-sm text-red-500 mt-2 text-center">{error}</p>
-        )}
 
         <button
           onClick={handleSearch}
@@ -74,6 +76,15 @@ export default function UserSearchPage() {
           {loading ? "Buscando..." : "Continuar"}
         </button>
       </div>
+
+      {/* Toast flotante */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage(null)}
+        />
+      )}
     </div>
   );
 }

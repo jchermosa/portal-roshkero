@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageLayout from "../../layouts/PageLayout";
 import SolicitudDispositivoPage from "./SolicitudDispositivoPage";
@@ -9,17 +9,10 @@ type TabKey = "solicitudes" | "asignaciones";
 export default function GestionDispositivosPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const rawTab = searchParams.get("tab");
   const activeTab: TabKey = useMemo(() => {
-    const t = (searchParams.get("tab") || "solicitudes") as TabKey;
-    return (t === "asignaciones" || t === "solicitudes") ? t : "solicitudes";
-  }, [searchParams]);
-
-  // Si no hay tab en la URL, fijamos el default
-  useEffect(() => {
-    if (!searchParams.get("tab")) {
-      setSearchParams({ tab: "solicitudes" }, { replace: true });
-    }
-  }, [searchParams, setSearchParams]);
+    return rawTab === "asignaciones" ? "asignaciones" : "solicitudes";
+  }, [rawTab]);
 
   const switchTab = (next: TabKey) => {
     setSearchParams({ tab: next }, { replace: true });
@@ -53,9 +46,8 @@ export default function GestionDispositivosPage() {
         </div>
       }
     >
-      {/* Render embed para no duplicar PageLayout */}
       <div className="mt-4">
-        {activeTab === "solicitudes" && <SolicitudDispositivoPage embedded />}
+        {activeTab === "solicitudes" && <SolicitudDispositivoPage embedded forceSysAdmin />}
         {activeTab === "asignaciones" && <DeviceAssignmentsPage embedded />}
       </div>
     </PageLayout>

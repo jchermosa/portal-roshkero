@@ -1,8 +1,6 @@
 // src/layouts/DashboardLayout.tsx
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { tieneRol } from "../utils/permisos";
-import { Roles } from "../types/roles";
 import "../styles/scrollbar.css";
 
 export default function DashboardLayout() {
@@ -10,31 +8,30 @@ export default function DashboardLayout() {
 
 
   // Permisos usando tieneRol
-  const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-  const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-  const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN);
+  // const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+  // const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+  // const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN, Roles.ADMINISTRADOR_DEL_SISTEMA);
 
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
-    { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: puedeGestionarUsuarios },
+    { id: "/catalogo-th", label: "Catalogo TH", icon: "👥", available: true },
+    { id: "/usuarios", label: "Gestión TH", icon: "🧑‍💼", available: true },
+    { id: "/catalogo-sys", label: "Catalogo SysAdmin", icon:"📚", available: true },
     { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: true },
+    { id: "/operations", label: "Gestion de Equipos", icon: "🛠️", available: true },
+     { id: "/catalogo-op", label: "Catalogo Operaciones", icon: "🏢", available: true },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: true},
-    { id: "/ubicacion", label: "Ubicaciones", icon: "📍", available: puedeGestionarDispositivos },
-    { id: "/tipo-dispositivo", label: "Tipos Dispositivos", icon: "🛠️", available: puedeGestionarDispositivos },
-    { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: puedeGestionarSolicitudes },
+    { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: true },
     { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/solicitud-dispositivo", label: "Solicitud Dispositivo", icon: "📱", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
     { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
    
+   
   ].filter((o) => o.available);
 
-
-
-  const initials =
-    "👤";
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">

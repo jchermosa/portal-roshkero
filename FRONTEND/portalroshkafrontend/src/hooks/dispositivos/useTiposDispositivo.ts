@@ -37,6 +37,6 @@ export function useTiposDispositivo(
     totalPages,
     loading,
     error,
-    refresh: fetchData, // 👈 ahora sí disponible
+    refresh: fetchData, 
   };
 }

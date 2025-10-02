@@ -1,40 +1,21 @@
-import type { SolicitudDispositivoItem } from "../types";
-import mockSolicitudesData from "../data/mockSolicitudesDispositivos.json";
-
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
-
-// Copia mutable de mock
-let mockSolicitudes: SolicitudDispositivoItem[] = [
-  ...(mockSolicitudesData as SolicitudDispositivoItem[]),
-];
-
-// ================================
-// Pageable estándar
-// ================================
-export interface PaginatedResponse<T> {
-  content: T[];
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number;
-}
-
-// ================================
-// API real
-// ================================
-async function getSolicitudesDispositivoApi(
+import type {
+  SolicitudDispositivoItem,
+  UserSolDispositivoDto,
+  PageResponse,
+  SolicitudUserItem,
+} from "../types";
+import { throwIfNotOk } from "../utils/http";
+/**
+ * Listar solicitudes de dispositivos (SysAdmin, paginado).
+ */
+async function getSolicitudesDispositivoAdmin(
   token: string,
-  params: Record<string, string | number | undefined> = {}
-): Promise<PaginatedResponse<SolicitudDispositivoItem>> {
-  const query = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== "") query.append(k, String(v));
-  });
+  page: number = 0,
+  size: number = 10
+): Promise<PageResponse<SolicitudDispositivoItem>> {
+  const url = `http://localhost:8080/api/v1/admin/sysadmin/allRequests?page=${page}&size=${size}`;
 
-  // ⚡ fuerza el filtro tipo_solicitud=Dispositivo
-  query.append("tipo_solicitud", "Dispositivo");
-
-  const res = await fetch(`/api/solicitudes?${query.toString()}`, {
+  const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -42,125 +23,103 @@ async function getSolicitudesDispositivoApi(
   return res.json();
 }
 
-async function getSolicitudDispositivoByIdApi(
-  token: string,
-  id: string
-): Promise<SolicitudDispositivoItem> {
-  const res = await fetch(`/api/solicitudes/${id}`, {
+/**
+ * Listar solicitudes del usuario autenticado (no paginado).
+ */
+async function getSolicitudesDispositivoUsuario(
+  token: string
+): Promise<SolicitudUserItem[]> {
+  const url = `/api/v1/usuarios/solicitudes`;
+
+  const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(await res.text());
-  const data = await res.json();
 
-  // ⚡ validar que sea tipo Dispositivo
-  if (data.tipo_solicitud !== "Dispositivo") {
-    throw new Error("La solicitud no es de tipo Dispositivo");
-  }
-  return data;
+  await throwIfNotOk(res);
+  return res.json();
 }
 
-async function createSolicitudDispositivoApi(
+/**
+ * Aceptar solicitud de dispositivo (solo SysAdmin).
+ */
+async function acceptSolicitudDispositivo(
   token: string,
-  data: Partial<SolicitudDispositivoItem>
-) {
-  const payload = { ...data, tipo_solicitud: "Dispositivo" }; // ⚡ fuerza tipo
-  const res = await fetch(`/api/solicitudes`, {
+  idSolicitud: number
+): Promise<void> {                         // 👈 ahora void
+  const url = `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/accept`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  
+    await throwIfNotOk(res); 
+  
+  
+}
+
+/**
+ * Rechazar solicitud de dispositivo (solo SysAdmin).
+ */
+async function rejectSolicitudDispositivo(
+  token: string,
+  idSolicitud: number
+): Promise<void> {                        
+  const url = `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/reject`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  
+    await throwIfNotOk(res); 
+  
+}
+
+/**
+ * Crear nueva solicitud de dispositivo (usuario autenticado).
+ */
+async function createSolicitudDispositivo(
+  token: string,
+  data: UserSolDispositivoDto
+): Promise<SolicitudUserItem> {
+  const url = `/api/v1/usuarios/pedir_dispositivo`;
+  console.log("[Service] POST /api/v1/usuarios/pedir_dispositivo", { data });
+  const res = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(await res.text());
+
+  await throwIfNotOk(res);
   return res.json();
 }
 
-async function updateSolicitudDispositivoApi(
+async function getSolicitudById(
   token: string,
-  id: string,
-  data: Partial<SolicitudDispositivoItem>
-) {
-  const payload = { ...data, tipo_solicitud: "Dispositivo" }; // ⚡ nunca se pierde
-  const res = await fetch(`/api/solicitudes/${id}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+  idSolicitud: number
+): Promise<SolicitudUserItem> {
+  const url = `/api/v1/admin/sysadmin/request/${idSolicitud}`;
+  console.log("[Service] GET", url);
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  await throwIfNotOk(res);
+  const json = await res.json();
+  console.log("[Service] detalle recibido:", json);
+  return json;
 }
 
-// ================================
-// Mocks
-// ================================
-async function getSolicitudesDispositivoMock(): Promise<
-  PaginatedResponse<SolicitudDispositivoItem>
-> {
-  return {
-    content: mockSolicitudes,
-    totalPages: 1,
-    totalElements: mockSolicitudes.length,
-    size: mockSolicitudes.length,
-    number: 0,
-  };
-}
-
-async function getSolicitudDispositivoByIdMock(
-  _token: string,
-  id: string
-): Promise<SolicitudDispositivoItem> {
-  const s = mockSolicitudes.find((x) => x.id_solicitud === Number(id));
-  if (!s) throw new Error("Solicitud no encontrada");
-  return s;
-}
-
-async function createSolicitudDispositivoMock(
-  _token: string,
-  data: Partial<SolicitudDispositivoItem>
-) {
-  const newSolicitud: SolicitudDispositivoItem = {
-    ...(data as SolicitudDispositivoItem),
-    id_solicitud: mockSolicitudes.length + 1,
-    tipo_solicitud: "Dispositivo",
-    fecha_creacion: new Date().toISOString(),
-  };
-  mockSolicitudes.push(newSolicitud);
-  return newSolicitud;
-}
-
-async function updateSolicitudDispositivoMock(
-  _token: string,
-  id: string,
-  data: Partial<SolicitudDispositivoItem>
-) {
-  const index = mockSolicitudes.findIndex(
-    (s) => s.id_solicitud === Number(id)
-  );
-  if (index === -1) throw new Error("Solicitud no encontrada");
-  mockSolicitudes[index] = {
-    ...mockSolicitudes[index],
-    ...(data as SolicitudDispositivoItem),
-    tipo_solicitud: "Dispositivo",
-  };
-  return mockSolicitudes[index];
-}
-
-// ================================
-// Export condicional
-// ================================
-export const getSolicitudesDispositivo = USE_MOCK
-  ? getSolicitudesDispositivoMock
-  : getSolicitudesDispositivoApi;
-export const getSolicitudDispositivoById = USE_MOCK
-  ? getSolicitudDispositivoByIdMock
-  : getSolicitudDispositivoByIdApi;
-export const createSolicitudDispositivo = USE_MOCK
-  ? createSolicitudDispositivoMock
-  : createSolicitudDispositivoApi;
-export const updateSolicitudDispositivo = USE_MOCK
-  ? updateSolicitudDispositivoMock
-  : updateSolicitudDispositivoApi;
+export {
+  getSolicitudesDispositivoAdmin,
+  getSolicitudesDispositivoUsuario,
+  acceptSolicitudDispositivo,
+  rejectSolicitudDispositivo,
+  createSolicitudDispositivo,
+  getSolicitudById,
+};

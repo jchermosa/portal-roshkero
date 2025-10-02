@@ -1,45 +1,60 @@
 // src/routes/AppRoutes.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
 
-// Pages
+// Pages públicas
 import LoginPage from "../pages/LoginPage";
+// import ChangePasswordPage from "../pages/ChangePasswordPage";
+
+// Pages privadas (home, perfil, etc.)
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
-import BeneficiosPage from "../pages/solicitudes/BenefitsPage";
-import UsuariosPage from "../pages/user/UserPage.tsx";
-import VacacionesPage from "../pages/solicitudes/VacacionesPage";
+import Configuration from "../pages/Configuration";
+
+// Solicitudes (genéricas)
 import RequestPage from "../pages/solicitudes/RequestPage";
-import Configuration from "../pages/Configuration.tsx";
-import UserFormPage from "../pages/user/UserFormPage.tsx";
-import UserSearchPage from "../pages/user/UserSearchPage.tsx";
 import RequestFormPage from "../pages/solicitudes/RequestFormPage";
+import RequestManagementPage from "../pages/solicitudes/RequestManagementPage";
+import RequestSearchPage from "../pages/solicitudes/RequestSearchPage";
+
+// Usuarios
+import UsuariosPage from "../pages/user/UserPage";
+import UserFormPage from "../pages/user/UserFormPage";
+import UserSearchPage from "../pages/user/UserSearchPage";
+
+// Vacaciones
+import VacacionesPage from "../pages/solicitudes/VacacionesPage";
 import SolicitudVacacionesPage from "../pages/solicitudes/SolicitudVacacionesPage";
-import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage.tsx";
-import RequestManagementPage from "../pages/solicitudes/RequestManagementPage.tsx";
-import RequestSearchPage from "../pages/solicitudes/RequestSearchPage.tsx";
-import ChangePasswordPage from "../pages/ChangePasswordPage.tsx";
+
+// Beneficios
+import BeneficiosPage from "../pages/solicitudes/BenefitsPage";
+import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage"; 
 
 // Dispositivos
-import DevicePage from "../pages/dispositivos/DevicePage.tsx";
-import DeviceFormPage from "../pages/dispositivos/DeviceFormPage.tsx";
-import DeviceAssignmentFormPage from "../pages/dispositivos/DeviceAssignmentFormPage.tsx";
-import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
-import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
-import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage.tsx";
-import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage.tsx";
-import UbicacionPage from "../pages/varios/UbicacionPage.tsx";
+import DevicePage from "../pages/dispositivos/DevicePage";
+import DeviceFormPage from "../pages/dispositivos/DeviceFormPage";
+import DeviceAssignmentFormPage from "../pages/dispositivos/DeviceAssignmentFormPage";
+import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage";
+import GestionDispositivosPage from "../pages/dispositivos/GestionDispositivosPage";
+import TipoDispositivoPage from "../pages/dispositivos/TipoDispositivoPage";
+import UbicacionPage from "../pages/varios/UbicacionPage";
+import ClientesPage from "../pages/varios/ClientesPage";
+import CargosPage from "../pages/varios/CargosPage";
+import RolesPage from "../pages/varios/RolesPage";
+import GestionTHPage from "../pages/varios/CatalogoTHPage";
+import CatalogoOperacionesPage from "../pages/varios/CatalogoSysPage";
+import CatalogoOpPage from "../pages/varios/CatalogoOp";
+import EquipoFormPage from "../pages/operations/EquipoFormPage";
+import OperationsPage from "../pages/operations/OperationsPage";
+import EditarEquipoPage from "../pages/operations/EditarEquipoPage";
 
 export default function AppRoutes() {
-  const { user } = useAuth();
-
   return (
     <Routes>
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/cambiar-contraseña" element={<ChangePasswordPage />} />
+      {/* <Route path="/cambiar-contraseña" element={<ChangePasswordPage />} /> */}
 
       {/* Rutas privadas */}
       <Route element={<ProtectedRoute />}>
@@ -66,6 +81,11 @@ export default function AppRoutes() {
           <Route path="/usuarios/nuevo" element={<UserFormPage />} />
           <Route path="/usuarios/:id" element={<UserFormPage />} />
 
+          {/* Operations */}
+          <Route path="/operations" element={<OperationsPage />} />
+          <Route path="/equipo/nuevo" element={<EquipoFormPage />} />
+          <Route path="/equipo/:id/edit" element={<EditarEquipoPage />} />
+
           {/* Vacaciones */}
           <Route path="/vacaciones" element={<VacacionesPage />} />
           <Route path="/solicitud-vacaciones" element={<SolicitudVacacionesPage />} />
@@ -77,39 +97,52 @@ export default function AppRoutes() {
           {/* Dispositivos */}
           <Route path="/dispositivos" element={<DevicePage />} />
           <Route path="/dispositivos/nuevo" element={<DeviceFormPage />} />
+          <Route path="/dispositivos/:id" element={<DeviceFormPage />} />
 
-          {/* Solicitud de Dispositivos (usuarios normales) */}
+          {/* Solicitud de Dispositivos (usuarios) */}
           <Route path="/solicitud-dispositivo" element={<SolicitudDispositivoPage />} />
-          <Route path="/solicitud-dispositivo/nuevo" element={<SolicitudDispositivoFormPage />} />
-          <Route path="/solicitud-dispositivo/:id" element={<SolicitudDispositivoFormPage />} />
 
-          {/* Gestión de Dispositivos (SYSADMIN → Tabs: Solicitudes + Asignaciones) */}
+          {/* Gestión de Dispositivos (SYSADMIN) */}
           <Route path="/gestion-dispositivos" element={<GestionDispositivosPage />} />
 
-          {/* Asignaciones (formularios) */}
+          {/* Asignaciones de Dispositivos */}
           <Route path="/dispositivos-asignados/nuevo" element={<DeviceAssignmentFormPage />} />
           <Route path="/dispositivos-asignados/:id" element={<DeviceAssignmentFormPage />} />
 
-          {/* Tipos de dispositivo */}
+          {/* Tipos de Dispositivo */}
           <Route path="/tipo-dispositivo" element={<TipoDispositivoPage />} />
+
+          {/* Clientes */}
+          <Route path="/clientes" element={<ClientesPage />} />
+
+          {/* Cargos */}
+          <Route path="/cargos" element={<CargosPage />} />
+
+          {/* Roles */}
+          <Route path="/roles" element={<RolesPage />} />
+          
+          {/* GestionTH */}
+          <Route path="/catalogo-th" element={<GestionTHPage />} />
 
           {/* Ubicación */}
           <Route path="/ubicacion" element={<UbicacionPage />} />
 
+          {/* CatalogoSysAdmin */}
+          <Route path="/catalogo-sys" element={< CatalogoOperacionesPage />} />
+
+          {/* CatalogoOperaciones */}
+           <Route path="/catalogo-op" element={< CatalogoOpPage />} />
+
           {/* Configuración */}
           <Route path="/configuracion" element={<Configuration />} />
-          <Route path="/gestion-solicitudes" element={<RequestManagementPage />} />
 
           {/* Perfil */}
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
 
-      {/* Fallback */}
-      <Route
-        path="*"
-        element={user ? <Navigate to="/" replace /> : <LoginPage />}
-      />
+      {/* Fallback simple para evitar loops */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
