@@ -2,20 +2,22 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/scrollbar.css";
+import { Roles } from "../types/roles";
+import { tieneRol } from "../utils/permisos";
 
 export default function DashboardLayout() {
   const { user, refreshUser, logout } = useAuth();
 
 
   // Permisos usando tieneRol
-  // const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-  // const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
-  // const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN, Roles.ADMINISTRADOR_DEL_SISTEMA);
+   const puedeGestionarUsuarios = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+   const puedeGestionarSolicitudes = tieneRol(user, Roles.TH, Roles.GTH, Roles.OPERACIONES);
+   const puedeGestionarDispositivos = tieneRol(user, Roles.SYSADMIN, Roles.ADMINISTRADOR_DEL_SISTEMA);
 
   const menuOptions = [
     { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
-    { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: puedeGestionarUsuarios },
+    { id: "/usuarios", label: "Gestión de Usuarios", icon: "👥", available: true },
     { id: "/dispositivos-asignados", label: "Gestión de Dispositivos", icon: "💻", available: puedeGestionarDispositivos},
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: puedeGestionarDispositivos},
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: true },

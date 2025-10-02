@@ -3,6 +3,7 @@ import {
   getSolicitudById,
   aprobarSolicitud,
   rechazarSolicitud,
+  confirmarSolicitudVacaciones
 } from "../../services/RequestTHService";
 import type { SolicitudItem } from "../../types";
 
@@ -77,6 +78,27 @@ const rechazar = async (): Promise<boolean> => {
     setProcesando(false);
   }
 };
+const confirmar = async (): Promise<boolean> => {
+  if (!token || !id || !solicitud) {
+    setError("Datos insuficientes para aprobar la solicitud");
+    return false;
+  }
+
+  setProcesando(true);
+  setError(null);
+
+  try {
+    await aprobarSolicitud(token, id);   
+    setSolicitud((prev) => (prev ? { ...prev, estado: "A" } : null));
+    return true;
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Error al aprobar la solicitud");
+    return false;
+  } finally {
+    setProcesando(false);
+  }
+};
+
 
   return {
     solicitud,
@@ -85,6 +107,7 @@ const rechazar = async (): Promise<boolean> => {
     procesando,
     aprobar,
     rechazar,
+    confirmar,
     puedeEvaluar: solicitud?.estado === "P",
     esPermiso: solicitud?.tipoSolicitud === "PERMISO",
     esBeneficio: solicitud?.tipoSolicitud === "BENEFICIO",

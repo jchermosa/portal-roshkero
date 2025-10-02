@@ -9,9 +9,6 @@ export interface PaginatedResponse<T> {
   number: number;
 }
 
-// ================================
-// Métodos API reales
-// ================================
 async function getSolicitudesApi(
   token: string,
   params: { tipoSolicitud?: "PERMISO" | "BENEFICIO" | "VACACIONES"; estado?: string } = {}
@@ -68,6 +65,23 @@ async function aprobarSolicitudApi(
   return res.json();
 }
 
+export async function confirmarSolicitudVacaciones(
+  token: string,
+  id: string
+) {
+  const res = await fetch(`/api/v1/admin/th/users/requests/${id}/accept`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}), 
+  });
+
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 async function rechazarSolicitudApi(
   token: string,
   id: string
@@ -86,10 +100,6 @@ async function rechazarSolicitudApi(
 }
 
 
-
-// ================================
-// Export selector entre MOCK y API
-// ================================
 export const getSolicitudes =  getSolicitudesApi;
 export const getSolicitudById = getSolicitudByIdApi;
 export const aprobarSolicitud =  aprobarSolicitudApi;

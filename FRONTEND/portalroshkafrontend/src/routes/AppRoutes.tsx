@@ -15,7 +15,6 @@ import UsuariosPage from "../pages/user/UserPage.tsx";
 import Configuration from "../pages/Configuration";
 
 // Solicitudes (genéricas)
-import VacacionesPage from "../pages/solicitudes/VacacionesPage";
 import RequestPage from "../pages/solicitudes/RequestPage";
 import RequestFormPage from "../pages/solicitudes/RequestFormPage";
 import BeneficioFormPage from "../pages/solicitudes/BenefitsFormPage.tsx";
@@ -27,7 +26,7 @@ import DeviceFormPage from "../pages/dispositivos/DeviceFormPage.tsx";
 import DeviceAssignmentsPage from "../pages/dispositivos/DeviceAssignmentsPage.tsx";
 import DeviceAssignmentsFormPage from "../pages/dispositivos/DeviceAssignmentFormPage.tsx";
 import SolicitudDispositivoPage from "../pages/dispositivos/SolicitudDispositivoPage.tsx";
-import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
+//import SolicitudDispositivoFormPage from "../pages/dispositivos/SolicitudDispositivoFormPage.tsx";
 
 import UserFormPage from "../pages/user/UserFormPage";
 import UserSearchPage from "../pages/user/UserSearchPage";
@@ -45,6 +44,10 @@ import CatalogoOpPage from "../pages/varios/CatalogoOp";
 import EquipoFormPage from "../pages/operations/EquipoFormPage";
 import OperationsPage from "../pages/operations/OperationsPage";
 import EditarEquipoPage from "../pages/operations/EditarEquipoPage";
+import RequestViewPageUsuario from "../pages/solicitudes/RequestViewPageUsuario.tsx";
+import RequestViewTL from "../pages/solicitudes/RequestViewTL.tsx";
+import RequestViewPage from "../pages/solicitudes/RequestViewPage.tsx";
+import RequestTLPage from "../pages/solicitudes/RequestTLPage.tsx";
 
 export default function AppRoutes() {
   return (

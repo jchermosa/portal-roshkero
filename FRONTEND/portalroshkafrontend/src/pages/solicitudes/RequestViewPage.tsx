@@ -9,7 +9,7 @@ export default function RequestViewPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { solicitud, loading, error, aprobar, rechazar, procesando } = useRequestView(
+  const { solicitud, loading, error, aprobar, rechazar, confirmar, procesando } = useRequestView(
     token,
     id ?? null
   );
@@ -27,9 +27,7 @@ export default function RequestViewPage() {
     
     try {
       const ok = await aprobar();
-      if (ok) {
-        navigate(-1);
-      }
+      if (ok) navigate(-1);
     } catch (err) {
       console.error(err);
       alert("Error al aprobar la solicitud");
@@ -44,12 +42,25 @@ export default function RequestViewPage() {
     
     try {
       const ok = await rechazar();
-      if (ok) {
-        navigate(-1);
-      }
+      if (ok) navigate(-1);
     } catch (err) {
       console.error(err);
       alert("Error al rechazar la solicitud");
+    }
+  };
+
+  const handleConfirmar = async () => {
+    if (!confirmar) return;
+    
+    const confirmado = window.confirm("¿Confirmar las vacaciones aprobadas?");
+    if (!confirmado) return;
+    
+    try {
+      const ok = await confirmar();
+      if (ok) navigate(-1);
+    } catch (err) {
+      console.error(err);
+      alert("Error al confirmar la solicitud");
     }
   };
 
@@ -65,6 +76,11 @@ export default function RequestViewPage() {
     VACACIONES: "Detalle Vacaciones",
     BENEFICIO: "Detalle Beneficio",
   };
+
+  const esVacacionesAprobadaSinConfirmar = 
+    solicitud.tipoSolicitud === "VACACIONES" && 
+    solicitud.estado === "A" && 
+    !solicitud.confirmacionTh;
 
   return (
     <PageLayout title={tituloPorTipo[solicitud.tipoSolicitud] ?? "Detalle"}>
@@ -92,6 +108,14 @@ export default function RequestViewPage() {
               <strong>Días:</strong> {solicitud.cantDias ?? 0}
             </div>
           )}
+
+          {solicitud.tipoSolicitud === "VACACIONES" && solicitud.confirmacionTh && (
+            <div>
+              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                ✓ Confirmado por TH
+              </span>
+            </div>
+          )}
         </div>
 
         {solicitud.estado === "P" && (
@@ -109,6 +133,18 @@ export default function RequestViewPage() {
               className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
             >
               Aprobar
+            </button>
+          </div>
+        )}
+
+        {esVacacionesAprobadaSinConfirmar && (
+          <div className="flex justify-center gap-4 mt-8">
+            <button
+              onClick={handleConfirmar}
+              disabled={procesando}
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-400"
+            >
+              Confirmar Vacaciones
             </button>
           </div>
         )}

@@ -99,7 +99,7 @@ export default function SolicitudesTHPage() {
   ];
 
   const renderActions = (s: SolicitudItem) => {
-    if (s.estado === "P") {
+    if (s.estado === "P" || tipoSolicitud === "VACACIONES" && s.confirmacionTh === false) {
       return (
         <button
           onClick={() => navigate(`/solicitudesTH/${s.idSolicitud}/evaluar`)}
@@ -128,6 +128,7 @@ export default function SolicitudesTHPage() {
     { value: "P", label: "Pendiente" },
     { value: "A", label: "Aprobada" },
     { value: "R", label: "Rechazada" },
+    { value: "RC", label: "Recalendarizada"}
   ];
   console.log("Solicitudes cargadas:", solicitudes);
 

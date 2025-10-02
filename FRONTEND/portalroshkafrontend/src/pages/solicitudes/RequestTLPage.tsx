@@ -8,7 +8,7 @@ import IconButton from "../../components/IconButton";
 import { useRequestTL } from "../../hooks/solicitudes/useRequestTL";
 import type { SolicitudItem } from "../../types";
 
-export default function RequestPage() {
+export default function RequestTLPage() {
 
   const navigate = useNavigate();
 

@@ -163,7 +163,7 @@ export interface SolicitudItem {
   fechaCreacion: string;
   nombreLider: string;
   estado: "P" | "A" | "R" | "RC";
-
+  confirmacionTh: boolean;
 }
 
 export interface SolicitudFormData {
