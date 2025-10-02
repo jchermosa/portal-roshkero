@@ -21,7 +21,7 @@ export default function DashboardLayout() {
     { id: "/usuarios", label: "Gestión TH", icon: "🧑‍💼", available: talentoHumano },
     { id: "/catalogo-sys", label: "Catalogo SysAdmin", icon:"📚", available: sysadmin },
     { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: sysadmin },
-    { id: "/operations", label: "Gestion de Equipos", icon: "🛠️", available: true },
+    { id: "/operations", label: "Gestion de Equipos", icon: "🛠️", available: operaciones },
     { id: "/catalogo-op", label: "Catalogo Operaciones", icon: "🏢", available: operaciones },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: sysadmin},
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: talentoHumano },
