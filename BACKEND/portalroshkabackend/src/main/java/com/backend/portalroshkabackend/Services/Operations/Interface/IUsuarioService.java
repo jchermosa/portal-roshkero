@@ -6,12 +6,14 @@ import java.util.Map;
 import com.backend.portalroshkabackend.DTO.Operationes.UsuarioAsignacionDto;
 import com.backend.portalroshkabackend.Models.Equipos;
 import com.backend.portalroshkabackend.Models.Usuario;
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 public interface IUsuarioService {
 
-    void ajustarDisponibilidadConDelta(Usuario usuario, float delta);
+    void ajustarDisponibilidadConDelta(Usuario usuario, Integer delta);
 
-    List<UsuarioAsignacionDto> updateUsers(Equipos equipo, List<UsuarioAsignacionDto> usuariosDto);
+    List<UsuarioAsignacionDto> updateUsers(EstadoActivoInactivo estadoEquipo, Equipos equipo,
+            List<UsuarioAsignacionDto> usuariosDto);
 
     List<UsuarioAsignacionDto> assignUsers(Integer equipoId, List<UsuarioAsignacionDto> usuariosDto);
 
