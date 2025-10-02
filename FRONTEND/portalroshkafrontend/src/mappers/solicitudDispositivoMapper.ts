@@ -23,7 +23,7 @@ export function mapAdminSolicitudToUI(
   return {
     idSolicitud: item.idSolicitud,
     usuarioId: item.idUsuario,
-    usuarioNombre: item.usuarioNombre,
+    usuarioNombre: item.nombreUsuario ?? undefined, // Ahora coincide
     tipoSolicitud: "DISPOSITIVO",
     comentario: item.comentario,
     estado: item.estado,

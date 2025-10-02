@@ -219,7 +219,7 @@ export interface DispositivoAsignadoItem {
 export interface SolicitudDispositivoItem {
   idSolicitud: number;
   idUsuario: number;
-  usuarioNombre?: string;
+  nombreUsuario?: string;
   idDocumentoAdjunto?: number | null;
   idLider?: number | null;
   tipoSolicitud: "DISPOSITIVO";
@@ -328,7 +328,7 @@ export interface SolicitudUserItem {
 export interface SolicitudDispositivoUI {
   idSolicitud: number;
   usuarioId?: number;        
-  usuarioNombre?:string;
+  usuarioNombre?: string;
   tipoSolicitud: "DISPOSITIVO";
   comentario?: string;
   estado: EstadoSolicitudEnum;
