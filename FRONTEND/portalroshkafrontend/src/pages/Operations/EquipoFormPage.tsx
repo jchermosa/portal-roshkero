@@ -95,6 +95,8 @@ export default function EquipoFormPage() {
   const [error, setError] = useState<string | null>(null);
   const [leadId, setLeadId] = useState<number | null>(null);
   const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
+  const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
+  const [errorUsuarios, setErrorUsuarios] = useState<string | null>(null);
   const updateMemberStart = (id: number, v: string) =>
     setMiembros((ms) => ms.map((m) => (m.id === id ? { ...m, fechaEntrada: v } : m)));
   // ========== THEME + STYLES ==========
@@ -197,6 +199,25 @@ export default function EquipoFormPage() {
   const [asignaciones, setAsignaciones] = useState<
     Map<number, { idUbicacion: number | null; nombreUbicacion: string | null }>
   >(new Map());
+  
+
+  const parseErrorMessage = (raw: string | null) => {
+    if (!raw) return null;
+    try {
+      const jsonPart = raw.split("—")[1]?.trim();
+      if (!jsonPart) return raw;
+
+      try {
+        const obj = JSON.parse(jsonPart);
+        return obj.message || raw;
+      } catch {
+        const match = jsonPart.match(/"message"\s*:\s*"([^"]*)"/);
+        return match ? match[1] : raw;
+      }
+    } catch {
+      return raw;
+    }
+  };
 
   // Miembros
   const [memberOptions, setMemberOptions] = useState<
@@ -645,12 +666,17 @@ export default function EquipoFormPage() {
       credentials: "include",
       body: JSON.stringify(payload),
     });
-    console.log("✅ Equipo: ", payload);
     console.log(JSON.stringify(payload, null, 2));
     if (!r.ok) {
-      const msg = await r.text();
-      throw new Error(`${r.status} ${r.statusText} — ${msg}`);
+      const msg = await r.text(); // <-- здесь msg есть
+      if (msg.includes("usuarios") || msg.includes("asignacion_usuario_equipo")) {
+        setErrorUsuarios(`${r.status} ${r.statusText} — ${msg}`);
+      } else {
+        setErrorGeneral(`${r.status} ${r.statusText} — ${msg}`);
+      }
+      return; // останавливаемся, чтобы не перейти к navigate
     }
+
     navigate("/operations");
   };
 
@@ -669,6 +695,7 @@ export default function EquipoFormPage() {
   ];
 
   return (
+
     <div className="h-full flex flex-col overflow-hidden">
       <div className="absolute inset-0 bg-brand-blue">
         <div className="absolute inset-0 bg-brand-blue/40" />
@@ -683,6 +710,15 @@ export default function EquipoFormPage() {
 
           {/* Body */}
           <div className="flex-1 overflow-auto p-6 space-y-6">
+            {/* Ошибки общего уровня */}
+            {errorGeneral && (
+              <div className="p-4 rounded-lg text-sm border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700 mb-4">
+                <div className="flex items-center gap-2">
+                  <span>❌</span>
+                  <span>{parseErrorMessage(errorGeneral)}</span>
+                </div>
+              </div>
+            )}
             <DynamicForm
               id="equipo-form"
               sections={getSections()}
@@ -927,28 +963,11 @@ export default function EquipoFormPage() {
               </div>
             </div>
             {/* Errores en tabla usuarios */}
-            {error && (
+            {errorUsuarios && (
               <div className="p-4 rounded-lg text-sm border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700 mb-4">
                 <div className="flex items-center gap-2">
                   <span>❌</span>
-                  <span>
-                    {(() => {
-                      try {
-                        const jsonPart = error.split('—')[1]?.trim(); // берём часть после "—"
-                        console.log(jsonPart);
-                        try {
-                          const obj = JSON.parse(jsonPart || '{}');
-                          return obj.message || error;
-                        } catch {
-                          const match = jsonPart.match(/"message"\s*:\s*"([^"]*)"/);
-                          if (match) return match[1]; // вернём найденное сообщение
-                          return error;
-                        }
-                      } catch {
-                        return error;
-                      }
-                    })()}
-                  </span>
+                  <span>{parseErrorMessage(errorUsuarios)}</span>
                 </div>
               </div>
             )}

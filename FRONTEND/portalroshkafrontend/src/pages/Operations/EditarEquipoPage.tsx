@@ -613,6 +613,21 @@ export default function EditarEquipoPage() {
   };
   const handleRemoveTec = (idTec: number) =>
     setTecnologiasSel((prev) => prev.filter((t) => t.value !== idTec));
+  const handleEliminarMiembro = (miembro: IMiembrosEquipo) => {
+    // Удаляем из текущих членов
+    setMiembros((prev) => prev.filter((m) => m.id !== miembro.id));
+    // Возвращаем в доступные опции для повторного выбора
+    setMemberOptions((prev) => [
+      ...prev,
+      {
+        value: miembro.id,
+        label: miembro.nombre,
+        idCargo: miembro.idCargo,
+        dispRestante: 100,
+      },
+    ]);
+  };
+
 
   const handleAddMember = () => {
     if (!selectedMember) return;
@@ -768,18 +783,7 @@ export default function EditarEquipoPage() {
       label: "Acciones",
       render: (s: IMiembrosEquipo) => (
         <button
-          onClick={() => {
-            setMiembros((ms) => ms.filter((m) => m.id !== s.id));
-            setMemberOptions((opts) => [
-              ...opts,
-              {
-                value: s.id,
-                label: s.nombre,
-                idCargo: s.idCargo,
-                dispRestante: 100,
-              },
-            ]);
-          }}
+          onClick={() => handleEliminarMiembro(s)}
           className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none"
         >
           Eliminar
@@ -946,7 +950,6 @@ export default function EditarEquipoPage() {
         })),
         equipoDiaUbicacion: duPayload,
       };
-
       const r = await fetch(`${TEAM_PATH}/${team.idEquipo}`, {
         method: "PATCH",
         headers: {
@@ -967,6 +970,8 @@ export default function EditarEquipoPage() {
         throw new Error(`${r.status} ${r.statusText} — ${txt.slice(0, 160)}`);
       }
 
+      console.log("Usuarios a enviar:", miembros);
+      console.log("Payload completo:", JSON.stringify(payload, null, 2));
       navigate("/operations");
     } catch (e: any) {
       setError(e.message || "Error al guardar");
@@ -1004,6 +1009,32 @@ export default function EditarEquipoPage() {
           </div>
 
           <div className="flex-1 overflow-auto p-6 space-y-6">
+            {/* Errores en tabla usuarios */}
+            {error && (
+              <div className="p-4 rounded-lg text-sm border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700 mb-4">
+                <div className="flex items-center gap-2">
+                  <span>❌</span>
+                  <span>
+                    {(() => {
+                      try {
+                        const jsonPart = error.split('—')[1]?.trim(); // берём часть после "—"
+                        console.log(jsonPart);
+                        try {
+                          const obj = JSON.parse(jsonPart || '{}');
+                          return obj.message || error;
+                        } catch {
+                          const match = jsonPart.match(/"message"\s*:\s*"([^"]*)"/);
+                          if (match) return match[1]; // вернём найденное сообщение
+                          return error;
+                        }
+                      } catch {
+                        return error;
+                      }
+                    })()}
+                  </span>
+                </div>
+              </div>
+            )}
             <DynamicForm
               id="editar-equipo-form"
               sections={sections}
@@ -1013,7 +1044,7 @@ export default function EditarEquipoPage() {
               externalErrors={externalErrors}
               onClearExternalError={onClearExternalError}
             />
-
+            {/* Tabla Día–Ubicación */}
             <div>
               <h3 className="text-sm font-semibold mb-2">
                 Días y ubicaciones asignadas
@@ -1259,32 +1290,7 @@ export default function EditarEquipoPage() {
                 </button>
               </div>
             </div>
-            {/* Errores en tabla usuarios */}
-            {error && (
-              <div className="p-4 rounded-lg text-sm border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700 mb-4">
-                <div className="flex items-center gap-2">
-                  <span>❌</span>
-                  <span>
-                    {(() => {
-                      try {
-                        const jsonPart = error.split('—')[1]?.trim(); // берём часть после "—"
-                        console.log(jsonPart);
-                        try {
-                          const obj = JSON.parse(jsonPart || '{}');
-                          return obj.message || error;
-                        } catch {
-                          const match = jsonPart.match(/"message"\s*:\s*"([^"]*)"/);
-                          if (match) return match[1]; // вернём найденное сообщение
-                          return error;
-                        }
-                      } catch {
-                        return error;
-                      }
-                    })()}
-                  </span>
-                </div>
-              </div>
-            )}
+
             <DataTable
               data={miembros}
               columns={columns}
