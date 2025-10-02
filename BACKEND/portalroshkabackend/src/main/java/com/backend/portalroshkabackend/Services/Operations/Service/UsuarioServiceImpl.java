@@ -2,9 +2,11 @@ package com.backend.portalroshkabackend.Services.Operations.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +58,21 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .findAllByEquipo_IdEquipo(equipo.getIdEquipo())
                 .stream()
                 .collect(Collectors.toMap(a -> a.getUsuario().getIdUsuario(), a -> a));
-
+        Set<Integer> incomingUserIds = usuariosDto != null
+                ? usuariosDto.stream().map(UsuarioAsignacionDto::getIdUsuario).collect(Collectors.toSet())
+                : Collections.emptySet();
         List<UsuarioAsignacionDto> result = new ArrayList<>();
-
+        for (AsignacionUsuarioEquipo asignacion : actualesMap.values()) {
+            if (!incomingUserIds.contains(asignacion.getUsuario().getIdUsuario())) {
+                if (asignacion.getEstado() == EstadoActivoInactivo.A) {
+                    // вернуть проценты только если был активен
+                    Usuario usuario = asignacion.getUsuario();
+                    usuario.setDisponibilidad(usuario.getDisponibilidad() + asignacion.getPorcentajeTrabajo());
+                    usuarioRepository.save(usuario);
+                }
+                asignacionUsuarioRepository.delete(asignacion);
+            }
+        }
         if (usuariosDto != null) {
             for (UsuarioAsignacionDto uDto : usuariosDto) {
                 Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
@@ -123,20 +137,26 @@ public class UsuarioServiceImpl implements IUsuarioService {
             Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
 
-            if (uDto.getPorcentajeTrabajo() == null || uDto.getPorcentajeTrabajo() <= 0) {
-                throw new IllegalArgumentException(
-                        "Porcentaje de trabajo inválido para usuario " + uDto.getIdUsuario());
+            // Если пользователь активный, проверяем и вычитаем проценты
+            if (uDto.getEstado() == EstadoActivoInactivo.A) {
+
+                if (uDto.getPorcentajeTrabajo() == null || uDto.getPorcentajeTrabajo() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Porcentaje de trabajo inválido para usuario " + uDto.getIdUsuario());
+                }
+
+                int nuevaDisponibilidad = usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo();
+                if (nuevaDisponibilidad < 0) {
+                    throw new ProcenteExisits("Usuario " + usuario.getIdUsuario() +
+                            " no tiene suficiente disponibilidad. Actual: " + usuario.getDisponibilidad() +
+                            ", requerido: " + uDto.getPorcentajeTrabajo());
+                }
+
+                usuario.setDisponibilidad(nuevaDisponibilidad);
+                usuarioRepository.save(usuario);
             }
 
-            int nuevaDisponibilidad = usuario.getDisponibilidad() - uDto.getPorcentajeTrabajo().intValue();
-            if (nuevaDisponibilidad < 0) {
-                throw new ProcenteExisits("Usuario " + usuario.getIdUsuario() +
-                        " no tiene suficiente disponibilidad. Actual: " + usuario.getDisponibilidad() +
-                        ", requerido: " + uDto.getPorcentajeTrabajo().intValue());
-            }
-
-            usuario.setDisponibilidad(nuevaDisponibilidad);
-            usuarioRepository.save(usuario);
+            // Если пользователь inactivo – ничего не делаем с disponibilidad
             result.add(uDto);
         }
         return result;

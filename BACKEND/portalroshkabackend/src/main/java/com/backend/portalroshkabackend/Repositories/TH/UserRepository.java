@@ -57,7 +57,8 @@ public interface UserRepository extends JpaRepository<Usuario, Integer>, JpaSpec
 
     Optional<Usuario> findByCorreo(String correo);
 
-    List<Usuario> findByIdUsuarioNotIn(List<Integer> list);//
+    List<Usuario> findByRol_IdRolAndDisponibilidadGreaterThanAndIdUsuarioNotIn(Integer idRol, Integer nol,
+            List<Integer> List);
 
     List<Usuario> findAllByCargo_IdCargo(int idCargo);
 
