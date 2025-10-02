@@ -1,8 +1,6 @@
 // src/layouts/DashboardLayout.tsx
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { tieneRol } from "../utils/permisos";
-import { Roles } from "../types/roles";
 import "../styles/scrollbar.css";
 
 export default function DashboardLayout() {
@@ -21,6 +19,7 @@ export default function DashboardLayout() {
     { id: "/usuarios", label: "Gestión TH", icon: "🧑‍💼", available: true },
     { id: "/catalogo-sys", label: "Catalogo SysAdmin", icon:"📚", available: true },
     { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: true },
+    { id: "/operations", label: "Gestion de Equipos", icon: "🛠️", available: true },
      { id: "/catalogo-op", label: "Catalogo Operaciones", icon: "🏢", available: true },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: true},
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: true },
@@ -33,10 +32,6 @@ export default function DashboardLayout() {
    
   ].filter((o) => o.available);
 
-
-
-  const initials =
-    "👤";
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">
