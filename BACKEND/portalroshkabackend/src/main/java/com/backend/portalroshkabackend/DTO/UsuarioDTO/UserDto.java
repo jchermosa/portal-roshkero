@@ -2,6 +2,8 @@ package com.backend.portalroshkabackend.DTO.UsuarioDTO;
 
 import java.time.LocalDate;
 
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 import com.backend.portalroshkabackend.Models.Enum.FocoEnum;
 import com.backend.portalroshkabackend.Models.Enum.SeniorityEnum;
@@ -17,14 +19,20 @@ public class UserDto {
     private String apellido;
     private String nroCedula;
     private String correo;
-    private Integer idRol;
-    private String nombreRol;
+    // private Integer idRol;
+    
+    private UserRolDto rol;
+
+    // private String nombreRol; // Si quieres exponer el nombre del rol
     private LocalDate fechaIngreso;
     private String antiguedad;
     private Integer diasVacaciones;
     private EstadoActivoInactivo estado;
     private String telefono;
-    private Integer idCargo;
+    // private Integer idCargo;
+
+    private UserCargoDto cargo;
+
     private LocalDate fechaNacimiento;
     private Integer diasVacacionesRestante;
     private Boolean requiereCambioContrasena;
