@@ -1,0 +1,58 @@
+package com.backend.portalroshkabackend.DTO.common;
+
+import com.backend.portalroshkabackend.Models.Cargos;
+import com.backend.portalroshkabackend.Models.Roles;
+import jakarta.validation.constraints.*;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
+import com.backend.portalroshkabackend.Models.Enum.FocoEnum;
+import com.backend.portalroshkabackend.Models.Enum.SeniorityEnum;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class UserInsertDto {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    private String nombre;
+
+    @NotBlank(message = "El apellido es obligatorio")
+    private String apellido;
+
+    @Positive(message = "El número de cédula debe ser positivo")
+    private String nroCedula;
+
+    @Email(message = "Correo inválido")
+    @NotBlank(message = "El correo es obligatorio")
+    private String correo;
+
+    private Roles rol;
+
+    @PastOrPresent(message = "La fecha de ingreso no puede ser futura")
+    private LocalDate fechaIngreso;
+
+    @Pattern(regexp = "^[0-9]{9,15}$", message = "Teléfono inválido")
+    private String telefono;
+
+    private Cargos cargo;
+
+    @Past(message = "La fecha de nacimiento debe ser en el pasado")
+    private LocalDate fechaNacimiento;
+
+    private boolean requiereCambioContrasena;
+
+    private EstadoActivoInactivo estado;
+
+    private FocoEnum foco;
+
+    private SeniorityEnum seniority;
+
+    private String url_perfil;
+
+    private Integer disponibilidad;
+}

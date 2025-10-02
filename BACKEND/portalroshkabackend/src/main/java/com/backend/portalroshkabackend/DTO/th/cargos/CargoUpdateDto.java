@@ -1,0 +1,13 @@
+package com.backend.portalroshkabackend.DTO.th.cargos;
+
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class CargoUpdateDto {
+
+    private Integer idCargo;
+    private String nombre;
+}

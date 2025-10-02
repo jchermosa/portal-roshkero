@@ -1,0 +1,41 @@
+[
+  {
+    "id_dispositivo": 1,
+    "id_tipo_dispositivo": 101,
+    "id_ubicacion": 5,
+    "nro_serie": "SN-ABC-123",
+    "modelo": "Dell Latitude 5520",
+    "detalles": "Notebook de oficina con 16GB RAM",
+    "fecha_fabricacion": "2022-05-10",
+    "estado": "Activo",
+    "categoria": "Laptop",
+    "encargado": "Juan Pérez",
+    "fecha_creacion": "2023-01-15"
+  },
+  {
+    "id_dispositivo": 2,
+    "id_tipo_dispositivo": 102,
+    "id_ubicacion": 7,
+    "nro_serie": "SN-XYZ-789",
+    "modelo": "HP LaserJet Pro",
+    "detalles": "Impresora multifunción",
+    "fecha_fabricacion": "2021-09-02",
+    "estado": "En reparación",
+    "categoria": "Impresora",
+    "encargado": "María López",
+    "fecha_creacion": "2023-03-20"
+  },
+  {
+    "id_dispositivo": 3,
+    "id_tipo_dispositivo": 103,
+    "id_ubicacion": 2,
+    "nro_serie": "SN-TABLET-456",
+    "modelo": "Samsung Galaxy Tab A8",
+    "detalles": "Tablet usada en planta de producción",
+    "fecha_fabricacion": "2023-02-14",
+    "estado": "Activo",
+    "categoria": "Tablet",
+    "encargado": "Carlos Gómez",
+    "fecha_creacion": "2023-04-05"
+  }
+]
