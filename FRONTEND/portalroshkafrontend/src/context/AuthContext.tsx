@@ -13,13 +13,14 @@ export type User = {
   rol: Rol;
   cargo?: Cargo;
   equipo?: Equipo;
-  dias_vacaciones?: number;
-  dias_vacaciones_restante?: number;
+  diasVacaciones?: number;
+  diasVacacionesRestante?: number;
   telefono?: string;
-  fecha_ingreso?: string;
-  nro_cedula?: string;
+  fechaIngreso?: string;
+  nroCedula?: string;
   estado?: boolean;
   requiereCambioContrasena?: boolean;
+  fotoBase64?: string;
 };
 
 type AuthContextType = {
@@ -61,27 +62,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const decodeAndSetUser = (jwtToken: string) => {
+  const decodeAndSetUser = async(jwtToken: string) => {
     try {
       const payload = parseJwt(jwtToken);
 
-      const usuario: User = {
+      const basicUser: User = {
         id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
         nombre: payload.nombre ?? "",
         apellido: payload.apellido ?? "",
         correo: payload.email ?? payload.sub ?? "",
-        rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
-        cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
+        // El JWT solo contiene el ID del rol, no el nombre ni el cargo
+        rol: payload.rol ? { id: payload.rol, nombre: "" } : { id: undefined, nombre: "" },
+        cargo: { id: undefined, nombre: "" }, // El cargo no viene en el JWT
         equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
         telefono: payload.telefono ?? undefined,
-        fecha_ingreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
-        dias_vacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
-        dias_vacaciones_restante:
+        fechaIngreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
+        diasVacaciones: payload.diasVacaciones ?? payload.dias_vacaciones,
+        diasVacacionesRestante:
           payload.diasVacacionesRestante ?? payload.dias_vacaciones_restante,
         requiereCambioContrasena: payload.requiereCambioContrasena ?? false,
+
       };
 
-      setUser(usuario);
+
+      
+      setUser(basicUser);
+
+      const res = await fetch("/api/v1/usuarios/me", {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+
+      if (!res.ok) throw new Error("No se pudo obtener datos completos del usuario");
+
+      const fullUser: User = await res.json();
+
+      setUser(fullUser);
+
     } catch (e) {
       console.error("Error al decodificar el token:", e);
     }
@@ -118,6 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

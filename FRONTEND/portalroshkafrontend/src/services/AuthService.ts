@@ -11,33 +11,17 @@ export type AuthResponse = {
 
 // 🔑 Login normal
 export async function login(req: AuthRequest): Promise<string> {
-  const res = await fetch(`${BASE}/api/auth/login`, {
+  const res = await fetch(`${BASE}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),
-    credentials: "include",
   });
   if (!res.ok) {
     const txt = await res.text();
     throw new Error(txt || "Login falló");
   }
-  const data: AuthResponse = await res.json();
-  return data.token;
-}
-
-// 🔑 Registro (opcional)
-export async function register(req: any): Promise<string> {
-  const res = await fetch(`${BASE}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(req),
-  });
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(txt || "Registro falló");
-  }
-  const data: AuthResponse = await res.json();
-  return data.token;
+  const token = await res.text(); // ✅ plain token
+  return token;
 }
 
 // 🔄 Cambio de contraseña (real)

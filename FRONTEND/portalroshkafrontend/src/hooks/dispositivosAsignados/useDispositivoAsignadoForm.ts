@@ -1,51 +1,93 @@
-// src/hooks/dispositivosAsignados/useDispositivoAsignadoForm.ts
 import { useEffect, useState } from "react";
 import type { DispositivoAsignadoItem } from "../../types";
 import {
-  getDispositivoAsignadoById,
   createDispositivoAsignado,
+  getDispositivoAsignadoById,
   updateDispositivoAsignado,
+  // getDispositivoAsignadoById  // ← TODO si luego expones este endpoint
 } from "../../services/DeviceAssignmentService";
+import { EstadoAsignacionEnum } from "../../types";
 
 export function useDispositivoAsignadoForm(
   token: string | null,
-  id?: string
+  id?: number,
+  solicitudPreasignada?: number
 ) {
   const isEditing = !!id;
 
-  // Estado inicial
   const [data, setData] = useState<Partial<DispositivoAsignadoItem>>({
-    estado_asignacion: "Pendiente",
-    fecha_entrega: new Date().toISOString().split("T")[0], // fecha actual
+    estadoAsignacion: EstadoAsignacionEnum.U,      // "En uso" por defecto
+    fechaEntrega: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+    ...(solicitudPreasignada ? { idSolicitud: solicitudPreasignada } : {}),
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar registro si es edición
+  // TODO: si luego tienes endpoint, carga aquí los datos al editar
   useEffect(() => {
     if (!token || !isEditing || !id) return;
-
     setLoading(true);
     getDispositivoAsignadoById(token, id)
-      .then((res) => setData(res))
-      .catch((err) => setError(err.message))
+      .then((res) => {
+        setData({...res})
+      })
+      .catch((e: any) => setError(e.message || "Error al cargar la asignación"))
       .finally(() => setLoading(false));
-  }, [token, id, isEditing]);
 
-  // Guardar (crear o actualizar)
+      
+  }, [token, isEditing, id]);
+
   const handleSubmit = async (formData: Partial<DispositivoAsignadoItem>) => {
     if (!token) return;
 
+    // Normalizar tipos (selects llegan como string)
+    const idDispositivo =
+      formData.idDispositivo != null ? Number(formData.idDispositivo) : undefined;
+
+    // Priorizar la solicitud preasignada si existe
+    const idSolicitud =
+      solicitudPreasignada != null
+        ? solicitudPreasignada
+        : formData.idSolicitud != null
+        ? Number(formData.idSolicitud)
+        : undefined;
+
+    const payload: Partial<DispositivoAsignadoItem> = {
+      ...formData,
+      idDispositivo,
+      idSolicitud,
+      // mantener fechaEntrega/fechaDevolucion tal como vienen (YYYY-MM-DD)
+      // estadoAsignacion ya es string literal del enum ("U" | "D")
+    };
+
+    // Validaciones rápidas
+    if (!payload.idDispositivo) {
+      setError("Debe seleccionar un dispositivo.");
+      throw new Error("Debe seleccionar un dispositivo.");
+    }
+    if (!payload.idSolicitud) {
+      setError("Debe indicar la solicitud asociada.");
+      throw new Error("Debe indicar la solicitud asociada.");
+    }
+    if (!payload.fechaEntrega) {
+      setError("Debe indicar la fecha de entrega.");
+      throw new Error("Debe indicar la fecha de entrega.");
+    }
+
+    setLoading(true);
+    setError(null);
     try {
       if (isEditing && id) {
-        await updateDispositivoAsignado(token, id, formData);
+        await updateDispositivoAsignado(token, id, payload);
       } else {
-        await createDispositivoAsignado(token, formData);
+        await createDispositivoAsignado(token, payload);
       }
     } catch (err: any) {
-      setError(err.message || "Error al guardar el dispositivo asignado");
+      setError(err.message || "Error al guardar la asignación de dispositivo");
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 

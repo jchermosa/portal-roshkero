@@ -1,10 +1,14 @@
-// src/pages/DeviceFormPage.tsx
+// src/pages/dispositivos/DeviceFormPage.tsx
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import DynamicForm from "../../components/DynamicForm";
 import FormLayout from "../../layouts/FormLayout";
 import { buildDispositivoSections } from "../../config/forms/dispositivoFormFields";
 import { useDispositivoForm } from "../../hooks/dispositivos/useDispositivoForm";
+import { getDeviceTypesPaged } from "../../services/DeviceService";
+import { getUbicaciones } from "../../services/UbicacionService";
+import { useEffect, useMemo, useState } from "react";
+import { EstadoInventarioEnum } from "../../types";
 
 export default function DeviceFormPage() {
   const { token } = useAuth();
@@ -12,47 +16,103 @@ export default function DeviceFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ Hook de formulario de dispositivo
-  const {
-    data,
-    loading,
-    error,
-    handleSubmit,
-    isEditing,
-  } = useDispositivoForm(token, id);
+  const idParam = id ? parseInt(id, 10) : undefined;
 
-  // 🚀 Readonly
+  const { data, setData, loading, error, handleSubmit, isEditing } = useDispositivoForm(token, idParam);
+
+  const [loadingCatalogs, setLoadingCatalogs] = useState(false);
+  const [tipoOptions, setTipoOptions] = useState<{ value: number; label: string }[]>([]);
+  const [ubicOptions, setUbicOptions] = useState<{ value: number; label: string }[]>([]);
+  const userOptions: { value: number; label: string }[] = [];
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+
+    const loadCatalogs = async () => {
+      try {
+        setLoadingCatalogs(true);
+
+        const tiposPage = await getDeviceTypesPaged<any>(token, 0, 200);
+        const tipos = Array.isArray((tiposPage as any)?.content) ? (tiposPage as any).content : Array.isArray(tiposPage) ? tiposPage : [];
+        const ubic = await getUbicaciones(token);
+        const ubicList = Array.isArray((ubic as any)?.content) ? (ubic as any).content : Array.isArray(ubic) ? ubic : [];
+
+        if (cancelled) return;
+
+        setTipoOptions(
+          tipos.map((t: any) => ({
+            value: t.idTipoDispositivo ?? t.id ?? 0,
+            label: t.nombre ?? `Tipo #${t.idTipoDispositivo ?? t.id}`,
+          }))
+        );
+
+        setUbicOptions(
+          ubicList.map((u: any) => ({
+            value: u.idUbicacion ?? u.id ?? 0,
+            label: u.nombre ?? `Ubicación #${u.idUbicacion ?? u.id}`,
+          }))
+        );
+      } finally {
+        if (!cancelled) setLoadingCatalogs(false);
+      }
+    };
+
+    loadCatalogs();
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  const sections = useMemo(() => buildDispositivoSections(tipoOptions, ubicOptions, userOptions), [tipoOptions, ubicOptions, userOptions]);
+
   const readonly = new URLSearchParams(location.search).get("readonly") === "true";
 
-  // ✅ Configuración de secciones
-  const sections = buildDispositivoSections();
+  const hasData = data && Object.keys(data).length > 0;
+  const formLoading = !readonly && (loading || loadingCatalogs) && !hasData;
+
+ const normalizeData = (formData: Record<string, any>) => {
+  return {
+    ...formData,
+    tipoDispositivo: formData.tipoDispositivo
+      ? Number(formData.tipoDispositivo)
+      : undefined,
+    ubicacion: formData.ubicacion
+      ? Number(formData.ubicacion)
+      : undefined,
+    encargado: formData.encargado
+      ? Number(formData.encargado)
+      : undefined,
+    estado: formData.estado ?? EstadoInventarioEnum.D,
+    categoria: formData.categoria ?? undefined,
+    fechaFabricacion: formData.fechaFabricacion || null,
+  };
+};
 
   return (
     <FormLayout
       title={isEditing ? (readonly ? "Detalle dispositivo" : "Editar dispositivo") : "Crear dispositivo"}
-      subtitle={
-        readonly
-          ? "Vista de solo lectura"
-          : isEditing
-          ? "Modifica los campos necesarios"
-          : "Completá la información del nuevo dispositivo"
-      }
+      subtitle={readonly ? "Vista de solo lectura" : isEditing ? "Modificá los campos necesarios" : "Completá la información del nuevo dispositivo"}
       icon={isEditing ? (readonly ? "👀" : "✏️") : "💻"}
       onCancel={() => navigate("/dispositivos")}
-      onSubmitLabel={readonly ? undefined : (isEditing ? "Guardar cambios" : "Crear dispositivo")}
+      onSubmitLabel={readonly ? undefined : isEditing ? "Guardar cambios" : "Crear dispositivo"}
       onCancelLabel={readonly ? "Volver" : "Cancelar"}
     >
-      <DynamicForm
-        id="dynamic-form-device"
+     <DynamicForm
+        id="dynamic-form"
         sections={sections}
-        initialData={data}
+        initialData={data} 
+        onChange={setData}
         onSubmit={async (formData) => {
           if (!readonly) {
-            await handleSubmit(formData);
-            navigate("/dispositivos");
+            const normalized = normalizeData(formData); 
+            const ok = await handleSubmit(normalized);
+            if (ok) {
+              navigate(`/dispositivos?success=${isEditing ? "updated" : "created"}`);
+            }
           }
         }}
-        loading={loading}
+        loading={loading || loadingCatalogs} 
         readonly={readonly}
         className="flex-1 overflow-hidden"
       />

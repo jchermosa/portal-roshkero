@@ -1,8 +1,12 @@
 import type { FormSection } from "../../components/DynamicForm";
-import type { EquipoItem, RolItem, CargoItem } from "../../types";
+import type { RolItem, CargoItem } from "../../types";
+import {
+  EstadoLabels,
+  SeniorityLabels,
+  FocoLabels,
+} from "../../types";
 
 export function buildUsuarioSections(
-  equipos: EquipoItem[],
   roles: RolItem[],
   cargos: CargoItem[]
 ): FormSection[] {
@@ -18,8 +22,6 @@ export function buildUsuarioSections(
         { name: "telefono", label: "Teléfono", type: "text" },
         { name: "fechaIngreso", label: "Fecha de ingreso", type: "date" },
         { name: "fechaNacimiento", label: "Fecha de nacimiento", type: "date" },
-        // { name: "contraseña", label: "Contraseña", type: "password", required: true },
-        
       ],
     },
     {
@@ -27,25 +29,18 @@ export function buildUsuarioSections(
       icon: "🛠️",
       fields: [
         {
-          name: "equipoId",
-          label: "Equipo",
-          type: "select",
-          required: true,
-          options: equipos.map((e) => ({ value: e.id, label: e.nombre })),
-        },
-        {
-          name: "rolId",
+          name: "idRol",
           label: "Rol",
           type: "select",
           required: true,
-          options: roles.map((r) => ({ value: r.id, label: r.nombre })),
+          options: roles.map((r) => ({ value: r.idRol, label: r.nombre })),
         },
         {
-          name: "cargoId",
+          name: "idCargo",
           label: "Cargo",
           type: "select",
           required: true,
-          options: cargos.map((c) => ({ value: c.id, label: c.nombre })),
+          options: cargos.map((c) => ({ value: c.idCargo, label: c.nombre })),
         },
       ],
     },
@@ -53,17 +48,58 @@ export function buildUsuarioSections(
       title: "Configuración avanzada",
       icon: "⚙️",
       fields: [
-        { name: "estado", label: "Usuario activo", type: "checkbox" },
-        { name: "requiereCambioContrasena", label: "Requiere cambio de contraseña", type: "checkbox" },
         {
-            name: "disponibilidad",
-            label: "Disponibilidad",
-            type: "slider",
-            min: 0,
-            max: 100,
-            step: 5,
-            required: true,
-        }
+          name: "estado",
+          label: "Estado",
+          type: "select",
+          required: true,
+          options: Object.entries(EstadoLabels).map(([value, label]) => ({
+            value,
+            label,
+          })),
+        },
+        {
+          name: "seniority",
+          label: "Seniority",
+          type: "select",
+          options: Object.entries(SeniorityLabels).map(([value, label]) => ({
+            value,
+            label,
+          })),
+        },
+        {
+          name: "foco",
+          label: "Foco principal",
+          type: "select",
+          options: Object.entries(FocoLabels).map(([value, label]) => ({
+            value,
+            label,
+          })),
+        },
+        {
+          name: "requiereCambioContrasena",
+          label: "Requiere cambio de contraseña",
+          type: "select",
+          options: [
+            { value: "true", label: "Sí" },
+            { value: "false", label: "No" },
+          ],
+        },
+        {
+          name: "disponibilidad",
+          label: "Disponibilidad (%)",
+          type: "slider",
+          min: 0,
+          max: 100,
+          step: 5,
+          required: true,
+        },
+        // {
+        //   name: "urlPerfil",
+        //   label: "URL Perfil",
+        //   type: "text",
+        //   placeholder: "https://...",
+        // },
       ],
     },
   ];

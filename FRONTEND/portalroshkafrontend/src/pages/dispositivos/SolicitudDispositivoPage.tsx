@@ -1,88 +1,120 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { tieneRol } from "../../utils/permisos";
 import { Roles } from "../../types/roles";
+import { useSolicitudesDispositivo } from "../../hooks/deviceRequest/useSolicitudesDispositivo";
+import { buildSolicitudDispositivoColumns } from "../../config/tables/solicitudDispositivoTableConfig";
 
-import type { SolicitudDispositivoItem } from "../../types";
+import type { SolicitudDispositivoUI } from "../../types";
 import DataTable from "../../components/DataTable";
 import PaginationFooter from "../../components/PaginationFooter";
 import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
-import { solicitudDispositivoColumns } from "../../config/tables/solicitudDispositivoTableConfig";
-import { useSolicitudesDispositivo } from "../../hooks/deviceRequest/useSolicitudesDispositivo";
 
-export default function SolicitudDispositivoPage() {
+import SolicitudDispositivoModal from "./SolicitudDispositivoModal";
+
+interface Props {
+  embedded?: boolean;
+  forceSysAdmin?: boolean; 
+}
+
+export default function SolicitudDispositivoPage({ embedded = false, forceSysAdmin = false }: Props) {
   const { token, user } = useAuth();
-  const navigate = useNavigate();
 
-  // Paginación
   const [page, setPage] = useState(0);
+  const [selected, setSelected] = useState<SolicitudDispositivoUI | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
-  // Permisos
-  const puedeVerSolicitudes = tieneRol(user, Roles.SYSADMIN, Roles.TH, Roles.GTH);
-
-  // Hook especializado: solo solicitudes de tipo "Dispositivo"
+   const isSysAdmin = forceSysAdmin || tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
+  // Hook listado
   const {
     data: solicitudes,
     totalPages,
     loading,
     error,
-  } = useSolicitudesDispositivo(token, {}, page, 10);
+    refresh,
+  } = useSolicitudesDispositivo(token, page, 10, isSysAdmin);
 
-  // Render de acciones por fila
-  const renderActions = (s: SolicitudDispositivoItem) => {
+  const canEdit = !tieneRol(user, Roles.OPERACIONES);
+
+  const renderActions = (s: SolicitudDispositivoUI) => {
+    if (s.estado === "A" || s.estado === "R") return null;
+
     return (
-      <>
+      <div className="flex gap-2">
         <button
-          onClick={() => navigate(`/solicitudes-dispositivo/${s.id_solicitud}?readonly=true`)}
-          className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition"
+          onClick={() => {
+            setSelected(s);
+            setShowModal(true);
+          }}
+          className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
         >
-          Ver
+          {isSysAdmin ? "Gestionar" : "Editar"}
         </button>
-        {!tieneRol(user, Roles.OPERACIONES) && (
-          <button
-            onClick={() => navigate(`/solicitudes-dispositivo/${s.id_solicitud}`)}
-            className="ml-2 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-          >
-            Editar
-          </button>
-        )}
-      </>
+      </div>
     );
   };
 
-  if (!puedeVerSolicitudes) return <p>No tenés permisos para ver esta página.</p>;
-  if (loading) return <p>Cargando solicitudes...</p>;
-  if (error) return <p>{error}</p>;
+  const newSolicitudButton = !embedded && !isSysAdmin && (
+    <IconButton
+      label="Nueva Solicitud"
+      icon={<span>➕</span>}
+      variant="primary"
+      onClick={() => {
+        setSelected(null);
+        setShowModal(true);
+      }}
+      className="h-10 text-sm px-4 flex items-center"
+    />
+  );
 
-  return (
-    <PageLayout
-      title="Solicitudes de Dispositivo"
-      actions={
-        <IconButton
-          label="Nueva Solicitud"
-          icon={<span>➕</span>}
-          variant="primary"
-          onClick={() => navigate("/solicitud-dispositivo/nuevo")}
-          className="h-10 text-sm px-4 flex items-center"
-        />
-      }
-    >
-      <DataTable
+  const body = (
+    <>
+      <DataTable<SolicitudDispositivoUI>
         data={solicitudes}
-        columns={solicitudDispositivoColumns}
-        rowKey={(s) => s.id_solicitud}
-        actions={renderActions}
+        columns={buildSolicitudDispositivoColumns(isSysAdmin)}
+        rowKey={(s) => s.idSolicitud}
+        actions={canEdit ? renderActions : undefined}
         scrollable={false}
       />
 
-      <PaginationFooter
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        onCancel={() => navigate("/home")}
-      />
+      {/* Solo admins tienen paginación */}
+      {isSysAdmin && (
+        <PaginationFooter
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      )}
+
+      {/* Modal Form */}
+      {showModal && (
+        <SolicitudDispositivoModal
+          token={token}
+          id={selected?.idSolicitud}
+          gestion={isSysAdmin} 
+          onClose={() => setShowModal(false)}
+          onSaved={refresh}
+        />
+      )}
+
+      {loading && <p>Cargando...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div>
+        <div className="mb-3 flex justify-end">{newSolicitudButton}</div>
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <PageLayout title="Solicitudes de Dispositivo" actions={newSolicitudButton}>
+      {body}
     </PageLayout>
   );
 }

@@ -1,31 +1,153 @@
+export interface PageResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+}
+
 export interface CatalogItem {
   id: number;
   nombre: string;
 }
 
-export interface UsuarioItem {
-  id: number;
-  nombre: string;
-  apellido: string;
-  nroCedula: number;
-  correo: string;
-  idRol: number;
-  fechaIngreso: string | null;
-  antiguedad?: string | null;
-  diasVacaciones?: number | null;
-  contrasena?: string;
-  telefono?: string;
-  idCargo: number;
-  fechaNacimiento?: string | null;
-  diasVacacionesRestante?: number | null;
-  requiereCambioContrasena: boolean;
-  fechaCreacion?: string; // timestamp
-  estado: "ACTIVO" | "INACTIVO"; // enum real
-  urlPerfil?: string;
-  disponibilidad?: number;
-  antiguedadPretty?: string; 
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number; // página actual
 }
 
+export const EstadoActivoInactivo = {
+  A: "A",
+  I: "I",
+} as const;
+export type EstadoActivoInactivo = keyof typeof EstadoActivoInactivo; // "A" | "I"
+
+// Para la UI
+export const EstadoLabels: Record<EstadoActivoInactivo, string> = {
+  A: "Activo",
+  I: "Inactivo",
+};
+export const SeniorityEnum = {
+  JUNIOR: "JUNIOR",
+  BOOTCAMPER: "BOOTCAMPER",
+  PLENO: "PLENO",
+  SENIOR: "SENIOR",
+} as const;
+export type SeniorityEnum = typeof SeniorityEnum[keyof typeof SeniorityEnum];
+
+export const SeniorityLabels: Record<SeniorityEnum, string> = {
+  JUNIOR: "Junior",
+  BOOTCAMPER: "Bootcamper",
+  PLENO: "Pleno",
+  SENIOR: "Senior",
+};
+
+export const FocoEnum = {
+  FABRICA: "FABRICA",
+  GAMES: "GAMES",
+  MANTENIMIENTO: "MANTENIMIENTO",
+  NINGUNO: "NINGUNO",
+  PRODUCTO: "PRODUCTO",
+  PROYECTO: "PROYECTO",
+  STAFF: "STAFF",
+  TERCERIZACION: "TERCERIZACION",
+} as const;
+export type FocoEnum = typeof FocoEnum[keyof typeof FocoEnum];
+
+export const FocoLabels: Record<FocoEnum, string> = {
+  FABRICA: "Fábrica",
+  GAMES: "Games",
+  MANTENIMIENTO: "Mantenimiento",
+  NINGUNO: "Ninguno",
+  PRODUCTO: "Producto",
+  PROYECTO: "Proyecto",
+  STAFF: "Staff",
+  TERCERIZACION: "Tercerización",
+};
+
+
+export interface UsuarioItem {
+  idUsuario: number;
+  nombre: string;
+  apellido: string;
+  nombreApellido?: string; 
+  nroCedula: string;
+  correo: string;
+  idRol: number;
+  nombreRol?: string;
+  rolNombre?: string;
+  idCargo: number;
+  cargoNombre?: string;
+  fechaIngreso: string | null;
+  fechaNacimiento?: string | null;
+  telefono?: string;
+  requiereCambioContrasena?: boolean;
+  estado: EstadoActivoInactivo; 
+  antiguedad?: string;
+  diasVacaciones?: number;
+  diasVacacionesRestante?: number;
+  seniority?: SeniorityEnum;
+  foco?: FocoEnum;
+  disponibilidad?: number;
+  urlPerfil?: string;
+  
+}
+
+
+export type SortBy = "active" | "inactive" | "rol" | "cargo";
+
+export interface FiltrosUsuarios {
+  sortBy?: SortBy;
+  idRol?: number;                
+  idCargo?: number;            
+  estado?: EstadoActivoInactivo; 
+}
+
+export interface RolItem {
+  idRol: number;          
+  nombre: string;
+  fechaCreacion: string;
+
+}
+
+export interface CargoItem {
+  idCargo: number;
+  nombre: string;
+  fechaCreacion: string;
+
+
+}
+
+export interface EquipoItem {
+  equipoId: number;
+  nombre: string;
+  idLider: number;
+  idCliente: number;
+  fechaInicio: string;
+  fechaLimite: string;
+  fechaCreacion: string;
+  estado: string;
+
+}
+
+export const EstadoAsignacionEnum = {
+  U: "U",
+  D: "D", 
+} as const;
+
+export type EstadoAsignacionEnum =
+  typeof EstadoAsignacionEnum[keyof typeof EstadoAsignacionEnum];
+
+export const EstadoAsignacionLabels: Record<EstadoAsignacionEnum, string> = {
+  U: "En uso",
+  D: "Devuelto",
+};
+
+
+export type SolicitudEstado = "P" | "A" | "R";
 
 
 export interface SolicitudItem {
@@ -41,6 +163,7 @@ export interface SolicitudItem {
   fechaCreacion: string;
   nombreLider: string;
   estado: "P" | "A" | "R" | "RC";
+
 }
 
 export interface SolicitudFormData {
@@ -71,27 +194,8 @@ export type SolicitudPayload =
       fecha_fin: string;
     };
 
-export interface EquipoItem {
-  id: number;
-  nombre: string;
-  fechaInicio?: string | null;
-  fechaLimite?: string | null;
-  idCliente: number;
-  fechaCreacion?: string;
-  estado: "ACTIVO" | "INACTIVO"; 
-}
 
-export interface RolItem {
-  id: number;
-  nombre: string;
-  fechaCreacion?: string;
-}
 
-export interface CargoItem {
-  id: number;
-  nombre: string;
-  fechaCreacion?: string;
-}
 
 export interface TipoPermisoItem {
   idTipoPermiso: number;
@@ -111,46 +215,272 @@ export interface TipoBeneficioItem {
 
 
 export interface DispositivoItem {
-  id_dispositivo: number;
-  id_tipo_dispositivo: number;
-  id_ubicacion: number;
-  nro_serie: string;
+  idDispositivo?: number; 
+  tipoDispositivo: number;
+  ubicacion: number;
+  nroSerie: string;
   modelo: string;
-  detalles: string;
-  fecha_fabricacion: string; // YYYY-MM-DD
-  estado: string;
-  categoria: string;
-  encargado: string;
-  fecha_creacion: string; // YYYY-MM-DD
+  detalle: string;
+  fechaFabricacion: string; 
+  estado: EstadoInventarioEnum;
+  categoria: CategoriaEnum;
+  encargado: number; 
+  nombreEncargado?: string;
 }
 
 export interface DispositivoAsignadoItem {
-  id_dispositivo_asignado: number;
-  id_dispositivo: number;
-  id_solicitud: number;
-  fecha_entrega: string;
-  fecha_devolucion?: string | null;
-  estado_asignacion: string;
+  idDispositivoAsignado: number;
+  idDispositivo: number;
+  nombreDispositivo?: string;
+  idSolicitud: number;
+  fechaEntrega: string;
+  fechaDevolucion?: string | null;
+  estadoAsignacion: EstadoAsignacionEnum;
   observaciones?: string | null;
 }
 
 export interface SolicitudDispositivoItem {
-  id_solicitud: number;
-  id_usuario: number;
-  id_documento_adjunto?: number | null;
-  tipo_solicitud: "Dispositivo"; // restringido
+  idSolicitud: number;
+  idUsuario: number;
+  nombreUsuario?: string;
+  idDocumentoAdjunto?: number | null;
+  idLider?: number | null;
+  tipoSolicitud: "DISPOSITIVO";
   comentario?: string;
-  estado: string; // enum estado_solicitud_enum
-  fecha_inicio: string;
-  cant_dias?: number | null;
-  fecha_fin?: string | null;
-  fecha_creacion: string;
+  estado: EstadoSolicitudEnum;
+  fechaInicio: string;
+  cantDias?: number | null;
+  fechaFin?: string | null;
+  idTipoDispositivo?: number | null;
+}
+
+export interface UserSolDispositivoDto {
+  id_tipo_dispositivo: number; 
+  comentario?: string;         
+}
+
+export interface TipoDispositivoItem {
+  idTipoDispositivo: number;
+  nombre: string;
+  detalle: string;
+}
+
+export interface UbicacionItem {
+  idUbicacion: number;
+  nombre: string;
+  dispositivos?: DispositivoItem[];
+  estado: EstadoActivoInactivo;
+}
+
+export const EstadoInventarioEnum = {
+  D: "D",   
+  A: "A",   
+  ND: "ND", 
+  R: "R",   
+} as const;
+
+export type EstadoInventarioEnum =
+  typeof EstadoInventarioEnum[keyof typeof EstadoInventarioEnum];
+
+export const EstadoInventarioLabels: Record<EstadoInventarioEnum, string> = {
+  D: "Disponible",
+  A: "Asignado",
+  ND: "No disponible",
+  R: "En reparación",
+};
+
+export const EstadoSolicitudEnum = {
+  A: "A",   
+  R: "R",   
+  P: "P",   
+  RC: "RC",
+} as const;
+
+export type EstadoSolicitudEnum =
+  typeof EstadoSolicitudEnum[keyof typeof EstadoSolicitudEnum];
+
+export const EstadoSolicitudLabels: Record<EstadoSolicitudEnum, string> = {
+  A: "Aprobado",
+  R: "Rechazado",
+  P: "Pendiente",
+  RC: "Recalendarizado",
+};
+
+export const SolicitudesEnum = {
+  PERMISO: "Permiso",
+  BENEFICIO: "Beneficio",
+  DISPOSITIVO: "Dispositivo",
+  VACACIONES: "Vacaciones",
+} as const;
+
+export type SolicitudesEnum =
+  typeof SolicitudesEnum[keyof typeof SolicitudesEnum];
+
+export const SolicitudesLabels: Record<SolicitudesEnum, string> = {
+  Permiso: "Permiso",
+  Beneficio: "Beneficio",
+  Dispositivo: "Dispositivo",
+  Vacaciones: "Vacaciones",
+};
+
+
+export const CategoriaEnum = {
+  CONCEDIDO: "CONCEDIDO",
+  OFICINA: "OFICINA",
+} as const;
+
+export type CategoriaEnum =
+  typeof CategoriaEnum[keyof typeof CategoriaEnum];
+
+export const CategoriaLabels: Record<CategoriaEnum, string> = {
+  CONCEDIDO: "Concedido",
+  OFICINA: "Oficina",
+};
+
+export interface SolicitudUserItem {
+  idSolicitud: number;
+  tipoSolicitud: "PERMISO" | "VACACIONES" | "BENEFICIO" | "DISPOSITIVO";
+  estado: EstadoSolicitudEnum;
+  comentario?: string;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  cantDias?: number | null;
+  idTipoDispositivo?: number | null;
+}
+
+export interface SolicitudDispositivoUI {
+  idSolicitud: number;
+  usuarioId?: number;        
+  usuarioNombre?: string;
+  tipoSolicitud: "DISPOSITIVO";
+  comentario?: string;
+  estado: EstadoSolicitudEnum;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  cantDias?: number | null;
+  idTipoDispositivo?: number | null;
+  fuente: "ADMINISTRADOR" | "USUARIO"; 
+}
+
+/** 
+* Clientes
+*/
+export type ClienteRequest = {
+  nombre: string;
+  nroTelefono: string;
+  correo: string;
+  ruc: string;
+};
+
+export type ClienteResponse = {
+  idCliente: number;
+  nombre: string;
+  nroTelefono: string;
+  correo: string;
+  ruc: string;
+  fechaCreacion: string; 
+};
+
+export type ClientesPageResponse = {
+  content: ClienteResponse[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
+};
+
+export interface PageSpring<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number; 
+  size: number;
+  first?: boolean;
+  last?: boolean;
+  numberOfElements?: number;
+  empty?: boolean;
+}
+
+// Cargos
+export interface CargoListItem {
+  idCargo: number;
+  nombre: string;
+}
+
+/** Detalle de cargo (GET /th/cargos/{idCargo}) */
+export interface CargoDetail {
+  idCargo: number;
+  nombre: string;
+  empleadosAsignados: UsuarioSimple[]; 
+}
+
+/** Representación mínima del UsuarioSimpleDto del back */
+export interface UsuarioSimple {
+  idUsuario: number;
+  nombre: string;
+}
+
+/** Insert/Update DTO (POST/PUT) */
+export interface CargoInsert {
+  nombre: string;
+}
+
+/** Respuesta por defecto */
+export interface CargoActionResponse {
+  idCargo: number;
+  message: string;
 }
 
 
-export interface TipoDispositivoItem {
-  id_tipo_dispositivo: number;
+//Roles
+export interface RolListItem {
+  idRol: number;
   nombre: string;
-  detalle: string;
-  fecha_creacion: string;
+}
+
+/** Detalle (GET /th/roles/{idRol}) */
+export interface RolDetail {
+  idRol: number;
+  nombre: string;
+  empleadosAsignados: UsuarioSimple[];
+}
+
+
+export interface UsuarioSimple {
+  idUsuario: number;
+  nombre: string;
+}
+
+/** Insert/Update DTO (POST/PUT) */
+export interface RolInsert {
+  nombre: string;
+}
+
+/** Respuesta del back en create/update/delete */
+export interface RolActionResponse {
+  idRol: number;
+  message: string;
+}
+
+
+// Tecnologias
+// Request DTO (crear/editar)
+export interface TecnologiaRequest {
+  nombre: string;
+  descripcion: string;
+}
+
+// Response DTO (uno solo)
+export interface TecnologiaResponse {
+  idTecnologia: number;
+  nombre: string;
+  descripcion: string;
+  fechaCreacion: string; // ISO (LocalDateTime)
+}
+
+// Respuesta paginada
+export interface TecnologiasPageResponse {
+  content: TecnologiaResponse[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
 }

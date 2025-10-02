@@ -1,38 +1,30 @@
-import type { EquipoItem, RolItem, CargoItem, TipoBeneficioItem, TipoPermisoItem } from "../types";
-import mockEquipos from "../data/mockEquipos.json";
-import mockRoles from "../data/mockRoles.json";
-import mockCargos from "../data/mockCargos.json";
-import mockTiposPermiso from "../data/mockTiposPermiso.json";
-import mockTiposBeneficio from "../data/mockTiposBeneficio.json";
-import mockLideres from "../data/mockLideres.json"
+import type {RolItem, CargoItem } from "../types";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+export const EstadoActivoInactivoOptions = [
+  { label: "Activo", value: "A" },
+  { label: "Inactivo", value: "I" },
+];
 
-// ================================
-// API real
-// ================================
-async function getEquiposApi(token: string): Promise<EquipoItem[]> {
-  const res = await fetch(`/api/catalogos/equipos`, {
+
+
+export async function getRoles(token: string): Promise<RolItem[]> {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/th/roles?page=0&size=100`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+
+  const json = await res.json();
+  return json.content;
 }
 
-async function getRolesApi(token: string): Promise<RolItem[]> {
-  const res = await fetch(`/api/catalogos/roles`, {
+export async function getCargos(token: string): Promise<CargoItem[]> {
+  const res = await fetch(`http://localhost:8080/api/v1/admin/th/cargos?page=0&size=100`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
 
-async function getCargosApi(token: string): Promise<CargoItem[]> {
-  const res = await fetch(`/api/catalogos/cargos`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  const json = await res.json();
+  return json.content;
 }
 
 async function getTiposPermisoApi(token: string) {
@@ -53,29 +45,7 @@ async function getTiposBeneficioApi(token: string) {
 
 
 
-// ================================
-// Mocks
-// ================================
-async function getEquiposMock(_: string): Promise<EquipoItem[]> {
-  return mockEquipos as EquipoItem[];
-}
 
-async function getRolesMock(_: string): Promise<RolItem[]> {
-  return mockRoles as RolItem[];
-}
-
-async function getCargosMock(_: string): Promise<CargoItem[]> {
-  return mockCargos as CargoItem[];
-}
-
-
-
-// ================================
-// Export condicional
-// ================================
-export const getEquipos = USE_MOCK ? getEquiposMock : getEquiposApi;
-export const getRoles = USE_MOCK ? getRolesMock : getRolesApi;
-export const getCargos = USE_MOCK ? getCargosMock : getCargosApi;
 export const getTiposPermiso =  getTiposPermisoApi;
 export const getTiposBeneficio = getTiposBeneficioApi;
 
