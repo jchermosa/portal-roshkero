@@ -65,7 +65,7 @@ export default function DashboardLayout() {
                 {user?.nombre}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {user?.nombreRol}
+                {user?.rol?.nombre}
               </p>
             </div>
           </div>

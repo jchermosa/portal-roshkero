@@ -1,26 +1,25 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 
-type Cargo = { id?: number; nombre: string };
-type Equipo = { id?: number; nombre: string };
-
 export type User = {
   id: number;
   nombre: string;
   apellido: string;
   correo: string;
-  rol: number;
-  nombreRol: string; 
-  cargo?: Cargo;
-  equipo?: Equipo;
+  rol: {
+    idRol: number;
+    nombre: string;
+  } | null;
+  cargo?: { idCargo: number; nombre: string };
+  equipos?: { idEquipo: number; nombre: string }[];
   diasVacaciones?: number;
   diasVacacionesRestante?: number;
   telefono?: string;
   fechaIngreso?: string;
   nroCedula?: string;
-  estado?: string; 
+  estado?: string;
   requiereCambioContrasena?: boolean;
-  fotoBase64?: string;
+  fotoBase64?: string | null;
 };
 
 type AuthContextType = {
@@ -71,8 +70,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         nombre: payload.nombre ?? "",
         apellido: payload.apellido ?? "",
         correo: payload.email ?? payload.sub ?? "",
-        rol: payload.rol ?? 0,
-        nombreRol: "", 
+        rol: payload.rol
+          ? {
+              idRol: payload.rol.idRol ?? 0,
+              nombre: payload.rol.nombre ?? "",
+            }
+          : null, // 👈 si no viene, null
       };
       setUser(basicUser);
 
