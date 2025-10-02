@@ -19,7 +19,7 @@ export default function DeviceAssignmentFormPage() {
   const { data, setData, loading, error, handleSubmit, isEditing } =
     useDispositivoAsignadoForm(token, id ? Number(id) : undefined, solicitudId);
 
-  const { options: deviceOptions } = useAvailableDevicesOptions(token);
+  const { options: deviceOptions } = useAvailableDevicesOptions(token, data.idDispositivo);
   const { options: solicitudOptions } = useSolicitudOptions(token, solicitudId);
 
   const sections = buildDispositivoAsignadoSections(

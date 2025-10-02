@@ -17,6 +17,22 @@ async function getDispositivosAsignados(
   return res.json();
 }
 
+// Listar una sola solicitud
+async function getDispositivoAsignadoById(
+  token: string,
+  id: number
+): Promise<DispositivoAsignadoItem> {
+  const res = await fetch(
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/getAssignment/${id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+
 // Crear nueva asignación
 async function createDispositivoAsignado(
   token: string,
@@ -75,6 +91,7 @@ async function deleteDispositivoAsignado(
 
 export {
   getDispositivosAsignados,
+  getDispositivoAsignadoById,
   createDispositivoAsignado,
   updateDispositivoAsignado,
   deleteDispositivoAsignado,

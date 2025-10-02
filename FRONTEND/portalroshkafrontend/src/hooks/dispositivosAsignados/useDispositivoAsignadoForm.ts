@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { DispositivoAsignadoItem } from "../../types";
 import {
   createDispositivoAsignado,
+  getDispositivoAsignadoById,
   updateDispositivoAsignado,
   // getDispositivoAsignadoById  // ← TODO si luego expones este endpoint
 } from "../../services/DeviceAssignmentService";
@@ -24,14 +25,18 @@ export function useDispositivoAsignadoForm(
   const [error, setError] = useState<string | null>(null);
 
   // TODO: si luego tienes endpoint, carga aquí los datos al editar
-  // useEffect(() => {
-  //   if (!token || !isEditing || !id) return;
-  //   setLoading(true);
-  //   getDispositivoAsignadoById(token, id)
-  //     .then((res) => setData(res))
-  //     .catch((e: any) => setError(e.message || "Error al cargar la asignación"))
-  //     .finally(() => setLoading(false));
-  // }, [token, isEditing, id]);
+  useEffect(() => {
+    if (!token || !isEditing || !id) return;
+    setLoading(true);
+    getDispositivoAsignadoById(token, id)
+      .then((res) => {
+        setData({...res})
+      })
+      .catch((e: any) => setError(e.message || "Error al cargar la asignación"))
+      .finally(() => setLoading(false));
+
+      
+  }, [token, isEditing, id]);
 
   const handleSubmit = async (formData: Partial<DispositivoAsignadoItem>) => {
     if (!token) return;
