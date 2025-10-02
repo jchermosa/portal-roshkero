@@ -11,6 +11,7 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateFoto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposBeneficiosDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposDispositivosDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposPermisosDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Equipos;
@@ -43,6 +44,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -168,6 +171,15 @@ public class UserService {
         return mapUsuarioToDtoUpdate(usuario);
     }
 
+    public SolicitudUserDto getSolicitudById(Integer id) {
+        Optional<Solicitud> solicitudOpt = solicitudesTHRepository.findById(id);
+        if (solicitudOpt.isPresent()) {
+            return mapSolicitudToDto(solicitudOpt.get());
+        } else {
+            return null; // o lanzar una excepción si prefieres
+        }
+    }
+
     public List<SolicitudUserDto> getSolicitudesUsuarioActual() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String correo;
@@ -231,6 +243,24 @@ public class UserService {
         return dto;
     }
 
+    public List<tiposDispositivosDto> getTiposDispositivos() {
+
+        // Obtiene todos los tipos de dispositivos con vigencia Activa desde el repositorio
+        List<TipoDispositivo> tiposDispositivos = tipoDispositivoRepository.findAll();
+
+        // Mapea cada TipoDispositivo a tiposDispositivosDto
+        return tiposDispositivos.stream()
+                .map(this::mapTipoDispositivoToDto)
+                .collect(Collectors.toList());
+    }
+
+    private tiposDispositivosDto mapTipoDispositivoToDto(TipoDispositivo tipoDispositivo) {
+        tiposDispositivosDto dto = new tiposDispositivosDto();
+        dto.setIdTipoDispositivo(tipoDispositivo.getIdTipoDispositivo());
+        dto.setNombre(tipoDispositivo.getNombre());
+        dto.setDetalle(tipoDispositivo.getDetalle());;
+        return dto;
+    }
 
     public UserSolPermisoDto crearPermisoUsuarioActual(UserSolPermisoDto solPermisoDto) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -670,12 +700,64 @@ public class UserService {
         dto.setFechaInicio(solicitud.getFechaInicio());
         dto.setFechaFin(solicitud.getFechaFin());
         dto.setCantDias(solicitud.getCantDias());
-        dto.setComentario(solicitud.getComentario());
+        // dto.setComentario(solicitud.getComentario());
+        //limpiar el comentario para que no muestre el id del tipo de permiso o beneficio
+        if (solicitud.getComentario() != null) {
+            dto.setComentario(limpiarComentario(solicitud.getComentario()));
+        } else {
+            dto.setComentario(null);
+        }
         dto.setTipoSolicitud(solicitud.getTipoSolicitud());
         dto.setEstado(solicitud.getEstado());
         dto.setFechaCreacion(solicitud.getFechaCreacion());
+        dto.setNombreLider(solicitud.getLider() != null ? solicitud.getLider().getNombre() + " " + solicitud.getLider().getApellido() : null);
+        dto.setNombreUsuario(solicitud.getUsuario() != null ? solicitud.getUsuario().getNombre() + " " + solicitud.getUsuario().getApellido() : null);
+        
+        
+        Integer idSubtipoSolicitud = extraerIdSubtipoSolicitud(solicitud.getComentario());
+        
+        // System.out.println("ID SUBTIPO SOLICITUD EXTRAIDO: " + idSubtipoSolicitud);
+        String nombreSubtipo = null;
+
+        if (idSubtipoSolicitud != null) {
+            switch (solicitud.getTipoSolicitud()) {
+                case PERMISO:
+                    TipoPermisos tipoPermiso = tipoPermisosRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoPermiso != null) nombreSubtipo = tipoPermiso.getNombre();
+                    break;
+                case BENEFICIO:
+                    TipoBeneficios tipoBeneficio = tipoBeneficiosRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoBeneficio != null) nombreSubtipo = tipoBeneficio.getNombre();
+                    break;
+                case DISPOSITIVO:
+                    TipoDispositivo tipoDispositivo = tipoDispositivoRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoDispositivo != null) nombreSubtipo = tipoDispositivo.getNombre();
+                    break;
+            }
+        }
+        dto.setNombreSubTipoSolicitud(nombreSubtipo);
+        
         // Puedes agregar más campos según lo que necesites exponer en el DTO
         return dto;
+    }
+
+    private Integer extraerIdSubtipoSolicitud(String comentario) {
+        if (comentario == null){
+            return null;
+        }else{
+            Pattern pattern = Pattern.compile("\\((\\d+)\\)");
+            Matcher matcher = pattern.matcher(comentario);
+            if (matcher.find()) {
+                return Integer.parseInt(matcher.group(1));
+            }else{
+                return null;
+            }
+        }
+    }
+    
+    public String limpiarComentario(String comentario) {
+        // Elimina cualquier grupo como (123) o {456789} al inicio del texto
+        return comentario.replaceAll("^(\\s*\\([^)]*\\)\\s*)?(\\s*\\{[^}]*\\}\\s*)?", "").trim();
     }
 
     // Mapeo de Usuario a UserHomeDto según el nuevo modelo
