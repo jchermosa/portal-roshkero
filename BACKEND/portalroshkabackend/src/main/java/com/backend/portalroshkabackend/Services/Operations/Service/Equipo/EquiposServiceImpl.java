@@ -147,9 +147,9 @@ public class EquiposServiceImpl implements IEquiposService {
                 Equipos savedEquipo = equiposRepository.save(equipo);
                 usuarioService.assignUsers(savedEquipo.getIdEquipo(), procentedUsuarios);
 
-                // List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
-                // asignacionServiceImpl.asignarDiasUbicacionesEquipo(savedEquipo.getIdEquipo(),
-                // diasUbicaciones);
+                List<DiaUbicacionDto> diasUbicaciones = requestDto.getEquipoDiaUbicacion();
+                asignacionServiceImpl.asignarDiasUbicacionesEquipo(savedEquipo.getIdEquipo(),
+                diasUbicaciones);
                 // --- 4. Сохранение технологий команды ---
                 tecnologiaEquiposService.updateTecnologiasEquipo(savedEquipo, requestDto.getIdTecnologias());
 

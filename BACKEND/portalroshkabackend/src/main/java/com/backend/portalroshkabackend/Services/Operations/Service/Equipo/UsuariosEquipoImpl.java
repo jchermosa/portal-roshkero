@@ -66,8 +66,8 @@ public class UsuariosEquipoImpl implements IUsuarioisEquipoService {
                                 .stream()
                                 .map(u -> u.getIdUsuario().getIdUsuario())
                                 .toList();
-
-                List<Usuario> usuariosNoEnEquipo = userRepository.findByIdUsuarioNotIn(idsEnEquipo);
+                List<Usuario> usuariosNoEnEquipo = userRepository
+                                .findByRol_IdRolAndDisponibilidadGreaterThanAndIdUsuarioNotIn(4, 0, idsEnEquipo);
 
                 List<UsuarioisResponseDto> usuariosFueraEquipo = usuariosNoEnEquipo.stream()
                                 .map(u -> {
