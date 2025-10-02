@@ -13,6 +13,7 @@ type IMiembrosEquipo = {
   disponibilidad?: number; // int 1..100
   fechaEntrada?: string;
   fechaFin?: string;
+  estado: boolean | "A" | "I";
 };
 type Tecnologia = { idTecnologia: number; nombre: string };
 
@@ -47,16 +48,16 @@ type MemberOpt = {
   dispRestante: number; // int 0..100
 };
 
-const METADATAS_PATH = "/api/v1/admin/operations/metadatas";
-const TEAM_PATH = "/api/v1/admin/operations/team";
-const USERS_PATH = "/api/v1/admin/operations/users";
-const DIAS_PATH = "/api/v1/admin/operations/diaslaborales";
-const LIBRES_PATH = "/api/v1/admin/operations/asignacion/libres";
+const METADATAS_PATH = "http://localhost:8080/api/v1/admin/operations/metadatas";
+const TEAM_PATH = "http://localhost:8080/api/v1/admin/operations/team";
+const USERS_PATH = "http://localhost:8080/api/v1/admin/operations/users";
+const DIAS_PATH = "http://localhost:8080/api/v1/admin/operations/diaslaborales";
+const LIBRES_PATH = "http://localhost:8080/api/v1/admin/operations/asignacion/libres";
 
 function useIsDark() {
   const [isDark, setIsDark] = useState(
     typeof document !== "undefined" &&
-      document.documentElement.classList.contains("dark")
+    document.documentElement.classList.contains("dark")
   );
   useEffect(() => {
     const el = document.documentElement;
@@ -153,8 +154,17 @@ export default function EditarEquipoPage() {
   const [newMemberDisp, setNewMemberDisp] = useState<number>(100);
   const [newMemberStart, setNewMemberStart] = useState<string>("");
   const [newMemberEnd, setNewMemberEnd] = useState<string>("");
+  const updateMemberEstado = (id: number, nuevoEstado: "A" | "I") => {
+    setMiembros((prev) =>
+      prev.map((m) =>
+        m.id === id
+          ? { ...m, estado: nuevoEstado }
+          : m
+      )
+    );
+  };
   // idUsuario -> disponibilidad restante global (0..100)
-const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
+  const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
 
   // Días / Ubicaciones / Asignaciones
   const [diasOptions, setDiasOptions] = useState<
@@ -201,10 +211,10 @@ const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
             ? "#1f2937"
             : "#dbeafe"
           : s.isFocused
-          ? isDark
-            ? "#374151"
-            : "#e5e7eb"
-          : "transparent",
+            ? isDark
+              ? "#374151"
+              : "#e5e7eb"
+            : "transparent",
         color: isDark ? "#ffffff" : "#111827",
       }),
     }),
@@ -339,34 +349,34 @@ const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
           ? t.usuariosNoEnEquipo
           : [];
         if (notIn.length) {
-  setMemberOptions(
-    notIn.map((u: any) => ({
-      value: u.idUsuario ?? u.id,
-      label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
-      idCargo: u.idCargo ?? 0,
-      dispRestante: Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100)),
-    }))
-  );
-  // además: traer caps para todos los usuarios para poder limitar filas existentes
-  try {
-    const urAll = await fetch(USERS_PATH, {
-      headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      credentials: "include",
-      signal: ac.signal,
-    });
-    if (urAll.ok) {
-      const usersData = await urAll.json();
-      const usersArr = Array.isArray(usersData?.content) ? usersData.content : Array.isArray(usersData) ? usersData : [];
-      const m = new Map<number, number>();
-      usersArr.forEach((u: any) => {
-        const id = u.id ?? u.idUsuario ?? u.usuarioId;
-        const rest = Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100));
-        if (id != null) m.set(Number(id), rest);
-      });
-      setDispCaps(m);
-    }
-  } catch {}
-} else {
+          setMemberOptions(
+            notIn.map((u: any) => ({
+              value: u.idUsuario ?? u.id,
+              label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
+              idCargo: u.idCargo ?? 0,
+              dispRestante: Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100)),
+            }))
+          );
+          // además: traer caps para todos los usuarios para poder limitar filas existentes
+          try {
+            const urAll = await fetch(USERS_PATH, {
+              headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+              credentials: "include",
+              signal: ac.signal,
+            });
+            if (urAll.ok) {
+              const usersData = await urAll.json();
+              const usersArr = Array.isArray(usersData?.content) ? usersData.content : Array.isArray(usersData) ? usersData : [];
+              const m = new Map<number, number>();
+              usersArr.forEach((u: any) => {
+                const id = u.id ?? u.idUsuario ?? u.usuarioId;
+                const rest = Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100));
+                if (id != null) m.set(Number(id), rest);
+              });
+              setDispCaps(m);
+            }
+          } catch { }
+        } else {
           const ur = await fetch(USERS_PATH, {
             headers: {
               Accept: "application/json",
@@ -376,25 +386,25 @@ const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
             signal: ac.signal,
           });
           if (ur.ok) {
-  const usersData = await ur.json();
-  const usersArr = Array.isArray(usersData?.content) ? usersData.content : Array.isArray(usersData) ? usersData : [];
-  setMemberOptions(
-    usersArr.map((u: any) => ({
-      value: u.id ?? u.idUsuario ?? u.usuarioId,
-      label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
-      idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
-      dispRestante: Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100)),
-    }))
-  );
-  // llenar caps
-  const m = new Map<number, number>();
-  usersArr.forEach((u: any) => {
-    const id = u.id ?? u.idUsuario ?? u.usuarioId;
-    const rest = Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100));
-    if (id != null) m.set(Number(id), rest);
-  });
-  setDispCaps(m);
-}
+            const usersData = await ur.json();
+            const usersArr = Array.isArray(usersData?.content) ? usersData.content : Array.isArray(usersData) ? usersData : [];
+            setMemberOptions(
+              usersArr.map((u: any) => ({
+                value: u.id ?? u.idUsuario ?? u.usuarioId,
+                label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
+                idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
+                dispRestante: Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100)),
+              }))
+            );
+            // llenar caps
+            const m = new Map<number, number>();
+            usersArr.forEach((u: any) => {
+              const id = u.id ?? u.idUsuario ?? u.usuarioId;
+              const rest = Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100));
+              if (id != null) m.set(Number(id), rest);
+            });
+            setDispCaps(m);
+          }
         }
 
         const estadoBool =
@@ -410,19 +420,20 @@ const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
           t.miembrosEquipo
         );
         const miembrosInicial: IMiembrosEquipo[] = miembrosFuente.map((u: any) => ({
-  id: u.idUsuario ?? u.id ?? u.usuarioId,
-  nombre:
-    u.nombreCompleto ??
-    [u.nombre, u.apellido].filter(Boolean).join(" ") ??
-    String(u.nombre ?? u.apellido ?? "Sin nombre"),
-  idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
-  disponibilidad: Math.max(
-    1,
-    Math.min(100, u.disponibilidad ?? u.porcentajeTrabajo ?? 100)
-  ),
-  fechaEntrada: u.fechaEntrada ?? "",
-  fechaFin: u.fechaFin ?? "",
-}));
+          id: u.idUsuario ?? u.id ?? u.usuarioId,
+          nombre:
+            u.nombreCompleto ??
+            [u.nombre, u.apellido].filter(Boolean).join(" ") ??
+            String(u.nombre ?? u.apellido ?? "Sin nombre"),
+          idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
+          disponibilidad: Math.max(
+            1,
+            Math.min(100, u.disponibilidad ?? u.porcentajeTrabajo ?? 100)
+          ),
+          fechaEntrada: u.fechaEntrada ?? "",
+          fechaFin: u.fechaFin ?? "",
+          estado: u.estado ?? "",
+        }));
 
 
         setTeam({
@@ -465,11 +476,11 @@ const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
         setLeadSel(
           lId
             ? {
-                value: lId,
-                label: [t.lider?.nombre, t.lider?.apellido]
-                  .filter(Boolean)
-                  .join(" "),
-              }
+              value: lId,
+              label: [t.lider?.nombre, t.lider?.apellido]
+                .filter(Boolean)
+                .join(" "),
+            }
             : null
         );
 
@@ -485,11 +496,11 @@ const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
             const nomUbi = e.nombreUbicacion ?? e?.ubicacion?.nombre ?? null;
             return idDia != null
               ? {
-                  idDiaLaboral: idDia,
-                  nombreDia: nomDia,
-                  idUbicacion: idUbi,
-                  nombreUbicacion: nomUbi,
-                }
+                idDiaLaboral: idDia,
+                nombreDia: nomDia,
+                idUbicacion: idUbi,
+                nombreUbicacion: nomUbi,
+              }
               : null;
           })
           .filter(Boolean) as AsignDU[];
@@ -609,15 +620,15 @@ const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
 
     const d = Math.max(1, Math.min(newMemberMax, newMemberDisp));
     const err = validateMemberDates(
-  formData.fechaInicio,
-  formData.fechaFin || null,
-  newMemberStart || null,
-  newMemberEnd || null
-);
-if (err) {
-  alert(err);
-  return;
-}
+      formData.fechaInicio,
+      formData.fechaFin || null,
+      newMemberStart || null,
+      newMemberEnd || null
+    );
+    if (err) {
+      alert(err);
+      return;
+    }
     setMiembros((ms) => [
       ...ms,
       {
@@ -627,6 +638,7 @@ if (err) {
         disponibilidad: d,
         fechaEntrada: newMemberStart || "",
         fechaFin: newMemberEnd || "",
+        estado: formData.estado ? "A" : "I",
       },
     ]);
     setMemberOptions((opts) =>
@@ -640,7 +652,7 @@ if (err) {
   };
 
   const updateMemberDisp = (id: number, val: number) =>
-    
+
     setMiembros((ms) =>
       ms.map((m) =>
         m.id === id
@@ -670,48 +682,48 @@ if (err) {
       ),
     },
     {
-  key: "disponibilidad",
-  label: "Disp. (%)",
-  render: (s: IMiembrosEquipo) => {
-    const restante = dispCaps.get(s.id) ?? 100;            // lo que le queda libre fuera de este equipo
-    const actual = Number(s.disponibilidad ?? 0);          // lo que ya tiene en este equipo
-    const cap = Math.max(1, Math.min(100, restante + actual)); // máximo permitido para esta celda
+      key: "disponibilidad",
+      label: "Disp. (%)",
+      render: (s: IMiembrosEquipo) => {
+        const restante = dispCaps.get(s.id) ?? 100;            // lo que le queda libre fuera de este equipo
+        const actual = Number(s.disponibilidad ?? 0);          // lo que ya tiene en este equipo
+        const cap = Math.max(1, Math.min(100, restante + actual)); // máximo permitido para esta celda
 
-    return (
-      <input
-        type="number"
-        min={1}
-        max={cap}
-        value={Number(s.disponibilidad ?? 100)}
-        onChange={(e) => {
-          const v = Number(e.target.value) || 1;
-          updateMemberDisp(s.id, Math.max(1, Math.min(cap, v)));
-        }}
-        className="w-20 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-        title={`Máximo permitido: ${cap}%`}
-      />
-    );
-  },
-},
+        return (
+          <input
+            type="number"
+            min={1}
+            max={cap}
+            value={Number(s.disponibilidad ?? 100)}
+            onChange={(e) => {
+              const v = Number(e.target.value) || 1;
+              updateMemberDisp(s.id, Math.max(1, Math.min(cap, v)));
+            }}
+            className="w-20 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+            title={`Máximo permitido: ${cap}%`}
+          />
+        );
+      },
+    },
 
-    
+
     {
       key: "fechaEntrada",
       label: "Entrada",
       render: (s: IMiembrosEquipo) => (
         <input
-  type="date"
-  value={s.fechaEntrada ?? ""}
-  onChange={(e) => {
-    const v = e.target.value;
-    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, s.fechaFin || null);
-    if (err) return alert(err);
-    updateMemberStart(s.id, v);
-  }}
-  min={formData.fechaInicio || undefined}
-  max={(s.fechaFin || formData.fechaFin) || undefined}
-  className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-/>
+          type="date"
+          value={s.fechaEntrada ?? ""}
+          onChange={(e) => {
+            const v = e.target.value;
+            const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, s.fechaFin || null);
+            if (err) return alert(err);
+            updateMemberStart(s.id, v);
+          }}
+          min={formData.fechaInicio || undefined}
+          max={(s.fechaFin || formData.fechaFin) || undefined}
+          className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+        />
       ),
     },
     {
@@ -719,18 +731,36 @@ if (err) {
       label: "Fin",
       render: (s: IMiembrosEquipo) => (
         <input
-  type="date"
-  value={s.fechaFin ?? ""}
-  onChange={(e) => {
-    const v = e.target.value;
-    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, s.fechaEntrada || null, v);
-    if (err) return alert(err);
-    updateMemberEnd(s.id, v);
-  }}
-  min={(s.fechaEntrada || formData.fechaInicio) || undefined}
-  max={formData.fechaFin || undefined}
-  className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-/>
+          type="date"
+          value={s.fechaFin ?? ""}
+          onChange={(e) => {
+            const v = e.target.value;
+            const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, s.fechaEntrada || null, v);
+            if (err) return alert(err);
+            updateMemberEnd(s.id, v);
+          }}
+          min={(s.fechaEntrada || formData.fechaInicio) || undefined}
+          max={formData.fechaFin || undefined}
+          className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+        />
+      ),
+    },
+    {
+      key: "estado",
+      label: "Activo",
+      render: (s: IMiembrosEquipo) => (
+        <input
+          type="checkbox"
+          checked={s.estado === "A"} // строго проверяем на "A"
+          onChange={(e) =>
+            setMiembros((prev) =>
+              prev.map((m) =>
+                m.id === s.id ? { ...m, estado: e.target.checked ? "A" : "I" } : m
+              )
+            )
+          }
+          className="w-4 h-4"
+        />
       ),
     },
     {
@@ -864,27 +894,28 @@ if (err) {
     },
   ];
 
-// Submit
-  const onSubmit = async (_data: Record<string, any>) => {if (formData.fechaFin && !lt(formData.fechaInicio, formData.fechaFin)) {
-  setError("La fecha de inicio del equipo debe ser anterior a la fecha límite.");
-  setSaving(false);
-  return;
-}
+  // Submit
+  const onSubmit = async (_data: Record<string, any>) => {
+    if (formData.fechaFin && !lt(formData.fechaInicio, formData.fechaFin)) {
+      setError("La fecha de inicio del equipo debe ser anterior a la fecha límite.");
+      setSaving(false);
+      return;
+    }
 
-// Validar fechas de todos los miembros
-for (const m of miembros) {
-  const err = validateMemberDates(
-    formData.fechaInicio,
-    formData.fechaFin || null,
-    m.fechaEntrada || null,
-    m.fechaFin || null
-  );
-  if (err) {
-    setError(`Miembro ${m.nombre}: ${err}`);
-    setSaving(false);
-    return;
-  }
-}
+    // Validar fechas de todos los miembros
+    for (const m of miembros) {
+      const err = validateMemberDates(
+        formData.fechaInicio,
+        formData.fechaFin || null,
+        m.fechaEntrada || null,
+        m.fechaFin || null
+      );
+      if (err) {
+        setError(`Miembro ${m.nombre}: ${err}`);
+        setSaving(false);
+        return;
+      }
+    }
     try {
       if (!team) return;
       setSaving(true);
@@ -906,13 +937,13 @@ for (const m of miembros) {
         idLider: leadSel ? Number(leadSel.value) : null,
         idTecnologias: tecnologiasSel.map((t) => Number(t.value)),
         usuarios: miembros.map((m) => ({
-  idUsuario: m.id,
-  idCargo: m.idCargo,
-  porcentajeTrabajo: Math.max(1, Math.min(100, Number(m.disponibilidad) || 1)),
-  fechaEntrada: m.fechaEntrada || null,
-  fechaFin: m.fechaFin || null,
-  estado: "A",
-})),
+          idUsuario: m.id,
+          idCargo: m.idCargo,
+          porcentajeTrabajo: Math.max(1, Math.min(100, Number(m.disponibilidad) || 1)),
+          fechaEntrada: m.fechaEntrada || null,
+          fechaFin: m.fechaFin || null,
+          estado: m.estado,
+        })),
         equipoDiaUbicacion: duPayload,
       };
 
@@ -946,7 +977,7 @@ for (const m of miembros) {
 
 
   if (loading) return <div className="p-4 text-sm">Cargando…</div>;
-  if (error) return <div className="p-4 text-sm text-red-600">Error: {error}</div>;
+  // if (error) return <div className="p-4 text-sm text-red-600">Error: {error}</div>;
   if (!team) return <div className="p-4 text-sm">No se encontró el equipo.</div>;
 
   return (
@@ -1177,24 +1208,24 @@ for (const m of miembros) {
               <div>
                 <label className="block text-sm mb-2">Entrada</label>
                 <input
-  type="date"
-  value={newMemberStart}
-  onChange={(e) => setNewMemberStart(e.target.value)}
-  min={formData.fechaInicio || undefined}
-  max={formData.fechaFin || undefined}
-  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-/>
+                  type="date"
+                  value={newMemberStart}
+                  onChange={(e) => setNewMemberStart(e.target.value)}
+                  min={formData.fechaInicio || undefined}
+                  max={formData.fechaFin || undefined}
+                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                />
               </div>
               <div>
                 <label className="block text-sm mb-2">Fin</label>
                 <input
-  type="date"
-  value={newMemberEnd}
-  onChange={(e) => setNewMemberEnd(e.target.value)}
-  min={(newMemberStart || formData.fechaInicio) || undefined}
-  max={formData.fechaFin || undefined}
-  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-/>
+                  type="date"
+                  value={newMemberEnd}
+                  onChange={(e) => setNewMemberEnd(e.target.value)}
+                  min={(newMemberStart || formData.fechaInicio) || undefined}
+                  max={formData.fechaFin || undefined}
+                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                />
               </div>
               <div className="flex items-end gap-2">
                 <input
@@ -1228,7 +1259,32 @@ for (const m of miembros) {
                 </button>
               </div>
             </div>
-
+            {/* Errores en tabla usuarios */}
+            {error && (
+              <div className="p-4 rounded-lg text-sm border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700 mb-4">
+                <div className="flex items-center gap-2">
+                  <span>❌</span>
+                  <span>
+                    {(() => {
+                      try {
+                        const jsonPart = error.split('—')[1]?.trim(); // берём часть после "—"
+                        console.log(jsonPart);
+                        try {
+                          const obj = JSON.parse(jsonPart || '{}');
+                          return obj.message || error;
+                        } catch {
+                          const match = jsonPart.match(/"message"\s*:\s*"([^"]*)"/);
+                          if (match) return match[1]; // вернём найденное сообщение
+                          return error;
+                        }
+                      } catch {
+                        return error;
+                      }
+                    })()}
+                  </span>
+                </div>
+              </div>
+            )}
             <DataTable
               data={miembros}
               columns={columns}

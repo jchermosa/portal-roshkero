@@ -8,8 +8,8 @@ import { useAuth } from "../../context/AuthContext";
 import PaginationFooter from "../../components/PaginationFooter";
 
 const PAGE_SIZE = 10;
-const LIST_PATH = "/api/v1/admin/operations/teams";
-const TEAM_PATH = "/api/v1/admin/operations/team";
+const LIST_PATH = "http://localhost:8080/api/v1/admin/operations/teams";
+const TEAM_PATH = "http://localhost:8080/api/v1/admin/operations/team";
 
 type Tecnologia = { idTecnologia: number; nombre: string };
 
@@ -173,7 +173,40 @@ export default function OperationsPage() {
     return () => ac.abort();
   }, [page, token]);
 
-  const confirmToggleEstado = (row: IListTeams) => setEquipoConfirm(row);
+  const confirmToggleEstado = async (row: IListTeams) => {
+    try {
+      const r = await fetch(`${TEAM_PATH}/${row.idTeam}`, {
+        method: "POST", // или PATCH/PUT если бэкенд требует
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+        body: JSON.stringify({}), // если нужно отправить какие-то данные
+      });
+
+      if (!r.ok) {
+        const txt = await r.text();
+        throw new Error(`${r.status} ${r.statusText} — ${txt}`);
+      }
+
+      // Можно обновить состояние локально после успешного запроса
+      // Например, переключить estado в массиве equipos
+      setEquipos((prev) =>
+        prev.map((e) =>
+          e.idTeam === row.idTeam
+            ? { ...e, estado: !e.estado } // переключаем true/false
+            : e
+        )
+      );
+    } catch (e: any) {
+      console.error("Error al cambiar estado:", e.message);
+      // Можно показывать ошибку пользователю
+      setError(`No se pudo cambiar el estado: ${e.message}`);
+    }
+  };
+
 
   const handleConfirmToggle = async () => {
     if (!equipoConfirm) return;
@@ -351,9 +384,8 @@ export default function OperationsPage() {
               </button>
               <button
                 onClick={handleConfirmToggle}
-                className={`px-4 py-2 rounded text-white ${
-                  equipoConfirm.estado ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
-                }`}
+                className={`px-4 py-2 rounded text-white ${equipoConfirm.estado ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
+                  }`}
                 disabled={changingEstado}
               >
                 {changingEstado ? "Guardando..." : "Confirmar"}
@@ -418,22 +450,22 @@ function TeamDetailsModal({ id, token, onClose }: TeamDetailsModalProps) {
 
         // después de: const data = await r.json();
 
-const baseMembers = extractMembersFromTeamDetail(data);
+        const baseMembers = extractMembersFromTeamDetail(data);
 
-// nombre completo del líder (si existe)
-const leaderName = [data?.lider?.nombre, data?.lider?.apellido]
-  .filter(Boolean)
-  .join(" ")
-  .trim();
+        // nombre completo del líder (si existe)
+        const leaderName = [data?.lider?.nombre, data?.lider?.apellido]
+          .filter(Boolean)
+          .join(" ")
+          .trim();
 
-// incluir líder como primer pill y evitar duplicados
-const items = leaderName
-  ? [`${leaderName} (Líder)`, ...baseMembers.filter(n => n.toLowerCase() !== leaderName.toLowerCase())]
-  : baseMembers;
+        // incluir líder como primer pill y evitar duplicados
+        const items = leaderName
+          ? [`${leaderName} (Líder)`, ...baseMembers.filter(n => n.toLowerCase() !== leaderName.toLowerCase())]
+          : baseMembers;
 
-setMemberNamesNoLead(items);
+        setMemberNamesNoLead(items);
 
-setDet(data);
+        setDet(data);
 
       } catch (e: any) {
         if (e?.name !== "AbortError") setErr(e.message || "Error");
@@ -468,11 +500,10 @@ setDet(data);
               <h3 className="text-xl font-bold text-brand-blue dark:text-blue-200">{det?.nombre || "Equipo"}</h3>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span
-                  className={`px-2 py-0.5 text-xs rounded-full ${
-                    estadoActivo
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-100"
-                      : "bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-100"
-                  }`}
+                  className={`px-2 py-0.5 text-xs rounded-full ${estadoActivo
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-100"
+                    : "bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-100"
+                    }`}
                 >
                   {estadoActivo ? "Activo" : "Inactivo"}
                 </span>
@@ -508,22 +539,22 @@ setDet(data);
                     <span>{det?.cliente?.nombre || "—"}</span>
                   </Section>
                   <Section label="Líder">
-  {(() => {
-    const leaderName = [det?.lider?.nombre, det?.lider?.apellido]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
+                    {(() => {
+                      const leaderName = [det?.lider?.nombre, det?.lider?.apellido]
+                        .filter(Boolean)
+                        .join(" ")
+                        .trim();
 
-    return leaderName ? (
-      <>
-        <PillsWithOverflow items={[leaderName]} maxToShow={1} color="blue" />
-        
-      </>
-    ) : (
-      <span className="text-gray-500 dark:text-gray-400">No asignado</span>
-    );
-  })()}
-</Section>
+                      return leaderName ? (
+                        <>
+                          <PillsWithOverflow items={[leaderName]} maxToShow={1} color="blue" />
+
+                        </>
+                      ) : (
+                        <span className="text-gray-500 dark:text-gray-400">No asignado</span>
+                      );
+                    })()}
+                  </Section>
 
                   <Section label="Día / Ubicación">
                     <PairGridWithOverflow pairs={duPairs} maxRows={2} />

@@ -17,16 +17,16 @@ type Miembro = {
   fechaFin?: string;
 };
 
-const METADATAS_PATH = "/api/v1/admin/operations/metadatas";
-const CREATE_TEAM_PATH = "/api/v1/admin/operations/team";
-const DIAS_PATH = "/api/v1/admin/operations/diaslaborales";
-const LIBRES_PATH = "/api/v1/admin/operations/asignacion/libres";
-const USERS_PATH = "/api/v1/admin/operations/users";
+const METADATAS_PATH = "http://localhost:8080/api/v1/admin/operations/metadatas";
+const CREATE_TEAM_PATH = "http://localhost:8080/api/v1/admin/operations/team";
+const DIAS_PATH = "http://localhost:8080/api/v1/admin/operations/diaslaborales";
+const LIBRES_PATH = "http://localhost:8080/api/v1/admin/operations/asignacion/libres";
+const USERS_PATH = "http://localhost:8080/api/v1/admin/operations/users";
 
 function useIsDark() {
   const [isDark, setIsDark] = useState(
     typeof document !== "undefined" &&
-      document.documentElement.classList.contains("dark")
+    document.documentElement.classList.contains("dark")
   );
   useEffect(() => {
     const el = document.documentElement;
@@ -88,8 +88,8 @@ export default function EquipoFormPage() {
         borderColor: s.isFocused
           ? "#3b82f6"
           : isDark
-          ? "#374151"
-          : "#d1d5db",
+            ? "#374151"
+            : "#d1d5db",
         minHeight: 40,
         boxShadow: s.isFocused ? "0 0 0 2px rgba(59,130,246,.2)" : "none",
         ":hover": { borderColor: "#3b82f6" },
@@ -113,10 +113,10 @@ export default function EquipoFormPage() {
             ? "#1f2937"
             : "#dbeafe"
           : s.isFocused
-          ? isDark
-            ? "#374151"
-            : "#e5e7eb"
-          : "transparent",
+            ? isDark
+              ? "#374151"
+              : "#e5e7eb"
+            : "transparent",
         color: isDark ? "#ffffff" : "#111827",
       }),
     }),
@@ -293,8 +293,8 @@ export default function EquipoFormPage() {
           const usersArr = Array.isArray(usersData?.content)
             ? usersData.content
             : Array.isArray(usersData)
-            ? usersData
-            : [];
+              ? usersData
+              : [];
           setMemberOptions(
             usersArr.map((u: any) => ({
               value: u.id ?? u.idUsuario,
@@ -309,9 +309,9 @@ export default function EquipoFormPage() {
                   100,
                   Number(
                     u.disponibilidadRestante ??
-                      u.disponibilidad ??
-                      u.dispRestante ??
-                      100
+                    u.disponibilidad ??
+                    u.dispRestante ??
+                    100
                   )
                 )
               ),
@@ -479,7 +479,7 @@ export default function EquipoFormPage() {
     console.log("✅ Equipo: ", payload);
     if (!r.ok) {
       const msg = await r.text();
-      throw new Error(`❌${r.status} ${r.statusText} — ${msg}`);
+      throw new Error(`${r.status} ${r.statusText} — ${msg}`);
     }
 
     navigate("/operations");
@@ -551,9 +551,9 @@ export default function EquipoFormPage() {
                             value={
                               r.idUbicacion != null
                                 ? {
-                                    value: r.idUbicacion,
-                                    label: r.nombreUbicacion ?? "—",
-                                  }
+                                  value: r.idUbicacion,
+                                  label: r.nombreUbicacion ?? "—",
+                                }
                                 : null
                             }
                             onChange={(opt) =>
@@ -683,52 +683,52 @@ export default function EquipoFormPage() {
                   menuPosition="fixed"
                 />
                 <input
-  type="date"
-  value={newMemberStart}
-  onChange={(e) => {
-    const v = e.target.value;
-    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, newMemberEnd || null);
-    if (err) return alert(err);
-    setNewMemberStart(v);
-  }}
-  min={formData.fechaInicio || undefined}
-  max={newMemberEnd || formData.fechaFin || undefined}
-  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-/>
+                  type="date"
+                  value={newMemberStart}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, newMemberEnd || null);
+                    if (err) return alert(err);
+                    setNewMemberStart(v);
+                  }}
+                  min={formData.fechaInicio || undefined}
+                  max={newMemberEnd || formData.fechaFin || undefined}
+                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                />
                 <input
-  type="date"
-  value={newMemberEnd}
-  onChange={(e) => {
-    const v = e.target.value;
-    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, newMemberStart || null, v);
-    if (err) return alert(err);
-    setNewMemberEnd(v);
-  }}
-  min={newMemberStart || formData.fechaInicio || undefined}
-  max={formData.fechaFin || undefined}
-  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-/>
+                  type="date"
+                  value={newMemberEnd}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, newMemberStart || null, v);
+                    if (err) return alert(err);
+                    setNewMemberEnd(v);
+                  }}
+                  min={newMemberStart || formData.fechaInicio || undefined}
+                  max={formData.fechaFin || undefined}
+                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                />
 
                 <input
-  type="number"
-  min={1}
-  max={newMemberMax || 1}
-  value={Math.max(
-    1,
-    Math.min(newMemberMax || 1, Number(newMemberDisp) || 1)
-  )}
-  onChange={(e) => {
-    const v = Number(e.target.value) || 1;
-    setNewMemberDisp(Math.max(1, Math.min(newMemberMax || 1, v)));
-  }}
-  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-  placeholder="Disp. %"
-  title={
-    selectedMember
-      ? `Disponible máx: ${newMemberMax}%`
-      : "Elegí un miembro primero"
-  }
-/>
+                  type="number"
+                  min={1}
+                  max={newMemberMax || 1}
+                  value={Math.max(
+                    1,
+                    Math.min(newMemberMax || 1, Number(newMemberDisp) || 1)
+                  )}
+                  onChange={(e) => {
+                    const v = Number(e.target.value) || 1;
+                    setNewMemberDisp(Math.max(1, Math.min(newMemberMax || 1, v)));
+                  }}
+                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                  placeholder="Disp. %"
+                  title={
+                    selectedMember
+                      ? `Disponible máx: ${newMemberMax}%`
+                      : "Elegí un miembro primero"
+                  }
+                />
 
                 <button
                   type="button"
@@ -751,6 +751,7 @@ export default function EquipoFormPage() {
                       <th className="px-4 py-2 text-left">Disp. (%)</th>
                       <th className="px-4 py-2 text-left">Entrada</th>
                       <th className="px-4 py-2 text-left">Fin</th>
+                      <th className="px-4 py-2 text-left">Estado</th>
                       <th className="px-4 py-2 text-left">Acciones</th>
                     </tr>
                   </thead>
