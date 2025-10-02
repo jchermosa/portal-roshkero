@@ -15,17 +15,25 @@ import SolicitudDispositivoModal from "./SolicitudDispositivoModal";
 
 interface Props {
   embedded?: boolean;
-  forceSysAdmin?: boolean; 
+  forceSysAdmin?: boolean; // true = vista de gestión global (solo admins)
 }
 
-export default function SolicitudDispositivoPage({ embedded = false, forceSysAdmin = false }: Props) {
+export default function SolicitudDispositivoPage({
+  embedded = false,
+  forceSysAdmin = false,
+}: Props) {
   const { token, user } = useAuth();
 
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<SolicitudDispositivoUI | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-   const isSysAdmin = forceSysAdmin || tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
+  // Rol del usuario
+  const isSysAdmin = tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
+
+  // Vista de gestión global → listado de TODAS las solicitudes
+  const isGestionView = forceSysAdmin;
+
   // Hook listado
   const {
     data: solicitudes,
@@ -33,10 +41,12 @@ export default function SolicitudDispositivoPage({ embedded = false, forceSysAdm
     loading,
     error,
     refresh,
-  } = useSolicitudesDispositivo(token, page, 10, isSysAdmin);
+  } = useSolicitudesDispositivo(token, page, 10, isGestionView);
 
+  // Quienes pueden editar (todos excepto rol de Operaciones)
   const canEdit = !tieneRol(user, Roles.OPERACIONES);
 
+  // Renderizar acciones por fila
   const renderActions = (s: SolicitudDispositivoUI) => {
     if (s.estado === "A" || s.estado === "R") return null;
 
@@ -49,13 +59,14 @@ export default function SolicitudDispositivoPage({ embedded = false, forceSysAdm
           }}
           className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
         >
-          {isSysAdmin ? "Gestionar" : "Editar"}
+          {isGestionView ? "Gestionar" : "Editar"}
         </button>
       </div>
     );
   };
 
-  const newSolicitudButton = !embedded && !isSysAdmin && (
+  // Botón para nueva solicitud (no aparece en gestión)
+  const newSolicitudButton = !embedded && !isGestionView && (
     <IconButton
       label="Nueva Solicitud"
       icon={<span>➕</span>}
@@ -72,14 +83,14 @@ export default function SolicitudDispositivoPage({ embedded = false, forceSysAdm
     <>
       <DataTable<SolicitudDispositivoUI>
         data={solicitudes}
-        columns={buildSolicitudDispositivoColumns(isSysAdmin)}
+        columns={buildSolicitudDispositivoColumns(isGestionView)}
         rowKey={(s) => s.idSolicitud}
         actions={canEdit ? renderActions : undefined}
         scrollable={false}
       />
 
-      {/* Solo admins tienen paginación */}
-      {isSysAdmin && (
+      {/* Solo vista de gestión tiene paginación */}
+      {isGestionView && (
         <PaginationFooter
           currentPage={page}
           totalPages={totalPages}
@@ -92,7 +103,7 @@ export default function SolicitudDispositivoPage({ embedded = false, forceSysAdm
         <SolicitudDispositivoModal
           token={token}
           id={selected?.idSolicitud}
-          gestion={isSysAdmin} 
+          gestion={isGestionView}
           onClose={() => setShowModal(false)}
           onSaved={refresh}
         />
