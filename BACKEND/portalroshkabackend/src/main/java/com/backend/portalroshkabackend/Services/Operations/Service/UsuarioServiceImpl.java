@@ -146,7 +146,6 @@ public class UsuarioServiceImpl implements IUsuarioService {
         List<UsuarioAsignacionDto> result = new ArrayList<>();
         if (usuariosDto != null) {
             for (UsuarioAsignacionDto uDto : usuariosDto) {
-                // Проверка и уменьшение доступности
                 Equipos equipo = equiposRepository.findByIdEquipo(equipoId);
                 Usuario usuario = usuarioRepository.findById(uDto.getIdUsuario())
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + uDto.getIdUsuario()));
@@ -157,8 +156,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 asignacion.setFechaEntrada(uDto.getFechaEntrada());
                 asignacion.setFechaFin(uDto.getFechaFin());
                 asignacion.setFechaCreacion(LocalDateTime.now());
-                asignacionUsuarioRepository.save(asignacion);
+                asignacion.setEstado(uDto.getEstado());
 
+                asignacionUsuarioRepository.save(asignacion);
                 result.add(uDto);
             }
         }
