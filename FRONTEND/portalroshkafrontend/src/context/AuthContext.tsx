@@ -12,6 +12,7 @@ export type User = {
   correo: string;
   rol?: Rol;
   cargo?: Cargo;
+  equipos: Equipo[];
   fechaIngreso?: string;
   antiguedad?: string;
   diasVacaciones?: number;
@@ -75,9 +76,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         nombre: payload.nombre ?? "",
         apellido: payload.apellido ?? "",
         correo: payload.email ?? payload.sub ?? "",
-        nombreRol: payload.rol ?? payload.nombreRol ?? "",
-        idCargo: payload.idCargo,
-        nombreCargo: payload.cargo ?? payload.nombreCargo,
+        rol: payload.rol ?? payload.nombreRol ?? "",
+        cargo: payload.idCargo,
+        equipos: payload.equipos ?? [],
         telefono: payload.telefono ?? undefined,
         fechaIngreso: payload.fechaIngreso ?? undefined,
         diasVacaciones: payload.diasVacaciones,

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import EditableField from "../components/EditableField";
 import UploadImageButton from "../components/UploadImageButton";
+import { getEquipos } from "../services/CatalogService";
 
 function formatDate(d?: string | Date) {
   if (!d) return "";
@@ -64,6 +65,7 @@ export default function ProfilePage() {
   const avatarSeed = fullName || email || "usuario";
   const rolNombre = user?.rol?.nombre;
   const cargoNombre = user?.cargo?.nombre;
+  const getEquipos = user?.equipos || [];
   const joinedAt = user?.fechaIngreso;
   const diasVac = user?.diasVacaciones;
   const diasVacRest = user?.diasVacacionesRestante;
@@ -92,7 +94,7 @@ export default function ProfilePage() {
 
 
 
-      const res = await fetch(`http://localhost:8080/api/v1/usuarios/actualizar_foto`, {
+      const res = await fetch(`http://localhost:8080/api/v1/usuarios/actualizarfoto`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -208,7 +210,7 @@ export default function ProfilePage() {
 
               {/* Grids responsivas */}
               <div className="grid gap-4 md:gap-6 p-4 md:p-6 md:grid-cols-3">
-                {/* Columna izquierda */}
+                {/* Columna izquierda (Contacto) */}
                 <div className="md:col-span-2">
                   <h2 className="mb-3 text-sm font-medium text-gray-600 dark:text-gray-400">
                     Contacto
@@ -227,6 +229,22 @@ export default function ProfilePage() {
                       </div>
                     )}
 
+                    {/* Equipos */}
+                    {getEquipos.length > 0 && (
+                      <div className="flex items-center justify-between rounded-xl border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/70 backdrop-blur-sm p-3 min-w-0">
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-gray-600 dark:text-gray-400">👥</span>
+                          <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Equipos</span>
+                        </div>
+                        <span
+                          className="inline-flex items-center rounded-full border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-800/80 px-2 py-0.5 text-xs text-gray-700 dark:text-gray-200 truncate max-w-[180px]"
+                          title={namesFrom(getEquipos).join(", ")} // tooltip
+                        >
+                          {namesFrom(getEquipos).join(", ")}
+                        </span>
+                      </div>
+                    )}
+
                     {/* Teléfono */}
                     <EditableField
                       label="📞 Teléfono"
@@ -238,18 +256,12 @@ export default function ProfilePage() {
                             method: "PUT",
                             headers: {
                               "Content-Type": "application/json",
-                              Authorization: `Bearer ${localStorage.getItem(
-                                "auth_token"
-                              )}`,
+                              Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
                             },
                             body: JSON.stringify({ telefono: newPhone }),
                           });
                           if (!res.ok) {
-                            console.error(
-                              "Error al actualizar teléfono",
-                              res.status,
-                              await res.text()
-                            );
+                            console.error("Error al actualizar teléfono", res.status, await res.text());
                             return;
                           }
                           setPhoneLocal(newPhone);
@@ -263,9 +275,7 @@ export default function ProfilePage() {
                     {joinedAt && (
                       <div className="flex items-center justify-between rounded-xl border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/70 backdrop-blur-sm p-3">
                         <div className="flex items-center gap-3">
-                          <span className="text-gray-600 dark:text-gray-400">
-                            📅
-                          </span>
+                          <span className="text-gray-600 dark:text-gray-400">📅</span>
                           <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                             Fecha de ingreso
                           </span>
@@ -275,14 +285,11 @@ export default function ProfilePage() {
                         </span>
                       </div>
                     )}
-
-
-
                   </div>
                 </div>
 
-                {/* Columna derecha */}
-                <div>
+                {/* Columna derecha (Resumen) */}
+                <div className="md:col-span-1">
                   <h2 className="mb-3 text-sm font-medium text-gray-600 dark:text-gray-400">
                     Resumen
                   </h2>
@@ -303,7 +310,7 @@ export default function ProfilePage() {
                       </div>
                     )}
                     {typeof diasVacRest !== "undefined" && (
-                      <div className="rounded-2xl border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/70 backdrop-blur-sm shadow-sm overflow-hidden w-full">
+                      <div className="rounded-2xl border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-800/70 backdrop-blur-sm shadow-sm overflow-hidden w-full">
                         <div className="p-4 text-center bg-white/80 dark:bg-gray-800">
                           <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 tabular-nums">
                             {diasVacRest}
@@ -322,18 +329,14 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
-          {/* Footer */}
-          <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 flex justify-end">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Última actualización del perfil visible aquí.
-            </p>
-          </div>
         </div>
       </div>
     </div>
   );
 }
+
+
+
 // function setUser(arg0: (prev: any) => any) {
 //   throw new Error("Function not implemented.");
 // }
