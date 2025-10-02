@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.portalroshkabackend.DTO.TeamLeaderDTO.SolTeamLeaderDTO;
 import com.backend.portalroshkabackend.DTO.TeamLeaderDTO.SolicitudRespuestaDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 // import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.Services.TeamLeaderServicio.TeamLeaderService;
 
@@ -49,6 +50,15 @@ public class TeamLeaderController {
         return ResponseEntity.ok(respuesta); // Placeholder response
     }
     
-
+    // Get de las solicitudes por ID
+    @GetMapping("/users/requests/{id}")
+    public ResponseEntity<SolicitudUserDto> getSolicitudById(@PathVariable Integer id) {
+        SolicitudUserDto solicitud = teamLeaderService.getSolicitudByIdTl(id);
+        if (solicitud != null) {
+            return ResponseEntity.ok(solicitud);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     
 }
