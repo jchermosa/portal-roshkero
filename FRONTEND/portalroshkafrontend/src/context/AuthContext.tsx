@@ -1,8 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 
+type Rol = { id?: number; nombre: string };
+type Cargo = { id?: number; nombre: string };
+type Equipo = { id?: number; nombre: string };
+
 export type User = {
-<<<<<<< HEAD
   idUsuario?: number;
   nombre: string;
   apellido: string;
@@ -12,23 +15,10 @@ export type User = {
   equipos: Equipo[];
   fechaIngreso?: string;
   antiguedad?: string;
-=======
-  id: number;
-  nombre: string;
-  apellido: string;
-  correo: string;
-  rol: {
-    idRol: number;
-    nombre: string;
-  } | null;
-  cargo?: { idCargo: number; nombre: string };
-  equipos?: { idEquipo: number; nombre: string }[];
->>>>>>> origin/merge-estable
   diasVacaciones?: number;
   diasVacacionesRestante?: number;
   telefono?: string;
   nroCedula?: string;
-<<<<<<< HEAD
   fechaNacimiento?: string;
   estado?: string;
   requiereCambioContrasena?: boolean;
@@ -36,11 +26,6 @@ export type User = {
   foco?: string;
   urlPerfil?: string;
   disponibilidad?: number;
-=======
-  estado?: string;
-  requiereCambioContrasena?: boolean;
-  fotoBase64?: string | null;
->>>>>>> origin/merge-estable
 };
 
 type AuthContextType = {
@@ -87,7 +72,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const payload = parseJwt(jwtToken);
 
       const basicUser: User = {
-<<<<<<< HEAD
         idUsuario: payload.idUsuario ?? payload.id ?? payload.userId ?? undefined,
         nombre: payload.nombre ?? "",
         apellido: payload.apellido ?? "",
@@ -102,19 +86,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         requiereCambioContrasena: payload.requiereCambioContrasena ?? false,
       };
 
-=======
-        id: payload.id ?? 0,
-        nombre: payload.nombre ?? "",
-        apellido: payload.apellido ?? "",
-        correo: payload.email ?? payload.sub ?? "",
-        rol: payload.rol
-          ? {
-              idRol: payload.rol.idRol ?? 0,
-              nombre: payload.rol.nombre ?? "",
-            }
-          : null, // 👈 si no viene, null
-      };
->>>>>>> origin/merge-estable
       setUser(basicUser);
 
       // Ahora pedimos los datos completos al backend
@@ -126,13 +97,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const fullUser: User = await res.json();
       setUser(fullUser);
-<<<<<<< HEAD
 
       console.log("Full user recibido del backend:", fullUser);
 
 
-=======
->>>>>>> origin/merge-estable
     } catch (e) {
       console.error("Error al decodificar el token:", e);
       setUser(null);
