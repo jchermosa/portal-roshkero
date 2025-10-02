@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import EditableField from "../components/EditableField";
 import UploadImageButton from "../components/UploadImageButton";
-import { getEquipos } from "../services/CatalogService";
+//import { getEquipos } from "../services/CatalogService";
 
 function formatDate(d?: string | Date) {
   if (!d) return "";
@@ -247,7 +247,7 @@ export default function ProfilePage() {
 
                     {/* Teléfono */}
                     <EditableField
-                      label="📞 Teléfono"
+                      label="📞  Teléfono"
                       value={phoneLocal}
                       placeholder="No definido"
                       onSave={async (newPhone) => {
