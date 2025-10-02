@@ -8,7 +8,7 @@ async function getDispositivosAsignados(
   size: number = 10
 ): Promise<PaginatedResponse<DispositivoAsignadoItem>> {
   const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceAssignments/listAssignments?page=${page}&size=${size}`,
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/listAssignments?page=${page}&size=${size}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -17,13 +17,29 @@ async function getDispositivosAsignados(
   return res.json();
 }
 
+// Listar una sola solicitud
+async function getDispositivoAsignadoById(
+  token: string,
+  id: number
+): Promise<DispositivoAsignadoItem> {
+  const res = await fetch(
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/getAssignment/${id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+
 // Crear nueva asignación
 async function createDispositivoAsignado(
   token: string,
   data: Partial<DispositivoAsignadoItem>
 ): Promise<DispositivoAsignadoItem> {
   const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceAssignments/createAssignment`,
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/createAssignment`,
     {
       method: "POST",
       headers: {
@@ -44,7 +60,7 @@ async function updateDispositivoAsignado(
   data: Partial<DispositivoAsignadoItem>
 ): Promise<DispositivoAsignadoItem> {
   const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceAssignments/updateAssignment/${id}`,
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/updateAssignment/${id}`,
     {
       method: "PUT",
       headers: {
@@ -64,7 +80,7 @@ async function deleteDispositivoAsignado(
   id: number
 ): Promise<void> {
   const res = await fetch(
-    `/api/v1/admin/sysadmin/deviceAssignments/deleteAssignment/${id}`,
+    `http://localhost:8080/api/v1/admin/sysadmin/deviceAssignments/deleteAssignment/${id}`,
     {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
@@ -75,6 +91,7 @@ async function deleteDispositivoAsignado(
 
 export {
   getDispositivosAsignados,
+  getDispositivoAsignadoById,
   createDispositivoAsignado,
   updateDispositivoAsignado,
   deleteDispositivoAsignado,

@@ -13,7 +13,6 @@ interface SelectDropdownProps {
   options: Option[];
   required?: boolean;
   placeholder?: string;
-  noMargin?: boolean;
 }
 
 const SelectDropdown: React.FC<SelectDropdownProps> = ({
@@ -24,10 +23,9 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
   options,
   required = false,
   placeholder,
-  noMargin = false,
 }) => {
   return (
-    <div className={noMargin ? "" : "mb-4"}> {/* 👈 Condicional */}
+    <div className="mb-4">
       <label
         htmlFor={name}
         className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"

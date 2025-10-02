@@ -20,7 +20,7 @@ export default function CatalogoSysPage() {
 
   return (
     <PageLayout
-      title="Catálogo de Operaciones"
+      title="Catálogo de Administrador de Sistemas"
       actions={
         <div className="flex gap-2">
           <button

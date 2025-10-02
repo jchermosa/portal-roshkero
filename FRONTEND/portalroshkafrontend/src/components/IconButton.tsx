@@ -32,8 +32,10 @@ export default function IconButton({
       type={type}
       onClick={onClick}
       className={`${baseStyles} ${variants[variant]} ${className}`}
-    >
-      {icon && <span>{icon}</span>}
+    ><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add" />
+      {icon && <span className="material-symbols-outlined">
+add
+</span>}
       <span>{label}</span>
     </button>
   );

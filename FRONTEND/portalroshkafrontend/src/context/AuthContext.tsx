@@ -6,22 +6,26 @@ type Cargo = { id?: number; nombre: string };
 type Equipo = { id?: number; nombre: string };
 
 export type User = {
-  id?: number;
+  idUsuario: number;
   nombre: string;
   apellido: string;
+  nroCedula: string;
   correo: string;
-  rol: Rol;
-  cargo?: Cargo;
-  equipo?: Equipo;
-  diasVacaciones?: number;
-  diasVacacionesRestante?: number;
-  telefono?: string;
-  fechaIngreso?: string;
-  nroCedula?: string;
-  estado?: boolean;
-  requiereCambioContrasena?: boolean;
-  fotoBase64?: string;
+  roles: Roles; // definir Roles como enum o type aparte
+  fechaIngreso: string; // LocalDate → string (ej: "2025-09-25")
+  antiguedad: string;
+  diasVacaciones: number;
+  estado: "ACTIVO" | "INACTIVO"; // si usas enum EstadoActivoInactivo mejor tiparlo
+  contrasena: string;
+  telefono: string;
+  cargos: Cargos; // idem, definirlo aparte
+  fechaNacimiento: string; // LocalDate → string
+  diasVacacionesRestante: number;
+  requiereCambioContrasena: boolean;
+  url: string;
+  disponibilidad: number | null;
 };
+
 
 type AuthContextType = {
   user: User | null;
@@ -29,7 +33,6 @@ type AuthContextType = {
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
-  refreshUser: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,17 +65,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const decodeAndSetUser = async(jwtToken: string) => {
-    try {
-      const payload = parseJwt(jwtToken);
+  const decodeAndSetUser = (jwtToken: string) => {
+try {
+const base = jwtToken.split(".")[1];
+const json = decodeURIComponent(
+atob(base)
+.split("")
+.map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+.join("")
+);
+const payload = JSON.parse(json);
 
       const basicUser: User = {
         id: payload.id ?? payload.userId ?? payload.usuarioId ?? undefined,
         nombre: payload.nombre ?? "",
         apellido: payload.apellido ?? "",
         correo: payload.email ?? payload.sub ?? "",
-        rol: payload.rol ? { nombre: payload.rol } : { nombre: "" },
-        cargo: payload.cargo ? { nombre: payload.cargo } : undefined,
+        // El JWT solo contiene el ID del rol, no el nombre ni el cargo
+        rol: payload.rol ? { id: payload.rol, nombre: "" } : { id: undefined, nombre: "" },
+        cargo: { id: undefined, nombre: "" }, // El cargo no viene en el JWT
         equipo: payload.equipo ? { nombre: payload.equipo } : undefined,
         telefono: payload.telefono ?? undefined,
         fechaIngreso: payload.fechaIngreso ?? payload.fecha_ingreso ?? undefined,
@@ -114,10 +125,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
   };
 
-  const refreshUser = () => {
-    if (token) decodeAndSetUser(token);
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -126,14 +133,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: !!token,
         login,
         logout,
-        refreshUser, 
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
