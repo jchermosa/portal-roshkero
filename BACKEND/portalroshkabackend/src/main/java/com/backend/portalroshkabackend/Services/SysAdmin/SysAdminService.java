@@ -79,15 +79,16 @@ public class SysAdminService {
             // Manejo seguro de objetos que pueden ser null
             if (solicitud.getUsuario() != null) {
                 dto.setIdUsuario(solicitud.getUsuario().getIdUsuario());
+                dto.setNombreUsuario(solicitud.getUsuario().getNombre());
             }
             
-            if (solicitud.getDocumentoAdjunto() != null) {
-                dto.setIdDocumentoAdjunto(solicitud.getDocumentoAdjunto().getIdDocumentoAdjunto());
-            }
+            // if (solicitud.getDocumentoAdjunto() != null) {
+            //     dto.setIdDocumentoAdjunto(solicitud.getDocumentoAdjunto().getIdDocumentoAdjunto());
+            // }
             
-            if (solicitud.getLider() != null) {
-                dto.setIdLider(solicitud.getLider().getIdUsuario());
-            }
+            // if (solicitud.getLider() != null) {
+            //     dto.setIdLider(solicitud.getLider().getIdUsuario());
+            // }
             
             if (solicitud.getTipoSolicitud() != null) {
                 dto.setTipoSolicitud(solicitud.getTipoSolicitud().name());
@@ -105,7 +106,7 @@ public class SysAdminService {
             }
             
             dto.setFechaInicio(solicitud.getFechaInicio());
-            dto.setCantDias(solicitud.getCantDias());
+            // dto.setCantDias(solicitud.getCantDias());
             dto.setFechaFin(solicitud.getFechaFin());
             
         } catch (Exception e) {
