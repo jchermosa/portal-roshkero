@@ -11,7 +11,7 @@ export type AuthResponse = {
 
 // 🔑 Login normal
 export async function login(req: AuthRequest): Promise<string> {
-  const res = await fetch(`${BASE}/api/auth/login`, {
+  const res = await fetch(`${BASE}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),
