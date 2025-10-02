@@ -32,11 +32,20 @@ export function useUsuarioForm(
     setLoading(true);
     getUsuarioById(token, id)
       .then((res) => {
-        setData({
+        console.log("Usuario cargado desde backend:", res);
+        
+        // Los datos ya vienen con idRol e idCargo correctos del backend
+        const mappedData = {
           ...res,
-          estado: res.estado ?? true,
+          // El backend ya devuelve idRol e idCargo correctamente
+          idRol: res.idRol,
+          idCargo: res.idCargo,
+          estado: res.estado, // Mantener el formato original del backend ("A"/"I")
           requiereCambioContrasena: res.requiereCambioContrasena ?? false,
-        });
+        };
+        
+        console.log("Datos mapeados para el formulario:", mappedData);
+        setData(mappedData);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -52,9 +61,13 @@ export function useUsuarioForm(
       } else {
         await createUsuario(token, formData);
       }
-    } catch (err: any) {
-      setError(err.message || "Error al guardar el usuario");
-      throw err; // importante para que la Page pueda reaccionar
+      return true;
+    } catch (err: unknown) {
+      console.error("Error en handleSubmit:", err);
+      setError(err instanceof Error ? err.message : "Error al guardar el usuario");
+      return false;
+    } finally {
+      setLoading(false);
     }
   };
 

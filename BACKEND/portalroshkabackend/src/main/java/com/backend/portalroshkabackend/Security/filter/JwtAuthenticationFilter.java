@@ -65,7 +65,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             Usuario usuario = userService.getUserByCorreo(correo);
             
             // Obtener solo el ID del rol
+<<<<<<< HEAD
             Integer rolId = usuario.getRoles().getIdRol();
+=======
+            Integer rolId = usuario.getRol().getIdRol();
+>>>>>>> parent of dca61a3 (se elimino backend)
 
             String token = Jwts.builder()
                 .subject(correo)

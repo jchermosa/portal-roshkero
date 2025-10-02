@@ -10,6 +10,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of dca61a3 (se elimino backend)
 import com.backend.portalroshkabackend.Security.filter.JwtAuthenticationFilter;
 import com.backend.portalroshkabackend.Security.filter.JwtValidationFilter;
 import com.backend.portalroshkabackend.Services.UsuariosService;
@@ -40,9 +44,15 @@ public class SpringSecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
         config.setAllowedOrigins(java.util.List.of("http://localhost:5173")); // Origen del frontend
+<<<<<<< HEAD
         config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowCredentials(true);
         config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type"));
+=======
+        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowCredentials(true);
+        config.setAllowedHeaders(java.util.List.of("Authorization","Content-Type","Accept","Origin","X-Requested-With"));
+>>>>>>> parent of dca61a3 (se elimino backend)
         
         org.springframework.web.cors.UrlBasedCorsConfigurationSource source = 
             new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
@@ -63,6 +73,7 @@ public class SpringSecurityConfig {
 
         http
             .authorizeHttpRequests(auth -> auth
+<<<<<<< HEAD
                 //.requestMatchers(HttpMethod.POST, "").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/v1/admin/operations/**").hasAuthority("ROLE_4") 
@@ -78,6 +89,26 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.DELETE,"/api/v1/admin/th/**").hasAuthority("ROLE_1") 
                 .requestMatchers(HttpMethod.PUT,"/api/v1/admin/th/**").hasAuthority("ROLE_1") 
                 // .requestMatchers(HttpMethod.GET,"/api/v1/usuarios").permitAll() 
+=======
+                // Endpoints públicos primero
+                .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/**").permitAll()
+                
+                // Reglas específicas ANTES de las generales - ORDEN IMPORTANTE
+                
+                // ROLE_1 - TALENTO HUMANO: Acceso a recursos humanos
+                .requestMatchers("/api/v1/admin/th/**").hasAnyAuthority("ROLE_1", "ROLE_5") 
+                
+                // ROLE_2 - OPERACIONES: Acceso a operaciones
+                .requestMatchers("/api/v1/admin/operations/**").hasAnyAuthority("ROLE_2", "ROLE_5") 
+                
+                // ROLE_3 - ADMINISTRADOR DE SISTEMAS: Acceso a sysadmin
+                .requestMatchers("/api/v1/admin/sysadmin/**").hasAnyAuthority("ROLE_3", "ROLE_5") 
+                
+                // ROLE_5 - DIRECTIVO: Esta regla debe ir AL FINAL porque es muy amplia
+                .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ROLE_5")
+                
+                // Cualquier otra request requiere autenticación
+>>>>>>> parent of dca61a3 (se elimino backend)
                 .anyRequest().authenticated()
             )
             .addFilter(jwtAuthenticationFilter) // Authentication filter for login

@@ -1,9 +1,17 @@
 package com.backend.portalroshkabackend.Controllers.HumanResource;
 
+<<<<<<< HEAD
 import com.backend.portalroshkabackend.DTO.RequestDto;
 import com.backend.portalroshkabackend.DTO.RequestRejectedDto;
 import com.backend.portalroshkabackend.DTO.th.*;
 import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+=======
+
+import com.backend.portalroshkabackend.DTO.th.*;
+import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
+import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
+import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
+>>>>>>> parent of dca61a3 (se elimino backend)
 import com.backend.portalroshkabackend.Services.HumanResource.IRequestService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +22,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+<<<<<<< HEAD
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +30,10 @@ import java.util.Set;
 // /th/ -> cuanto TH necesita crear sus propias solicitudes
 
 
+=======
+import java.util.Set;
+
+>>>>>>> parent of dca61a3 (se elimino backend)
 @RestController
 @RequestMapping("/api/v1/admin")
 public class RequestController {
@@ -31,6 +44,7 @@ public class RequestController {
         this.requestService = requestService;
     }
 
+<<<<<<< HEAD
     @GetMapping("/th/users/requests/leader/approved")
     public ResponseEntity<Page<SolicitudTHResponseDto>> getApprovedByLeader(
             @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
@@ -56,6 +70,15 @@ public class RequestController {
             HttpServletRequest request
     ){
         Set<String> allowedParams = Set.of("estado");
+=======
+    @GetMapping("/th/users/requests/sortby")
+    public ResponseEntity<Page<SolicitudResponseDto>> getBenefitsOrPermissions(
+            @RequestParam(value = "type", required = true) String estado,
+            @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable,
+            HttpServletRequest request
+    ){
+        Set<String> allowedParams = Set.of("type");
+>>>>>>> parent of dca61a3 (se elimino backend)
 
         for (String paramName : request.getParameterMap().keySet()){
             if (!allowedParams.contains(paramName)){
@@ -66,18 +89,27 @@ public class RequestController {
         if (estado.isBlank()) throw new IllegalArgumentException("El argumento del parametro no debe estar vacio");
 
 
+<<<<<<< HEAD
         Page<SolicitudTHResponseDto> requests;
 
         switch (estado) {
             case "A" -> requests = requestService.getByEstado(EstadoSolicitudEnum.A, pageable);
             case "R" -> requests = requestService.getByEstado(EstadoSolicitudEnum.R, pageable);
             case "P" -> requests = requestService.getByEstado(EstadoSolicitudEnum.P, pageable);
+=======
+        Page<SolicitudResponseDto> requests;
+
+        switch (estado) {
+            case "beneficio" -> requests = requestService.getBenefitsOrPermissions(SolicitudesEnum.BENEFICIO, pageable);
+            case "permiso" -> requests = requestService.getBenefitsOrPermissions(SolicitudesEnum.PERMISO, pageable);
+>>>>>>> parent of dca61a3 (se elimino backend)
             default -> throw new IllegalArgumentException("Argumento del parametro invalido: " + estado);
         }
 
         return ResponseEntity.ok(requests);
     }
 
+<<<<<<< HEAD
 
 
 
@@ -105,6 +137,45 @@ public class RequestController {
     }
 
     @PostMapping("/th/users/request")
+=======
+    @GetMapping("th/users/requests/vacations")
+    public ResponseEntity<Page<SolicitudResponseDto>> getVacations(
+            @PageableDefault(size = 10, direction = Sort.Direction.ASC) Pageable pageable
+    ){
+        Page<SolicitudResponseDto> requests = requestService.getVacations(SolicitudesEnum.VACACIONES, pageable);
+
+        return ResponseEntity.ok(requests);
+    }
+
+    // TODO: getyByIdSolicitud?
+    @GetMapping("/th/users/requests/{idRequest}")
+    public ResponseEntity<SolicitudByIdResponseDto> getRequestById(
+            @PathVariable int idRequest
+    ){
+        SolicitudByIdResponseDto request = requestService.getRequestById(idRequest);
+
+        return ResponseEntity.ok(request);
+    }
+
+    @PostMapping("/th/users/requests/{idRequest}/accept")
+    public ResponseEntity<RequestResponseDto> acceptRequest(@PathVariable int idRequest){
+
+        RequestResponseDto response = requestService.acceptRequest(idRequest);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @PostMapping("/th/users/requests/{idRequest}/reject")
+    public ResponseEntity<RequestResponseDto> rejectRequest(@PathVariable int idRequest){
+
+        RequestResponseDto response  = requestService.rejectRequest(idRequest);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/th/users/requests")
+>>>>>>> parent of dca61a3 (se elimino backend)
     public ResponseEntity<?> addNewRequestType(){
 
         // TODO: Implementar cuando la base de datos tenga tipo de solicitudes
@@ -112,6 +183,7 @@ public class RequestController {
     }
 
 
+<<<<<<< HEAD
 
 
 
@@ -132,4 +204,6 @@ public class RequestController {
     // GET: listar por estado de la solicitud (A,I,P)
     // GET: Tipo de solicitudes
 
+=======
+>>>>>>> parent of dca61a3 (se elimino backend)
 }

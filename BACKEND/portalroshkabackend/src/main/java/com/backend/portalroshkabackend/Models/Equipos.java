@@ -1,7 +1,12 @@
 package com.backend.portalroshkabackend.Models;
 
 import java.time.LocalDate;
+<<<<<<< HEAD
 import java.time.LocalDateTime;
+=======
+// import java.util.List;
+
+>>>>>>> parent of dca61a3 (se elimino backend)
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
@@ -9,14 +14,30 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+<<<<<<< HEAD
+=======
+import jakarta.persistence.FetchType;
+// import jakarta.persistence.FetchType;
+>>>>>>> parent of dca61a3 (se elimino backend)
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+<<<<<<< HEAD
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+=======
+// import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+// import java.util.ArrayList;
+>>>>>>> parent of dca61a3 (se elimino backend)
 
 @Entity
 @Data
@@ -29,14 +50,26 @@ public class Equipos {
     @Column(name = "id_equipo")
     private Integer idEquipo;
 
+<<<<<<< HEAD
     private String nombre;
 
     @ManyToOne
+=======
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_lider")
+    private Usuario lider;
+
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+>>>>>>> parent of dca61a3 (se elimino backend)
     @JoinColumn(name = "id_cliente")
     private Clientes cliente;
 
     @Column(name = "fecha_inicio")
     private LocalDate fechaInicio;
+<<<<<<< HEAD
     @Column(name = "fecha_limite")
     private LocalDate fechaLimite;
     @Column(name = "fecha_creacion")
@@ -54,4 +87,28 @@ public class Equipos {
 
 
 
+=======
+
+    @Column(name = "fecha_limite")
+    private LocalDate fechaLimite;
+
+    @Column(name = "fecha_creacion")
+    private LocalDateTime fechaCreacion;
+
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//        name = "tecnologias_equipos",
+//        joinColumns = @JoinColumn(name = "id_equipo"),
+//        inverseJoinColumns = @JoinColumn(name = "id_tecnologia")
+//    )
+//    private Set<Tecnologias> tecnologias = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", columnDefinition = "estado_ac_enum")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private EstadoActivoInactivo estado = EstadoActivoInactivo.A;
+
+    // @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
+    // private List<AsignacionUsuarioEquipo> asignacionesUsuario = new ArrayList<>();
+>>>>>>> parent of dca61a3 (se elimino backend)
 }
