@@ -1,6 +1,7 @@
 package com.backend.portalroshkabackend.DTO.UsuarioDTO;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 
@@ -40,4 +41,6 @@ public class UserDto {
     private FocoEnum foco;
     private String urlPerfil;
     private Integer disponibilidad;
+
+    private List <UserEquiposDto> equipos;
 }

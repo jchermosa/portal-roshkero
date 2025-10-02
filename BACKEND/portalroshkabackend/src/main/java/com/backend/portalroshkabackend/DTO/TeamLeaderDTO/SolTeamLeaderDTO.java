@@ -17,6 +17,8 @@ public class SolTeamLeaderDTO {
 
     private Integer idUsuario;
 
+    private String nombreUsuario;
+
     private SolicitudesEnum tipoSolicitud;
 
     private String comentario;
@@ -30,5 +32,7 @@ public class SolTeamLeaderDTO {
     private LocalDate fechaFin;
 
     private LocalDateTime fechaCreacion;
+
+    private String nombreSubTipoSolicitud;
 
 }
