@@ -8,14 +8,18 @@ export default function HomePage() {
 
   if (!user) return <p>Cargando...</p>;
 
-  const isThOrGth = user?.rol?.nombre === "TH" || user?.rol?.nombre === "GTH" || user?.rol?.nombre === "OPERACIONES";
-  const isManu = user?.rol?.nombre === "MANU";
+  // Ahora usamos user.nombreRol para verificar permisos
+  const isThOrGth =
+    ["TALENTO HUMANO", "GTH", "OPERACIONES"].includes(user.nombreRol);
+
+  const isManu = user.nombreRol === "MANU";
+
   const isFuncionario = [
     "FUNCIONARIO_FABRICA",
     "FUNCIONARIO_TERCERIZADO",
     "LIDER",
     "DIRECTORIO",
-  ].includes(user?.rol?.nombre || "");
+  ].includes(user.nombreRol);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -54,7 +58,7 @@ export default function HomePage() {
               <ProfileCard
                 title="Mi Perfil"
                 icon="👤"
-                description={`Rol: ${user?.rol?.nombre}`}
+                description={`Rol: ${user?.nombreRol || user?.rol}`}
                 onClick={() => navigate("/profile")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
@@ -70,38 +74,42 @@ export default function HomePage() {
                 buttonClass="bg-blue-600 hover:bg-blue-700"
                 color=""
               />
+
               {isThOrGth && (
-                <><ProfileCard
-                  title="Gestión de Usuarios"
-                  icon="👥"
-                  description="Administra perfiles y usuarios del sistema"
-                  onClick={() => navigate("/usuarios")}
-                  borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700"
-                  color=""
-                /><ProfileCard
-                  title="Gestión de Solicitudes"
-                  icon="📤"
-                  description="Administra las solicitudes de los usuarios"
-                  onClick={() => navigate("/gestion-solicitudes")}
-                  borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700"
-                  color=""
-                />
-                
+                <>
+                  <ProfileCard
+                    title="Gestión de Usuarios"
+                    icon="👥"
+                    description="Administra perfiles y usuarios del sistema"
+                    onClick={() => navigate("/usuarios")}
+                    borderClass="border-blue-600"
+                    buttonClass="bg-blue-600 hover:bg-blue-700"
+                    color=""
+                  />
+                  <ProfileCard
+                    title="Gestión de Solicitudes"
+                    icon="📤"
+                    description="Administra las solicitudes de los usuarios"
+                    onClick={() => navigate("/gestion-solicitudes")}
+                    borderClass="border-blue-600"
+                    buttonClass="bg-blue-600 hover:bg-blue-700"
+                    color=""
+                  />
                 </>
               )}
+
               {isManu && (
                 <ProfileCard
-                  title="Gestion de dispositivos"
+                  title="Gestión de dispositivos"
                   icon="💻"
                   description="Administra los dispositivos asignados a los usuarios"
                   onClick={() => navigate("/dispositivos")}
                   borderClass="border-blue-600"
                   buttonClass="bg-blue-600 hover:bg-blue-700"
                   color=""
-                />)}
-                
+                />
+              )}
+
               <ProfileCard
                 title="Beneficios"
                 icon="🎁"
@@ -110,7 +118,8 @@ export default function HomePage() {
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
                 color=""
-                />
+              />
+
               <ProfileCard
                 title="Solicitudes"
                 icon="📝"

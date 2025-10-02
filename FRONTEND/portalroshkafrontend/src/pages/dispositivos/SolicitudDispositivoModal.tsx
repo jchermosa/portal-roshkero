@@ -140,7 +140,7 @@ export default function SolicitudDispositivoModal({
         key={isEditing ? `sol-${numericId}` : "sol-new"}
         sections={sections}
         initialData={initial}
-        readonly={readonly || gestion}
+        readonly={readonly}
         loading={formLoading}
         onSubmit={handleCreate}
       />

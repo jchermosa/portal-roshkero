@@ -22,11 +22,10 @@ export default function TipoDispositivoModal({
   readonly = false,
 }: Props) {
   const {
-    data,          // { idTipoDispositivo?, nombre, detalle }
+    data,          
     setData,
     handleSubmit,
-    handleDelete,  // si luego querés botón de eliminar dentro del modal
-    loading,       // carga del detalle
+    loading,       
     error,
     isEditing,
   } = useTipoDispositivoForm(token, id);

@@ -88,8 +88,8 @@ export function useSolicitudDispositivoForm(
     setLoading(true);
     setError(null);
     try {
-      await acceptSolicitudDispositivo(token, id); // 👈 ignoramos body
-      return true;                                 // 👈 el caller hará refresh()
+      await acceptSolicitudDispositivo(token, id); 
+      return true;                                 
     } catch (err: any) {
       setError(err?.message || "Error al aceptar la solicitud");
       throw err;
@@ -113,8 +113,8 @@ export function useSolicitudDispositivoForm(
     setLoading(true);
     setError(null);
     try {
-      await rejectSolicitudDispositivo(token, id); // 👈 ignoramos body
-      return true;                                 // 👈 el caller hará refresh()
+      await rejectSolicitudDispositivo(token, id); 
+      return true;                                 
     } catch (err: any) {
       setError(err?.message || "Error al rechazar la solicitud");
       throw err;

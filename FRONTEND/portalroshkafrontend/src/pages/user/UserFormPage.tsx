@@ -34,17 +34,6 @@ export default function UserFormPage() {
   // Configuración de secciones (roles y cargos actuales)
   const sections = buildUsuarioSections(roles, cargos);
 
-  // Logs para debugging - TEMPORALES
-  console.log("=== DEBUG UserFormPage ===");
-  console.log("Datos del usuario:", data);
-  console.log("Roles disponibles:", roles);
-  console.log("Cargos disponibles:", cargos);
-  console.log("ID Rol en data:", data.idRol);
-  console.log("ID Cargo en data:", data.idCargo);
-  console.log("Loading catalogos:", loadingCatalogos);
-  console.log("Loading usuario:", loadingUsuario);
-  console.log("Is editing:", isEditing);
-  console.log("=========================");
 
   // Render
   const readonly = new URLSearchParams(location.search).get("readonly") === "true";

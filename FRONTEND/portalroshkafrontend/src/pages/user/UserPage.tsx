@@ -25,11 +25,20 @@ export default function UserPage() {
   const [filtros, setFiltros] = useState<{ idRol?: number; idCargo?: number; estado?: "A" | "I" }>({});
   const [page, setPage] = useState(0);
 
-  // ✅ Toast con tipo
+  // Toast con tipo
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error" | "info" | "warning">("info");
 
   if (!token) return <p>No autorizado</p>;
+
+  // permisos
+  const puedeVerUsuarios = tieneRol(user, Roles.TALENTO_HUMANO);
+  const puedeEditarUsuarios = tieneRol(user, Roles.TALENTO_HUMANO);
+
+  // si no tiene permisos de ver
+  if (!puedeVerUsuarios) {
+    return <p>No tenés permisos para ver esta página.</p>;
+  }
 
   // Catálogos
   const { roles, cargos, loading: loadingCatalogos } = useCatalogosUsuarios(token);
@@ -48,12 +57,10 @@ export default function UserPage() {
   };
 
   // Acciones con íconos
-  const canEdit = !tieneRol(user, Roles.OPERACIONES);
-
   const onEdit = (u: UsuarioItem) => navigate(`/usuarios/${u.idUsuario}`);
   const onView = (u: UsuarioItem) => navigate(`/usuarios/${u.idUsuario}?readonly=true`);
 
-  const rowActions: RowAction<UsuarioItem>[] = canEdit
+  const rowActions: RowAction<UsuarioItem>[] = puedeEditarUsuarios
     ? [
         {
           key: "edit",
@@ -73,7 +80,7 @@ export default function UserPage() {
         },
       ];
 
-  // ✅ Mostrar toast en base a query param success
+  // Mostrar toast en base a query param success
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const success = params.get("success");
@@ -101,7 +108,7 @@ export default function UserPage() {
     <PageLayout
       title="Listado de usuarios"
       actions={
-        canEdit && (
+        puedeEditarUsuarios && (
           <IconButton
             label="Crear Usuario"
             icon={<span>➕</span>}
@@ -112,7 +119,7 @@ export default function UserPage() {
         )
       }
     >
-      {/* 🔽 Filtros */}
+      {/*  Filtros */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
         <SelectDropdown
           label="Rol"
@@ -162,7 +169,7 @@ export default function UserPage() {
           noMargin
         />
 
-       <div className="h-full flex items-end">
+        <div className="h-full flex items-end">
           <IconButton
             label="Limpiar filtros"
             icon={<span>🧹</span>}
@@ -173,7 +180,7 @@ export default function UserPage() {
         </div>
       </div>
 
-      {/* 🔽 Tabla */}
+      {/* Tabla */}
       <DataTable<UsuarioItem>
         data={usuarios}
         columns={usuariosColumns}
@@ -182,20 +189,12 @@ export default function UserPage() {
         scrollable={false}
       />
 
-      {/* 🔽 Paginación */}
-      <PaginationFooter
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
+      {/* Paginación */}
+      <PaginationFooter currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
-      {/* 🔽 Toast flotante */}
+      {/* Toast flotante */}
       {toastMessage && (
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          onClose={() => setToastMessage(null)}
-        />
+        <Toast message={toastMessage} type={toastType} onClose={() => setToastMessage(null)} />
       )}
     </PageLayout>
   );
