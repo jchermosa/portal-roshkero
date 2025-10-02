@@ -44,9 +44,9 @@ export default function DashboardLayout() {
         <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
-              {user?.fotoBase64 ? (
+              {user?.urlPerfil ? (
                 <img
-                  src={`data:image/png;base64,${user.fotoBase64}`}
+                  src={`data:image/png;base64,${user.urlPerfil}`}
                   alt={user?.nombre}
                   className="w-full h-full object-cover"
                 />
@@ -62,7 +62,7 @@ export default function DashboardLayout() {
                 {user?.nombre}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {user?.rol?.nombre}
+                {user?.rol ? user.rol.nombre : "Sin rol asignado"}
               </p>
             </div>
           </div>

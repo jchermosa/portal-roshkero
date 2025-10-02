@@ -10,10 +10,8 @@ export type User = {
   nombre: string;
   apellido: string;
   correo: string;
-  idRol?: number;
-  nombreRol?: string;
-  idCargo?: number;
-  nombreCargo?: string;
+  rol?: Rol;
+  cargo?: Cargo;
   fechaIngreso?: string;
   antiguedad?: string;
   diasVacaciones?: number;
@@ -98,6 +96,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const fullUser: User = await res.json();
 
       setUser(fullUser);
+
+      console.log("Full user recibido del backend:", fullUser);
+
 
     } catch (e) {
       console.error("Error al decodificar el token:", e);
