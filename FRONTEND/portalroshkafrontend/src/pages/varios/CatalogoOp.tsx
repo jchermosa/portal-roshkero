@@ -1,15 +1,21 @@
-// src/pages/operaciones/CatalogoOpPage.tsx
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageLayout from "../../layouts/PageLayout";
 
 import ClientesPage from "../varios/ClientesPage";
 import TecnologiasPage from "../varios/TecnologiasPage";
+import { useAuth } from "../../context/AuthContext";
+import { tieneRol } from "../../utils/permisos";
+import { Roles } from "../../types/roles";
 
 type TabKey = "clientes" | "tecnologias";
 
 export default function CatalogoOpPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
+
+  //  permisos
+  const puedeVer = tieneRol(user, Roles.OPERACIONES);
 
   const rawTab = searchParams.get("tab");
   const activeTab: TabKey = useMemo<TabKey>(() => {
@@ -19,6 +25,11 @@ export default function CatalogoOpPage() {
   const switchTab = (next: TabKey) => {
     setSearchParams({ tab: next }, { replace: true });
   };
+
+  //  sin permisos
+  if (!puedeVer) {
+    return <p>No tenés permisos para ver esta página.</p>;
+  }
 
   return (
     <PageLayout

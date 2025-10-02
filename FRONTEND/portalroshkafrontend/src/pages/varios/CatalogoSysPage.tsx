@@ -3,11 +3,18 @@ import { useSearchParams } from "react-router-dom";
 import PageLayout from "../../layouts/PageLayout";
 import TipoDispositivoPage from "../dispositivos/TipoDispositivoPage";
 import UbicacionPage from "./UbicacionPage";
+import { useAuth } from "../../context/AuthContext";
+import { tieneRol } from "../../utils/permisos";
+import { Roles } from "../../types/roles";
 
 type TabKey = "tipos" | "ubicaciones";
 
 export default function CatalogoSysPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
+
+  // permisos (solo ADMIN DEL SISTEMA)
+  const puedeVer = tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
 
   const rawTab = searchParams.get("tab");
   const activeTab: TabKey = useMemo<TabKey>(() => {
@@ -17,6 +24,11 @@ export default function CatalogoSysPage() {
   const switchTab = (next: TabKey) => {
     setSearchParams({ tab: next }, { replace: true });
   };
+
+  // sin permisos
+  if (!puedeVer) {
+    return <p>No tenés permisos para ver esta página.</p>;
+  }
 
   return (
     <PageLayout
