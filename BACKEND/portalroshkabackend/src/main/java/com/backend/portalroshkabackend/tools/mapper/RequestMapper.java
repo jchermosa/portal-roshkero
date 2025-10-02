@@ -6,13 +6,17 @@ import com.backend.portalroshkabackend.DTO.th.request.RequestResponseDto;
 import com.backend.portalroshkabackend.Models.Solicitud;
 import com.backend.portalroshkabackend.Models.TipoBeneficios;
 import com.backend.portalroshkabackend.Models.TipoPermisos;
+import com.backend.portalroshkabackend.Models.VacacionesAsignadas;
 import com.backend.portalroshkabackend.Repositories.PermisosRepository;
 import com.backend.portalroshkabackend.Repositories.TH.BeneficiosRepository;
+import com.backend.portalroshkabackend.Repositories.TH.VacacionesAsignadasRepository;
 import com.backend.portalroshkabackend.tools.errors.errorslist.beneficios.BenefitTypeNotFoundException;
 import com.backend.portalroshkabackend.tools.errors.errorslist.permisos.PermissionTypeNotFoundException;
+import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.RequestNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +28,9 @@ public class RequestMapper {
 
     @Autowired
     private  BeneficiosRepository beneficiosRepository;
+
+    @Autowired
+    private VacacionesAsignadasRepository vacacionesAsignadasRepository;
 
 
     public  RequestResponseDto toRequestResponseDto(Integer idSolicitud, String message){
@@ -94,7 +101,11 @@ public class RequestMapper {
 
     }
 
-    public  SolicitudResponseDto toVacationsResponseDto(Solicitud solicitud){
+    public  SolicitudResponseDto toVacationsResponseDto(Solicitud solicitud) {
+        Optional<VacacionesAsignadas> vacacionesAsignadasOptional = vacacionesAsignadasRepository.findBySolicitud_idSolicitud(solicitud.getIdSolicitud());
+
+        VacacionesAsignadas vacacionesAsignadas;
+
         SolicitudResponseDto dto = new SolicitudResponseDto();
 
         dto.setIdSolicitud(solicitud.getIdSolicitud());
@@ -105,6 +116,13 @@ public class RequestMapper {
         dto.setSubTipo(solicitud.getTipoSolicitud().name());
         dto.setEstado(solicitud.getEstado());
         dto.setFechaCreacion(solicitud.getFechaCreacion());
+
+        if (vacacionesAsignadasOptional.isPresent()) {
+            vacacionesAsignadas = vacacionesAsignadasOptional.get();
+            dto.setConfirmacionTh(vacacionesAsignadas.getConfirmacionTH());
+        } else {
+            dto.setConfirmacionTh(false);
+        }
 
         return dto;
 
