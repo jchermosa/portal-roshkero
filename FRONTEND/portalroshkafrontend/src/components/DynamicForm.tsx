@@ -351,7 +351,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       onSubmit={handleSubmit}
       className={`flex flex-col h-full ${className}`}
     >
-      {message && (
+      {/* {message && (
         <div
           className={`p-4 rounded-lg text-sm border ${
             message.type === "error"
@@ -364,7 +364,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             <span>{message.text}</span>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="flex-1 overflow-y-auto p-6 space-y-10">
         {sections.map((section, idx) => (
