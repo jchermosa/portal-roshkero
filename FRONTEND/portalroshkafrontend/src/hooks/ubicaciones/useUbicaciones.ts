@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { getUbicaciones } from "../../services/UbicacionService";
-import type { UbicacionItem } from "../../types";
+import type { UbicacionItem, PageResponse } from "../../types";
 
 export function useUbicaciones(
   token: string | null,
@@ -9,18 +9,19 @@ export function useUbicaciones(
 ) {
   const [data, setData] = useState<UbicacionItem[]>([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!token) return;
     setLoading(true);
+    setError(null);
     try {
-      const all = await getUbicaciones(token);
-      const start = page * pageSize;
-      const end = start + pageSize;
-      setData(all.slice(start, end));
-      setTotalPages(Math.ceil(all.length / pageSize));
+      const pageRes: PageResponse<UbicacionItem> = await getUbicaciones(token, page, pageSize);
+      setData(pageRes.content ?? []);
+      setTotalPages(pageRes.totalPages ?? 0);
+      setTotalElements(pageRes.totalElements ?? 0);
     } catch (err: any) {
       setError(err.message || "Error al cargar ubicaciones");
     } finally {
@@ -35,8 +36,9 @@ export function useUbicaciones(
   return {
     data,
     totalPages,
+    totalElements,
     loading,
     error,
-    refresh: fetchData, // 👈 disponible para refrescar
+    refresh: fetchData,
   };
 }

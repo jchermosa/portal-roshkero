@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { tieneRol } from "../../utils/permisos";
@@ -6,16 +6,27 @@ import { Roles } from "../../types/roles";
 
 import type { DispositivoItem } from "../../types";
 import { useDispositivos } from "../../hooks/dispositivos/useDispositivos";
-import DataTable from "../../components/DataTable";
+import DataTable, { type RowAction } from "../../components/DataTable";
 import PaginationFooter from "../../components/PaginationFooter";
 import SelectDropdown from "../../components/SelectDropdown";
 import IconButton from "../../components/IconButton";
 import PageLayout from "../../layouts/PageLayout";
 import { dispositivosColumns } from "../../config/tables/dispositivoTableConfig";
+import { MsIcon } from "../../components/MsIcon";
+import {
+  CategoriaEnum,
+  CategoriaLabels,
+  EstadoInventarioEnum,
+  EstadoInventarioLabels,
+} from "../../types";
 
 export default function DevicePage() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
+
+  // 🔒 permisos
+  const puedeVer = tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA, Roles.OPERACIONES);
+  const puedeEditar = tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA);
 
   // Filtros
   const [categoria, setCategoria] = useState("");
@@ -23,16 +34,13 @@ export default function DevicePage() {
   const [encargado, setEncargado] = useState("");
   const [page, setPage] = useState(0);
 
-  // Permisos
-  const puedeVerDispositivos = tieneRol(user, Roles.SYSADMIN );
+  // Resetear página cuando cambian filtros
+  useEffect(() => {
+    setPage(0);
+  }, [categoria, estado, encargado]);
 
-  // Dispositivos (hook especializado)
-  const {
-    data: dispositivos,
-    totalPages,
-    loading,
-    error,
-  } = useDispositivos(
+  // Hook de listado
+  const { data: dispositivos, loading, error, totalPages } = useDispositivos(
     token,
     { categoria, estado, encargado },
     page,
@@ -48,84 +56,75 @@ export default function DevicePage() {
 
   const columns = dispositivosColumns;
 
-  const renderActions = (d: DispositivoItem) => {
-    if (tieneRol(user, Roles.OPERACIONES)) {
-      // Solo ver
-      return (
-        <button
-          onClick={() =>
-            navigate(`/dispositivos/${d.id_dispositivo}?readonly=true`)
-          }
-          className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition"
-        >
-          Ver
-        </button>
-      );
+  //  Acciones por fila
+  const rowActions: RowAction<DispositivoItem>[] = useMemo(() => {
+    if (!puedeEditar) {
+      return [
+        {
+          key: "view",
+          label: "Ver",
+          icon: <MsIcon name="visibility" />,
+          onClick: (d) =>
+            navigate(`/dispositivos/${d.idDispositivo}?readonly=true`),
+          variant: "secondary",
+        },
+      ];
     }
+    return [
+      {
+        key: "edit",
+        label: "Editar",
+        icon: <MsIcon name="edit" />,
+        onClick: (d) => navigate(`/dispositivos/${d.idDispositivo}`),
+        variant: "primary",
+      },
+    ];
+  }, [puedeEditar, navigate]);
 
-    return (
-      <button
-        onClick={() => navigate(`/dispositivos/${d.id_dispositivo}`)}
-        className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
-      >
-        Editar
-      </button>
-    );
-  };
-
-  if (!puedeVerDispositivos)
+  //  acceso total
+  if (!puedeVer) {
     return <p>No tenés permisos para ver esta página.</p>;
-  if (loading) return <p>Cargando dispositivos...</p>;
-  if (error) return <p>{error}</p>;
+  }
 
   return (
     <PageLayout
       title="Listado de dispositivos"
       actions={
-        <IconButton
-          label="Registrar Dispositivo"
-          icon={<span>➕</span>}
-          variant="primary"
-          onClick={() => navigate("/dispositivos/nuevo")}
-          className="h-10 text-sm px-4 flex items-center"
-        />
+        puedeEditar && (
+          <IconButton
+            label="Registrar Dispositivo"
+            icon={<span>➕</span>}
+            variant="primary"
+            onClick={() => navigate("/dispositivos/nuevo")}
+            className="h-10 text-sm px-4 flex items-center"
+          />
+        )
       }
     >
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-end gap-4 mb-4">
         <SelectDropdown
           name="categoria"
           label="Categoría"
           value={categoria}
           onChange={(e) => setCategoria(e.target.value)}
-          options={[
-            { value: "Laptop", label: "Laptop" },
-            { value: "Impresora", label: "Impresora" },
-            { value: "Servidor", label: "Servidor" },
-          ]}
+          options={Object.values(CategoriaEnum).map((value) => ({
+            value,
+            label: CategoriaLabels[value],
+          }))}
           placeholder="Filtrar por Categoría"
+          noMargin
         />
         <SelectDropdown
           name="estado"
           label="Estado"
           value={estado}
           onChange={(e) => setEstado(e.target.value)}
-          options={[
-            { value: "Activo", label: "Activo" },
-            { value: "En reparación", label: "En reparación" },
-            { value: "Inactivo", label: "Inactivo" },
-          ]}
+          options={Object.values(EstadoInventarioEnum).map((value) => ({
+            value,
+            label: EstadoInventarioLabels[value],
+          }))}
           placeholder="Filtrar por Estado"
-        />
-        <SelectDropdown
-          name="encargado"
-          label="Encargado"
-          value={encargado}
-          onChange={(e) => setEncargado(e.target.value)}
-          options={[
-            { value: "Juan Pérez", label: "Juan Pérez" },
-            { value: "María López", label: "María López" },
-          ]}
-          placeholder="Filtrar por Encargado"
+          noMargin
         />
         <IconButton
           label="Limpiar filtros"
@@ -136,17 +135,20 @@ export default function DevicePage() {
         />
       </div>
 
-      <DataTable
+      {loading && <p>Cargando dispositivos...</p>}
+      {error && <p className="text-red-600">{error}</p>}
+
+      <DataTable<DispositivoItem>
         data={dispositivos}
         columns={columns}
-        rowKey={(d) => d.id_dispositivo}
-        actions={renderActions}
+        rowKey={(d) => d.idDispositivo!}
+        rowActions={rowActions}
         scrollable={false}
       />
 
       <PaginationFooter
         currentPage={page}
-        totalPages={totalPages}
+        totalPages={totalPages || 1}
         onPageChange={setPage}
         onCancel={() => navigate("/home")}
       />

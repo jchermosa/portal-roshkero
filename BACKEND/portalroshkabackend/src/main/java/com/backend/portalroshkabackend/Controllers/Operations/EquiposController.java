@@ -1,0 +1,102 @@
+package com.backend.portalroshkabackend.Controllers.Operations;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.backend.portalroshkabackend.DTO.Operationes.EquiposRequestDto;
+import com.backend.portalroshkabackend.DTO.Operationes.EquiposResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.UsuarioisResponseDto;
+import com.backend.portalroshkabackend.DTO.Operationes.Metadatas.MetaDatasDto;
+import com.backend.portalroshkabackend.Services.Operations.Interface.IMetaDatasService;
+import com.backend.portalroshkabackend.Services.Operations.Interface.Equipo.IEquiposService;
+
+import jakarta.validation.Valid;
+
+@RestController("equiposController")
+@RequestMapping("/api/v1/admin/operations")
+public class EquiposController {
+
+    private final IMetaDatasService metaDatasService;
+    private final IEquiposService equiposService;
+
+    @Autowired
+    public EquiposController(IEquiposService equiposService,
+            IMetaDatasService metaDatasService) {
+        this.equiposService = equiposService;
+        this.metaDatasService = metaDatasService;
+    }
+
+    @GetMapping("/teams")
+    public ResponseEntity<Map<String, Object>> getAllTeams(
+            @PageableDefault(size = 10, sort = "idEquipo", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false, defaultValue = "default") String sortBy) {
+
+        Page<EquiposResponseDto> page = equiposService.getTeamsSorted(pageable, sortBy);
+
+        // Better json for front
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", page.getContent());
+        response.put("currentPage", page.getNumber());
+        response.put("totalItems", page.getTotalElements());
+        response.put("totalPages", page.getTotalPages());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/team/{id}")
+    public ResponseEntity<EquiposResponseDto> getTeamById(@PathVariable Integer id) {
+        EquiposResponseDto team = equiposService.getTeamById(id);
+        return ResponseEntity.ok(team);
+    }
+
+    @GetMapping("/metadatas") // info for "form Create team"
+    public MetaDatasDto getMetaDatas() {
+        return metaDatasService.getMetaDatas();
+    }
+
+    @GetMapping("/users") // info for "form Create team"
+    public List<UsuarioisResponseDto> getAllUsers() {
+        return metaDatasService.getAllUsers();
+    }
+
+    // ----------------- CREATE -----------------
+    @PostMapping("/team")
+    public void postNewTeam(@Valid @RequestBody EquiposRequestDto equipoRequest) {
+        equiposService.postNewTeam(equipoRequest);
+    }
+
+    // ----------------- POST for Estado -----------------
+    @PostMapping("/team/{id}")
+    public void toggleTeam(@PathVariable int id) {
+        equiposService.toggleEquipo(id);
+    }
+
+    // ----------------- UPDATE -----------------
+    @PatchMapping("/team/{id}")
+    public void patchTeam(
+            @PathVariable int id,
+            @RequestBody EquiposRequestDto equipoRequest) { // Не @Valid!
+
+        equiposService.updateTeam(id, equipoRequest);
+    }
+
+
+}

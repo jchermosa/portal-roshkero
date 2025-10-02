@@ -1,31 +1,24 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 
-type Rol = { id?: number; nombre: string };
-type Cargo = { id?: number; nombre: string };
-type Equipo = { id?: number; nombre: string };
-
 export type User = {
-  idUsuario?: number;
+  id: number;
   nombre: string;
   apellido: string;
   correo: string;
-  rol?: Rol;
-  cargo?: Cargo;
-  equipos: Equipo[];
-  fechaIngreso?: string;
-  antiguedad?: string;
+  rol: {
+    idRol: number;
+    nombre: string;
+  } | null;
+  cargo?: { idCargo: number; nombre: string };
+  equipos?: { idEquipo: number; nombre: string }[];
   diasVacaciones?: number;
   diasVacacionesRestante?: number;
   telefono?: string;
   nroCedula?: string;
-  fechaNacimiento?: string;
   estado?: string;
   requiereCambioContrasena?: boolean;
-  seniority?: string;
-  foco?: string;
-  urlPerfil?: string;
-  disponibilidad?: number;
+  fotoBase64?: string | null;
 };
 
 type AuthContextType = {
@@ -39,7 +32,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// decode JWT payload con soporte UTF-8
+// decode JWT payload 
 function parseJwt(token: string): any {
   try {
     const base = token.split(".")[1];
@@ -67,42 +60,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const decodeAndSetUser = async(jwtToken: string) => {
+  const decodeAndSetUser = async (jwtToken: string) => {
     try {
       const payload = parseJwt(jwtToken);
 
       const basicUser: User = {
-        idUsuario: payload.idUsuario ?? payload.id ?? payload.userId ?? undefined,
+        id: payload.id ?? 0,
         nombre: payload.nombre ?? "",
         apellido: payload.apellido ?? "",
         correo: payload.email ?? payload.sub ?? "",
-        rol: payload.rol ?? payload.nombreRol ?? "",
-        cargo: payload.idCargo,
-        equipos: payload.equipos ?? [],
-        telefono: payload.telefono ?? undefined,
-        fechaIngreso: payload.fechaIngreso ?? undefined,
-        diasVacaciones: payload.diasVacaciones,
-        diasVacacionesRestante: payload.diasVacacionesRestante,
-        requiereCambioContrasena: payload.requiereCambioContrasena ?? false,
+        rol: payload.rol
+          ? {
+              idRol: payload.rol.idRol ?? 0,
+              nombre: payload.rol.nombre ?? "",
+            }
+          : null, // 👈 si no viene, null
       };
-
       setUser(basicUser);
 
-      const res = await fetch("/api/v1/usuarios/me", {
+      // Ahora pedimos los datos completos al backend
+      const res = await fetch("http://localhost:8080/api/v1/usuarios/me", {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
 
       if (!res.ok) throw new Error("No se pudo obtener datos completos del usuario");
 
       const fullUser: User = await res.json();
-
       setUser(fullUser);
-
-      console.log("Full user recibido del backend:", fullUser);
-
-
     } catch (e) {
       console.error("Error al decodificar el token:", e);
+      setUser(null);
     }
   };
 
@@ -130,7 +117,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: !!token,
         login,
         logout,
-        refreshUser, 
+        refreshUser,
       }}
     >
       {children}

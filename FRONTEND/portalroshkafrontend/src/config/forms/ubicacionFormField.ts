@@ -1,6 +1,9 @@
 import type { FormSection } from "../../components/DynamicForm";
+import { EstadoActivoInactivo, EstadoLabels } from "../../types";
 
 export function buildUbicacionSections(): FormSection[] {
+  const estados = Object.values(EstadoActivoInactivo) as ("A" | "I")[]; 
+
   return [
     {
       title: "Ubicación",
@@ -18,10 +21,10 @@ export function buildUbicacionSections(): FormSection[] {
           label: "Estado",
           type: "select",
           required: true,
-          options: [
-            { value: "ACTIVO", label: "Activo" },
-            { value: "INACTIVO", label: "Inactivo" },
-          ],
+          options: estados.map((value) => ({
+            value,
+            label: EstadoLabels[value],
+          })),
         },
       ],
     },

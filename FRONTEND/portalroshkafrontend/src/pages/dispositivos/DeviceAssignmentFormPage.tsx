@@ -3,7 +3,9 @@ import { useAuth } from "../../context/AuthContext";
 import DynamicForm from "../../components/DynamicForm";
 import { useDispositivoAsignadoForm } from "../../hooks/dispositivosAsignados/useDispositivoAsignadoForm";
 import FormLayout from "../../layouts/FormLayout";
-import { buildDispositivoAsignadoSections } from "../../config/forms/dispositivoAsignadoFormField";
+import { buildDispositivoAsignadoSections } from "../../config/forms/dispositivoAsignadoFormFields";
+import { useAvailableDevicesOptions } from "../../hooks/dispositivosAsignados/useAvailableDevicesOptions";
+import { useSolicitudOptions } from "../../hooks/deviceRequest/useSolicitudOptions";
 
 export default function DeviceAssignmentFormPage() {
   const { token } = useAuth();
@@ -11,51 +13,44 @@ export default function DeviceAssignmentFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ Extraer solicitudId del query param (cuando se aprueba una solicitud)
   const solicitudIdStr = new URLSearchParams(location.search).get("solicitudId");
   const solicitudId = solicitudIdStr ? Number(solicitudIdStr) : undefined;
 
-  // ✅ Hook de formulario de dispositivo asignado (ahora soporta solicitudPreasignada)
   const { data, setData, loading, error, handleSubmit, isEditing } =
-    useDispositivoAsignadoForm(token, id, solicitudId);
+    useDispositivoAsignadoForm(token, id ? Number(id) : undefined, solicitudId);
 
-  // ✅ Configuración de secciones (puede recibir catálogos en el futuro)
-  const sections = buildDispositivoAsignadoSections();
+  const { options: deviceOptions } = useAvailableDevicesOptions(token, data.idDispositivo);
+  const { options: solicitudOptions } = useSolicitudOptions(token, solicitudId);
 
-  // 🚀 Render
+  const sections = buildDispositivoAsignadoSections(
+    deviceOptions,
+    solicitudOptions,
+    solicitudId
+  );
+
   const readonly = new URLSearchParams(location.search).get("readonly") === "true";
 
   return (
     <FormLayout
       title={
-        isEditing
-          ? readonly
-            ? "Detalle de asignación"
-            : "Editar asignación"
-          : "Nueva asignación"
+        isEditing ? (readonly ? "Detalle de asignación" : "Editar asignación") : "Nueva asignación"
       }
       subtitle={
         readonly
           ? "Vista de solo lectura"
           : isEditing
-          ? "Modifica los datos de la asignación"
+          ? "Modificá los datos de la asignación"
           : "Completá los datos para asignar un dispositivo"
       }
       icon={isEditing ? (readonly ? "👀" : "✏️") : "📦"}
       onCancel={() => navigate("/gestion-dispositivos?tab=asignaciones")}
-      onSubmitLabel={
-        readonly
-          ? undefined
-          : isEditing
-          ? "Guardar cambios"
-          : "Asignar dispositivo"
-      }
+      onSubmitLabel={readonly ? undefined : isEditing ? "Guardar cambios" : "Asignar dispositivo"}
       onCancelLabel={readonly ? "Volver" : "Cancelar"}
     >
       <DynamicForm
-        id="device-assignment-form"
+        id="dynamic-form"
         sections={sections}
-        initialData={data}
+        initialData={{ ...data, ...(solicitudId ? { idSolicitud: solicitudId } : {}) }}
         onChange={setData}
         onSubmit={async (formData) => {
           if (!readonly) {
