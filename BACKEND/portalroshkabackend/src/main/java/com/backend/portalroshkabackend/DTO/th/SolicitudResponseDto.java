@@ -28,4 +28,6 @@ public class SolicitudResponseDto {
 
     private EstadoSolicitudEnum estado;
 
+    private boolean confirmacionTh;
+
 }

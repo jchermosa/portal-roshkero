@@ -2,14 +2,19 @@ package com.backend.portalroshkabackend.Services.UsuarioServicio;
 
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCambContrasDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCargoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserEquiposDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserRolDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolVacacionDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserUpdateFoto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposBeneficiosDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposDispositivosDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.tiposPermisosDto;
 import com.backend.portalroshkabackend.Models.AsignacionUsuarioEquipo;
 import com.backend.portalroshkabackend.Models.Equipos;
@@ -30,6 +35,7 @@ import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.UsuarioR
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoDispositivosRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,10 +43,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -116,7 +125,7 @@ public class UserService {
 
         return dto;
     }
-
+    //TODO: Equipos en /me
     public UserDto getUsuarioActual() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String correo;
@@ -164,6 +173,15 @@ public class UserService {
         usuarioRepository.save(usuario);
 
         return mapUsuarioToDtoUpdate(usuario);
+    }
+
+    public SolicitudUserDto getSolicitudById(Integer id) {
+        Optional<Solicitud> solicitudOpt = solicitudesTHRepository.findById(id);
+        if (solicitudOpt.isPresent()) {
+            return mapSolicitudToDto(solicitudOpt.get());
+        } else {
+            return null; // o lanzar una excepción si prefieres
+        }
     }
 
     public List<SolicitudUserDto> getSolicitudesUsuarioActual() {
@@ -229,6 +247,24 @@ public class UserService {
         return dto;
     }
 
+    public List<tiposDispositivosDto> getTiposDispositivos() {
+
+        // Obtiene todos los tipos de dispositivos con vigencia Activa desde el repositorio
+        List<TipoDispositivo> tiposDispositivos = tipoDispositivoRepository.findAll();
+
+        // Mapea cada TipoDispositivo a tiposDispositivosDto
+        return tiposDispositivos.stream()
+                .map(this::mapTipoDispositivoToDto)
+                .collect(Collectors.toList());
+    }
+
+    private tiposDispositivosDto mapTipoDispositivoToDto(TipoDispositivo tipoDispositivo) {
+        tiposDispositivosDto dto = new tiposDispositivosDto();
+        dto.setIdTipoDispositivo(tipoDispositivo.getIdTipoDispositivo());
+        dto.setNombre(tipoDispositivo.getNombre());
+        dto.setDetalle(tipoDispositivo.getDetalle());;
+        return dto;
+    }
 
     public UserSolPermisoDto crearPermisoUsuarioActual(UserSolPermisoDto solPermisoDto) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -625,6 +661,38 @@ public class UserService {
         return true;
     }
 
+    public boolean actualizarFoto(UserUpdateFoto dto){
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        if (!esBase64(dto.getFoto())) { // Verifica si la cadena es una imagen en base64
+            return false;
+        }
+        usuario.setUrlPerfil(dto.getFoto());; // Actualiza la foto con la nueva codificada
+        usuarioRepository.save(usuario);
+        return true;
+    }
+
+    public boolean esBase64(String texto) {
+        try {
+            Base64.getDecoder().decode(texto);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
     // Mapeo de Solicitud a SolicitudUserDto según el nuevo modelo
     private SolicitudUserDto mapSolicitudToDto(Solicitud solicitud) {
         SolicitudUserDto dto = new SolicitudUserDto();
@@ -636,12 +704,64 @@ public class UserService {
         dto.setFechaInicio(solicitud.getFechaInicio());
         dto.setFechaFin(solicitud.getFechaFin());
         dto.setCantDias(solicitud.getCantDias());
-        dto.setComentario(solicitud.getComentario());
+        // dto.setComentario(solicitud.getComentario());
+        //limpiar el comentario para que no muestre el id del tipo de permiso o beneficio
+        if (solicitud.getComentario() != null) {
+            dto.setComentario(limpiarComentario(solicitud.getComentario()));
+        } else {
+            dto.setComentario(null);
+        }
         dto.setTipoSolicitud(solicitud.getTipoSolicitud());
         dto.setEstado(solicitud.getEstado());
         dto.setFechaCreacion(solicitud.getFechaCreacion());
+        dto.setNombreLider(solicitud.getLider() != null ? solicitud.getLider().getNombre() + " " + solicitud.getLider().getApellido() : null);
+        dto.setNombreUsuario(solicitud.getUsuario() != null ? solicitud.getUsuario().getNombre() + " " + solicitud.getUsuario().getApellido() : null);
+        
+        
+        Integer idSubtipoSolicitud = extraerIdSubtipoSolicitud(solicitud.getComentario());
+        
+        // System.out.println("ID SUBTIPO SOLICITUD EXTRAIDO: " + idSubtipoSolicitud);
+        String nombreSubtipo = null;
+
+        if (idSubtipoSolicitud != null) {
+            switch (solicitud.getTipoSolicitud()) {
+                case PERMISO:
+                    TipoPermisos tipoPermiso = tipoPermisosRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoPermiso != null) nombreSubtipo = tipoPermiso.getNombre();
+                    break;
+                case BENEFICIO:
+                    TipoBeneficios tipoBeneficio = tipoBeneficiosRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoBeneficio != null) nombreSubtipo = tipoBeneficio.getNombre();
+                    break;
+                case DISPOSITIVO:
+                    TipoDispositivo tipoDispositivo = tipoDispositivoRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoDispositivo != null) nombreSubtipo = tipoDispositivo.getNombre();
+                    break;
+            }
+        }
+        dto.setNombreSubTipoSolicitud(nombreSubtipo);
+        
         // Puedes agregar más campos según lo que necesites exponer en el DTO
         return dto;
+    }
+
+    private Integer extraerIdSubtipoSolicitud(String comentario) {
+        if (comentario == null){
+            return null;
+        }else{
+            Pattern pattern = Pattern.compile("\\((\\d+)\\)");
+            Matcher matcher = pattern.matcher(comentario);
+            if (matcher.find()) {
+                return Integer.parseInt(matcher.group(1));
+            }else{
+                return null;
+            }
+        }
+    }
+    
+    public String limpiarComentario(String comentario) {
+        // Elimina cualquier grupo como (123) o {456789} al inicio del texto
+        return comentario.replaceAll("^(\\s*\\([^)]*\\)\\s*)?(\\s*\\{[^}]*\\}\\s*)?", "").trim();
     }
 
     // Mapeo de Usuario a UserHomeDto según el nuevo modelo
@@ -676,20 +796,43 @@ public class UserService {
     // Mapeo de Usuario a UserDto según el nuevo modelo
     private UserDto mapUsuarioToDto(Usuario usuario) {
         if (usuario == null) return null;
+
+        List<AsignacionUsuarioEquipo> asignaciones = asignacionUsuarioRepository.findByUsuario(usuario);
+
+        List<UserEquiposDto> equiposDto = asignaciones.stream()
+            .map(asignacion -> {
+                UserEquiposDto unicoEquipoDto = new UserEquiposDto();
+                unicoEquipoDto.setIdEquipo(asignacion.getEquipo().getIdEquipo());
+                unicoEquipoDto.setLider(asignacion.getEquipo().getLider().getNombre() + " " + asignacion.getEquipo().getLider().getApellido());
+                unicoEquipoDto.setNombre(asignacion.getEquipo().getNombre());
+                unicoEquipoDto.setPorcentajeTrabajo(asignacion.getPorcentajeTrabajo());
+                return unicoEquipoDto;
+            })
+            .collect(Collectors.toList());
+
+
         UserDto dto = new UserDto();
+        UserRolDto rolDto = new UserRolDto();
+        UserCargoDto cargoDto = new UserCargoDto();
+
+        rolDto.setIdRol(usuario.getRol() != null ? usuario.getRol().getIdRol() : null);
+        rolDto.setNombre(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
+        cargoDto.setIdCargo(usuario.getCargo() != null ? usuario.getCargo().getIdCargo() : null);
+        cargoDto.setNombre(usuario.getCargo() != null ? usuario.getCargo().getNombre() : null);
+
         dto.setIdUsuario(usuario.getIdUsuario());
         dto.setNombre(usuario.getNombre());
         dto.setApellido(usuario.getApellido());
         dto.setNroCedula(usuario.getNroCedula());
         dto.setCorreo(usuario.getCorreo());
-        dto.setIdRol(usuario.getRol() != null ? usuario.getRol().getIdRol() : null);
-        dto.setNombreRol(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
+        // dto.setIdRol(usuario.getRol() != null ? usuario.getRol().getIdRol() : null);
+        // dto.setNombreRol(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
         dto.setFechaIngreso(usuario.getFechaIngreso());
         dto.setAntiguedad(usuario.getAntiguedad());
         dto.setDiasVacaciones(usuario.getDiasVacaciones());
         dto.setEstado(usuario.getEstado());
         dto.setTelefono(usuario.getTelefono());
-        dto.setIdCargo(usuario.getCargo() != null ? usuario.getCargo().getIdCargo() : null);
+        // dto.setIdCargo(usuario.getCargo() != null ? usuario.getCargo().getIdCargo() : null);
         dto.setFechaNacimiento(usuario.getFechaNacimiento());
         dto.setDiasVacacionesRestante(usuario.getDiasVacacionesRestante());
         dto.setRequiereCambioContrasena(usuario.getRequiereCambioContrasena());
@@ -697,6 +840,12 @@ public class UserService {
         dto.setFoco(usuario.getFoco());
         dto.setUrlPerfil(usuario.getUrlPerfil());
         dto.setDisponibilidad(usuario.getDisponibilidad());
+
+        //nuevos campos dto ROL y CARGO
+        dto.setRol(rolDto);
+        dto.setCargo(cargoDto);
+        dto.setEquipos(equiposDto);
+
         return dto;
     }
 

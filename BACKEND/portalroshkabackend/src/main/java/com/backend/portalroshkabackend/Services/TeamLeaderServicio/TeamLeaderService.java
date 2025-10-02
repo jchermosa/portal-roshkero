@@ -12,8 +12,11 @@ import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.TeamLeaderDTO.SolTeamLeaderDTO;
 import com.backend.portalroshkabackend.DTO.TeamLeaderDTO.SolicitudRespuestaDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.Models.PermisosAsignados;
 import com.backend.portalroshkabackend.Models.Solicitud;
+import com.backend.portalroshkabackend.Models.TipoBeneficios;
+import com.backend.portalroshkabackend.Models.TipoDispositivo;
 import com.backend.portalroshkabackend.Models.TipoPermisos;
 import com.backend.portalroshkabackend.Models.Usuario;
 import com.backend.portalroshkabackend.Models.VacacionesAsignadas;
@@ -21,6 +24,8 @@ import com.backend.portalroshkabackend.Models.Enum.EstadoSolicitudEnum;
 import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.AsigPermSoliRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.SolicitudesTHRepository;
+import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoBeneficiosRepository;
+import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoDispositivosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.TipoPermisosRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.UsuarioRepository;
 import com.backend.portalroshkabackend.Repositories.UsuarioRepositories.VacacAsignaRepository;
@@ -41,6 +46,12 @@ public class TeamLeaderService {
 
     @Autowired
     private VacacAsignaRepository vacacAsignaRepository;
+
+    @Autowired
+    private TipoBeneficiosRepository tipoBeneficiosRepository;
+
+    @Autowired
+    private TipoDispositivosRepository tipoDispositivoRepository;
 
     // @Autowired
     // private 
@@ -98,11 +109,53 @@ public class TeamLeaderService {
             dto.setCantDias(solicitud.getCantDias());
             dto.setFechaFin(solicitud.getFechaFin());
             dto.setFechaCreacion(solicitud.getFechaCreacion());
+
+            dto.setNombreUsuario(solicitud.getUsuario() != null ? solicitud.getUsuario().getNombre() + " " + solicitud.getUsuario().getApellido() : null);
+            
+            Integer idSubtipoSolicitud = extraerIdSubtipoSolicitud(solicitud.getComentario());
+            
+            // System.out.println("ID SUBTIPO SOLICITUD EXTRAIDO: " + idSubtipoSolicitud);
+            String nombreSubtipo = null;
+
+            if (idSubtipoSolicitud != null) {
+                switch (solicitud.getTipoSolicitud()) {
+                    case PERMISO:
+                        TipoPermisos tipoPermiso = tipoPermisosRepository.findById(idSubtipoSolicitud).orElse(null);
+                        if (tipoPermiso != null) nombreSubtipo = tipoPermiso.getNombre();
+                        break;
+                    case BENEFICIO:
+                        TipoBeneficios tipoBeneficio = tipoBeneficiosRepository.findById(idSubtipoSolicitud).orElse(null);
+                        if (tipoBeneficio != null) nombreSubtipo = tipoBeneficio.getNombre();
+                        break;
+                    case DISPOSITIVO:
+                        TipoDispositivo tipoDispositivo = tipoDispositivoRepository.findById(idSubtipoSolicitud).orElse(null);
+                        if (tipoDispositivo != null) nombreSubtipo = tipoDispositivo.getNombre();
+                        break;
+                }
+            }
+            dto.setNombreSubTipoSolicitud(nombreSubtipo);
+        
+
+
             return dto;
         }).toList();
     }
 
     public SolicitudRespuestaDto acceptRequest(int idSolicitud) {
+
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            return null;
+        }
 
         //Optional<Solicitud> solicitud = solicitudesTHRepository.findById(idSolicitud);
 
@@ -111,6 +164,11 @@ public class TeamLeaderService {
         if (solicitud == null) {
             throw new RuntimeException("Solicitud no encontrada");
         }
+
+        if (solicitud.getLider().getIdUsuario() != usuario.getIdUsuario()) {
+            throw new RuntimeException("No tienes permiso para aceptar esta solicitud de" + solicitud.getTipoSolicitud() );
+        }
+
 
         switch (solicitud.getTipoSolicitud()) {
             case SolicitudesEnum.VACACIONES -> acceptSolicitudVacaciones(solicitud);
@@ -199,12 +257,29 @@ public class TeamLeaderService {
 
     public SolicitudRespuestaDto rejectRequest(int idSolicitud) {
 
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            return null;
+        }
+
         //Optional<Solicitud> solicitud = solicitudesTHRepository.findById(idSolicitud);
 
         Solicitud solicitud = getSolicitudById(idSolicitud);
 
         if (solicitud == null) {
             throw new RuntimeException("Solicitud no encontrada");
+        }
+
+        if (solicitud.getLider().getIdUsuario() != usuario.getIdUsuario()) {
+            throw new RuntimeException("No tienes permiso para aceptar esta solicitud de" + solicitud.getTipoSolicitud() );
         }
 
         solicitud.setEstado(EstadoSolicitudEnum.R); // Setea la solicitud como rechazada
@@ -218,7 +293,100 @@ public class TeamLeaderService {
         return respuesta; // Placeholder response
     }
 
+    public SolicitudUserDto getSolicitudByIdTl(Integer id) {
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String correo;
+        if (principal instanceof UserDetails) {
+            correo = ((UserDetails) principal).getUsername();
+        } else {
+            correo = principal.toString();
+        }
+
+        Usuario usuario = getUserByCorreo(correo);
+        if (usuario == null) {
+            return null;
+        }
+
+        // Optional<Solicitud> solicitudOpt = solicitudesTHRepository.findById(id);
+
+        Solicitud solicitudOpt = getSolicitudById(id.intValue());
+        
+        if (solicitudOpt != null ) {
+            if (solicitudOpt.getLider().getIdUsuario() != usuario.getIdUsuario()) {
+                throw new RuntimeException("No tienes permiso para acceder a esta solicitud de" + solicitudOpt.getTipoSolicitud() );
+            }
+            return mapSolicitudToDto(solicitudOpt);
+        } else {
+            return null; // o lanzar una excepción si prefieres
+        }
+    }
 
 
 
+   // Mapeo de Solicitud a SolicitudUserDto según el nuevo modelo
+    private SolicitudUserDto mapSolicitudToDto(Solicitud solicitud) {
+        SolicitudUserDto dto = new SolicitudUserDto();
+        dto.setIdSolicitud(solicitud.getIdSolicitud());
+        // dto.setUsuario(solicitud.getUsuario());
+        dto.setIdUsuario(solicitud.getUsuario() != null ? solicitud.getUsuario().getIdUsuario() : null);
+        // dto.setLider(solicitud.getLider());
+        dto.setIdLider(solicitud.getLider() != null ? solicitud.getLider().getIdUsuario() : null);
+        dto.setFechaInicio(solicitud.getFechaInicio());
+        dto.setFechaFin(solicitud.getFechaFin());
+        dto.setCantDias(solicitud.getCantDias());
+        // dto.setComentario(solicitud.getComentario());
+        //limpiar el comentario para que no muestre el id del tipo de permiso o beneficio
+        if (solicitud.getComentario() != null) {
+            dto.setComentario(limpiarComentario(solicitud.getComentario()));
+        } else {
+            dto.setComentario(null);
+        }
+        dto.setTipoSolicitud(solicitud.getTipoSolicitud());
+        dto.setEstado(solicitud.getEstado());
+        dto.setFechaCreacion(solicitud.getFechaCreacion());
+        dto.setNombreLider(solicitud.getLider() != null ? solicitud.getLider().getNombre() + " " + solicitud.getLider().getApellido() : null);
+        dto.setNombreUsuario(solicitud.getUsuario() != null ? solicitud.getUsuario().getNombre() + " " + solicitud.getUsuario().getApellido() : null);
+        
+        
+        Integer idSubtipoSolicitud = extraerIdSubtipoSolicitud(solicitud.getComentario());
+        
+        // System.out.println("ID SUBTIPO SOLICITUD EXTRAIDO: " + idSubtipoSolicitud);
+        String nombreSubtipo = null;
+
+        if (idSubtipoSolicitud != null) {
+            switch (solicitud.getTipoSolicitud()) {
+                case PERMISO:
+                    TipoPermisos tipoPermiso = tipoPermisosRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoPermiso != null) nombreSubtipo = tipoPermiso.getNombre();
+                    break;
+                case BENEFICIO:
+                    TipoBeneficios tipoBeneficio = tipoBeneficiosRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoBeneficio != null) nombreSubtipo = tipoBeneficio.getNombre();
+                    break;
+                case DISPOSITIVO:
+                    TipoDispositivo tipoDispositivo = tipoDispositivoRepository.findById(idSubtipoSolicitud).orElse(null);
+                    if (tipoDispositivo != null) nombreSubtipo = tipoDispositivo.getNombre();
+                    break;
+            }
+        }
+        dto.setNombreSubTipoSolicitud(nombreSubtipo);
+        
+        // Puedes agregar más campos según lo que necesites exponer en el DTO
+        return dto;
+    }
+
+    private Integer extraerIdSubtipoSolicitud(String comentario) {
+        if (comentario == null){
+            return null;
+        }else{
+            Pattern pattern = Pattern.compile("\\((\\d+)\\)");
+            Matcher matcher = pattern.matcher(comentario);
+            if (matcher.find()) {
+                return Integer.parseInt(matcher.group(1));
+            }else{
+                return null;
+            }
+        }
+    }
 }

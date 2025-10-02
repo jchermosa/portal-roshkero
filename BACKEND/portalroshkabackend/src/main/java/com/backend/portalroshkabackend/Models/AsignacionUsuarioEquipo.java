@@ -42,7 +42,7 @@ public class AsignacionUsuarioEquipo {
     private LocalDate fechaFin;
 
     @Column(name ="porcentaje_trabajo")
-    private int porcentajeTrabajo;
+    private Integer porcentajeTrabajo;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
@@ -58,6 +58,6 @@ public class AsignacionUsuarioEquipo {
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "estado_ac_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private EstadoActivoInactivo estado = EstadoActivoInactivo.A;
+    private EstadoActivoInactivo estado;
 
 }

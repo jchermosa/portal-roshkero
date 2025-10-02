@@ -4,7 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.backend.portalroshkabackend.tools.RepositoryService;
+import com.backend.portalroshkabackend.tools.errors.errorslist.dispositivos.DeviceTypeNotFoundException;
+import com.backend.portalroshkabackend.tools.mapper.TipoDispositivoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.backend.portalroshkabackend.DTO.SYSADMIN.DeviceTypeDTO;
@@ -13,32 +18,36 @@ import com.backend.portalroshkabackend.Repositories.SYSADMIN.DeviceTypesReposito
 
 import jakarta.transaction.Transactional;
 
+import static com.backend.portalroshkabackend.tools.MessagesConst.DATABASE_DEFAULT_ERROR;
+
 @Service
 public class DeviceTypeService {
     
     @Autowired
     private final DeviceTypesRepository deviceTypesRepository;
 
-    DeviceTypeService(DeviceTypesRepository deviceTypesRepository) {
+    @Autowired
+    private final RepositoryService repositoryService;
+
+    DeviceTypeService(DeviceTypesRepository deviceTypesRepository, RepositoryService repositoryService) {
         this.deviceTypesRepository = deviceTypesRepository;
+        this.repositoryService = repositoryService;
     }
 
     @Transactional
     // Add service methods here
-    public List<DeviceTypeDTO> getAllDeviceTypes() {
+    public Page<DeviceTypeDTO> getAllDeviceTypes(Pageable pageable) {
         // Implement the logic to fetch all device types from the repository
-        List<TipoDispositivo> deviceTypes = deviceTypesRepository.findAll();
+        Page<TipoDispositivo> deviceTypes = deviceTypesRepository.findAll(pageable);
         // Convert entities to DTOs
-        return deviceTypes.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        return deviceTypes.map(TipoDispositivoMapper::toDeviceTypeDto);
     }
 
     @Transactional
     public DeviceTypeDTO getDeviceTypeById(Integer id) {
         TipoDispositivo deviceType = deviceTypesRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Device type not found with id: " + id));
-        return convertToDTO(deviceType);
+                .orElseThrow(() -> new DeviceTypeNotFoundException(id));
+        return TipoDispositivoMapper.toDeviceTypeDto(deviceType);
     }   
 
     // Create a CRUD for DeviceTypes 
@@ -46,15 +55,23 @@ public class DeviceTypeService {
     @Transactional
     public DeviceTypeDTO createDeviceType(DeviceTypeDTO dto) {
         TipoDispositivo tipoDispositivo = convertToEntity(dto);
-        TipoDispositivo savedTipoDispositivo = deviceTypesRepository.save(tipoDispositivo);
-        return convertToDTO(savedTipoDispositivo);
+        TipoDispositivo savedTipoDispositivo = repositoryService.save(
+                deviceTypesRepository,
+                tipoDispositivo,
+                DATABASE_DEFAULT_ERROR
+        );
+        return TipoDispositivoMapper.toDeviceTypeDto(savedTipoDispositivo);
     }
 
     @Transactional
     public DeviceTypeDTO updateDeviceType(DeviceTypeDTO dto) {
         TipoDispositivo tipoDispositivo = convertToEntity(dto);
-        TipoDispositivo updatedTipoDispositivo = deviceTypesRepository.save(tipoDispositivo);
-        return convertToDTO(updatedTipoDispositivo);
+        TipoDispositivo updatedTipoDispositivo = repositoryService.save(
+                deviceTypesRepository,
+                tipoDispositivo,
+                DATABASE_DEFAULT_ERROR
+        );
+        return TipoDispositivoMapper.toDeviceTypeDto(updatedTipoDispositivo);
     }
 
     @Transactional
@@ -71,11 +88,4 @@ public class DeviceTypeService {
         return tipoDispositivo;
     }
 
-    private DeviceTypeDTO convertToDTO(TipoDispositivo tipoDispositivo) {
-        DeviceTypeDTO dto = new DeviceTypeDTO();
-        dto.setIdTipoDispositivo(tipoDispositivo.getIdTipoDispositivo());
-        dto.setNombre(tipoDispositivo.getNombre());
-        dto.setDetalle(tipoDispositivo.getDetalle());
-        return dto;
-    }
 }

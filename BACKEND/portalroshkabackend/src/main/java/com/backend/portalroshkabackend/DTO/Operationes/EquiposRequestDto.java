@@ -10,7 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.backend.portalroshkabackend.Exception.ClienteExists;
-import com.backend.portalroshkabackend.Exception.ValidEstado;
+
+import com.backend.portalroshkabackend.Models.Enum.EstadoActivoInactivo;
 
 // @UniqueNombre   //для проверки по уникальности имени для create, для проверки уникальности Для update
 @Data
@@ -35,8 +36,9 @@ public class EquiposRequestDto {
     private List<Integer> idTecnologias;
 
     @NotNull(message = "El estado es obligatorio")
-    @ValidEstado
-    private String estado;
+    private EstadoActivoInactivo estado;
 
     private List<UsuarioAsignacionDto> usuarios;
+
+    private List<DiaUbicacionDto> equipoDiaUbicacion;
 }

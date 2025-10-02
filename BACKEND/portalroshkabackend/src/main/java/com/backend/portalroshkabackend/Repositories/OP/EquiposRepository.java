@@ -34,4 +34,6 @@ public interface EquiposRepository extends JpaRepository<Equipos, Integer> {
 
     boolean existsByNombreAndIdEquipoNot(String nuevoNombre, Integer idEquipo);
 
+    Equipos findByIdEquipo(Integer idEquipo);
+
 }
