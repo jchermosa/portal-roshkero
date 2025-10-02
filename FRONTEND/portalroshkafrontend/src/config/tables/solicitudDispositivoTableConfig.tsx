@@ -64,7 +64,7 @@ export function buildSolicitudDispositivoColumns(
       {
         key: "usuarioId",
         label: "Usuario",
-        render: (s) => s.usuarioId ?? "-",
+        render: (s) => s.usuarioNombre ?? "-",
       },
       ...base.slice(1), // reuso todas excepto el ID (ya está arriba)
       {

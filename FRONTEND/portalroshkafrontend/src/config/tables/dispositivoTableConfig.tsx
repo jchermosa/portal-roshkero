@@ -20,7 +20,7 @@ export const dispositivosColumns: TableColumn<DispositivoItem>[] = [
   {
     key: "encargado",
     label: "Encargado",
-    render: (d: DispositivoItem) => d.encargado ?? "-",
+    render: (d: DispositivoItem) => d.nombreEncargado ?? "SYSADMIN",
   },
   {
     key: "estado",

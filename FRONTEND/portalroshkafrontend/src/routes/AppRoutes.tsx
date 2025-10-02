@@ -45,6 +45,9 @@ import RolesPage from "../pages/varios/RolesPage";
 import GestionTHPage from "../pages/varios/CatalogoTHPage";
 import CatalogoOperacionesPage from "../pages/varios/CatalogoSysPage";
 import CatalogoOpPage from "../pages/varios/CatalogoOp";
+import EquipoFormPage from "../pages/operations/EquipoFormPage";
+import OperationsPage from "../pages/operations/OperationsPage";
+import EditarEquipoPage from "../pages/operations/EditarEquipoPage";
 
 export default function AppRoutes() {
   return (
@@ -77,6 +80,11 @@ export default function AppRoutes() {
           <Route path="/usuarios/buscar" element={<UserSearchPage />} />
           <Route path="/usuarios/nuevo" element={<UserFormPage />} />
           <Route path="/usuarios/:id" element={<UserFormPage />} />
+
+          {/* Operations */}
+          <Route path="/operations" element={<OperationsPage />} />
+          <Route path="/equipo/nuevo" element={<EquipoFormPage />} />
+          <Route path="/equipo/:id/edit" element={<EditarEquipoPage />} />
 
           {/* Vacaciones */}
           <Route path="/vacaciones" element={<VacacionesPage />} />

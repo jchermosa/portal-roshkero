@@ -204,11 +204,13 @@ export interface DispositivoItem {
   estado: EstadoInventarioEnum;
   categoria: CategoriaEnum;
   encargado: number; 
+  nombreEncargado?: string;
 }
 
 export interface DispositivoAsignadoItem {
   idDispositivoAsignado: number;
   idDispositivo: number;
+  nombreDispositivo?: string;
   idSolicitud: number;
   fechaEntrega: string;
   fechaDevolucion?: string | null;
@@ -219,6 +221,7 @@ export interface DispositivoAsignadoItem {
 export interface SolicitudDispositivoItem {
   idSolicitud: number;
   idUsuario: number;
+  nombreUsuario?: string;
   idDocumentoAdjunto?: number | null;
   idLider?: number | null;
   tipoSolicitud: "DISPOSITIVO";
@@ -327,6 +330,7 @@ export interface SolicitudUserItem {
 export interface SolicitudDispositivoUI {
   idSolicitud: number;
   usuarioId?: number;        
+  usuarioNombre?: string;
   tipoSolicitud: "DISPOSITIVO";
   comentario?: string;
   estado: EstadoSolicitudEnum;
