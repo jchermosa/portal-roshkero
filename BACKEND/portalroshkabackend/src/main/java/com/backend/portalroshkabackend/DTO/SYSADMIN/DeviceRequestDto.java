@@ -27,7 +27,7 @@ public class DeviceRequestDto {
     @Positive ( message = "El id debe ser positivo")
     private int idUsuario;
 
-    @NotNull ( message = "El nombre del usuario es obligatorio")
+    
     private String nombreUsuario;
 
 
