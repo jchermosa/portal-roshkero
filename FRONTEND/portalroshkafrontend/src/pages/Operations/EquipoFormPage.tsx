@@ -4,6 +4,7 @@ import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import DynamicForm from "../../components/DynamicForm";
 import { useAuth } from "../../context/AuthContext";
+import DataTable from "../../components/DataTable";
 
 type DiaLaboral = { idDiaLaboral: number; nombreDia: string };
 type Ubicacion = { idUbicacion: number; nombre: string };
@@ -16,7 +17,35 @@ type Miembro = {
   fechaEntrada?: string;
   fechaFin?: string;
 };
-
+type IMiembrosEquipo = {
+  id: number;
+  nombre: string;
+  idCargo: number;
+  disponibilidad?: number; // int 1..100
+  fechaEntrada?: string;
+  fechaFin?: string;
+  estado: boolean | "A" | "I";
+};
+type MemberOpt = {
+  value: number;
+  label: string;
+  idCargo: number;
+  dispRestante: number; // int 0..100
+};
+type Tecnologia = { idTecnologia: number; nombre: string };
+type ITeam = {
+  idEquipo: number;
+  nombre: string;
+  clienteId?: number;
+  clienteNombre?: string;
+  fechaInicio: string;
+  fechaFin: string;
+  estado: boolean | "A" | "I";
+  tecnologias: Tecnologia[];
+  miembros: IMiembrosEquipo[];
+  leadId?: number | null;
+  leadNombre?: string | null;
+};
 const METADATAS_PATH = "http://localhost:8080/api/v1/admin/operations/metadatas";
 const CREATE_TEAM_PATH = "http://localhost:8080/api/v1/admin/operations/team";
 const DIAS_PATH = "http://localhost:8080/api/v1/admin/operations/diaslaborales";
@@ -63,7 +92,11 @@ export default function EquipoFormPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
   const isDark = useIsDark();
-
+  const [error, setError] = useState<string | null>(null);
+  const [leadId, setLeadId] = useState<number | null>(null);
+  const [dispCaps, setDispCaps] = useState<Map<number, number>>(new Map());
+  const updateMemberStart = (id: number, v: string) =>
+    setMiembros((ms) => ms.map((m) => (m.id === id ? { ...m, fechaEntrada: v } : m)));
   // ========== THEME + STYLES ==========
   const selectTheme = useMemo(
     () => (base: any) => ({
@@ -180,12 +213,29 @@ export default function EquipoFormPage() {
     idCargo: number;
     dispRestante: number;
   } | null>(null);
-  const [miembros, setMiembros] = useState<Miembro[]>([]);
+  const [miembros, setMiembros] = useState<IMiembrosEquipo[]>([]);
+
+  const updateMemberEnd = (id: number, v: string) =>
+    setMiembros((ms) =>
+      ms.map((m) =>
+        m.id === id
+          ? { ...m, fechaFin: v, estado: m.estado ?? "A" } // гарантируем поле estado
+          : m
+      )
+    );
   const [newMemberStart, setNewMemberStart] = useState("");
   const [newMemberEnd, setNewMemberEnd] = useState("");
   const [newMemberMax, setNewMemberMax] = useState(100);
   const [newMemberDisp, setNewMemberDisp] = useState(100);
+  const updateMemberDisp = (id: number, val: number) =>
 
+    setMiembros((ms) =>
+      ms.map((m) =>
+        m.id === id
+          ? { ...m, disponibilidad: Math.max(1, Math.min(100, val)) }
+          : m
+      )
+    );
   // Cargar metadatas + días + libres + usuarios
   useEffect(() => {
     const ac = new AbortController();
@@ -352,7 +402,128 @@ export default function EquipoFormPage() {
     }
     return opts;
   };
+  const columns = [
+    { key: "id", label: "ID" },
+    {
+      key: "nombre",
+      label: "Nombre",
+      render: (s: IMiembrosEquipo) => (
+        <div className="flex items-center gap-2">
+          <span className="text-gray-900 dark:text-gray-100">{s.nombre}</span>
+          {leadId === s.id && (
+            <span className="px-2 py-0.5 text-[10px] rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100">
+              Lead
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "disponibilidad",
+      label: "Disp. (%)",
+      render: (s: IMiembrosEquipo) => {
+        const restante = dispCaps.get(s.id) ?? 100;            // lo que le queda libre fuera de este equipo
+        const actual = Number(s.disponibilidad ?? 0);          // lo que ya tiene en este equipo
+        const cap = Math.max(1, Math.min(100, restante + actual)); // máximo permitido para esta celda
 
+        return (
+          <input
+            type="number"
+            min={1}
+            max={cap}
+            value={Number(s.disponibilidad ?? 100)}
+            onChange={(e) => {
+              const v = Number(e.target.value) || 1;
+              updateMemberDisp(s.id, Math.max(1, Math.min(cap, v)));
+            }}
+            className="w-20 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+            title={`Máximo permitido: ${cap}%`}
+          />
+        );
+      },
+    },
+
+
+    {
+      key: "fechaEntrada",
+      label: "Entrada",
+      render: (s: IMiembrosEquipo) => (
+        <input
+          type="date"
+          value={s.fechaEntrada ?? ""}
+          onChange={(e) => {
+            const v = e.target.value;
+            const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, s.fechaFin || null);
+            if (err) return alert(err);
+            updateMemberStart(s.id, v);
+          }}
+          min={formData.fechaInicio || undefined}
+          max={(s.fechaFin || formData.fechaFin) || undefined}
+          className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+        />
+      ),
+    },
+    {
+      key: "fechaFin",
+      label: "Fin",
+      render: (s: IMiembrosEquipo) => (
+        <input
+          type="date"
+          value={s.fechaFin ?? ""}
+          onChange={(e) => {
+            const v = e.target.value;
+            const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, s.fechaEntrada || null, v);
+            if (err) return alert(err);
+            updateMemberEnd(s.id, v);
+          }}
+          min={(s.fechaEntrada || formData.fechaInicio) || undefined}
+          max={formData.fechaFin || undefined}
+          className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+        />
+      ),
+    },
+    {
+      key: "estado",
+      label: "Activo",
+      render: (s: IMiembrosEquipo) => (
+        <input
+          type="checkbox"
+          checked={s.estado === "A"} // строго проверяем на "A"
+          onChange={(e) =>
+            setMiembros((prev) =>
+              prev.map((m) =>
+                m.id === s.id ? { ...m, estado: e.target.checked ? "A" : "I" } : m
+              )
+            )
+          }
+          className="w-4 h-4"
+        />
+      ),
+    },
+    {
+      key: "acciones",
+      label: "Acciones",
+      render: (s: IMiembrosEquipo) => (
+        <button
+          onClick={() => {
+            setMiembros((ms) => ms.filter((m) => m.id !== s.id));
+            setMemberOptions((opts) => [
+              ...opts,
+              {
+                value: s.id,
+                label: s.nombre,
+                idCargo: s.idCargo,
+                dispRestante: 100,
+              },
+            ]);
+          }}
+          className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none"
+        >
+          Eliminar
+        </button>
+      ),
+    },
+  ];
   const setUbicacionForDay = (
     dayId: number,
     opt: { value: number; label: string } | null
@@ -397,31 +568,29 @@ export default function EquipoFormPage() {
 
   const handleAddMember = () => {
     if (!selectedMember) return;
-    if (miembros.some((m) => m.id === selectedMember.value)) return;
 
-    const d = Math.max(1, Math.min(newMemberMax, Number(newMemberDisp) || 1));
-    if (d <= 0) {
-      alert("Este usuario no tiene disponibilidad para asignar.");
+    const maxPermitido = newMemberMax; // уже вычислен
+    if (newMemberDisp > maxPermitido) {
+      setError(`El porcentaje asignado (${newMemberDisp}%) supera el máximo permitido (${maxPermitido}%)`);
       return;
     }
 
-    setMiembros((ms) => [
-      ...ms,
-      {
-        id: selectedMember.value,
-        nombre: selectedMember.label,
-        idCargo: selectedMember.idCargo,
-        disponibilidad: d, // int 1..100
-        fechaEntrada: newMemberStart || "",
-        fechaFin: newMemberEnd || "",
-      },
-    ]);
+    const nuevo: IMiembrosEquipo = {
+      id: selectedMember.value,
+      nombre: selectedMember.label,
+      idCargo: selectedMember.idCargo,
+      disponibilidad: newMemberDisp,
+      fechaEntrada: newMemberStart || formData.fechaInicio,
+      fechaFin: newMemberEnd || formData.fechaFin,
+      estado: "A",
+    };
+
+    setMiembros((prev) => [...prev, nuevo]);
     setMemberOptions((opts) =>
       opts.filter((o) => o.value !== selectedMember.value)
     );
     setSelectedMember(null);
-    setNewMemberStart("");
-    setNewMemberEnd("");
+    setNewMemberDisp(0);
   };
 
   const removeMember = (id: number) => {
@@ -456,10 +625,10 @@ export default function EquipoFormPage() {
       usuarios: miembros.map((m) => ({
         idUsuario: m.id,
         idCargo: m.idCargo,
-        disponibilidad: Math.max(1, Math.min(100, Number(m.disponibilidad) || 1)),
-        estado: "A",
-        ...(m.fechaEntrada ? { fechaEntrada: m.fechaEntrada } : {}),
-        ...(m.fechaFin ? { fechaFin: m.fechaFin } : {}),
+        porcentajeTrabajo: Math.max(1, Math.min(100, Number(m.disponibilidad) || 1)), // <- renombrado
+        estado: m.estado || "A",
+        fechaEntrada: m.fechaEntrada || formData.fechaInicio,
+        fechaFin: m.fechaFin || null,
       })),
       equipoDiaUbicacion: duPayload,
       ...(leadSel ? { idLider: Number(leadSel.value) } : {}),
@@ -477,11 +646,11 @@ export default function EquipoFormPage() {
       body: JSON.stringify(payload),
     });
     console.log("✅ Equipo: ", payload);
+    console.log(JSON.stringify(payload, null, 2));
     if (!r.ok) {
       const msg = await r.text();
       throw new Error(`${r.status} ${r.statusText} — ${msg}`);
     }
-
     navigate("/operations");
   };
 
@@ -667,60 +836,78 @@ export default function EquipoFormPage() {
             </div>
 
             {/* Agregar miembro */}
-            <div>
-              <label className="block text-sm mb-2">Agregar miembro</label>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+              <div className="md:col-span-2">
+                <label className="block text-sm mb-2">Agregar miembro</label>
                 <Select
                   options={memberOptions}
                   value={selectedMember}
-                  onChange={(opt: any) => setSelectedMember(opt)}
+                  onChange={(opt) => {
+                    const m = opt as MemberOpt | null;
+                    setSelectedMember(m);
+                    const max = Math.max(
+                      0,
+                      Math.min(100, m?.dispRestante ?? 100)
+                    );
+                    setNewMemberMax(max);
+                    setNewMemberDisp(max);
+                  }}
                   isClearable
                   isSearchable
                   placeholder="Buscar miembro…"
-                  theme={selectTheme}
+                  theme={(base) => ({
+                    ...base,
+                    colors: {
+                      ...base.colors,
+                      neutral0: isDark ? "#111827" : "#ffffff",
+                      neutral20: isDark ? "#374151" : "#d1d5db",
+                      neutral80: isDark ? "#f9fafb" : "#111827",
+                      primary: "#3b82f6",
+                      primary25: isDark ? "#374151" : "#e5e7eb",
+                      primary50: isDark ? "#1f2937" : "#dbeafe",
+                    },
+                  })}
                   styles={selectStyles}
                   menuPortalTarget={document.body}
                   menuPosition="fixed"
                 />
+              </div>
+              <div>
+                <label className="block text-sm mb-2">Entrada</label>
                 <input
                   type="date"
                   value={newMemberStart}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, newMemberEnd || null);
-                    if (err) return alert(err);
-                    setNewMemberStart(v);
-                  }}
+                  onChange={(e) => setNewMemberStart(e.target.value)}
                   min={formData.fechaInicio || undefined}
-                  max={newMemberEnd || formData.fechaFin || undefined}
-                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-                />
-                <input
-                  type="date"
-                  value={newMemberEnd}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, newMemberStart || null, v);
-                    if (err) return alert(err);
-                    setNewMemberEnd(v);
-                  }}
-                  min={newMemberStart || formData.fechaInicio || undefined}
                   max={formData.fechaFin || undefined}
                   className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
                 />
-
+              </div>
+              <div>
+                <label className="block text-sm mb-2">Fin</label>
+                <input
+                  type="date"
+                  value={newMemberEnd}
+                  onChange={(e) => setNewMemberEnd(e.target.value)}
+                  min={(newMemberStart || formData.fechaInicio) || undefined}
+                  max={formData.fechaFin || undefined}
+                  className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                />
+              </div>
+              <div className="flex items-end gap-2">
                 <input
                   type="number"
                   min={1}
-                  max={newMemberMax || 1}
-                  value={Math.max(
-                    1,
-                    Math.min(newMemberMax || 1, Number(newMemberDisp) || 1)
-                  )}
-                  onChange={(e) => {
-                    const v = Number(e.target.value) || 1;
-                    setNewMemberDisp(Math.max(1, Math.min(newMemberMax || 1, v)));
-                  }}
+                  max={newMemberMax}
+                  value={newMemberDisp}
+                  onChange={(e) =>
+                    setNewMemberDisp(
+                      Math.max(
+                        1,
+                        Math.min(newMemberMax, Number(e.target.value) || 1)
+                      )
+                    )
+                  }
                   className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
                   placeholder="Disp. %"
                   title={
@@ -729,73 +916,49 @@ export default function EquipoFormPage() {
                       : "Elegí un miembro primero"
                   }
                 />
-
                 <button
                   type="button"
                   onClick={handleAddMember}
-                  disabled={!selectedMember || (newMemberMax || 0) <= 0}
+                  disabled={!selectedMember || newMemberMax <= 0}
                   className="px-4 h-10 rounded bg-blue-600 text-white text-sm disabled:opacity-60"
-                  title={selectedMember ? undefined : "Elegí un miembro primero"}
                 >
                   Agregar
                 </button>
               </div>
-
-              {/* Tabla miembros */}
-              <div className="mt-4 w-full overflow-x-auto rounded-xl border border-gray-200/40 dark:border-gray-700/60">
-                <table className="min-w-full text-sm">
-                  <thead className="bg-indigo-900/70 text-white">
-                    <tr>
-                      <th className="px-4 py-2 text-left">Nombre</th>
-                      <th className="px-4 py-2 text-left">Cargo</th>
-                      <th className="px-4 py-2 text-left">Disp. (%)</th>
-                      <th className="px-4 py-2 text-left">Entrada</th>
-                      <th className="px-4 py-2 text-left">Fin</th>
-                      <th className="px-4 py-2 text-left">Estado</th>
-                      <th className="px-4 py-2 text-left">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-transparent">
-                    {miembros.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan={6}
-                          className="px-4 py-6 text-center text-gray-400"
-                        >
-                          No hay resultados.
-                        </td>
-                      </tr>
-                    ) : (
-                      miembros.map((m) => (
-                        <tr
-                          key={m.id}
-                          className="border-t border-gray-200/30 dark:border-gray-700/50"
-                        >
-                          <td className="px-4 py-2">{m.nombre}</td>
-                          <td className="px-4 py-2">{m.idCargo}</td>
-                          <td className="px-4 py-2">
-                            {Math.max(1, Math.min(100, Number(m.disponibilidad) || 1))}
-                          </td>
-                          <td className="px-4 py-2">
-                            {m.fechaEntrada || "—"}
-                          </td>
-                          <td className="px-4 py-2">{m.fechaFin || "—"}</td>
-                          <td className="px-4 py-2">
-                            <button
-                              type="button"
-                              onClick={() => removeMember(m.id)}
-                              className="px-3 py-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
-                            >
-                              Eliminar
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
             </div>
+            {/* Errores en tabla usuarios */}
+            {error && (
+              <div className="p-4 rounded-lg text-sm border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700 mb-4">
+                <div className="flex items-center gap-2">
+                  <span>❌</span>
+                  <span>
+                    {(() => {
+                      try {
+                        const jsonPart = error.split('—')[1]?.trim(); // берём часть после "—"
+                        console.log(jsonPart);
+                        try {
+                          const obj = JSON.parse(jsonPart || '{}');
+                          return obj.message || error;
+                        } catch {
+                          const match = jsonPart.match(/"message"\s*:\s*"([^"]*)"/);
+                          if (match) return match[1]; // вернём найденное сообщение
+                          return error;
+                        }
+                      } catch {
+                        return error;
+                      }
+                    })()}
+                  </span>
+                </div>
+              </div>
+            )}
+            <DataTable
+              data={miembros}
+              columns={columns}
+              rowKey={(s) => s.id}
+              scrollable={false}
+              enableSearch={false}
+            />
           </div>
 
           {/* Footer */}
