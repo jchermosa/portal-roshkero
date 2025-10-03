@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 // Iconos SVG nativos
 const EyeIcon = () => (
@@ -251,6 +252,8 @@ export default function Configuration() {
       if (!response.ok) {
         throw new Error(data.message || "Error al cambiar contraseña");
       }
+
+      alert(data.message);
 
       // Opcional: Mostrar mensaje de éxito
       console.log("Contraseña actualizada exitosamente");
