@@ -95,7 +95,7 @@ public class UsuariosController {
         boolean actualizado = userService.actualizarContrasena(dto);
 
         if (actualizado) {
-            return ResponseEntity.ok("Contraseña actualizada correctamente");
+            return ResponseEntity.ok("Contrasenha actualizada correctamente");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("La contraseña actual es incorrecta");
         }
