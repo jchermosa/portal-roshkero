@@ -117,7 +117,7 @@ export async function createSolicitudVacaciones(
   return res.json();
 }
 
-async function updateSolicitud(
+export async function updateSolicitud(
   token: string,
   id: string,
   solicitud: Partial<SolicitudItem>
