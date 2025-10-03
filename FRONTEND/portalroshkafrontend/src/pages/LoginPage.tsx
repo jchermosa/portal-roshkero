@@ -17,11 +17,13 @@ export default function Login() {
 
   // Estados para animación
   const [showSplash, setShowSplash] = useState(true);
-  const [phase, setPhase] = useState<"start" | "grow" | "move" | "done">("start");
+  const [phase, setPhase] = useState<"start" | "grow" | "move" | "done">(
+    "start"
+  );
 
   useEffect(() => {
     // Fase 1: giro y crecimiento
-    const growTimer = setTimeout(() => setPhase("grow"), 100); 
+    const growTimer = setTimeout(() => setPhase("grow"), 100);
     // Fase 2: mover arriba
     const moveTimer = setTimeout(() => setPhase("move"), 1500);
     // Fase 3: mostrar login
@@ -98,7 +100,11 @@ export default function Login() {
               w-32 h-32 object-contain transform transition-all duration-1000 ease-out
               ${phase === "start" ? "scale-50 rotate-0 opacity-0" : ""}
               ${phase === "grow" ? "scale-125 rotate-180 opacity-100" : ""}
-              ${phase === "move" ? "-translate-y-36 scale-100 rotate-360 opacity-100" : ""}
+              ${
+                phase === "move"
+                  ? "-translate-y-36 scale-100 rotate-360 opacity-100"
+                  : ""
+              }
             `}
           />
         </div>
@@ -129,7 +135,11 @@ export default function Login() {
       {/* Contenedor del login */}
       <div
         className={`relative z-10 w-full max-w-md bg-white/95 dark:bg-gray-900/90 backdrop-blur-sm shadow-2xl rounded-2xl p-10 transform transition-all duration-1000
-          ${phase === "move" || phase === "done" ? "translate-y-0 opacity-100 delay-500" : "translate-y-12 opacity-0"}
+          ${
+            phase === "move" || phase === "done"
+              ? "translate-y-0 opacity-100 delay-500"
+              : "translate-y-12 opacity-0"
+          }
         `}
       >
         {/* Logo + título */}
@@ -186,7 +196,7 @@ export default function Login() {
             />
           </div>
 
-          {/* Link olvidar contraseña */}
+          {/* Link olvidar contraseña
           <div className="text-center">
             <button
               type="button"
@@ -194,7 +204,7 @@ export default function Login() {
             >
               ¿Olvidaste tu contraseña?
             </button>
-          </div>
+          </div> */}
 
           {/* Error */}
           {error && (
