@@ -26,14 +26,16 @@ export default function IconButton({
     danger: "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
     ghost: ""
   };
-
+const add = <span className="material-symbols-outlined">
+add
+</span>
   return (
     <button
       type={type}
       onClick={onClick}
       className={`${baseStyles} ${variants[variant]} ${className}`}
     >
-      {icon && <span>{icon}</span>}
+      {icon && <span>{add}</span>}
       <span>{label}</span>
     </button>
   );
