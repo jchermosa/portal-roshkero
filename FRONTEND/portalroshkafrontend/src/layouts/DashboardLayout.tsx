@@ -32,8 +32,8 @@ export default function DashboardLayout() {
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: talentoHumano },
     // { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     
-    { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
     {id: "/solicitudesTL", label: "Solicitudes de Equipo", icon:"📬", available: leader },
+    { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
    
    
   ].filter((o) => o.available);
