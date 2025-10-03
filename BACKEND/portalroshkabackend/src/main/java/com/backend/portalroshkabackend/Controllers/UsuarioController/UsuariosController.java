@@ -11,6 +11,7 @@ import com.backend.portalroshkabackend.DTO.UsuarioDTO.SolicitudUserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserCambContrasDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserHomeDto;
+import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserMensajeJsonDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolBeneficioDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolDispositivoDto;
 import com.backend.portalroshkabackend.DTO.UsuarioDTO.UserSolPermisoDto;
@@ -91,13 +92,16 @@ public class UsuariosController {
     }
     
     @PostMapping("/cambiarcontrasena")
-    public ResponseEntity<?> cambiarContrasena(@RequestBody UserCambContrasDto dto) {
+    public ResponseEntity<UserMensajeJsonDto> cambiarContrasena(@RequestBody UserCambContrasDto dto) {
         boolean actualizado = userService.actualizarContrasena(dto);
+        UserMensajeJsonDto respuesta = new UserMensajeJsonDto();
 
         if (actualizado) {
-            return ResponseEntity.ok("Contrasenha actualizada correctamente");
+            respuesta.setMessage("Contraseña actualizada correctamente");
+            return ResponseEntity.ok(respuesta);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("La contraseña actual es incorrecta");
+            respuesta.setMessage("La contraseña actual es incorrecta");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(respuesta);
         }
     }
 

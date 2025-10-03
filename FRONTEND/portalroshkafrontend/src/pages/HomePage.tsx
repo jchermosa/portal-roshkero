@@ -45,73 +45,38 @@ export default function HomePage() {
               <ProfileCard
                 title="Mi Perfil"
                 icon="👤"
-                // description={`Rol: ${user?.nombreRol || user?.rol}`}
+                description="Visualiza tu información personal"
                 onClick={() => navigate("/profile")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
                 color=""
               />
-
-              <ProfileCard
-                title="Vacaciones"
-                icon="🏖️"
-                description="Consulta tus vacaciones"
-                onClick={() => navigate("/vacaciones")}
-                borderClass="border-blue-600"
-                buttonClass="bg-blue-600 hover:bg-blue-700"
-                color=""
-              />
-
-              {/* {isThOrGth && ( */}
-                <>
-                  <ProfileCard
-                    title="Gestión de Usuarios"
-                    icon="👥"
-                    description="Administra perfiles y usuarios del sistema"
-                    onClick={() => navigate("/usuarios")}
-                    borderClass="border-blue-600"
-                    buttonClass="bg-blue-600 hover:bg-blue-700"
-                    color=""
-                  />
-                  <ProfileCard
-                    title="Gestión de Solicitudes"
-                    icon="📤"
-                    description="Administra las solicitudes de los usuarios"
-                    onClick={() => navigate("/gestion-solicitudes")}
-                    borderClass="border-blue-600"
-                    buttonClass="bg-blue-600 hover:bg-blue-700"
-                    color=""
-                  />
-                </>
-              {/* )} */}
-
-              {/* {isManu && ( */}
-                <ProfileCard
-                  title="Gestión de dispositivos"
-                  icon="💻"
-                  description="Administra los dispositivos asignados a los usuarios"
-                  onClick={() => navigate("/dispositivos")}
-                  borderClass="border-blue-600"
-                  buttonClass="bg-blue-600 hover:bg-blue-700"
-                  color=""
-                />
-              {/* )} */}
-
-              <ProfileCard
-                title="Beneficios"
-                icon="🎁"
-                description="Explora y accede a tus beneficios"
-                onClick={() => navigate("/benefits")}
-                borderClass="border-blue-600"
-                buttonClass="bg-blue-600 hover:bg-blue-700"
-                color=""
-              />
+             
 
               <ProfileCard
                 title="Solicitudes"
                 icon="📝"
                 description="Crea y revisa tus solicitudes"
                 onClick={() => navigate("/requests")}
+                borderClass="border-blue-600"
+                buttonClass="bg-blue-600 hover:bg-blue-700"
+                color=""
+              />
+
+              <ProfileCard
+                title="Solicitar Dispositivos"
+                icon="📱"
+                description="Crea y revisa tus peticiones de dispositivos"
+                onClick={() => navigate("/requests")}
+                borderClass="border-blue-600"
+                buttonClass="bg-blue-600 hover:bg-blue-700"
+                color=""
+              />
+               <ProfileCard
+                title="Beneficios"
+                icon="🎁"
+                description="Explora y accede a tus beneficios"
+                onClick={() => navigate("/benefits")}
                 borderClass="border-blue-600"
                 buttonClass="bg-blue-600 hover:bg-blue-700"
                 color=""

@@ -5,6 +5,7 @@ export const Roles = {
   ADMINISTRADOR_DEL_SISTEMA: "ADMINISTRADOR_DEL_SISTEMA",
   DIRECTIVO: "DIRECTIVO",
   ADMINISTRATIVO: "ADMINISTRATIVO",
+  TEAM_LEADER:"TEAM_LEADER",
 } as const;
 
 export type Roles = typeof Roles[keyof typeof Roles];
@@ -17,6 +18,7 @@ export const RolesMap: Record<string, Roles> = {
   "ADMINISTRADOR DEL SISTEMA": Roles.ADMINISTRADOR_DEL_SISTEMA,
   "DIRECTIVO": Roles.DIRECTIVO,
   "ADMINISTRATIVO": Roles.ADMINISTRATIVO,
+  "TEAM_LEADER": Roles.TEAM_LEADER,
 };
 
 // Etiquetas legibles para mostrar en la UI
