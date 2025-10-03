@@ -13,6 +13,7 @@ export default function DashboardLayout() {
    const talentoHumano = tieneRol(user, Roles.TALENTO_HUMANO, Roles.DIRECTIVO);
    const operaciones = tieneRol(user, Roles.OPERACIONES, Roles.DIRECTIVO);
    const sysadmin= tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA, Roles.DIRECTIVO);
+   const leader = tieneRol(user, Roles.TEAM_LEADER, Roles.DIRECTIVO)
    
 
   const menuOptions = [
@@ -31,6 +32,7 @@ export default function DashboardLayout() {
     { id: "/solicitud-dispositivo", label: "Solicitud Dispositivo", icon: "📱", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
     { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
+    {id: "/solicitudesTL", label: "Solicitudes de Equipo", icon:"📬", available: leader },
    
    
   ].filter((o) => o.available);

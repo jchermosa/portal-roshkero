@@ -217,7 +217,7 @@ export default function RequestFormPage() {
       onSubmitLabel={isEditing ? "Guardar cambios" : "Enviar solicitud"}
     >
       <DynamicForm
-        id={`${tipo.toLowerCase()}-form`}
+        id="dynamic-form"
         sections={getSections()}
         initialData={data}
         onChange={(newData) => setData(prev => ({ ...prev, ...newData }))}
