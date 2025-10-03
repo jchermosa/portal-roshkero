@@ -87,6 +87,11 @@ export default function RequestViewPage() {
               <strong>Días:</strong> {solicitud.cantDias ?? 0}
             </div>
           )}
+          {(solicitud.tipoSolicitud === "BENEFICIO") && (
+            <div>
+              <strong>Monto:</strong> {solicitud.monto ?? 0}
+            </div>
+          )}
         </div>
 
         {solicitud.estado === "P" && (

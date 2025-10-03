@@ -51,7 +51,7 @@ export default function RequestViewPageUsuario() {
         )}
         {solicitud.tipoSolicitud === "BENEFICIO" && (
           <div>
-            <strong>Monto:</strong> {solicitud.monto ?? "—"}
+            <strong>Monto:</strong> {solicitud.monto ?? "0"}
           </div>
         )}
         <div className="flex justify-center mt-6">

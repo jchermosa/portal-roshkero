@@ -71,7 +71,7 @@ export default function RequestViewTL() {
       <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <div className="space-y-4">
           <div>
-            <strong>Usuario:</strong> {solicitud.usuario}
+            <strong>Usuario:</strong> {solicitud.nombreUsuario}
           </div>
           <div>
             <strong>Tipo:</strong> {solicitud.tipoSolicitud}
