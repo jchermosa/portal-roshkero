@@ -16,6 +16,7 @@ import com.backend.portalroshkabackend.tools.errors.errorslist.solicitudes.Reque
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,6 +133,9 @@ public class RequestMapper {
     public SolicitudByIdResponseDto toSolicitudByIdResponseDto(Solicitud solicitud) {
         SolicitudByIdResponseDto dto = new SolicitudByIdResponseDto();
 
+        String comentario = solicitud.getComentario();
+        BigDecimal monto = extraerMonto(comentario);
+
         dto.setIdSolicitud(solicitud.getIdSolicitud());
         dto.setUsuario(solicitud.getUsuario().getNombre() + " " + solicitud.getUsuario().getApellido());
 
@@ -176,6 +180,12 @@ public class RequestMapper {
             dto.setFechaCreacion(null);
         }
 
+        if (monto != null){
+            dto.setMonto(monto);
+        } else {
+            dto.setMonto(BigDecimal.valueOf(0));
+        }
+
 
         return dto;
     }
@@ -196,6 +206,19 @@ public class RequestMapper {
         return comentario.replaceAll("\\(\\d+\\)", "")
                 .replaceAll("\\{\\d+}", "")
                 .trim();
+    }
+
+    private BigDecimal extraerMonto(String comentario) {
+        if (comentario == null) return null;
+
+        // Expresión regular para capturar números (enteros o decimales) dentro de {}
+        Pattern pattern = Pattern.compile("\\{(\\d+(?:\\.\\d+)?)}");
+        Matcher matcher = pattern.matcher(comentario);
+
+        if (matcher.find()) {
+            return new BigDecimal(matcher.group(1));
+        }
+        return null;
     }
 
 }

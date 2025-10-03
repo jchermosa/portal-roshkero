@@ -5,6 +5,7 @@ import com.backend.portalroshkabackend.Models.Enum.SolicitudesEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -27,6 +28,8 @@ public class SolicitudByIdResponseDto {
     private EstadoSolicitudEnum estado;
 
     private LocalDate fechaInicio;
+
+    private BigDecimal monto;
 
     private int cantDias;
 
