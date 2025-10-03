@@ -29,7 +29,7 @@ async function getSolicitudesDispositivoAdmin(
 async function getSolicitudesDispositivoUsuario(
   token: string
 ): Promise<SolicitudUserItem[]> {
-  const url = `/api/v1/usuarios/solicitudes`;
+  const url = `http://localhost:8080/api/v1/usuarios/solicitudes`;
 
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -46,7 +46,7 @@ async function acceptSolicitudDispositivo(
   token: string,
   idSolicitud: number
 ): Promise<void> {                         // 👈 ahora void
-  const url = `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/accept`;
+  const url = `http://localhost:8080/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/accept`;
 
   const res = await fetch(url, {
     method: "POST",
@@ -65,8 +65,8 @@ async function acceptSolicitudDispositivo(
 async function rejectSolicitudDispositivo(
   token: string,
   idSolicitud: number
-): Promise<void> {                        
-  const url = `/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/reject`;
+): Promise<void> {
+  const url = `http://localhost:8080/api/v1/admin/sysadmin/deviceRequest/${idSolicitud}/reject`;
 
   const res = await fetch(url, {
     method: "POST",
@@ -103,7 +103,7 @@ async function getSolicitudById(
   token: string,
   idSolicitud: number
 ): Promise<SolicitudUserItem> {
-  const url = `/api/v1/admin/sysadmin/request/${idSolicitud}`;
+  const url = `http://localhost:8080/api/v1/admin/sysadmin/request/${idSolicitud}`;
   console.log("[Service] GET", url);
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },

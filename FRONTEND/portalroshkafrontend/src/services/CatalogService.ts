@@ -28,7 +28,7 @@ export async function getCargos(token: string): Promise<CargoItem[]> {
 }
 
 async function getTiposPermisoApi(token: string) {
-  const res = await fetch(`/api/v1/usuarios/tipospermisos`, {
+  const res = await fetch(`http://localhost:8080/api/v1/usuarios/tipospermisos`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());
@@ -36,7 +36,7 @@ async function getTiposPermisoApi(token: string) {
 }
 
 async function getTiposBeneficioApi(token: string) {
-  const res = await fetch(`/api/v1/usuarios/tiposbeneficios`, {
+  const res = await fetch(`http://localhost:8080/api/v1/usuarios/tiposbeneficios`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await res.text());

@@ -26,7 +26,7 @@ export default function DashboardLayout() {
     { id: "/catalogo-op", label: "Catalogo Operaciones", icon: "🏢", available: operaciones },
     { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: sysadmin},
     { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: talentoHumano },
-    { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
+    // { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
     { id: "/solicitud-dispositivo", label: "Solicitud Dispositivo", icon: "📱", available: true },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },

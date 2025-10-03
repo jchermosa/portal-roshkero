@@ -251,7 +251,7 @@ export default function ProfilePage() {
                       placeholder="No definido"
                       onSave={async (newPhone) => {
                         try {
-                          const res = await fetch(`/api/v1/usuarios/me`, {
+                          const res = await fetch(`http://localhost:8080/api/v1/usuarios/me`, {
                             method: "PUT",
                             headers: {
                               "Content-Type": "application/json",
