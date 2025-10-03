@@ -37,14 +37,14 @@ public class UsuariosController {
     @GetMapping("/")
     public ResponseEntity<UserHomeDto> getUsuarioHome() {
         UserHomeDto user = userService.getUsuarioHome();
-        System.out.println("\n \n getUsuarioHome: \n\n" + user + "\n \n UserHomeDto \n\n");
+        // System.out.println("\n \n getUsuarioHome: \n\n" + user + "\n \n UserHomeDto \n\n");
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUsuarioActual() {
         UserDto user = userService.getUsuarioActual();
-        System.out.println("\n \n Usuario DTO: \n\n" + user);
+        // System.out.println("\n \n Usuario DTO: \n\n" + user);
         return ResponseEntity.ok(user);
     }
 
@@ -65,7 +65,7 @@ public class UsuariosController {
 
     @PostMapping("/crearpermiso") // Endpoint para solcitar un Permiso para el usuario actual
     public ResponseEntity<UserSolPermisoDto> crearPermisoUsuarioActual(@RequestBody UserSolPermisoDto solPermisoDto) {
-        System.out.println("\n \n Solicitud DTO Recibida en el Controller: \n\n" + solPermisoDto + "\n \n");
+        // System.out.println("\n \n Solicitud DTO Recibida en el Controller: \n\n" + solPermisoDto + "\n \n");
         solPermisoDto = userService.crearPermisoUsuarioActual(solPermisoDto);
         return ResponseEntity.ok(solPermisoDto);
     }
