@@ -29,6 +29,7 @@ export const RolesLabels: Record<Roles, string> = {
   [Roles.ADMINISTRADOR_DEL_SISTEMA]: "Administrador del Sistema",
   [Roles.DIRECTIVO]: "Directivo",
   [Roles.ADMINISTRATIVO]: "Administrativo",
+  [Roles.TEAM_LEADER]: "Team Leader"
 };
 
 // Opcional: IdRol → Enum (si querés validar por ID en vez de nombre)

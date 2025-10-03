@@ -195,8 +195,6 @@ export type SolicitudPayload =
     };
 
 
-
-
 export interface TipoPermisoItem {
   idTipoPermiso: number;
   nombre: string;

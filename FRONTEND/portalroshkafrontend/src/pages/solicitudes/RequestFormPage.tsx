@@ -42,18 +42,32 @@ export default function RequestFormPage() {
   const loading = loadingCatalogos || loadingForm;
 
   // Auto-calcular días para permisos
-  useEffect(() => {
-    if (tipo === "PERMISO" && data.idSubtipo != null) {
-      const tipoPermiso = tiposPermiso.find((t) => t.idTipoPermiso === data.idSubtipo);
-      if (tipoPermiso) {
-        setData((prev) => ({
-          ...prev,
-          cantDias: tipoPermiso.cantDias ?? 0 // asigna siempre el valor del tipo, incluso 0
-        }));
-      }
-    }
-  }, [data.idSubtipo, tipo, tiposPermiso, setData]);
+    useEffect(() => {
 
+      if (tipo === "PERMISO" && data.idSubtipo != null) {
+        const tipoPermiso = tiposPermiso.find(
+          (t) => t.idTipoPermiso === data.idSubtipo
+        );
+
+        if (tipoPermiso) {
+          if (tipoPermiso.cantDias && tipoPermiso.cantDias > 0) {
+            setData((prev) => ({
+              ...prev,
+              cantDias: tipoPermiso.cantDias,
+            }));
+          } else {
+            console.log(" Permiso editable, dejo cantDias sin tocar:", data.cantDias);
+            //aseguramos que exista inicial
+            if (data.cantDias == null) {
+              setData((prev) => ({
+                ...prev,
+                cantDias: 0,
+              }));
+            }
+          }
+        }
+      }
+    }, [data.idSubtipo, tipo, tiposPermiso]);
 
 
 
@@ -66,7 +80,7 @@ export default function RequestFormPage() {
 
   // Validar monto contra monto máximo del beneficio
   useEffect(() => {
-    if (tipo === "BENEFICIO" && data.idSubtipo) {
+    if (tipo === "BENEFICIO" && data.idSubtipo === 1) {
       const beneficio = tiposBeneficio.find((b) => b.idTipoBeneficio === data.idSubtipo);
       if (beneficio && data.monto != null) {
         if (data.monto > beneficio.montoMaximo) {
@@ -110,15 +124,9 @@ export default function RequestFormPage() {
           value: data.idSubtipo,
           disabled: !editable,
         });
-
-        const beneficioSeleccionado = tiposBeneficio.find(
-          (b) => b.idTipoBeneficio === data.idSubtipo
-        );
-        const montoMax = beneficioSeleccionado?.montoMaximo;
-
         fields.push({
           name: "monto",
-          label: `Monto ${montoMax ? `(máx. ${montoMax})` : ""}`,
+          label: "Monto",
           type: "number",
           required: true,
           value: data.monto ?? 0,
@@ -126,6 +134,8 @@ export default function RequestFormPage() {
           error: beneficioError || undefined,
         });
       }
+      //Monto ahora solo para Prestamo
+      
 
       // Campos para todas las solicitudes
       fields.push({
@@ -151,13 +161,18 @@ export default function RequestFormPage() {
 
       // Campos solo para PERMISO
       if (tipo === "PERMISO") {
+            const tipoPermiso = tiposPermiso.find(
+              (t) => t.idTipoPermiso === data.idSubtipo
+            );
+        const diasFijos = tipoPermiso?.cantDias && tipoPermiso.cantDias > 0;
+
         fields.push({
-          name: "cantidadDias",
+          name: "cantDias",
           label: "Cantidad de días",
           type: "number",
           required: true,
           value: data.cantDias ?? 0,
-          disabled: !editable,
+          disabled: !editable || diasFijos, // editable si es 0, bloqueado si > 0
         });
       }
 
@@ -166,7 +181,7 @@ export default function RequestFormPage() {
         fields.push({
           name: "comentario",
           label: "Comentario",
-          type: "textarea",
+          type: "text",
           required: tipo === "BENEFICIO",
           value: data.comentario,
           disabled: !editable,
@@ -197,12 +212,16 @@ export default function RequestFormPage() {
     VACACIONES: "Vacaciones"
   };
 
-  const handleFormSubmit = async () => {
-    if (beneficioError) return; 
+ const handleFormSubmit = async () => {
+    if (beneficioError) return;
 
-    const payload = { ...data, ...(tipo === "BENEFICIO" ? { monto: data.monto ?? 0 } : {}) };
+    // Limpiar campos que no correspondan al tipo
+    const formData = { ...data };
+    if (tipo !== "VACACIONES") {
+      delete formData.fechaFin;
+    }
 
-    const success = await handleSubmit(payload);
+    const success = await handleSubmit(formData);
     if (success) {
       navigate(-1);
     }

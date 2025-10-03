@@ -40,8 +40,6 @@ export function useRequestView(token: string | null, id: string | null) {
   useEffect(() => {
   if (solicitud) {
     console.log("Solicitud completa:", solicitud);
-    console.log("confirmacionTh:", solicitud.confirmacionTh);
-    console.log("confirmadoTh:", solicitud.confirmacionTh);
     console.log("Todas las keys:", Object.keys(solicitud));
   }
 }, [solicitud]);

@@ -40,12 +40,12 @@ export function useRequestForm(
       .then((res: SolicitudItem) => {
         if (res.tipoSolicitud === tipo) {
           setData({
-            idSubtipo: undefined, // no viene en SolicitudItem
+            idSubtipo: undefined, 
             fechaInicio: res.fechaInicio,
             cantDias: res.cantDias ?? undefined,
-            comentario: res.subtipo ?? "", // en tu model no hay comentario, fallback
+            comentario: res.subTipo ?? "", 
             monto: undefined,
-            fechaFin: "" // tampoco viene en SolicitudItem
+            fechaFin: "" 
           });
           setEditable(res.estado === "P");
         } else {
@@ -72,7 +72,7 @@ export function useRequestForm(
         fecha_inicio: data.fechaInicio,
         cant_dias: data.cantDias ?? null,
         comentario: data.comentario || "",
-        monto: data.monto ?? null,
+        monto: data.monto ?? 0,
       };
     }
 
