@@ -48,16 +48,18 @@ type MemberOpt = {
   dispRestante: number; // int 0..100
 };
 
-const METADATAS_PATH = "http://localhost:8080/api/v1/admin/operations/metadatas";
+const METADATAS_PATH =
+  "http://localhost:8080/api/v1/admin/operations/metadatas";
 const TEAM_PATH = "http://localhost:8080/api/v1/admin/operations/team";
 const USERS_PATH = "http://localhost:8080/api/v1/admin/operations/users";
 const DIAS_PATH = "http://localhost:8080/api/v1/admin/operations/diaslaborales";
-const LIBRES_PATH = "http://localhost:8080/api/v1/admin/operations/asignacion/libres";
+const LIBRES_PATH =
+  "http://localhost:8080/api/v1/admin/operations/asignacion/libres";
 
 function useIsDark() {
   const [isDark, setIsDark] = useState(
     typeof document !== "undefined" &&
-    document.documentElement.classList.contains("dark")
+      document.documentElement.classList.contains("dark")
   );
   useEffect(() => {
     const el = document.documentElement;
@@ -87,13 +89,17 @@ const validateMemberDates = (
   end?: string | null
 ): string | null => {
   // start must be >= teamStart
-  if (start && lt(start, teamStart)) return "La entrada debe ser posterior al inicio del equipo.";
+  if (start && lt(start, teamStart))
+    return "La entrada debe ser posterior al inicio del equipo.";
   // if teamEnd exists, start must be <= teamEnd
-  if (teamEnd && start && gt(start, teamEnd)) return "La entrada debe ser anterior o igual a la fecha límite del equipo.";
+  if (teamEnd && start && gt(start, teamEnd))
+    return "La entrada debe ser anterior o igual a la fecha límite del equipo.";
   // end must be > start (if both present)
-  if (start && end && !gt(end, start)) return "La fecha de fin debe ser posterior a la de entrada.";
+  if (start && end && !gt(end, start))
+    return "La fecha de fin debe ser posterior a la de entrada.";
   // if teamEnd exists, end must be <= teamEnd
-  if (teamEnd && end && gt(end, teamEnd)) return "La fecha de fin debe ser anterior o igual a la fecha límite del equipo.";
+  if (teamEnd && end && gt(end, teamEnd))
+    return "La fecha de fin debe ser anterior o igual a la fecha límite del equipo.";
   return null;
 };
 
@@ -156,11 +162,7 @@ export default function EditarEquipoPage() {
   const [newMemberEnd, setNewMemberEnd] = useState<string>("");
   const updateMemberEstado = (id: number, nuevoEstado: "A" | "I") => {
     setMiembros((prev) =>
-      prev.map((m) =>
-        m.id === id
-          ? { ...m, estado: nuevoEstado }
-          : m
-      )
+      prev.map((m) => (m.id === id ? { ...m, estado: nuevoEstado } : m))
     );
   };
   // idUsuario -> disponibilidad restante global (0..100)
@@ -195,7 +197,10 @@ export default function EditarEquipoPage() {
         backgroundColor: isDark ? "#111827" : "#ffffff",
       }),
       input: (p: any) => ({ ...p, color: isDark ? "#ffffff" : "#111827" }),
-      singleValue: (p: any) => ({ ...p, color: isDark ? "#ffffff" : "#111827" }),
+      singleValue: (p: any) => ({
+        ...p,
+        color: isDark ? "#ffffff" : "#111827",
+      }),
       placeholder: (p: any) => ({
         ...p,
         color: isDark ? "#d1d5db" : "#6b7280",
@@ -211,10 +216,10 @@ export default function EditarEquipoPage() {
             ? "#1f2937"
             : "#dbeafe"
           : s.isFocused
-            ? isDark
-              ? "#374151"
-              : "#e5e7eb"
-            : "transparent",
+          ? isDark
+            ? "#374151"
+            : "#e5e7eb"
+          : "transparent",
         color: isDark ? "#ffffff" : "#111827",
       }),
     }),
@@ -352,30 +357,58 @@ export default function EditarEquipoPage() {
           setMemberOptions(
             notIn.map((u: any) => ({
               value: u.idUsuario ?? u.id,
-              label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
+              label:
+                [u.nombre, u.apellido].filter(Boolean).join(" ") ||
+                u.nombreCompleto ||
+                "Sin nombre",
               idCargo: u.idCargo ?? 0,
-              dispRestante: Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100)),
+              dispRestante: Math.max(
+                0,
+                Math.min(
+                  100,
+                  u.disponibilidadRestante ??
+                    u.disponibilidad ??
+                    u.dispRestante ??
+                    100
+                )
+              ),
             }))
           );
           // además: traer caps para todos los usuarios para poder limitar filas existentes
           try {
             const urAll = await fetch(USERS_PATH, {
-              headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+              headers: {
+                Accept: "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
               credentials: "include",
               signal: ac.signal,
             });
             if (urAll.ok) {
               const usersData = await urAll.json();
-              const usersArr = Array.isArray(usersData?.content) ? usersData.content : Array.isArray(usersData) ? usersData : [];
+              const usersArr = Array.isArray(usersData?.content)
+                ? usersData.content
+                : Array.isArray(usersData)
+                ? usersData
+                : [];
               const m = new Map<number, number>();
               usersArr.forEach((u: any) => {
                 const id = u.id ?? u.idUsuario ?? u.usuarioId;
-                const rest = Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100));
+                const rest = Math.max(
+                  0,
+                  Math.min(
+                    100,
+                    u.disponibilidadRestante ??
+                      u.disponibilidad ??
+                      u.dispRestante ??
+                      100
+                  )
+                );
                 if (id != null) m.set(Number(id), rest);
               });
               setDispCaps(m);
             }
-          } catch { }
+          } catch {}
         } else {
           const ur = await fetch(USERS_PATH, {
             headers: {
@@ -387,20 +420,45 @@ export default function EditarEquipoPage() {
           });
           if (ur.ok) {
             const usersData = await ur.json();
-            const usersArr = Array.isArray(usersData?.content) ? usersData.content : Array.isArray(usersData) ? usersData : [];
+            const usersArr = Array.isArray(usersData?.content)
+              ? usersData.content
+              : Array.isArray(usersData)
+              ? usersData
+              : [];
             setMemberOptions(
               usersArr.map((u: any) => ({
                 value: u.id ?? u.idUsuario ?? u.usuarioId,
-                label: [u.nombre, u.apellido].filter(Boolean).join(" ") || u.nombreCompleto || "Sin nombre",
+                label:
+                  [u.nombre, u.apellido].filter(Boolean).join(" ") ||
+                  u.nombreCompleto ||
+                  "Sin nombre",
                 idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
-                dispRestante: Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100)),
+                dispRestante: Math.max(
+                  0,
+                  Math.min(
+                    100,
+                    u.disponibilidadRestante ??
+                      u.disponibilidad ??
+                      u.dispRestante ??
+                      100
+                  )
+                ),
               }))
             );
             // llenar caps
             const m = new Map<number, number>();
             usersArr.forEach((u: any) => {
               const id = u.id ?? u.idUsuario ?? u.usuarioId;
-              const rest = Math.max(0, Math.min(100, u.disponibilidadRestante ?? u.disponibilidad ?? u.dispRestante ?? 100));
+              const rest = Math.max(
+                0,
+                Math.min(
+                  100,
+                  u.disponibilidadRestante ??
+                    u.disponibilidad ??
+                    u.dispRestante ??
+                    100
+                )
+              );
               if (id != null) m.set(Number(id), rest);
             });
             setDispCaps(m);
@@ -419,22 +477,23 @@ export default function EditarEquipoPage() {
           t.integrantes,
           t.miembrosEquipo
         );
-        const miembrosInicial: IMiembrosEquipo[] = miembrosFuente.map((u: any) => ({
-          id: u.idUsuario ?? u.id ?? u.usuarioId,
-          nombre:
-            u.nombreCompleto ??
-            [u.nombre, u.apellido].filter(Boolean).join(" ") ??
-            String(u.nombre ?? u.apellido ?? "Sin nombre"),
-          idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
-          disponibilidad: Math.max(
-            1,
-            Math.min(100, u.disponibilidad ?? u.porcentajeTrabajo ?? 100)
-          ),
-          fechaEntrada: u.fechaEntrada ?? "",
-          fechaFin: u.fechaFin ?? "",
-          estado: u.estado ?? "",
-        }));
-
+        const miembrosInicial: IMiembrosEquipo[] = miembrosFuente.map(
+          (u: any) => ({
+            id: u.idUsuario ?? u.id ?? u.usuarioId,
+            nombre:
+              u.nombreCompleto ??
+              [u.nombre, u.apellido].filter(Boolean).join(" ") ??
+              String(u.nombre ?? u.apellido ?? "Sin nombre"),
+            idCargo: u.idCargo ?? u.cargo?.idCargo ?? 0,
+            disponibilidad: Math.max(
+              1,
+              Math.min(100, u.disponibilidad ?? u.porcentajeTrabajo ?? 100)
+            ),
+            fechaEntrada: u.fechaEntrada ?? "",
+            fechaFin: u.fechaFin ?? "",
+            estado: u.estado ?? "",
+          })
+        );
 
         setTeam({
           idEquipo: t.idEquipo,
@@ -476,11 +535,11 @@ export default function EditarEquipoPage() {
         setLeadSel(
           lId
             ? {
-              value: lId,
-              label: [t.lider?.nombre, t.lider?.apellido]
-                .filter(Boolean)
-                .join(" "),
-            }
+                value: lId,
+                label: [t.lider?.nombre, t.lider?.apellido]
+                  .filter(Boolean)
+                  .join(" "),
+              }
             : null
         );
 
@@ -496,11 +555,11 @@ export default function EditarEquipoPage() {
             const nomUbi = e.nombreUbicacion ?? e?.ubicacion?.nombre ?? null;
             return idDia != null
               ? {
-                idDiaLaboral: idDia,
-                nombreDia: nomDia,
-                idUbicacion: idUbi,
-                nombreUbicacion: nomUbi,
-              }
+                  idDiaLaboral: idDia,
+                  nombreDia: nomDia,
+                  idUbicacion: idUbi,
+                  nombreUbicacion: nomUbi,
+                }
               : null;
           })
           .filter(Boolean) as AsignDU[];
@@ -596,11 +655,14 @@ export default function EditarEquipoPage() {
   );
 
   // Handler seguro para DynamicForm
-  const handleFormChangeDeferred = useCallback((updated: Record<string, any>) => {
-    Promise.resolve().then(() =>
-      setFormData((prev) => ({ ...prev, ...updated }))
-    );
-  }, []);
+  const handleFormChangeDeferred = useCallback(
+    (updated: Record<string, any>) => {
+      Promise.resolve().then(() =>
+        setFormData((prev) => ({ ...prev, ...updated }))
+      );
+    },
+    []
+  );
 
   // ====== TECNOLOGÍAS / MIEMBROS ======
   const handleAddTec = () => {
@@ -627,7 +689,6 @@ export default function EditarEquipoPage() {
       },
     ]);
   };
-
 
   const handleAddMember = () => {
     if (!selectedMember) return;
@@ -667,7 +728,6 @@ export default function EditarEquipoPage() {
   };
 
   const updateMemberDisp = (id: number, val: number) =>
-
     setMiembros((ms) =>
       ms.map((m) =>
         m.id === id
@@ -676,9 +736,13 @@ export default function EditarEquipoPage() {
       )
     );
   const updateMemberStart = (id: number, v: string) =>
-    setMiembros((ms) => ms.map((m) => (m.id === id ? { ...m, fechaEntrada: v } : m)));
+    setMiembros((ms) =>
+      ms.map((m) => (m.id === id ? { ...m, fechaEntrada: v } : m))
+    );
   const updateMemberEnd = (id: number, v: string) =>
-    setMiembros((ms) => ms.map((m) => (m.id === id ? { ...m, fechaFin: v } : m)));
+    setMiembros((ms) =>
+      ms.map((m) => (m.id === id ? { ...m, fechaFin: v } : m))
+    );
 
   const columns = [
     { key: "id", label: "ID" },
@@ -700,8 +764,8 @@ export default function EditarEquipoPage() {
       key: "disponibilidad",
       label: "Disp. (%)",
       render: (s: IMiembrosEquipo) => {
-        const restante = dispCaps.get(s.id) ?? 100;            // lo que le queda libre fuera de este equipo
-        const actual = Number(s.disponibilidad ?? 0);          // lo que ya tiene en este equipo
+        const restante = dispCaps.get(s.id) ?? 100; // lo que le queda libre fuera de este equipo
+        const actual = Number(s.disponibilidad ?? 0); // lo que ya tiene en este equipo
         const cap = Math.max(1, Math.min(100, restante + actual)); // máximo permitido para esta celda
 
         return (
@@ -721,7 +785,6 @@ export default function EditarEquipoPage() {
       },
     },
 
-
     {
       key: "fechaEntrada",
       label: "Entrada",
@@ -731,12 +794,17 @@ export default function EditarEquipoPage() {
           value={s.fechaEntrada ?? ""}
           onChange={(e) => {
             const v = e.target.value;
-            const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, v, s.fechaFin || null);
+            const err = validateMemberDates(
+              formData.fechaInicio,
+              formData.fechaFin || null,
+              v,
+              s.fechaFin || null
+            );
             if (err) return alert(err);
             updateMemberStart(s.id, v);
           }}
           min={formData.fechaInicio || undefined}
-          max={(s.fechaFin || formData.fechaFin) || undefined}
+          max={s.fechaFin || formData.fechaFin || undefined}
           className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
         />
       ),
@@ -750,11 +818,16 @@ export default function EditarEquipoPage() {
           value={s.fechaFin ?? ""}
           onChange={(e) => {
             const v = e.target.value;
-            const err = validateMemberDates(formData.fechaInicio, formData.fechaFin || null, s.fechaEntrada || null, v);
+            const err = validateMemberDates(
+              formData.fechaInicio,
+              formData.fechaFin || null,
+              s.fechaEntrada || null,
+              v
+            );
             if (err) return alert(err);
             updateMemberEnd(s.id, v);
           }}
-          min={(s.fechaEntrada || formData.fechaInicio) || undefined}
+          min={s.fechaEntrada || formData.fechaInicio || undefined}
           max={formData.fechaFin || undefined}
           className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
         />
@@ -770,7 +843,9 @@ export default function EditarEquipoPage() {
           onChange={(e) =>
             setMiembros((prev) =>
               prev.map((m) =>
-                m.id === s.id ? { ...m, estado: e.target.checked ? "A" : "I" } : m
+                m.id === s.id
+                  ? { ...m, estado: e.target.checked ? "A" : "I" }
+                  : m
               )
             )
           }
@@ -901,7 +976,9 @@ export default function EditarEquipoPage() {
   // Submit
   const onSubmit = async (_data: Record<string, any>) => {
     if (formData.fechaFin && !lt(formData.fechaInicio, formData.fechaFin)) {
-      setError("La fecha de inicio del equipo debe ser anterior a la fecha límite.");
+      setError(
+        "La fecha de inicio del equipo debe ser anterior a la fecha límite."
+      );
       setSaving(false);
       return;
     }
@@ -943,7 +1020,10 @@ export default function EditarEquipoPage() {
         usuarios: miembros.map((m) => ({
           idUsuario: m.id,
           idCargo: m.idCargo,
-          porcentajeTrabajo: Math.max(1, Math.min(100, Number(m.disponibilidad) || 1)),
+          porcentajeTrabajo: Math.max(
+            1,
+            Math.min(100, Number(m.disponibilidad) || 1)
+          ),
           fechaEntrada: m.fechaEntrada || null,
           fechaFin: m.fechaFin || null,
           estado: m.estado,
@@ -980,10 +1060,10 @@ export default function EditarEquipoPage() {
     }
   };
 
-
   if (loading) return <div className="p-4 text-sm">Cargando…</div>;
   // if (error) return <div className="p-4 text-sm text-red-600">Error: {error}</div>;
-  if (!team) return <div className="p-4 text-sm">No se encontró el equipo.</div>;
+  if (!team)
+    return <div className="p-4 text-sm">No se encontró el equipo.</div>;
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -1017,13 +1097,15 @@ export default function EditarEquipoPage() {
                   <span>
                     {(() => {
                       try {
-                        const jsonPart = error.split('—')[1]?.trim(); // берём часть после "—"
+                        const jsonPart = error.split("—")[1]?.trim(); // берём часть после "—"
                         console.log(jsonPart);
                         try {
-                          const obj = JSON.parse(jsonPart || '{}');
+                          const obj = JSON.parse(jsonPart || "{}");
                           return obj.message || error;
                         } catch {
-                          const match = jsonPart.match(/"message"\s*:\s*"([^"]*)"/);
+                          const match = jsonPart.match(
+                            /"message"\s*:\s*"([^"]*)"/
+                          );
                           if (match) return match[1]; // вернём найденное сообщение
                           return error;
                         }
@@ -1087,7 +1169,7 @@ export default function EditarEquipoPage() {
               <div className="grid grid-cols-3 gap-2 items-end">
                 <div className="col-span-2">
                   <label className="block text-sm mb-2">
-                    Team Lead (metadatas)
+                    Team Leader (opcional)
                   </label>
                   <Select
                     options={leadOptions}
@@ -1126,7 +1208,9 @@ export default function EditarEquipoPage() {
                         headers: {
                           "Content-Type": "application/json",
                           Accept: "application/json",
-                          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                          ...(token
+                            ? { Authorization: `Bearer ${token}` }
+                            : {}),
                         },
                         credentials: "include",
                         body: JSON.stringify(payload),
@@ -1253,7 +1337,7 @@ export default function EditarEquipoPage() {
                   type="date"
                   value={newMemberEnd}
                   onChange={(e) => setNewMemberEnd(e.target.value)}
-                  min={(newMemberStart || formData.fechaInicio) || undefined}
+                  min={newMemberStart || formData.fechaInicio || undefined}
                   max={formData.fechaFin || undefined}
                   className="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
                 />
