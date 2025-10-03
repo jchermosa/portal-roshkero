@@ -4,40 +4,99 @@ import { tieneRol } from "../utils/permisos";
 import { Roles } from "../types/roles";
 import "../styles/scrollbar.css";
 
-
 export default function DashboardLayout() {
   const { user, refreshUser, logout } = useAuth();
 
-
   // Permisos usando tieneRol
-   const talentoHumano = tieneRol(user, Roles.TALENTO_HUMANO, Roles.DIRECTIVO);
-   const operaciones = tieneRol(user, Roles.OPERACIONES, Roles.DIRECTIVO);
-   const sysadmin= tieneRol(user, Roles.ADMINISTRADOR_DEL_SISTEMA, Roles.DIRECTIVO);
-   const leader = tieneRol(user, Roles.TEAM_LEADER, Roles.DIRECTIVO)
-   
+  const talentoHumano = tieneRol(user, Roles.TALENTO_HUMANO, Roles.DIRECTIVO);
+  const operaciones = tieneRol(user, Roles.OPERACIONES, Roles.DIRECTIVO);
+  const sysadmin = tieneRol(
+    user,
+    Roles.ADMINISTRADOR_DEL_SISTEMA,
+    Roles.DIRECTIVO
+  );
+  const leader = tieneRol(user, Roles.TEAM_LEADER, Roles.DIRECTIVO);
 
   const menuOptions = [
-    { id: "/", label: "Inicio", icon: "🏠", available: true, end: true as const },
+    {
+      id: "/",
+      label: "Inicio",
+      icon: "🏠",
+      available: true,
+      end: true as const,
+    },
     { id: "/profile", label: "Mi Perfil", icon: "👤", available: true },
     { id: "/requests", label: "Solicitudes", icon: "📩", available: true },
-    { id: "/solicitud-dispositivo", label: "Soliciar Dispositivos", icon: "📱", available: true },
+    {
+      id: "/solicitud-dispositivo",
+      label: "Solicitar Dispositivos",
+      icon: "📱",
+      available: true,
+    },
     { id: "/benefits", label: "Beneficios", icon: "🎁", available: true },
-    { id: "/catalogo-th", label: "Cargos", icon: "👥", available: talentoHumano },
-    { id: "/usuarios", label: "Funcionarios", icon: "🧑‍💼", available: talentoHumano },
-    { id: "/catalogo-sys", label: "Tipos de Dis. y Uicaciones", icon:"📚", available: sysadmin },
-    { id: "/dispositivos", label: "Dispositivos", icon: "🖥️", available: sysadmin},
-    { id: "/gestion-dispositivos", label: "Gestión de Dispositivos", icon: "💻", available: sysadmin },
-    { id: "/catalogo-op", label: "Clientes y Tecnologías", icon: "🏢", available: operaciones },
-    { id: "/operations", label: "Gestion de Equipos", icon: "🛠️", available: operaciones },
-    { id: "/seleccion-solicitudesTH", label: "Gestión de Solicitudes", icon: "📤", available: talentoHumano },
+    {
+      id: "/catalogo-th",
+      label: "Cargos",
+      icon: "👥",
+      available: talentoHumano,
+    },
+    {
+      id: "/usuarios",
+      label: "Funcionarios",
+      icon: "🧑‍💼",
+      available: talentoHumano,
+    },
+    {
+      id: "/catalogo-sys",
+      label: "Tipos de Disp. y Ubicaciones",
+      icon: "📚",
+      available: sysadmin,
+    },
+    {
+      id: "/dispositivos",
+      label: "Dispositivos",
+      icon: "🖥️",
+      available: sysadmin,
+    },
+    {
+      id: "/gestion-dispositivos",
+      label: "Gestión de Dispositivos",
+      icon: "💻",
+      available: sysadmin,
+    },
+    {
+      id: "/catalogo-op",
+      label: "Clientes y Tecnologías",
+      icon: "🏢",
+      available: operaciones,
+    },
+    {
+      id: "/operations",
+      label: "Gestión de Equipos",
+      icon: "🛠️",
+      available: operaciones,
+    },
+    {
+      id: "/seleccion-solicitudesTH",
+      label: "Gestión de Solicitudes",
+      icon: "📤",
+      available: talentoHumano,
+    },
     // { id: "/vacaciones", label: "Vacaciones", icon: "🏖️", available: true },
-    
-    {id: "/solicitudesTL", label: "Solicitudes de Equipo", icon:"📬", available: leader },
-    { id: "/configuracion", label: "Configuración", icon: "⚙️", available: true },
-   
-   
-  ].filter((o) => o.available);
 
+    {
+      id: "/solicitudesTL",
+      label: "Solicitudes de Equipo",
+      icon: "📬",
+      available: leader,
+    },
+    {
+      id: "/configuracion",
+      label: "Configuración",
+      icon: "⚙️",
+      available: true,
+    },
+  ].filter((o) => o.available);
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-950 flex overflow-hidden">
@@ -72,14 +131,13 @@ export default function DashboardLayout() {
         </div>
 
         {/* Menú con scroll personalizado */}
-        <nav 
+        <nav
           className="flex-1 overflow-y-auto mt-6 custom-scrollbar"
           style={{
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'rgb(209 213 219) transparent'
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgb(209 213 219) transparent",
           }}
         >
-          
           {menuOptions.map((opt) => (
             <NavLink
               key={opt.id}
